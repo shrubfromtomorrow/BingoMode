@@ -33,9 +33,9 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                //Futile.atlasManager.LoadAtlas("Atlases/bingomode");
+                Futile.atlasManager.LoadAtlas("Atlases/bingomode");
 
-                BingoMenuHooks.Apply();
+                BingoHooks.Apply();
             }
         }
     }

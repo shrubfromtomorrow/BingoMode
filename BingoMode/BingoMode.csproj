@@ -54,6 +54,9 @@
     <Reference Include="PUBLIC-Assembly-CSharp">
       <HintPath>..\..\..\h\PUBLIC-Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Rewired_Core">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Rewired_Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -71,7 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
-    <Compile Include="BingoMenuHooks.cs" />
+    <Compile Include="BingoButton.cs" />
+    <Compile Include="BingoData.cs" />
+    <Compile Include="BingoHUD.cs" />
+    <Compile Include="BingoHooks.cs" />
     <Compile Include="BingoPage.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
