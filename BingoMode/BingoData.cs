@@ -19,5 +19,10 @@ namespace BingoMode
         {
             BingoMode = true;
         }
+
+        public static void FinishBingo()
+        {
+            ExpeditionData.ClearActiveChallengeList();
+        }
     }
 }

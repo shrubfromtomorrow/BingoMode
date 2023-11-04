@@ -11,13 +11,11 @@ using UnityEngine;
 
 namespace BingoMode
 {
-    using static BingoBoard;
-
     public class BingoPage : PositionedMenuObject
     {
         public ExpeditionMenu expMenu;
         public BingoBoard board;
-        public List<BingoButton> challengeButtons;
+        public BingoGrid grid;
         public int size;
         public FSprite pageTitle;
         public SymbolButton rightPage;
@@ -27,8 +25,9 @@ namespace BingoMode
         {
             expMenu = menu as ExpeditionMenu;
             board = BingoHooks.GlobalBoard;
-            challengeButtons = new List<BingoButton>();
             size = board.size;
+            BingoData.BingoMode = false;
+
             pageTitle = new FSprite("bingotitle");
             pageTitle.SetAnchor(0.5f, 0f);
             pageTitle.x = 680f;
@@ -42,30 +41,13 @@ namespace BingoMode
             rightPage.roundedRect.size = rightPage.size;
             subObjects.Add(rightPage);
 
+            grid = new BingoGrid(menu, this, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
+            subObjects.Add(grid);
+
             startGame = new BigSimpleButton(menu, this, "BEGIN", "STARTBINGO",
                 new Vector2(menu.manager.rainWorld.screenSize.x * 0.75f, 40f),
                 new Vector2(200f, 40f), FLabelAlignment.Center, true);
             subObjects.Add(startGame);
-
-            GenerateBoardButtons();
-        }
-
-        public void GenerateBoardButtons()
-        {
-            for (int i = 0; i < board.challengeGrid.GetLength(0); i++)
-            {
-                for (int j = 0; j < board.challengeGrid.GetLength(1); j++)
-                {
-                    float butSize = 500f / size;
-                    float topLeft = -butSize * size / 2f;
-                    Vector2 center = new (menu.manager.rainWorld.screenSize.x / 2f - butSize / 2f, menu.manager.rainWorld.screenSize.y / 2f - butSize / 2f);
-                    BingoButton but = new BingoButton(menu, this, 
-                        center + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f), new Vector2(butSize, butSize), board.challengeGrid[i, j], "TEST");
-                    challengeButtons.Add(but);
-                    subObjects.Add(but);
-                    //Plugin.logger.LogMessage("Added new bimbo " + but + " at " + but.pos);
-                }
-            }
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -102,7 +84,6 @@ namespace BingoMode
                 BingoData.InitializeBingo();
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
-                ExpeditionData.challengeList.Clear();
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);

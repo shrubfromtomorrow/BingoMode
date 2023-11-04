@@ -33,43 +33,75 @@ namespace BingoMode
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
             On.Menu.CharacterSelectPage.ClearStats += CharacterSelectPage_ClearStats;
 
-            // Stop the base Expedition HUD from appearing
-            IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
-
-            // Nuh uh
+            // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
+            IL.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
 
-            // Adding HUD
-            On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud1;
+            // Add Bingo HUD
+            On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+            // Stop the base Expedition HUD from appearing
+            IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
         }
 
-        public static void HUD_InitSinglePlayerHud1(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+        public static void ProcessManager_PostSwitchMainProcess(ILContext il)
         {
-            orig.Invoke(self, cam);
+            ILCursor c = new(il);
 
-            if (BingoData.BingoMode)
+            if (c.TryGotoNext(
+                x => x.MatchLdsfld("Expedition.ExpeditionEnums/ProcessID", "ExpeditionMenu")
+                ))
             {
-                self.AddPart(new BingoHUD(self));
+                c.Emit(OpCodes.Ldarg_1);
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<ProcessManager.ProcessID, ProcessManager>>((orig, self) =>
+                {
+                    if (orig == BingoEnums.BingoWinScreen)
+                    {
+                        self.currentMainLoop = new BingoWinScreen(self);
+                        self.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    }
+                });
             }
+            else Plugin.logger.LogError(nameof(ProcessManager_PostSwitchMainProcess) + " Threw :(( " + il);
         }
 
         public static void WinState_CycleCompleted(ILContext il)
         {
             ILCursor c = new(il);
+            ILCursor b = new(il);
 
-            if (c.TryGotoNext(
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld("Expedition.ExpeditionEnums/ProcessID", "ExpeditionWinScreen")
+                ))
+            {
+                c.EmitDelegate<Func<ProcessManager.ProcessID, ProcessManager.ProcessID>>((orig) =>
+                {
+                    if (orig == ExpeditionEnums.ProcessID.ExpeditionWinScreen)
+                    {
+                        orig = BingoEnums.BingoWinScreen;
+                    }
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 1 :(( " + il);
+
+            if (b.TryGotoNext(MoveType.After,
                 x => x.MatchLdstr("Cycle complete, saving run data")
                 ))
             {
-                c.EmitDelegate(() =>
+                b.EmitDelegate(() =>
                 {
-                    if (ExpeditionGame.expeditionComplete && BingoData.BingoMode) ExpeditionGame.expeditionComplete = false;
+                    if (BingoData.BingoMode) 
+                    {
+                        ExpeditionGame.expeditionComplete = GlobalBoard.CheckWin();
+                    }
                 });
             }
-            else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw :(( " + il);
+            else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 2 :(( " + il);
         }
 
-        public static void HUD_InitSinglePlayerHud(ILContext il)
+        public static void HUD_InitSinglePlayerHudIL(ILContext il)
         {
             ILCursor c = new(il);
 
@@ -84,14 +116,22 @@ namespace BingoMode
                     return orig;
                 });
             }
-            else Plugin.logger.LogError(nameof(HUD_InitSinglePlayerHud) + " Threw :(( " + il);
+            else Plugin.logger.LogError(nameof(HUD_InitSinglePlayerHudIL) + " Threw :(( " + il);
+        }
+
+        public static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+        {
+            orig.Invoke(self, cam);
+
+            if (BingoData.BingoMode)
+            {
+                self.AddPart(new BingoHUD(self));
+            }
         }
 
         public static void ExpeditionMenu_ctor(On.Menu.ExpeditionMenu.orig_ctor orig, ExpeditionMenu self, ProcessManager manager)
         {
             orig.Invoke(self, manager);
-
-            GlobalBoard = new BingoBoard();
 
             self.pages.Add(new Page(self, null, "BINGO", 4));
         }
@@ -99,6 +139,14 @@ namespace BingoMode
         public static void ExpeditionMenu_InitMenuPages(On.Menu.ExpeditionMenu.orig_InitMenuPages orig, ExpeditionMenu self)
         {
             orig.Invoke(self);
+
+            Plugin.logger.LogMessage("11111111111111111111");
+            foreach (var c in ExpeditionData.challengeList) Plugin.logger.LogMessage(c);
+
+            GlobalBoard = new BingoBoard();
+
+            Plugin.logger.LogMessage("22222222222222222222");
+            foreach (var c in ExpeditionData.challengeList) Plugin.logger.LogMessage(c);
 
             if (!bingoPage.TryGetValue(self, out _))
             {

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Expedition;
+using RWCustom;
 using Menu;
 using Menu.Remix;
 using UnityEngine;
@@ -15,27 +16,26 @@ namespace BingoMode
     {
         public ExpeditionCoreFile core;
         public Challenge[,] challengeGrid; // The challenges will be treated as coordinates on a grid for convenience
+        public List<IntVector2> currentWinLine; // A list of grid coordinates
         public int size;
 
         public BingoBoard()
         {
-            size = 5;
+            size = 4;
             GenerateBoard(size);
+            currentWinLine = new();
         }
 
         public void GenerateBoard(int size)
         {
             challengeGrid = new Challenge[size, size];
-            FillGrid();
-        }
-
-        public void FillGrid()
-        {
-            for (int i = 0; i < challengeGrid.GetLength(0); i++)
+            ExpeditionData.ClearActiveChallengeList();
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < challengeGrid.GetLength(1); j++)
+                for (int j = 0; j < size; j++)
                 {
                     challengeGrid[i, j] = ChallengeOrganizer.RandomChallenge(false);
+                    ExpeditionData.challengeList.Add(challengeGrid[i, j]);
                 }
             }
             UpdateChallenges();
@@ -47,6 +47,86 @@ namespace BingoMode
             {
                 c.UpdateDescription();
             }
+        }
+
+        public bool CheckWin()
+        {
+            bool won = false;
+
+            // Vertical lines
+            for (int i = 0; i < size; i++)
+            {
+                bool line = true;
+                for (int j = 0; j < size; j++)
+                {
+                    line &= challengeGrid[i, j].completed;
+                    if (line) currentWinLine.Add(new IntVector2(i, j));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Vertical win");
+                    break;
+                }
+                else currentWinLine.Clear();
+            }
+
+            // Horizontal lines
+            if (!won)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    bool line = true;
+                    for (int j = 0; j < size; j++)
+                    {
+                        line &= challengeGrid[j, i].completed;
+                        if (line) currentWinLine.Add(new IntVector2(j, i));
+                    }
+                    won = line;
+                    if (won)
+                    {
+                        Plugin.logger.LogMessage("Horizontal win");
+                        break;
+                    }
+                    else currentWinLine.Clear();
+                }
+            }
+
+            // Diagonal line 1
+            if (!won)
+            {
+                bool line = true;
+                for (int i = 0; i < size; i++)
+                {
+                    line &= challengeGrid[i, i].completed;
+                    if (line) currentWinLine.Add(new IntVector2(i, i));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Diagonal 1 win");
+                }
+                else currentWinLine.Clear();
+            }
+
+            // Diagonal line 2
+            if (!won)
+            {
+                bool line = true;
+                for (int i = 0; i < size; i++)
+                {
+                    line &= challengeGrid[size - 1 - i, i].completed;
+                    if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Diagnoal 2 win");
+                }
+                else currentWinLine.Clear();
+            }
+
+            return won;
         }
 
         public List<Challenge> AllChallengeList()

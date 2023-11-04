@@ -18,6 +18,12 @@ namespace BingoMode
         public BingoBoard board;
         public Vector2 pos;
         public BingoInfo[,] grid;
+        public Vector2 mousePosition;
+        public Vector2 lastMousePosition;
+        public bool mouseDown;
+        public bool lastMouseDown;
+
+        public bool MousePressed => mouseDown && !lastMouseDown;
 
         public BingoHUD(HUD.HUD hud) : base(hud)
         {
@@ -25,6 +31,25 @@ namespace BingoMode
             board = BingoHooks.GlobalBoard;
 
             GenerateBingoGrid();
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            lastMousePosition = mousePosition;
+            mousePosition = Futile.mousePosition;
+
+            lastMouseDown = mouseDown;
+            mouseDown = (Input.GetMouseButton(0));
+
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    grid[i, j].Update();
+                }
+            }
         }
 
         public void GenerateBingoGrid()
@@ -38,8 +63,8 @@ namespace BingoMode
                     float size = 250f / board.size;
                     float topLeft = -size * board.size / 2f;
                     Vector2 center = new(hud.rainWorld.screenSize.x * 0.1f, hud.rainWorld.screenSize.y * 0.823f);
-                    grid[i, j] = new BingoInfo(hud,
-                        center + new Vector2(topLeft + i * size + size / 2f, -topLeft - j * size - size / 2f), size, hud.fContainers[1]);
+                    grid[i, j] = new BingoInfo(hud, this,
+                        center + new Vector2(topLeft + i * size + (i * size * 0.2f) + size / 2f, -topLeft - j * size - (j * size * 0.2f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j]);
                 }
             }
         }
@@ -51,12 +76,25 @@ namespace BingoMode
             public FSprite sprite;
             public FLabel label;
             public float size;
+            public Challenge challenge;
+            public BingoHUD owner;
 
-            public BingoInfo(HUD.HUD hud, Vector2 pos, float size, FContainer container)
+            public bool MouseOver
+            {
+                get
+                {
+                    return owner.mousePosition.x > pos.x - size / 2f && owner.mousePosition.y > pos.y - size / 2f 
+                        && owner.mousePosition.x < pos.x + size / 2f && owner.mousePosition.y < pos.y + size / 2f;
+                }
+            }
+
+            public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge)
             {
                 this.hud = hud;
                 this.pos = pos;
                 this.size = size;
+                this.challenge = challenge;
+                this.owner = owner;
 
                 sprite = new FSprite("pixel")
                 {
@@ -68,7 +106,7 @@ namespace BingoMode
                     anchorX = 0.5f,
                     anchorY = 0.5f
                 };
-                label = new FLabel(Custom.GetFont(), "HELO")
+                label = new FLabel(Custom.GetFont(), challenge.ChallengeName())
                 {
                     x = pos.x,
                     y = pos.y,
@@ -77,6 +115,19 @@ namespace BingoMode
                 };
                 container.AddChild(sprite);
                 container.AddChild(label);
+            }
+
+            public void Update()
+            {
+                label.text = challenge.completed ? "YES" : "NO";
+
+                if (MouseOver && owner.mouseDown)
+                {
+                    sprite.color = Color.blue;
+                    if (owner.MousePressed) challenge.CompleteChallenge();
+                }
+                else if (MouseOver || challenge.completed) sprite.color = Color.red;
+                else sprite.color = Color.grey;
             }
         }
     }

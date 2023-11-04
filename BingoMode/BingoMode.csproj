@@ -71,14 +71,21 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoButton.cs" />
     <Compile Include="BingoData.cs" />
+    <Compile Include="BingoEnums.cs" />
+    <Compile Include="BingoGrid.cs" />
     <Compile Include="BingoHUD.cs" />
     <Compile Include="BingoHooks.cs" />
     <Compile Include="BingoPage.cs" />
+    <Compile Include="BingoWinScreen.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
