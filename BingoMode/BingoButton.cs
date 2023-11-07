@@ -31,7 +31,7 @@ namespace BingoMode
             subObjects.Add(bkgRect);
             selectRect = new RoundedRect(menu, owner, pos, size, false);
             subObjects.Add(selectRect);
-            textLabel = new MenuLabel(menu, owner, singalText, pos, size, false);
+            textLabel = new MenuLabel(menu, owner, SplitString(challenge.description), pos, size, false);
             subObjects.Add(textLabel);
         }
 
@@ -59,6 +59,7 @@ namespace BingoMode
             bkgRect.size = size;
             selectRect.size = size;
             textLabel.size = size;
+            textLabel.label.scale = size.magnitude * 2f;
         }
 
         // Stolen from SimpleButton
@@ -68,7 +69,7 @@ namespace BingoMode
             buttonBehav.Update();
             bkgRect.fillAlpha = Mathf.Lerp(0.3f, 0.6f, buttonBehav.col);
             //bkgRect.addSize = new Vector2(10f, 6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
-            selectRect.addSize = new Vector2(10f, 6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
+            selectRect.addSize = new Vector2(-10f, -6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
         }
 
         // Mostly stolen from SimpleButton

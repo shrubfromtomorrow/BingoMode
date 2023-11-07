@@ -35,6 +35,9 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+    </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>..\..\..\h\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -85,6 +88,8 @@
     <Compile Include="BingoHUD.cs" />
     <Compile Include="BingoHooks.cs" />
     <Compile Include="BingoPage.cs" />
+    <Compile Include="BingoSteamworks\InnerWorkings.cs" />
+    <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoWinScreen.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -140,13 +140,7 @@ namespace BingoMode
         {
             orig.Invoke(self);
 
-            Plugin.logger.LogMessage("11111111111111111111");
-            foreach (var c in ExpeditionData.challengeList) Plugin.logger.LogMessage(c);
-
             GlobalBoard = new BingoBoard();
-
-            Plugin.logger.LogMessage("22222222222222222222");
-            foreach (var c in ExpeditionData.challengeList) Plugin.logger.LogMessage(c);
 
             if (!bingoPage.TryGetValue(self, out _))
             {
@@ -174,7 +168,6 @@ namespace BingoMode
         public static void CharacterSelectPage_UpdateStats(On.Menu.CharacterSelectPage.orig_UpdateStats orig, CharacterSelectPage self)
         {
             orig.Invoke(self);
-            Plugin.logger.LogMessage("ASS");
 
             self.confirmExpedition.pos.x += 90;
 

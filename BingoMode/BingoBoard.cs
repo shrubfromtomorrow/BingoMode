@@ -21,7 +21,7 @@ namespace BingoMode
 
         public BingoBoard()
         {
-            size = 4;
+            size = 5;
             GenerateBoard(size);
             currentWinLine = new();
         }
@@ -152,8 +152,13 @@ namespace BingoMode
             }
             catch
             {
-                Plugin.logger.LogError("Invalid bingo board coordinates :(");
+                Plugin.logger.LogError("Invalid bingo board coordinates or challenge null :(");
             }
+        }
+
+        public void CompleteChallengeAt(int x, int y)
+        {
+            challengeGrid[x, y].CompleteChallenge();
         }
 
         public Challenge GetChallenge(int x, int y)

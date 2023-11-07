@@ -10,6 +10,8 @@ using Menu;
 using Menu.Remix;
 using UnityEngine;
 using RWCustom;
+using BingoMode.BingoSteamworks;
+using Steamworks;
 
 namespace BingoMode
 {
@@ -22,6 +24,7 @@ namespace BingoMode
         public Vector2 lastMousePosition;
         public bool mouseDown;
         public bool lastMouseDown;
+        public bool show;
 
         public bool MousePressed => mouseDown && !lastMouseDown;
 
@@ -29,6 +32,7 @@ namespace BingoMode
         {
             pos = new Vector2(20.2f, 725.2f);
             board = BingoHooks.GlobalBoard;
+            show = true;
 
             GenerateBingoGrid();
         }
@@ -64,7 +68,29 @@ namespace BingoMode
                     float topLeft = -size * board.size / 2f;
                     Vector2 center = new(hud.rainWorld.screenSize.x * 0.1f, hud.rainWorld.screenSize.y * 0.823f);
                     grid[i, j] = new BingoInfo(hud, this,
-                        center + new Vector2(topLeft + i * size + (i * size * 0.2f) + size / 2f, -topLeft - j * size - (j * size * 0.2f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j]);
+                        center + new Vector2(topLeft + i * size + (i * size * 0.2f) + size / 2f, -topLeft - j * size - (j * size * 0.2f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j], i, j);
+                }
+            }
+        }
+
+        public override void Draw(float timeStacker)
+        {
+            base.Draw(timeStacker);
+
+            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player) // Use later when fading the hud
+            {
+                Player p = hud.owner as Player;
+
+                //if (p.input[0].mp) show = true;
+                //else show = false;
+            }
+
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    grid[i, j].show = show;
+                    grid[i, j].Draw();
                 }
             }
         }
@@ -78,6 +104,9 @@ namespace BingoMode
             public float size;
             public Challenge challenge;
             public BingoHUD owner;
+            public bool show;
+            public int x;
+            public int y;
 
             public bool MouseOver
             {
@@ -88,13 +117,15 @@ namespace BingoMode
                 }
             }
 
-            public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge)
+            public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
                 this.hud = hud;
                 this.pos = pos;
                 this.size = size;
                 this.challenge = challenge;
                 this.owner = owner;
+                this.x = x;
+                this.y = y;
 
                 sprite = new FSprite("pixel")
                 {
@@ -117,6 +148,20 @@ namespace BingoMode
                 container.AddChild(label);
             }
 
+            public void Draw() // Add fading later
+            {
+                if (!show)
+                {
+                    sprite.alpha = 0f;
+                    label.alpha = 0f;
+                }
+                else
+                {
+                    sprite.alpha = 0.1f;
+                    label.alpha = 1f;
+                }
+            }
+
             public void Update()
             {
                 label.text = challenge.completed ? "YES" : "NO";
@@ -124,7 +169,14 @@ namespace BingoMode
                 if (MouseOver && owner.mouseDown)
                 {
                     sprite.color = Color.blue;
-                    if (owner.MousePressed) challenge.CompleteChallenge();
+                    if (owner.MousePressed)
+                    {
+                        challenge.completed = !challenge.completed;
+                        CSteamID id = (CSteamID)76561198140779563;
+                        SteamNetworkingIdentity identity = new SteamNetworkingIdentity();
+                        identity.SetSteamID(id);
+                        InnerWorkings.SendMessage($"#{x - 1};{y}", identity);
+                    }
                 }
                 else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 else sprite.color = Color.grey;
