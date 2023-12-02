@@ -23,18 +23,21 @@ namespace BingoMode
         {
             size = 5;
             GenerateBoard(size);
-            currentWinLine = new();
+            currentWinLine = [];
         }
 
         public void GenerateBoard(int size)
         {
+            Plugin.logger.LogMessage("Generating bored");
             challengeGrid = new Challenge[size, size];
             ExpeditionData.ClearActiveChallengeList();
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
-                    challengeGrid[i, j] = ChallengeOrganizer.RandomChallenge(false);
+                redo:
+                    challengeGrid[i, j] = RandomBingoChallenge();
+                    if (challengeGrid[i, j] == null) goto redo;
                     ExpeditionData.challengeList.Add(challengeGrid[i, j]);
                 }
             }
@@ -129,9 +132,25 @@ namespace BingoMode
             return won;
         }
 
+        public static Challenge RandomBingoChallenge()
+        {
+            if (BingoData.availableBingoChallenges == null)
+            {
+                ChallengeOrganizer.SetupChallengeTypes();
+            }
+            List<Challenge> list = [];
+            for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
+            {
+                list.Add(BingoData.availableBingoChallenges[i]);
+            }
+            Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
+            Plugin.logger.LogMessage(ch.ChallengeName());
+            return ch.Generate();
+        }
+
         public List<Challenge> AllChallengeList()
         {
-            List<Challenge> chacha = new();
+            List<Challenge> chacha = [];
 
             for (int i = 0; i < challengeGrid.GetLength(0); i++)
             {
@@ -165,18 +184,6 @@ namespace BingoMode
         {
             if (x < challengeGrid.GetLength(0) && y < challengeGrid.GetLength(1)) return challengeGrid[x, y];
             return null;
-        }
-
-        public class BingoChallenge
-        {
-            public BingoBoard board;
-            public string text;
-
-            public BingoChallenge(BingoBoard board)
-            {
-                this.board = board;
-                text = "test";
-            }
         }
     }
 }

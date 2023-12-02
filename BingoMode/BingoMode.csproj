@@ -91,9 +91,15 @@
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoWinScreen.cs" />
+    <Compile Include="Challenges\BingoDamageChallenge.cs" />
+    <Compile Include="Challenges\BingoEatChallenge.cs" />
+    <Compile Include="Challenges\BingoUnlockChallenge.cs" />
+    <Compile Include="Challenges\ChallengeHooks.cs" />
+    <Compile Include="Challenges\ChallengeUtils.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins\$(TargetName).dll"</PostBuildEvent>

@@ -23,7 +23,7 @@ namespace BingoMode
         public BingoGrid(Menu.Menu menu, MenuObject owner, Vector2 centerPos, float maxSize) : base(menu, owner, default)
         {
             board = BingoHooks.GlobalBoard;
-            challengeButtons = new List<BingoButton>();
+            challengeButtons = [];
             size = board.size;
             this.maxSize = maxSize;
             this.centerPos = centerPos;
@@ -40,7 +40,7 @@ namespace BingoMode
                     float butSize = maxSize / size;
                     float topLeft = -butSize * size / 2f;
                     BingoButton but = new BingoButton(menu, this,
-                        centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f), new Vector2(butSize, butSize), board.challengeGrid[i, j], i + " " + j)
+                    centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f), new Vector2(butSize, butSize), board.challengeGrid[i, j], i + " " + j)
                     {
                         lastPos = pos
                     };
@@ -50,6 +50,5 @@ namespace BingoMode
                 }
             }
         }
-
     }
 }

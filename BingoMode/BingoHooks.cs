@@ -21,6 +21,20 @@ namespace BingoMode
         public static ConditionalWeakTable<ExpeditionMenu, BingoPage> bingoPage = new ();
         public static ConditionalWeakTable<CharacterSelectPage, HoldButton> newBingoButton = new ();
 
+        public static void EarlyApply()
+        {
+            // Ignoring bingo challenges in bingo (has to be done here)
+            On.Expedition.ChallengeOrganizer.SetupChallengeTypes += ChallengeOrganizer_SetupChallengeTypes;
+        }
+
+        public static void ChallengeOrganizer_SetupChallengeTypes(On.Expedition.ChallengeOrganizer.orig_SetupChallengeTypes orig)
+        {
+            BingoData.availableBingoChallenges ??= new();
+            orig.Invoke();
+            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes);
+            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => !x.GetType().Name.StartsWith("Bingo")).ToList();
+        }
+
         public static void Apply()
         {
             // Adding the bingo page to exp menu
@@ -32,6 +46,7 @@ namespace BingoMode
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
             On.Menu.CharacterSelectPage.ClearStats += CharacterSelectPage_ClearStats;
+            On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
 
             // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
@@ -41,6 +56,15 @@ namespace BingoMode
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             // Stop the base Expedition HUD from appearing
             IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
+
+            // 
+        }
+
+        public static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
+        {
+            orig.Invoke(self, num);
+
+            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
         }
 
         public static void ProcessManager_PostSwitchMainProcess(ILContext il)
@@ -144,13 +168,12 @@ namespace BingoMode
 
             if (!bingoPage.TryGetValue(self, out _))
             {
-                bingoPage.Add(self, null);
+                bingoPage.Add(self, new BingoPage(self, self.pages[4], default));
             }
             bingoPage.TryGetValue(self, out var page);
-            page = new BingoPage(self, self.pages[4], default);
             self.pages[4].subObjects.Add(page);
             self.pages[4].pos.x -= 1500f;
-            Plugin.logger.LogMessage("Initialized new menu page " + self.pages[4] + " " + page);
+            Plugin.logger.LogMessage("Initialized bingo menu page " + self.pages[4] + " " + page);
         }
 
         public static void ExpeditionMenu_Singal(On.Menu.ExpeditionMenu.orig_Singal orig, ExpeditionMenu self, MenuObject sender, string message)
@@ -161,6 +184,14 @@ namespace BingoMode
             {
                 self.UpdatePage(4);
                 self.MovePage(new Vector2(1500f, 0f));
+                GlobalBoard.GenerateBoard(GlobalBoard.size);
+                if (bingoPage.TryGetValue(self, out var page))
+                {
+                    page.grid.RemoveSprites();
+                    page.RemoveSubObject(page.grid);
+                    page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
+                    page.subObjects.Add(page.grid);
+                }
             }
         }
 
@@ -173,10 +204,9 @@ namespace BingoMode
 
             if (!newBingoButton.TryGetValue(self, out _))
             {
-                newBingoButton.Add(self, null);
+                newBingoButton.Add(self, new HoldButton(self.menu, self, "NEW\nBINGO", "NEWBINGO", new Vector2(590f, 180f), 30f));
             }
             newBingoButton.TryGetValue(self, out var button);
-            button = new HoldButton(self.menu, self, "NEW\nBINGO", "NEWBINGO", new Vector2(590f, 180f), 30f);
             self.subObjects.Add(button);
         }
 
@@ -188,6 +218,7 @@ namespace BingoMode
             {
                 button.RemoveSprites();
                 button.RemoveSubObject(button);
+                newBingoButton.Remove(self);
             }
         }
     }

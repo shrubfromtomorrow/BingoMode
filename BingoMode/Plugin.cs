@@ -2,7 +2,6 @@
 using System.Security.Permissions;
 using System.Security;
 using Steamworks;
-using System.Text;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -10,8 +9,10 @@ using System.Text;
 
 namespace BingoMode
 {
+    using Challenges;
     using BingoSteamworks;
     using System;
+    using System.Linq;
     using System.Runtime.InteropServices;
 
     [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.1")]
@@ -24,14 +25,15 @@ namespace BingoMode
         {
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
-            On.RainWorld.Update += RainWorld_Update;
+            BingoHooks.EarlyApply();
+            //On.RainWorld.Update += RainWorld_Update;
         }
 
+        // Receiving data from yuh (networking)
         public void RainWorld_Update(On.RainWorld.orig_Update orig, RainWorld self)
         {
             orig.Invoke(self);
 
-            // Receiving data from yuh
             //uint size;
             //while (SteamNetworking.IsP2PPacketAvailable(out size))
             //{
@@ -84,12 +86,13 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                SteamTest.Apply();
+                //SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
                 BingoEnums.Register();
                 
                 BingoHooks.Apply();
+                ChallengeHooks.Apply();
             }
         }
     }

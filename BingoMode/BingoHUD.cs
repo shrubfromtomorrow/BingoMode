@@ -10,11 +10,12 @@ using Menu;
 using Menu.Remix;
 using UnityEngine;
 using RWCustom;
-using BingoMode.BingoSteamworks;
 using Steamworks;
 
 namespace BingoMode
 {
+    using BingoSteamworks;
+
     public class BingoHUD : HudPart
     {
         public BingoBoard board;
@@ -64,9 +65,9 @@ namespace BingoMode
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    float size = 250f / board.size;
+                    float size = 400f / board.size;
                     float topLeft = -size * board.size / 2f;
-                    Vector2 center = new(hud.rainWorld.screenSize.x * 0.1f, hud.rainWorld.screenSize.y * 0.823f);
+                    Vector2 center = new(hud.rainWorld.screenSize.x * 0.175f, hud.rainWorld.screenSize.y * 0.7f);
                     grid[i, j] = new BingoInfo(hud, this,
                         center + new Vector2(topLeft + i * size + (i * size * 0.2f) + size / 2f, -topLeft - j * size - (j * size * 0.2f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j], i, j);
                 }
@@ -81,8 +82,9 @@ namespace BingoMode
             {
                 Player p = hud.owner as Player;
 
-                //if (p.input[0].mp) show = true;
-                //else show = false;
+                // Display only if map pressed
+                if (p.input[0].mp) show = true;
+                else show = false;
             }
 
             for (int i = 0; i < grid.GetLength(0); i++)
@@ -164,22 +166,39 @@ namespace BingoMode
 
             public void Update()
             {
-                label.text = challenge.completed ? "YES" : "NO";
+                label.text = SplitString(challenge.description);//challenge.completed ? "YES" : "NO";
 
-                if (MouseOver && owner.mouseDown)
+                if (show && MouseOver && owner.mouseDown)
                 {
                     sprite.color = Color.blue;
                     if (owner.MousePressed)
                     {
                         challenge.completed = !challenge.completed;
-                        CSteamID id = (CSteamID)76561198140779563;
-                        SteamNetworkingIdentity identity = new SteamNetworkingIdentity();
-                        identity.SetSteamID(id);
-                        InnerWorkings.SendMessage($"#{x - 1};{y}", identity);
+                        //CSteamID id = (CSteamID)76561198140779563;
+                        //SteamNetworkingIdentity identity = new SteamNetworkingIdentity();
+                        //identity.SetSteamID(id);
+                        //InnerWorkings.SendMessage($"#{x - 1};{y}", identity);
                     }
                 }
                 else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 else sprite.color = Color.grey;
+            }
+
+            public string SplitString(string s)
+            {
+                string modified = "";
+                int limit = 0;
+                foreach (var c in s)
+                {
+                    limit += 6;
+                    if (limit > size * 0.8f)
+                    {
+                        modified += "\n";
+                        limit = 0;
+                    }
+                    modified += c;
+                }
+                return modified;
             }
         }
     }
