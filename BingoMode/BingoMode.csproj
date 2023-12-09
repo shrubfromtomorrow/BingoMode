@@ -91,8 +91,16 @@
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoWinScreen.cs" />
+    <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />
+    <Compile Include="Challenges\BingoGreenNeuronChallenge.cs" />
     <Compile Include="Challenges\BingoDamageChallenge.cs" />
+    <Compile Include="Challenges\BingoDontUseItemChallenge.cs" />
     <Compile Include="Challenges\BingoEatChallenge.cs" />
+    <Compile Include="Challenges\BingoNoRegionChallenge.cs" />
+    <Compile Include="Challenges\BingoPopcornChallenge.cs" />
+    <Compile Include="Challenges\BingoStealChallenge.cs" />
+    <Compile Include="Challenges\BingoTameChallenge.cs" />
+    <Compile Include="Challenges\BingoTradeChallenge.cs" />
     <Compile Include="Challenges\BingoUnlockChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />

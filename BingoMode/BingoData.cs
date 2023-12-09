@@ -21,6 +21,9 @@ namespace BingoMode
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[4];
+        public static int[] heldItemsTime;
+
+        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallengeList().Any(x => x is BingoGreenNeuronChallenge c && c.moon);
 
         public static void InitializeBingo()
         {
@@ -31,6 +34,7 @@ namespace BingoMode
             {
                 if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock)) challengeTokens.Add(c.unlock);
             }
+            heldItemsTime = new int[ExtEnum<AbstractPhysicalObject.AbstractObjectType>.values.Count];
         }
 
         public static void FinishBingo()
@@ -43,16 +47,17 @@ namespace BingoMode
         {
             Plugin.logger.LogMessage("Current slug: " + slug);
             possibleTokens[0] = []; // blue
-            possibleTokens[1] = []; // yellow
+            possibleTokens[1] = []; // gold
             possibleTokens[2] = []; // red
             possibleTokens[3] = []; // green
             foreach (var kvp in Custom.rainWorld.regionBlueTokens)
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
+                    if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE: " + kvp.Value[n].value);
+                        Plugin.logger.LogMessage("ACCESSIBLE BLUE: " + kvp.Value[n].value);
                         possibleTokens[0].Add(kvp.Value[n].value);
                     }
                 }
@@ -61,21 +66,23 @@ namespace BingoMode
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
+                    if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE: " + kvp.Value[n].value);
+                        Plugin.logger.LogMessage("ACCESSIBLE GOLD: " + kvp.Value[n].value);
                         possibleTokens[1].Add(kvp.Value[n].value);
                     }
                 }
             }
             foreach (var kvp in Custom.rainWorld.regionRedTokens)
             {
+                if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
                     if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && SlugcatStats.getSlugcatStoryRegions(slug).Concat(SlugcatStats.getSlugcatOptionalRegions(slug)).Contains(kvp.Key.ToUpperInvariant()))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE: " + kvp.Value[n].value);
-                        possibleTokens[2].Add(kvp.Value[n].value);
+                        Plugin.logger.LogMessage("ACCESSIBLE SAFARI: " + kvp.Value[n].value + "-safari");
+                        possibleTokens[2].Add(kvp.Value[n].value + "-safari");
                     }
                 }
             }
@@ -92,7 +99,7 @@ namespace BingoMode
                             (slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer && kvp.Key.ToLowerInvariant() == "lc") ||
                             (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear && kvp.Key.ToLowerInvariant() == "dm"))
                         {
-                            Plugin.logger.LogMessage("ACCESSIBLE: " + kvp.Value[n].value);
+                            Plugin.logger.LogMessage("ACCESSIBLE GREEN: " + kvp.Value[n].value);
                             possibleTokens[3].Add(kvp.Value[n].value);
                         }
                     }

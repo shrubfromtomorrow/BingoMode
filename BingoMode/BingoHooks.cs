@@ -31,7 +31,7 @@ namespace BingoMode
         {
             BingoData.availableBingoChallenges ??= new();
             orig.Invoke();
-            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes);
+            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x.GetType().Name.StartsWith("Bingo")).ToList());
             ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => !x.GetType().Name.StartsWith("Bingo")).ToList();
         }
 
@@ -46,7 +46,6 @@ namespace BingoMode
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
             On.Menu.CharacterSelectPage.ClearStats += CharacterSelectPage_ClearStats;
-            On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
 
             // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
@@ -56,15 +55,6 @@ namespace BingoMode
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             // Stop the base Expedition HUD from appearing
             IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
-
-            // 
-        }
-
-        public static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
-        {
-            orig.Invoke(self, num);
-
-            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
         }
 
         public static void ProcessManager_PostSwitchMainProcess(ILContext il)

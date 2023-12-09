@@ -45,6 +45,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
+            // Eventually make this generate better with weighted numbers based on the creature and items
             AbstractPhysicalObject.AbstractObjectType wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
             List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value];
             CreatureTemplate.Type crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature;

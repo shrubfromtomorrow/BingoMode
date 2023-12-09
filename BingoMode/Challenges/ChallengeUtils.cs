@@ -49,7 +49,44 @@ namespace BingoMode.Challenges
             ItemType.Rock,
             ItemType.ScavengerBomb,
             ItemType.PuffBall,
+            ItemType.SporePlant,
             new("LillyPuck", false),
+        };
+
+        public static ItemType[] StealableStolable =
+        {
+            ItemType.Spear,
+            ItemType.Rock,
+            ItemType.ScavengerBomb,
+        };
+
+        public static ItemType[] Bannable =
+        {
+            ItemType.FlyLure,
+            ItemType.Lantern,
+            ItemType.PuffBall,
+            ItemType.VultureMask,
+            ItemType.ScavengerBomb,
+            ItemType.BubbleGrass,
+            ItemType.DangleFruit,
+            ItemType.SlimeMold,
+            ItemType.WaterNut
+        };
+
+        public static CreatureType[] Befriendable =
+        {
+            CreatureType.CicadaA,
+            CreatureType.CicadaB,
+            CreatureType.GreenLizard,
+            CreatureType.PinkLizard,
+            CreatureType.YellowLizard,
+            CreatureType.BlackLizard,
+            CreatureType.CyanLizard,
+            CreatureType.WhiteLizard,
+            CreatureType.BlueLizard,
+            new ("EelLizard", false),
+            new ("SpitLizard", false),
+            new ("ZoopLizard", false)
         };
     }
 }

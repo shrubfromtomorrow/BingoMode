@@ -29,6 +29,7 @@ namespace BingoMode
         public void GenerateBoard(int size)
         {
             Plugin.logger.LogMessage("Generating bored");
+            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             challengeGrid = new Challenge[size, size];
             ExpeditionData.ClearActiveChallengeList();
             for (int i = 0; i < size; i++)
