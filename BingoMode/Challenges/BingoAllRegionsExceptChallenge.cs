@@ -23,7 +23,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoAllRegionsExcept s || s.region != region;
+            return challenge is not BingoAllRegionsExcept;
         }
 
         public override string ChallengeName()
@@ -33,11 +33,16 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            // Do (add generated region to BingoData list<>)
+            List<string> regiones = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
+            string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
+            regiones.Remove(regionn);
+
+            foreach (var s in regiones) Plugin.logger.LogMessage(s);
 
             return new BingoAllRegionsExcept
             {
-                region = "ss",
+                region = regionn,
+                regionsToEnter = regiones
             };
         }
 
@@ -51,13 +56,14 @@ namespace BingoMode.Challenges
             }
             else if (!completed && regionsToEnter.Contains(regionName))
             {
-                UpdateDescription();
                 regionsToEnter.Remove(regionName);
+                foreach (var s in regionsToEnter) Plugin.logger.LogMessage(s);
 
                 if (regionsToEnter.Count == 0)
                 {
                     CompleteChallenge();
                 }
+                UpdateDescription();
             }
         }
 

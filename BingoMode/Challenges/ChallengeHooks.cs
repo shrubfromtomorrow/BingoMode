@@ -66,10 +66,66 @@ namespace BingoMode.Challenges
             On.Player.GrabUpdate += Player_GrabUpdate;
 
             // Tame creature
-            IL.FriendTracker.Update += FriendTracker_Update;
+            IL.FriendTracker.Update += FriendTracker_UpdateIL;
+            On.FriendTracker.Update += FriendTracker_Update;
+
+            // Region entering
+            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues;
         }
 
-        private static void FriendTracker_Update(ILContext il)
+        public static void FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
+        {
+            orig.Invoke(self);
+
+            // Copied from base game
+            if (BingoData.BingoMode && self.AI.creature.state.socialMemory != null && self.AI.creature.state.socialMemory.relationShips != null && self.AI.creature.state.socialMemory.relationShips.Count > 0)
+            {
+                for (int j = 0; j < self.AI.creature.state.socialMemory.relationShips.Count; j++)
+                {
+                    if (self.AI.creature.state.socialMemory.relationShips[j].like > 0.5f && self.AI.creature.state.socialMemory.relationShips[j].tempLike > 0.5f)
+                    {
+                        for (int k = 0; k < self.AI.creature.Room.creatures.Count; k++)
+                        {
+                            if (self.AI.creature.Room.creatures[k].ID == self.AI.creature.state.socialMemory.relationShips[j].subjectID && self.AI.creature.Room.creatures[k].realizedCreature != null)
+                            {
+                                for (int p = 0; p < ExpeditionData.challengeList.Count; p++)
+                                {
+                                    if (ExpeditionData.challengeList[p] is BingoTameChallenge c)
+                                    {
+                                        c.Fren(self.AI.creature.creatureTemplate.type);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
+        public static void WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        {
+            orig.Invoke(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
+
+            if (BingoData.BingoMode)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge c)
+                    {
+                        c.Entered(worldName);
+                    }
+
+                    if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept r)
+                    {
+                        r.Entered(worldName);
+                    }
+                }
+            } 
+        }
+
+        private static void FriendTracker_UpdateIL(ILContext il)
         {
             ILCursor c = new(il);
 
@@ -78,12 +134,13 @@ namespace BingoMode.Challenges
                 x => x.MatchStfld<FriendTracker>("friend")
                 ))
             {
-                c.Emit(OpCodes.Ldloc_2);
+                c.Emit(OpCodes.Ldloc_1);
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Action<int, FriendTracker>>((i, self) =>
                 {
                     if (BingoData.BingoMode)
                     {
+                        //Plugin.logger.LogMessage()
                         for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                         {
                             if (ExpeditionData.challengeList[j] is BingoTameChallenge c)
@@ -399,9 +456,9 @@ namespace BingoMode.Challenges
             {
                 return;
             }
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && BingoHooks.GlobalBoard.AllChallengeList().Any(x => x is BingoUnlockChallenge b && b.unlock == d.tokenString))
+            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoUnlockChallenge b && b.unlock == d.tokenString))
             {
-                foreach (Challenge ch in BingoHooks.GlobalBoard.AllChallengeList())
+                foreach (Challenge ch in BingoHooks.GlobalBoard.AllChallenges)
                 {
                     if (ch is BingoUnlockChallenge b && b.unlock == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
@@ -464,7 +521,7 @@ namespace BingoMode.Challenges
                 b.Emit(OpCodes.Ldloc, 72);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
-                    if (BingoData.BingoMode && BingoHooks.GlobalBoard.AllChallengeList().Any(x => x is BingoGreenNeuronChallenge))
+                    if (BingoData.BingoMode && BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge))
                     {
                         AbstractPhysicalObject startItem = new (room.world, ItemType.NSHSwarmer, null, pos, room.game.GetNewID());
                         room.abstractRoom.entities.Add(startItem);

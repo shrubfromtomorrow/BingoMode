@@ -23,14 +23,14 @@ namespace BingoMode
         public static List<string>[] possibleTokens = new List<string>[4];
         public static int[] heldItemsTime;
 
-        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallengeList().Any(x => x is BingoGreenNeuronChallenge c && c.moon);
+        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon);
 
         public static void InitializeBingo()
         {
             BingoMode = true;
 
             challengeTokens.Clear();
-            foreach (Challenge challenge in BingoHooks.GlobalBoard.AllChallengeList())
+            foreach (Challenge challenge in BingoHooks.GlobalBoard.AllChallenges)
             {
                 if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock)) challengeTokens.Add(c.unlock);
             }

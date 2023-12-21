@@ -17,6 +17,7 @@ namespace BingoMode
         public ExpeditionCoreFile core;
         public Challenge[,] challengeGrid; // The challenges will be treated as coordinates on a grid for convenience
         public List<IntVector2> currentWinLine; // A list of grid coordinates
+        public List<Challenge> AllChallenges;
         public int size;
 
         public BingoBoard()
@@ -29,6 +30,7 @@ namespace BingoMode
         public void GenerateBoard(int size)
         {
             Plugin.logger.LogMessage("Generating bored");
+            AllChallenges = [];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             challengeGrid = new Challenge[size, size];
             ExpeditionData.ClearActiveChallengeList();
@@ -47,7 +49,7 @@ namespace BingoMode
 
         public void UpdateChallenges()
         {
-            foreach (Challenge c in AllChallengeList())
+            foreach (Challenge c in AllChallenges)
             {
                 c.UpdateDescription();
             }
@@ -133,36 +135,59 @@ namespace BingoMode
             return won;
         }
 
-        public static Challenge RandomBingoChallenge()
+        public Challenge RandomBingoChallenge()
         {
             if (BingoData.availableBingoChallenges == null)
             {
                 ChallengeOrganizer.SetupChallengeTypes();
             }
+
             List<Challenge> list = [];
             for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
             {
                 list.Add(BingoData.availableBingoChallenges[i]);
             }
+
+        resette:
             Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
-            Plugin.logger.LogMessage(ch.ChallengeName());
-            return ch.Generate();
-        }
-
-        public List<Challenge> AllChallengeList()
-        {
-            List<Challenge> chacha = [];
-
-            for (int i = 0; i < challengeGrid.GetLength(0); i++)
+            if (!ch.ValidForThisSlugcat(ExpeditionData.slugcatPlayer))
             {
-                for (int j = 0; j < challengeGrid.GetLength(1); j++)
+                list.Remove(ch);
+                goto resette;
+            }
+            ch = ch.Generate();
+
+            if (AllChallenges.Count > 0)
+            {
+                for (int i = 0; i < AllChallenges.Count; i++)
                 {
-                    chacha.Add(challengeGrid[i, j]);
+                    if (!AllChallenges[i].Duplicable(ch))
+                    {
+                        list.Remove(ch);
+                        goto resette;
+                    }
                 }
             }
 
-            return chacha;
+            Plugin.logger.LogMessage("Assigned " + ch.ChallengeName());
+            AllChallenges.Add(ch);
+            return AllChallenges.Last();
         }
+
+        //public List<Challenge> AllChallengeList()
+        //{
+        //    List<Challenge> chacha = [];
+        //
+        //    for (int i = 0; i < challengeGrid.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < challengeGrid.GetLength(1); j++)
+        //        {
+        //            chacha.Add(challengeGrid[i, j]);
+        //        }
+        //    }
+        //
+        //    return chacha;
+        //}
 
         public void SetChallenge(int x, int y, Challenge newChallenge)
         {

@@ -32,11 +32,11 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            // Do
+            string[] regiones = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer);
 
             return new BingoNoRegionChallenge
             {
-                region = "hi",
+                region = regiones[UnityEngine.Random.Range(0, regiones.Length)],
                 completed = true,
             };
         }
