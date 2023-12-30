@@ -7,54 +7,51 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoTradeChallenge : Challenge
+    public class BingoTradeTradedChallenge : Challenge
     {
         public int amount;
         public int current;
-        public List<EntityID> bannedIDs;
+        public List<EntityID> traderItems;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] worth of value to Scavenger Merchants")
-                .Replace("<amount>", ValueConverter.ConvertToString(amount))
-                .Replace("<current>", ValueConverter.ConvertToString(current));
+            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount == 1 ? "item" : "items") + " from Scavenger Merchants to others")
+                .Replace("<current>", ValueConverter.ConvertToString(current))
+                .Replace("<amount>", ValueConverter.ConvertToString(amount));
             base.UpdateDescription();
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTradeChallenge;
+            return challenge is not BingoTradeTradedChallenge;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Trading");
+            return ChallengeTools.IGT.Translate("Trading traded");
         }
 
         public override Challenge Generate()
         {
-            int amou = UnityEngine.Random.Range(9, 21);
-
-            return new BingoTradeChallenge
+            return new BingoTradeTradedChallenge
             {
-                amount = amou,
-                bannedIDs = []
+                amount = UnityEngine.Random.Range(1, 4),
+                traderItems = []
             };
         }
 
-        public void Traded(int pnts, EntityID ID)
+        public void Traded(EntityID id)
         {
-            Plugin.logger.LogMessage("Traded " + pnts);
-            if (!bannedIDs.Contains(ID))
+            Plugin.logger.LogMessage("Traded " + id);
+            if (traderItems.Contains(id))
             {
-                current += pnts;
-                bannedIDs.Add(ID);
+                Plugin.logger.LogMessage("Suck ces");
+                traderItems.Remove(id);
+                current++;
                 UpdateDescription();
-
                 if (!completed && current >= amount)
                 {
                     CompleteChallenge();
@@ -64,7 +61,7 @@ namespace BingoMode.Challenges
 
         public override int Points()
         {
-            return amount * 10;
+            return 20;
         }
 
         public override bool CombatRequired()
@@ -81,7 +78,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Trading",
+                "TradeTraded",
                 "~",
                 current.ToString(),
                 "><",
@@ -109,7 +106,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Trading FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: TradeTraded FromString() encountered an error: " + ex.Message);
             }
         }
     }

@@ -4,13 +4,13 @@
     {
         public static ProcessManager.ProcessID BingoWinScreen;
         public static ProcessManager.ProcessID BingoLoseScreen;
-        public static SLOracleBehaviorHasMark.MiscItemType GreenNeuron;
+        //public static SLOracleBehaviorHasMark.MiscItemType GreenNeuron;
 
         public static void Register()
         {
             BingoWinScreen = new("BingoWinScreen", true);
             BingoLoseScreen = new("BingoLoseScreen", true);
-            GreenNeuron = new("GreenNeuron", true);
+            //GreenNeuron = new("GreenNeuron", true);
         }
     }
 }

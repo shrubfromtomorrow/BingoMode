@@ -92,6 +92,8 @@
     <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoWinScreen.cs" />
     <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />
+    <Compile Include="Challenges\BingoCollectPearlChallenge.cs" />
+    <Compile Include="Challenges\BingoDodgeLeviathanChallenge.cs" />
     <Compile Include="Challenges\BingoGreenNeuronChallenge.cs" />
     <Compile Include="Challenges\BingoDamageChallenge.cs" />
     <Compile Include="Challenges\BingoDontUseItemChallenge.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Challenges\BingoStealChallenge.cs" />
     <Compile Include="Challenges\BingoTameChallenge.cs" />
     <Compile Include="Challenges\BingoTradeChallenge.cs" />
+    <Compile Include="Challenges\BingoTradeTradedChallenge.cs" />
     <Compile Include="Challenges\BingoUnlockChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />

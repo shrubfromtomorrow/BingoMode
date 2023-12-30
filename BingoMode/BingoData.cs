@@ -54,6 +54,7 @@ namespace BingoMode
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
+                    if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
@@ -66,6 +67,7 @@ namespace BingoMode
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
+                    if (!Custom.rainWorld.regionGoldTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
@@ -76,6 +78,7 @@ namespace BingoMode
             }
             foreach (var kvp in Custom.rainWorld.regionRedTokens)
             {
+                if (!Custom.rainWorld.regionRedTokensAccessibility.ContainsKey(kvp.Key)) continue;
                 if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {

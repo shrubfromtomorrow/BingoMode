@@ -18,34 +18,33 @@ namespace BingoMode.Challenges
         public int amountRequired;
         public int currentEated;
         public bool isCreature;
-
+    
         public override void UpdateDescription()
         {
-            Plugin.logger.LogMessage(creatureFoodType);
             description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type>")
                 .Replace("<current>", ValueConverter.ConvertToString(currentEated))
                 .Replace("<amount>", ValueConverter.ConvertToString(amountRequired))
                 .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[creatureFoodType.Index]) : ChallengeTools.ItemName(itemFoodType));
             base.UpdateDescription();
         }
-
+    
         public override string ChallengeName()
         {
             return "Eating Food";
         }
-
+    
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoEatChallenge || (isCreature ? (challenge as BingoEatChallenge).creatureFoodType != creatureFoodType : (challenge as BingoEatChallenge).itemFoodType != itemFoodType);
         }
-
+    
         public override Challenge Generate()
         {
             // Choose random food, if Riv is selected then make glowweed available
             ItemType randomFood = null;
             CreatureType randomCreatureFood = null;
             bool c = UnityEngine.Random.value < 0.5f;
-
+    
             if (c)
             {
                 randomCreatureFood = ChallengeUtils.CreatureFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.CreatureFoodTypes.Length)];
@@ -55,7 +54,7 @@ namespace BingoMode.Challenges
                 randomFood = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length -
                             (ModManager.MSC ? (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet ? 0 : 1) : 4))];
             }
-
+    
             return new BingoEatChallenge()
             {
                 itemFoodType = randomFood,
@@ -64,17 +63,17 @@ namespace BingoMode.Challenges
                 amountRequired = Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
             };
         }
-
+    
         public override bool CombatRequired()
         {
             return false;
         }
-
+    
         public override int Points()
         {
             return Mathf.RoundToInt(6 * FoodDifficultyMultiplier()) * amountRequired * (hidden ? 2 : 1);
         }
-
+    
         public float FoodDifficultyMultiplier()
         {
             if (!isCreature && itemFoodType == ItemType.DangleFruit) return 0.5f;
@@ -83,10 +82,10 @@ namespace BingoMode.Challenges
             if (!isCreature && itemFoodType == MSCItemType.DandelionPeach) return 1.33f;
             if (isCreature && creatureFoodType == CreatureType.SmallNeedleWorm) return 1.5f;
             if (isCreature && creatureFoodType == CreatureType.Fly) return 0.33f;
-
+    
             return 1f;
         }
-
+    
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
             if (thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
@@ -97,7 +96,7 @@ namespace BingoMode.Challenges
                 if (currentEated >= amountRequired) CompleteChallenge();
             }
         }
-
+    
         public override string ToString()
         {
             return string.Concat(new string[]
@@ -119,7 +118,7 @@ namespace BingoMode.Challenges
                 revealed ? "1" : "0"
             });
         }
-
+    
         public override void FromString(string args)
         {
             try

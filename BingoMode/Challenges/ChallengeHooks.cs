@@ -25,10 +25,6 @@ namespace BingoMode.Challenges
             // Eated
             On.Player.ObjectEaten += Player_ObjectEaten;
 
-            // Item and creatuer name utils
-            On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
-            On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
-
             // Sandbox unlock getting
             On.PlayerProgression.MiscProgressionData.GetTokenCollected_string_bool += MiscProgressionData_GetTokenCollected;
             On.PlayerProgression.MiscProgressionData.GetTokenCollected_SafariUnlockID += MiscProgressionData_GetTokenCollected_SafariUnlockID;
@@ -45,6 +41,7 @@ namespace BingoMode.Challenges
             On.PhysicalObject.HitByExplosion += PhysicalObject_HitByExplosion;
             IL.SporeCloud.Update += SporeCloud_Update;
             On.SporePlant.Bee.Attach += Bee_Attach;
+            IL.JellyFish.Collide += JellyFish_Collide;
 
             // Theft ing
             On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update;
@@ -66,11 +63,13 @@ namespace BingoMode.Challenges
             On.Player.GrabUpdate += Player_GrabUpdate;
 
             // Tame creature
-            IL.FriendTracker.Update += FriendTracker_UpdateIL;
             On.FriendTracker.Update += FriendTracker_Update;
 
             // Region entering
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues;
+
+            // Dodging leviathans
+
         }
 
         public static void FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
@@ -123,35 +122,6 @@ namespace BingoMode.Challenges
                     }
                 }
             } 
-        }
-
-        private static void FriendTracker_UpdateIL(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
-                x => x.MatchCallOrCallvirt<AbstractCreature>("get_realizedCreature"),
-                x => x.MatchStfld<FriendTracker>("friend")
-                ))
-            {
-                c.Emit(OpCodes.Ldloc_1);
-                c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Action<int, FriendTracker>>((i, self) =>
-                {
-                    if (BingoData.BingoMode)
-                    {
-                        //Plugin.logger.LogMessage()
-                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                        {
-                            if (ExpeditionData.challengeList[j] is BingoTameChallenge c)
-                            {
-                                c.Fren(self.friend.Template.type);
-                            }
-                        }
-                    }
-                });
-            }
-            else Plugin.logger.LogError("Uh oh, FriendTracker_Update il fucked up " + il);
         }
 
         public static void Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
@@ -277,24 +247,32 @@ namespace BingoMode.Challenges
         public static void ScavengerAI_RecognizeCreatureAcceptingGift(ILContext il)
         {
             ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
+        
+            if (c.TryGotoNext(MoveType.Before,
                 x => x.MatchCallOrCallvirt<ItemTracker>("RepresentationForObject")
                 ))
             {
-                c.Index++;
                 c.Emit(OpCodes.Ldarg_0);
                 c.Emit(OpCodes.Ldarg, 4);
-                c.EmitDelegate<Action<ScavengerAI, PhysicalObject>>((self, item) =>
+                c.Emit(OpCodes.Ldloc, 15);
+                c.EmitDelegate<Action<ScavengerAI, PhysicalObject, int>>((self, item, i) =>
                 {
                     if (BingoData.BingoMode && self.tradeSpot != null && (self.creature.abstractAI as ScavengerAbstractAI).squad.missionType == ScavengerAbstractAI.ScavengerSquad.MissionID.Trade)
                     {
+                        Plugin.logger.LogMessage("GURG");
                         for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                         {
                             if (ExpeditionData.challengeList[j] is BingoTradeChallenge c)
                             {
-                                Plugin.logger.LogMessage("Traded " + self.CollectScore(item, false));
                                 c.Traded(self.CollectScore(item, false), item.abstractPhysicalObject.ID);
+                            }
+                            else if (ExpeditionData.challengeList[j] is BingoTradeTradedChallenge t)
+                            {
+                                EntityID id = self.scavenger.room.socialEventRecognizer.ownedItemsOnGround[i].item.abstractPhysicalObject.ID;
+                                EntityID id2 = item.abstractPhysicalObject.ID;
+                                //Plugin.logger.LogMessage($"{id} - {id2}");
+                                if (!t.traderItems.Contains(id) && id != id2) t.traderItems.Add(id);
+                                t.Traded(id2);
                             }
                         }
                     }
@@ -410,7 +388,7 @@ namespace BingoMode.Challenges
                 {
                     if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
                     {
-                        c.Hit(explosion.sourceObject.abstractPhysicalObject.type, victim, self);
+                        c.Hit(explosion.sourceObject.abstractPhysicalObject.type, victim, explosion);
                     }
                 }
             }
@@ -430,6 +408,35 @@ namespace BingoMode.Challenges
                     }
                 }
             }
+        }
+
+        public static void JellyFish_Collide(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(
+                x => x.MatchLdarg(1),
+                x => x.MatchIsinst<BigEel>()
+                ))
+            {
+                c.Index++;
+                c.Emit(OpCodes.Ldarg_0);
+                c.Emit(OpCodes.Ldarg_1);
+                c.EmitDelegate<Action<JellyFish, PhysicalObject>>((self, obj) =>
+                {
+                    if (BingoData.BingoMode)
+                    {
+                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                        {
+                            if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
+                            {
+                                c.Hit(self.abstractPhysicalObject.type, obj as Creature);
+                            }
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogMessage("JellyFish_Collide failed! " + il);
         }
 
         public static bool MiscProgressionData_GetTokenCollected(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_string_bool orig, PlayerProgression.MiscProgressionData self, string tokenString, bool sandbox)
@@ -538,14 +545,6 @@ namespace BingoMode.Challenges
             else Plugin.logger.LogError("Ass " + il);
         }
 
-        public static void ChallengeTools_CreatureName(On.Expedition.ChallengeTools.orig_CreatureName orig, ref string[] creatureNames)
-        {
-            orig.Invoke(ref creatureNames);
-            creatureNames[(int)CreatureType.SmallNeedleWorm] = ChallengeTools.IGT.Translate("Small Noodleflies");
-            creatureNames[(int)CreatureType.VultureGrub] = ChallengeTools.IGT.Translate("Vulture Grubs");
-            creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
-        }
-
         // Register food for the eat food challenge if its on
         public static void Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
         {
@@ -564,26 +563,6 @@ namespace BingoMode.Challenges
                     }
                 }
             }
-        }
-
-        public static string ChallengeTools_ItemName(On.Expedition.ChallengeTools.orig_ItemName orig, AbstractPhysicalObject.AbstractObjectType type)
-        {
-            InGameTranslator translator = ChallengeTools.IGT;
-            // Weapons
-            if (type == ItemType.Spear) return translator.Translate("Spears");
-            if (type == ItemType.Rock) return translator.Translate("Rocks");
-            // Food items
-            if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
-            if (type == ItemType.EggBugEgg) return translator.Translate("Eggbug Eggs");
-            if (type == ItemType.WaterNut) return translator.Translate("Bubble Fruit");
-            if (type == ItemType.SlimeMold) return translator.Translate("Slime Mold");
-            if (type == ItemType.BubbleGrass) return translator.Translate("Slime Mold");
-            if (type == MSCItemType.GlowWeed) return translator.Translate("Glow Weed");
-            if (type == MSCItemType.DandelionPeach) return translator.Translate("Dandelion Peaches");
-            if (type == MSCItemType.LillyPuck) return translator.Translate("Lillypucks");
-            if (type == MSCItemType.GooieDuck) return translator.Translate("Gooieducks");
-
-            return orig.Invoke(type);
         }
     }
 }

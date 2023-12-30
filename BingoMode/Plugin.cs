@@ -93,6 +93,7 @@ namespace BingoMode
                 
                 BingoHooks.Apply();
                 ChallengeHooks.Apply();
+                ChallengeUtils.Apply();
             }
         }
     }
