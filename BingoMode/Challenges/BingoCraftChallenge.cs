@@ -7,46 +7,45 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoNoRegionChallenge : Challenge, IBingoChallenge
+    public class BingoCraftChallenge : Challenge, IBingoChallenge
     {
-        public string region;
+        public ItemType craftee;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Do not enter " + region);
+            this.description = ChallengeTools.IGT.Translate("Craft a <item>")
+                .Replace("<item>", ChallengeTools.ItemName(craftee).TrimEnd('s'));
             base.UpdateDescription();
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoNoRegionChallenge;
+            return challenge is not BingoCraftChallenge c;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Region ban");
+            return ChallengeTools.IGT.Translate("Crafting");
         }
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer);
-
-            return new BingoNoRegionChallenge
+            return new BingoCraftChallenge
             {
-                region = regiones[UnityEngine.Random.Range(0, regiones.Length)],
-                completed = true,
+                craftee = ChallengeUtils.CraftableItems[UnityEngine.Random.Range(0, ChallengeUtils.CraftableItems.Length)]
             };
         }
 
-        public void Entered(string regionName)
+        public void Crafted(ItemType item)
         {
-            if (completed && region == regionName)
+            if (!completed && item == craftee)
             {
-                completed = false;
+                CompleteChallenge();
             }
         }
 
@@ -62,16 +61,16 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == MoreSlugcatsEnums.SlugcatStatsName.Gourmand;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "RegionBan",
+                "Crafting",
                 "~",
-                region,
+                ValueConverter.ConvertToString(craftee),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -86,7 +85,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                region = array[0];
+                craftee = new ItemType(array[0], false);
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -94,18 +93,18 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Region Ban FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: Crafting FromString() encountered an error: " + ex.Message);
             }
         }
 
         public void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoaderNoRegion1;
+            On.Player.CraftingResults += Player_CraftingResults;
         }
 
         public void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion1;
+            On.Player.CraftingResults -= Player_CraftingResults;
         }
     }
 }

@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoTameChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoTameChallenge : Challenge, IBingoChallenge
     {
         public CreatureTemplate.Type crit;
 
@@ -95,6 +96,16 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Befriending FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.FriendTracker.Update += FriendTracker_Update;
+        }
+
+        public void RemoveHooks()
+        {
+            On.FriendTracker.Update -= FriendTracker_Update;
         }
     }
 }

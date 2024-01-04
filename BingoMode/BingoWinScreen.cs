@@ -46,7 +46,9 @@ namespace BingoMode
             continueButton = new SimpleButton(this, pages[0], Translate("CONTINUE"), "CONTINUE", new Vector2(rightOffset - 150f, 40f), new Vector2(100f, 30f));
             pages[0].subObjects.Add(continueButton);
 
-            BingoData.BingoMode = false;
+            BingoData.FinishBingo();
+            // Save
+            // Do other stuff when completing
         }
 
         public override void Singal(MenuObject sender, string message)

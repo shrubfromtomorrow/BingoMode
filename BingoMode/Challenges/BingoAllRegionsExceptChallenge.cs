@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoAllRegionsExcept : Challenge
+    using static ChallengeHooks;
+    public class BingoAllRegionsExcept : Challenge, IBingoChallenge
     {
         public string region;
         public List<string> regionsToEnter;
@@ -113,6 +114,16 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Region Ban 2 FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoaderNoRegion2;
+        }
+
+        public void RemoveHooks()
+        {
+            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion2;
         }
     }
 }

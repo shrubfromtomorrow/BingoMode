@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoPopcornChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoPopcornChallenge : Challenge, IBingoChallenge
     {
         public int amount;
         public int current;
@@ -100,6 +101,17 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Popcorn FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            IL.SeedCob.HitByWeapon += SeedCob_HitByWeapon;
+
+        }
+
+        public void RemoveHooks()
+        {
+            IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
         }
     }
 }

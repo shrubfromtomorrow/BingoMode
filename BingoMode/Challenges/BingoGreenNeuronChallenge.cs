@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoGreenNeuronChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoGreenNeuronChallenge : Challenge, IBingoChallenge
     {
         public bool moon;
 
@@ -92,6 +93,20 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Green Neuron Delivery FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            IL.SaveState.ctor += SaveState_ctor;
+            On.SLOracleWakeUpProcedure.NextPhase += SLOracleWakeUpProcedure_NextPhase;
+            On.SSOracleBehavior.SSOracleGetGreenNeuron.ctor += SSOracleGetGreenNeuron_ctor;
+        }
+
+        public void RemoveHooks()
+        {
+            IL.SaveState.ctor -= SaveState_ctor;
+            On.SLOracleWakeUpProcedure.NextPhase -= SLOracleWakeUpProcedure_NextPhase;
+            On.SSOracleBehavior.SSOracleGetGreenNeuron.ctor -= SSOracleGetGreenNeuron_ctor;
         }
     }
 }

@@ -89,6 +89,8 @@ namespace BingoMode
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
             }
+
+            // Also initialize bingo on continue
         }
 
         public override void GrafUpdate(float timeStacker)

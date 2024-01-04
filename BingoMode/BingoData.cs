@@ -22,12 +22,15 @@ namespace BingoMode
         public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[4];
         public static int[] heldItemsTime;
+        public static List<string> appliedChallenges = [];
 
         public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon);
 
         public static void InitializeBingo()
         {
             BingoMode = true;
+            appliedChallenges = [];
+            HookAll(BingoHooks.GlobalBoard.AllChallenges, true);
 
             challengeTokens.Clear();
             foreach (Challenge challenge in BingoHooks.GlobalBoard.AllChallenges)
@@ -41,6 +44,23 @@ namespace BingoMode
         {
             ExpeditionData.ClearActiveChallengeList();
             BingoMode = false;
+        }
+
+        public static void HookAll(IEnumerable<Challenge> challenges, bool add)
+        {
+            if (!BingoMode) return;
+            // literally what is this syntax
+            foreach (IBingoChallenge challenge in from challenge in challenges where challenge is IBingoChallenge select challenge)
+            {
+                string name = challenge.GetType().Name;
+                Plugin.logger.LogMessage(name);
+                if (add && !appliedChallenges.Contains(name))
+                {
+                    challenge.AddHooks();
+                    appliedChallenges.Add(name);
+                }
+                else if (!add) challenge.RemoveHooks();
+            }
         }
 
         public static void FillPossibleTokens(SlugcatStats.Name slug)

@@ -11,8 +11,9 @@ using System.Xml.Linq;
 
 namespace BingoMode.Challenges
 {
+    using static ChallengeHooks;
     //Using counts as either throwing an item, or holding it for more than 5 seconds
-    public class BingoDontUseItemChallenge : Challenge
+    public class BingoDontUseItemChallenge : Challenge, IBingoChallenge
     {
         public AbstractPhysicalObject.AbstractObjectType item;
         public bool isFood;
@@ -115,6 +116,18 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Restraint FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.Player.ThrowObject += Player_ThrowObject;
+            On.Player.GrabUpdate += Player_GrabUpdate;
+        }
+
+        public void RemoveHooks()
+        {
+            On.Player.ThrowObject -= Player_ThrowObject;
+            On.Player.GrabUpdate -= Player_GrabUpdate;
         }
     }
 }

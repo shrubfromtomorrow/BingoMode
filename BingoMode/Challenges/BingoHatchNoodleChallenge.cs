@@ -7,59 +7,51 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoTradeChallenge : Challenge, IBingoChallenge
+    public class BingoHatchNoodleChallenge : Challenge
     {
         public int amount;
         public int current;
-        public List<EntityID> bannedIDs;
+        public bool atOnce;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] worth of value to Scavenger Merchants")
-                .Replace("<amount>", ValueConverter.ConvertToString(amount))
-                .Replace("<current>", ValueConverter.ConvertToString(current));
+            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce ? " at once" : ""))
+                .Replace("<current>", ValueConverter.ConvertToString(current))
+                .Replace("<amount>", ValueConverter.ConvertToString(amount));
             base.UpdateDescription();
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTradeChallenge;
+            return challenge is not BingoHatchNoodleChallenge;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Trading");
+            return ChallengeTools.IGT.Translate("Noodle hatching");
         }
 
         public override Challenge Generate()
         {
-            int amou = UnityEngine.Random.Range(9, 21);
-
-            return new BingoTradeChallenge
+            bool onc = UnityEngine.Random.value < 0.5f;
+            return new BingoHatchNoodleChallenge
             {
-                amount = amou,
-                bannedIDs = []
+                atOnce = onc,
+                amount = UnityEngine.Random.Range(1, onc ? 3 : 6)
             };
         }
 
-        public void Traded(int pnts, EntityID ID)
+        public void Hatch()
         {
-            Plugin.logger.LogMessage("Traded " + pnts);
-            if (!bannedIDs.Contains(ID))
+            if (!completed)
             {
-                current += pnts;
-                bannedIDs.Add(ID);
+                current++;
                 UpdateDescription();
-
-                if (!completed && current >= amount)
-                {
-                    CompleteChallenge();
-                }
+                if (current >= amount) CompleteChallenge();
             }
         }
 
@@ -75,14 +67,14 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return slugcat != MoreSlugcatsEnums.SlugcatStatsName.Artificer;
+            return true;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "Trading",
+                "Hatching",
                 "~",
                 current.ToString(),
                 "><",
@@ -110,18 +102,8 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Trading FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: Popcorn FromString() encountered an error: " + ex.Message);
             }
-        }
-
-        public void AddHooks()
-        {
-            IL.ScavengerAI.RecognizeCreatureAcceptingGift += ScavengerAI_RecognizeCreatureAcceptingGift1;
-        }
-
-        public void RemoveHooks()
-        {
-            IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift1;
         }
     }
 }

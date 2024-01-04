@@ -8,10 +8,12 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using RWCustom;
+using System.Reflection;
 
 namespace BingoMode.Challenges
 {
-    public class BingoUnlockChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoUnlockChallenge : Challenge, IBingoChallenge
     {
         public string unlock;
 
@@ -98,6 +100,27 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: UnlockChallenge FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            IL.Room.Loaded += Room_LoadedUnlock;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_string_bool += MiscProgressionData_GetTokenCollected;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_SafariUnlockID += MiscProgressionData_GetTokenCollected_SafariUnlockID;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_SlugcatUnlockID += MiscProgressionData_GetTokenCollected_SlugcatUnlockID;
+            tokenColorHook = new(typeof(CollectToken).GetProperty("TokenColor", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), CollectToken_TokenColor_get);
+            On.CollectToken.Pop += CollectToken_Pop;
+        }
+
+        public void RemoveHooks()
+        {
+
+            IL.Room.Loaded -= Room_LoadedUnlock;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_string_bool -= MiscProgressionData_GetTokenCollected;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_SafariUnlockID -= MiscProgressionData_GetTokenCollected_SafariUnlockID;
+            On.PlayerProgression.MiscProgressionData.GetTokenCollected_SlugcatUnlockID -= MiscProgressionData_GetTokenCollected_SlugcatUnlockID;
+            tokenColorHook?.Dispose();
+            On.CollectToken.Pop -= CollectToken_Pop;
         }
     }
 }

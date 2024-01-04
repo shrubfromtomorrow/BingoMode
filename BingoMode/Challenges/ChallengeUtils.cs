@@ -33,6 +33,7 @@ namespace BingoMode.Challenges
             // Weapons
             if (type == ItemType.Spear) return translator.Translate("Spears");
             if (type == ItemType.Rock) return translator.Translate("Rocks");
+            if (type == ItemType.SporePlant) return translator.Translate("Bee Hives");
             // Food items
             if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
             if (type == ItemType.EggBugEgg) return translator.Translate("Eggbug Eggs");
@@ -57,7 +58,7 @@ namespace BingoMode.Challenges
 
         public static string NameForPearl(PearlType pearl)
         {
-            switch(pearl.value)
+            switch (pearl.value)
             {
                 case "SU":
                     return "Light Blue";
@@ -174,7 +175,7 @@ namespace BingoMode.Challenges
             new ("ZoopLizard", false)
         };
 
-        public static PearlType[] CollectablePearls = 
+        public static PearlType[] CollectablePearls =
         {
             PearlType.UW,
             PearlType.SH,
@@ -196,6 +197,23 @@ namespace BingoMode.Challenges
             new("SI_chat4", false),
             new("SI_chat5", false),
             new("VS", false),
+        };
+
+        public static ItemType[] CraftableItems =
+        {
+            ItemType.Rock,
+            ItemType.FlareBomb,
+            ItemType.SporePlant,
+            ItemType.ScavengerBomb,
+            ItemType.VultureMask,
+            ItemType.SlimeMold,
+            ItemType.FirecrackerPlant,
+            ItemType.PuffBall,
+            ItemType.Mushroom,
+            new("GlowWeed", false),
+            new("GooieDuck", false),
+            new("FireEgg", false),
+            new("SingularityBomb", false)
         };
     }
 }

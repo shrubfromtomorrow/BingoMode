@@ -143,10 +143,11 @@ namespace BingoMode
             }
 
             List<Challenge> list = [];
-            for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
-            {
-                list.Add(BingoData.availableBingoChallenges[i]);
-            }
+            list.AddRange(BingoData.availableBingoChallenges);
+            //for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
+            //{
+            //    list.Add(BingoData.availableBingoChallenges[i]);
+            //}
 
         resette:
             Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
@@ -164,6 +165,7 @@ namespace BingoMode
                     if (!AllChallenges[i].Duplicable(ch))
                     {
                         list.Remove(ch);
+                        ch = null;
                         goto resette;
                     }
                 }

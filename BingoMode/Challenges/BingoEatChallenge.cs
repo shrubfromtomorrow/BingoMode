@@ -11,14 +11,15 @@ using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 
 namespace BingoMode.Challenges
 {
-    public class BingoEatChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoEatChallenge : Challenge, IBingoChallenge
     {
         public ItemType itemFoodType;
         public CreatureType creatureFoodType;
         public int amountRequired;
         public int currentEated;
         public bool isCreature;
-    
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type>")
@@ -138,6 +139,16 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: FeastChallenge FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.Player.ObjectEaten += Player_ObjectEaten;
+        }
+
+        public void RemoveHooks()
+        {
+            On.Player.ObjectEaten -= Player_ObjectEaten;
         }
     }
 }

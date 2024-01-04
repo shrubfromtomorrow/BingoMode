@@ -14,6 +14,8 @@ using Mono.Cecil;
 
 namespace BingoMode
 {
+    using Challenges;
+
     public class BingoHooks
     {
         public static BingoBoard GlobalBoard;
@@ -25,14 +27,23 @@ namespace BingoMode
         {
             // Ignoring bingo challenges in bingo (has to be done here)
             On.Expedition.ChallengeOrganizer.SetupChallengeTypes += ChallengeOrganizer_SetupChallengeTypes;
+            // Remove all hooks while at it
+            On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
+        }
+
+        public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
+        {
+            orig.Invoke();
+
+            try { BingoData.HookAll(GlobalBoard.AllChallenges, false); } catch { }
         }
 
         public static void ChallengeOrganizer_SetupChallengeTypes(On.Expedition.ChallengeOrganizer.orig_SetupChallengeTypes orig)
         {
-            BingoData.availableBingoChallenges ??= new();
+            BingoData.availableBingoChallenges ??= [];
             orig.Invoke();
-            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x.GetType().Name.StartsWith("Bingo")).ToList());
-            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => !x.GetType().Name.StartsWith("Bingo")).ToList();
+            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x is IBingoChallenge).ToList());
+            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => x is not IBingoChallenge).ToList();
         }
 
         public static void Apply()

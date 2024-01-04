@@ -10,11 +10,12 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoTradeTradedChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoTradeTradedChallenge : Challenge, IBingoChallenge
     {
         public int amount;
         public int current;
-        public List<EntityID> traderItems;
+        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader
 
         public override void UpdateDescription()
         {
@@ -43,20 +44,26 @@ namespace BingoMode.Challenges
             };
         }
 
-        public void Traded(EntityID id)
+        public void Traded(EntityID item, EntityID scav)
         {
-            Plugin.logger.LogMessage("Traded " + id);
-            if (traderItems.Contains(id))
+            Plugin.logger.LogMessage("Traded " + item);
+            if (!completed && traderItems.ContainsKey(item) && traderItems[item] != scav)
             {
                 Plugin.logger.LogMessage("Suck ces");
-                traderItems.Remove(id);
+                traderItems.Remove(item);
                 current++;
                 UpdateDescription();
-                if (!completed && current >= amount)
+                if (current >= amount)
                 {
                     CompleteChallenge();
                 }
             }
+        }
+
+        public override void CompleteChallenge()
+        {
+            base.CompleteChallenge();
+            traderItems.Clear();
         }
 
         public override int Points()
@@ -108,6 +115,16 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: TradeTraded FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            IL.ScavengerAI.RecognizeCreatureAcceptingGift += ScavengerAI_RecognizeCreatureAcceptingGift2;
+        }
+
+        public void RemoveHooks()
+        {
+            IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift2;
         }
     }
 }

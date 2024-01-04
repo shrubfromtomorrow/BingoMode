@@ -11,6 +11,7 @@ using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 
 namespace BingoMode.Challenges
 {
+    using static ChallengeHooks;
     public class BingoCollectPearlChallenge : Challenge
     {
         public PearlType pearl;

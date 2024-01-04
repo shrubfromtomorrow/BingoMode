@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace BingoMode.Challenges
 {
-    public class BingoDamageChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoDamageChallenge : Challenge, IBingoChallenge
     {
         public AbstractPhysicalObject.AbstractObjectType weapon;
         public CreatureTemplate.Type victim;
@@ -21,12 +22,12 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            if (ChallengeTools.creatureNames == null)
+            if (ChallengeTools.creatureNames == null && victim != null)
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             this.description = ChallengeTools.IGT.Translate("Damage <crit> with <weapon> [<current>/<amount>] times")
-                .Replace("<crit>", ChallengeTools.creatureNames[victim.Index])
+                .Replace("<crit>", victim == null ? "creatures" : ChallengeTools.creatureNames[victim.Index])
                 .Replace("<weapon>", ChallengeTools.ItemName(weapon))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount));
@@ -46,9 +47,12 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             // Eventually make this generate better with weighted numbers based on the creature and items
-            AbstractPhysicalObject.AbstractObjectType wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
             List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value];
-            CreatureTemplate.Type crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature;
+            AbstractPhysicalObject.AbstractObjectType wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
+
+            CreatureTemplate.Type crit;
+            if (UnityEngine.Random.value < 0.3f) crit = null;
+            else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature;
             int amound = UnityEngine.Random.Range(2, 7);
 
             return new BingoDamageChallenge
@@ -62,7 +66,7 @@ namespace BingoMode.Challenges
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm, UpdatableAndDeletable nonPhysicalSource = null)
         {
             if (completed || weaponn == null || victimm == null) return;
-            if (weaponn == weapon && victimm.Template.type == victim)
+            if (weaponn == weapon && (victim == null || victimm.Template.type == victim))
             {
                 if (nonPhysicalSource != null) 
                 {
@@ -114,7 +118,7 @@ namespace BingoMode.Challenges
                 "~",
                 ValueConverter.ConvertToString(weapon),
                 "><",
-                ValueConverter.ConvertToString(victim),
+                victim == null ? "NULL" : ValueConverter.ConvertToString(victim),
                 "><",
                 current.ToString(),
                 "><",
@@ -134,7 +138,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 weapon = new AbstractPhysicalObject.AbstractObjectType(array[0], false);
-                victim = new CreatureTemplate.Type(array[1], false);
+                victim = array[0] == "NULL" ? null : new CreatureTemplate.Type(array[1], false);
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
                 completed = (array[4] == "1");
@@ -146,6 +150,24 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: DmgWithItem FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.SocialEventRecognizer.WeaponAttack += SocialEventRecognizer_WeaponAttack;
+            On.PhysicalObject.HitByExplosion += PhysicalObject_HitByExplosion;
+            IL.SporeCloud.Update += SporeCloud_Update;
+            On.SporePlant.Bee.Attach += Bee_Attach;
+            IL.JellyFish.Collide += JellyFish_Collide;
+        }
+
+        public void RemoveHooks()
+        {
+            On.SocialEventRecognizer.WeaponAttack -= SocialEventRecognizer_WeaponAttack;
+            On.PhysicalObject.HitByExplosion -= PhysicalObject_HitByExplosion;
+            IL.SporeCloud.Update -= SporeCloud_Update;
+            On.SporePlant.Bee.Attach -= Bee_Attach;
+            IL.JellyFish.Collide -= JellyFish_Collide;
         }
     }
 }

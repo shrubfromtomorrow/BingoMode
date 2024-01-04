@@ -6,15 +6,19 @@ using MoreSlugcats;
 using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq; 
+using static BingoMode.Challenges.ChallengeHooks;
 
 namespace BingoMode.Challenges
 {
-    public class BingoDodgeLeviathanChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoDodgeLeviathanChallenge : Challenge, IBingoChallenge
     {
+        public int wasInArea;
+
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Dodge a leviathan bite");
+            this.description = ChallengeTools.IGT.Translate("Dodge a leviathan's bite");
             base.UpdateDescription();
         }
 
@@ -38,6 +42,37 @@ namespace BingoMode.Challenges
             return new BingoDodgeLeviathanChallenge
             {
             };
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (completed) return;
+            wasInArea = Mathf.Max(0, wasInArea - 1);
+            for (int i = 0; i < game.Players.Count; i++)
+            {
+                if (game.Players[i] != null
+                    && game.Players[i].realizedCreature != null
+                    && game.Players[i].realizedCreature.room != null)
+                {
+                    Player player = game.Players[i].realizedCreature as Player;
+                    Room room = player.room;
+
+                    for (int j = 0; j < room.physicalObjects.Length; j++)
+                    {
+                        for (int k = 0; k < room.physicalObjects[j].Count; k++)
+                        {
+                            if (!room.physicalObjects[j][k].slatedForDeletetion && room.physicalObjects[j][k] is BigEel levi)
+                            {
+                                if (levi.InBiteArea(player.bodyChunks[1].pos, 10f))
+                                {
+                                    wasInArea = 60;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public override int Points()
@@ -83,6 +118,16 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: DodgeLeviathan FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.BigEel.JawsSnap += BigEel_JawsSnap;
+        }
+
+        public void RemoveHooks()
+        {
+            On.BigEel.JawsSnap -= BigEel_JawsSnap;
         }
     }
 }

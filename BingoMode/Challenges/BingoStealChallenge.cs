@@ -11,7 +11,8 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode.Challenges
 {
-    public class BingoStealChallenge : Challenge
+    using static ChallengeHooks;
+    public class BingoStealChallenge : Challenge, IBingoChallenge
     {
         public int current;
         public int amount;
@@ -126,6 +127,18 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: Theft FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update;
+            On.SocialEventRecognizer.Theft += SocialEventRecognizer_Theft;
+        }
+
+        public void RemoveHooks()
+        {
+            On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update;
+            On.SocialEventRecognizer.Theft -= SocialEventRecognizer_Theft;
         }
     }
 }
