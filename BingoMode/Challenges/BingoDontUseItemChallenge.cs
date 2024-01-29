@@ -37,8 +37,12 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool edible = UnityEngine.Random.value < 0.5f;
-            AbstractPhysicalObject.AbstractObjectType type = ChallengeUtils.Bannable[UnityEngine.Random.Range(edible ? 6 : 0, edible ? ChallengeUtils.Bannable.Length : 6)];
-
+            AbstractPhysicalObject.AbstractObjectType type;
+            if (edible)
+            {
+                type = ChallengeUtils.Bannable[UnityEngine.Random.Range(6, 9)];
+            } 
+            else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, 6)];
             return new BingoDontUseItemChallenge
             {
                 item = type,

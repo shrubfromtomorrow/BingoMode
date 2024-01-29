@@ -39,7 +39,7 @@ namespace BingoMode
         {
             string modified = "";
             int limit = 0;
-            foreach(var c in s)
+            foreach (var c in s)
             {
                 limit += 6;
                 if (limit > size.x * 0.8f)
@@ -96,4 +96,18 @@ namespace BingoMode
             Singal(this, singalText);
         }
     }
+
+    public abstract class BingoSettingButton
+    {
+        public BingoSettingButton()
+        {
+
+        }
+    }
+    //public class AnimationIndex : ExtEnum<AnimationIndex>
+    //{
+    //    public AnimationIndex(string value, bool register = false) : base(value, register)
+    //    {
+    //    }
+    //}
 }

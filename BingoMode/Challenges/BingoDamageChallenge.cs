@@ -66,7 +66,7 @@ namespace BingoMode.Challenges
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm, UpdatableAndDeletable nonPhysicalSource = null)
         {
             if (completed || weaponn == null || victimm == null) return;
-            if (weaponn == weapon && (victim == null || victimm.Template.type == victim))
+            if (weaponn == weapon && (victimm.Template.type == victim))
             {
                 if (nonPhysicalSource != null) 
                 {
@@ -154,7 +154,9 @@ namespace BingoMode.Challenges
 
         public void AddHooks()
         {
-            On.SocialEventRecognizer.WeaponAttack += SocialEventRecognizer_WeaponAttack;
+            On.Spear.HitSomething += Spear_HitSomething;
+            On.Rock.HitSomething += Rock_HitSomething;
+            On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
             On.PhysicalObject.HitByExplosion += PhysicalObject_HitByExplosion;
             IL.SporeCloud.Update += SporeCloud_Update;
             On.SporePlant.Bee.Attach += Bee_Attach;
@@ -163,7 +165,9 @@ namespace BingoMode.Challenges
 
         public void RemoveHooks()
         {
-            On.SocialEventRecognizer.WeaponAttack -= SocialEventRecognizer_WeaponAttack;
+            On.Spear.HitSomething -= Spear_HitSomething;
+            On.Rock.HitSomething -= Rock_HitSomething;
+            On.MoreSlugcats.LillyPuck.HitSomething -= LillyPuck_HitSomething;
             On.PhysicalObject.HitByExplosion -= PhysicalObject_HitByExplosion;
             IL.SporeCloud.Update -= SporeCloud_Update;
             On.SporePlant.Bee.Attach -= Bee_Attach;

@@ -11,7 +11,7 @@ using System.Linq;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoHatchNoodleChallenge : Challenge
+    public class BingoHatchNoodleChallenge : Challenge, IBingoChallenge
     {
         public int amount;
         public int current;
@@ -41,7 +41,7 @@ namespace BingoMode.Challenges
             return new BingoHatchNoodleChallenge
             {
                 atOnce = onc,
-                amount = UnityEngine.Random.Range(1, onc ? 3 : 6)
+                amount = UnityEngine.Random.Range(2, onc ? 3 : 6)
             };
         }
 
@@ -102,8 +102,18 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Popcorn FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: Hatching FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+            On.SmallNeedleWorm.PlaceInRoom += SmallNeedleWorm_PlaceInRoom;
+        }
+
+        public void RemoveHooks()
+        {
+            On.SmallNeedleWorm.PlaceInRoom -= SmallNeedleWorm_PlaceInRoom;
         }
     }
 }

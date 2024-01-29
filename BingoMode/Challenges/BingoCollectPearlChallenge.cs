@@ -12,7 +12,7 @@ using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoCollectPearlChallenge : Challenge
+    public class BingoCollectPearlChallenge : Challenge, IBingoChallenge
     {
         public PearlType pearl;
         public List<string> collected;
@@ -160,6 +160,14 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("ERROR: CollectPearl FromString() encountered an error: " + ex.Message);
             }
+        }
+
+        public void AddHooks()
+        {
+        }
+
+        public void RemoveHooks()
+        {
         }
     }
 }

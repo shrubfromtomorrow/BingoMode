@@ -41,8 +41,8 @@ namespace BingoMode
             rightPage.roundedRect.size = rightPage.size;
             subObjects.Add(rightPage);
 
-            grid = new BingoGrid(menu, this, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
-            subObjects.Add(grid);
+            //grid = new BingoGrid(menu, this, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
+            //subObjects.Add(grid);
 
             startGame = new BigSimpleButton(menu, this, "BEGIN", "STARTBINGO",
                 new Vector2(menu.manager.rainWorld.screenSize.x * 0.75f, 40f),

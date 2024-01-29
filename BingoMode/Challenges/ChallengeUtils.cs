@@ -1,21 +1,8 @@
-﻿using UnityEngine;
-using RWCustom;
-using MoreSlugcats;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Mono.Cecil;
-using MonoMod.Utils;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using Expedition;
+﻿using Expedition;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
-using System.Linq;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
 
 namespace BingoMode.Challenges
 {
@@ -55,6 +42,15 @@ namespace BingoMode.Challenges
             creatureNames[(int)CreatureType.VultureGrub] = ChallengeTools.IGT.Translate("Vulture Grubs");
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
         }
+
+        public static string[] BombableOutposts =
+        {
+            "su_c02",
+            "gw_c05",
+            "gw_c11",
+            "lf_e03",
+            "ug_toll",
+        };
 
         public static string NameForPearl(PearlType pearl)
         {

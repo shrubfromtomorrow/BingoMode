@@ -52,6 +52,7 @@ namespace BingoMode
             On.Menu.ExpeditionMenu.ctor += ExpeditionMenu_ctor;
             On.Menu.ExpeditionMenu.InitMenuPages += ExpeditionMenu_InitMenuPages;
             On.Menu.ExpeditionMenu.Singal += ExpeditionMenu_Singal;
+            On.Menu.ExpeditionMenu.UpdatePage += ExpeditionMenu_UpdatePage;
 
             // Adding new bingo button to the character select page
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
@@ -181,15 +182,29 @@ namespace BingoMode
         {
             orig.Invoke(self, sender, message);
 
+            if (self.pagesMoving) return;
             if (message == "NEWBINGO")
             {
                 self.UpdatePage(4);
                 self.MovePage(new Vector2(1500f, 0f));
-                GlobalBoard.GenerateBoard(GlobalBoard.size);
+            }
+        }
+
+        public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)
+        {
+            orig.Invoke(self, pageIndex);
+
+            if (pageIndex == 4)
+            {
                 if (bingoPage.TryGetValue(self, out var page))
                 {
-                    page.grid.RemoveSprites();
-                    page.RemoveSubObject(page.grid);
+                    GlobalBoard.GenerateBoard(GlobalBoard.size);
+                    if (page.grid != null)
+                    {
+                        page.grid.RemoveSprites();
+                        page.RemoveSubObject(page.grid);
+                        page.grid = null;
+                    }
                     page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                     page.subObjects.Add(page.grid);
                 }

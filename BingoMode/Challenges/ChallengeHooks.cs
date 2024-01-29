@@ -15,6 +15,7 @@ using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using System.Linq;
 using System.Reflection;
 using MonoMod.RuntimeDetour;
+using static Rewired.Controller;
 
 namespace BingoMode.Challenges
 {
@@ -29,8 +30,119 @@ namespace BingoMode.Challenges
         // Runtime detour hooks
         public static Hook tokenColorHook;
 
+        // Normal/IL hooks
         public static void Apply()
         {
+            // Clearing stuff that needs to be cleared at the end of the cycle
+            On.SaveState.SessionEnded += ClearBs;
+        }
+
+        public static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck self, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (self.thrownBy is Player && result.obj is Creature victim)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
+                    {
+                        c.Hit(self.abstractPhysicalObject.type, victim);
+                    }
+                }
+            }
+
+            return orig.Invoke(self, result, eu);
+        }
+
+        public static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock self, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (self.thrownBy is Player && result.obj is Creature victim)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
+                    {
+                        c.Hit(self.abstractPhysicalObject.type, victim);
+                    }
+                }
+            }
+
+            return orig.Invoke(self, result, eu);
+        }
+
+        public static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (self.thrownBy is Player && result.obj is Creature victim)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
+                    {
+                        c.Hit(self.abstractPhysicalObject.type, victim);
+                    }
+                }
+            }
+
+            return orig.Invoke(self, result, eu);
+        }
+
+        public static void PlayerTracker_Update2(On.ScavengerOutpost.PlayerTracker.orig_Update orig, ScavengerOutpost.PlayerTracker self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (self.PlayerOnOtherSide && ExpeditionData.challengeList[j] is BingoBombTollChallenge c && c.bombed)
+                {
+                    c.Pass(self.outpost.room.abstractRoom.name);
+                }
+            }
+        }
+
+        private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
+        {
+            orig.Invoke(self, game, survived, newMalnourished);
+
+            if (BingoData.BingoMode)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
+                    {
+                        c.bombed = false;
+                    }
+                }
+            }
+        }
+
+        public static void ScavengerBomb_Explode(On.ScavengerBomb.orig_Explode orig, ScavengerBomb self, BodyChunk hitChunk)
+        {
+            orig.Invoke(self, hitChunk);
+
+            if (self.room.abstractRoom.scavengerOutpost && self.room.updateList.Find(x => x is ScavengerOutpost) is ScavengerOutpost outpost && Custom.DistLess(self.firstChunk.pos, outpost.placedObj.pos, 500f))
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
+                    {
+                        c.Boom(self.room.abstractRoom.name);
+                    }
+                }
+            }
+        }
+
+        public static void SmallNeedleWorm_PlaceInRoom(On.SmallNeedleWorm.orig_PlaceInRoom orig, SmallNeedleWorm self, Room placeRoom)
+        {
+            if (self.State.eggSpawn && placeRoom.abstractRoom.shelter && placeRoom.world.rainCycle.timer < 40)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoHatchNoodleChallenge c)
+                    {
+                        c.Hatch();
+                    }
+                }
+            }
+            orig.Invoke(self, placeRoom);
         }
 
         public static ItemType Player_CraftingResults(On.Player.orig_CraftingResults orig, Player self)
@@ -133,7 +245,7 @@ namespace BingoMode.Challenges
                     {
                         ignore = heldType;
                         BingoData.heldItemsTime[(int)heldType]++;
-                        Plugin.logger.LogMessage(BingoData.heldItemsTime[(int)heldType]);
+                        //Plugin.logger.LogMessage(BingoData.heldItemsTime[(int)heldType]);
                     }
                 }
             }
@@ -307,8 +419,6 @@ namespace BingoMode.Challenges
                     {
                         if (self.player.realizedCreature.grasps[j].grabbed.abstractPhysicalObject.ID == self.outpost.outPostProperty[k].ID)
                         {
-                            Plugin.logger.LogMessage("Stefth!!");
-                            foreach (var g in self.outpost.outPostProperty) Plugin.logger.LogMessage("Property: " + g);
                             bool gruh = false;
                             for (int w = 0; w < ExpeditionData.challengeList.Count; w++)
                             {
@@ -399,22 +509,6 @@ namespace BingoMode.Challenges
                     if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
                     {
                         c.Hit(explosion.sourceObject.abstractPhysicalObject.type, victim, explosion);
-                    }
-                }
-            }
-        }
-
-        public static void SocialEventRecognizer_WeaponAttack(On.SocialEventRecognizer.orig_WeaponAttack orig, SocialEventRecognizer self, PhysicalObject weapon, Creature thrower, Creature victim, bool hit)
-        {
-            orig.Invoke(self, weapon, thrower, victim, hit);
-
-            if (weapon is not PuffBall && weapon is not SporePlant && thrower is Player && hit && !victim.dead)
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(weapon.abstractPhysicalObject.type, victim);
                     }
                 }
             }
