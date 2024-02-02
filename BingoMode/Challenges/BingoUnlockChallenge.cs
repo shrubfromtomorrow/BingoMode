@@ -25,7 +25,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoUnlockChallenge || (challenge as BingoUnlockChallenge).unlock != unlock;
+            return challenge is not BingoUnlockChallenge c || c.unlock != unlock;
         }
 
         public override string ChallengeName()

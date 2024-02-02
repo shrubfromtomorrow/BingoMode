@@ -76,7 +76,7 @@ namespace BingoMode.Challenges
             {
                 "Hatching",
                 "~",
-                current.ToString(),
+                atOnce ? "0" : current.ToString(),
                 "><",
                 amount.ToString(),
                 "><",

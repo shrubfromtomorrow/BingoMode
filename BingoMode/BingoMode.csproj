@@ -95,6 +95,9 @@
     <Compile Include="Challenges\BingoBombTollChallenge.cs" />
     <Compile Include="Challenges\BingoCollectPearlChallenge.cs" />
     <Compile Include="Challenges\BingoCraftChallenge.cs" />
+    <Compile Include="Challenges\BingoCreatureGateChallenge.cs" />
+    <Compile Include="Challenges\BingoDeathPitChallenge.cs" />
+    <Compile Include="Challenges\BingoDepthsChallenge.cs" />
     <Compile Include="Challenges\BingoDodgeLeviathanChallenge.cs" />
     <Compile Include="Challenges\BingoEchoChallenge.cs" />
     <Compile Include="Challenges\BingoGreenNeuronChallenge.cs" />
@@ -102,12 +105,15 @@
     <Compile Include="Challenges\BingoDontUseItemChallenge.cs" />
     <Compile Include="Challenges\BingoEatChallenge.cs" />
     <Compile Include="Challenges\BingoHatchNoodleChallenge.cs" />
+    <Compile Include="Challenges\BingoKillChallenge.cs" />
     <Compile Include="Challenges\BingoNoRegionChallenge.cs" />
+    <Compile Include="Challenges\BingoPinChallenge.cs" />
     <Compile Include="Challenges\BingoPopcornChallenge.cs" />
     <Compile Include="Challenges\BingoStealChallenge.cs" />
     <Compile Include="Challenges\BingoTameChallenge.cs" />
     <Compile Include="Challenges\BingoTradeChallenge.cs" />
     <Compile Include="Challenges\BingoTradeTradedChallenge.cs" />
+    <Compile Include="Challenges\BingoTransportChallenge.cs" />
     <Compile Include="Challenges\BingoUnlockChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />

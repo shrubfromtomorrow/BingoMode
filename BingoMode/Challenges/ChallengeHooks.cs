@@ -35,19 +35,122 @@ namespace BingoMode.Challenges
         {
             // Clearing stuff that needs to be cleared at the end of the cycle
             On.SaveState.SessionEnded += ClearBs;
+
+            // For damage and kill challenges, i put them here since theres so many and both challenges would have to do the same hooks
+            On.Spear.HitSomething += Spear_HitSomething;
+            On.Rock.HitSomething += Rock_HitSomething;
+            On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
+            On.PhysicalObject.HitByExplosion += PhysicalObject_HitByExplosion;
+            IL.SporeCloud.Update += SporeCloud_Update;
+            //On.SporePlant.Bee.Attach += Bee_Attach;
+            IL.JellyFish.Collide += JellyFish_Collide;
+        }
+
+        public static void ReportHit(ItemType weapon, Creature victim, UpdatableAndDeletable nonPhysicalSource = null)
+        {
+            if (weapon == null || victim == null) return;
+            Plugin.logger.LogMessage($"Report hit! {weapon} {victim.Template.type} {nonPhysicalSource}");
+
+            if (nonPhysicalSource != null)
+            {
+                if (BingoData.blacklist.TryGetValue(victim, out var gruh) && gruh.Contains(nonPhysicalSource)) return;
+                if (!BingoData.blacklist.ContainsKey(victim)) { BingoData.blacklist.Add(victim, []); }
+                BingoData.blacklist[victim].Add(nonPhysicalSource);
+            }
+
+            Plugin.logger.LogMessage($"Hit {weapon} {victim.Template.type} {nonPhysicalSource} went through!");
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
+                {
+                    c.Hit(weapon, victim);
+                }
+            }
+
+            EntityID id = victim.abstractCreature.ID;
+            if (!BingoData.hitTimeline.ContainsKey(id)) BingoData.hitTimeline.Add(id, []);
+            if (BingoData.hitTimeline.TryGetValue(id, out var gru) && (gru.Count == 0 || gru.Last() != weapon)) { gru.Remove(weapon); gru.Add(weapon); Plugin.logger.LogMessage($"Added {weapon} to id: {id} and creature type: {victim.abstractCreature.creatureTemplate.type}"); }
+        }
+
+        public static void Creature_UpdateIL(ILContext il)
+        {
+            ILCursor c = new(il);
+        
+            if (c.TryGotoNext(
+                x => x.MatchLdstr("Fell out of room!")
+                ) && 
+                c.TryGotoNext(MoveType.After,
+                x => x.MatchCallOrCallvirt<Creature>("Die")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<Creature>>((self) =>
+                {
+                    if (self.killTag != null && self.killTag.creatureTemplate.type == CreatureType.Slugcat && self.killTag.realizedCreature is Player p)
+                    {
+                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                        {
+                            if (ExpeditionData.challengeList[j] is BingoKillChallenge c)
+                            {
+                                c.DeathPit(self, p);
+                            }
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, Creature_UpdateIL il fucked up " + il);
+        }
+
+        public static void Player_SlugcatGrab(On.Player.orig_SlugcatGrab orig, Player self, PhysicalObject obj, int graspUsed)
+        {
+            orig.Invoke(self, obj, graspUsed);
+
+            if (obj is Creature crit)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoTransportChallenge c)
+                    {
+                        c.Grabbed(crit);
+                    }
+                }
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        {
+            orig.Invoke(self);
+            Plugin.logger.LogMessage("HALO HALOO 2");
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoTransportChallenge c)
+                {
+                    c.Gated(self.room.world.region.name);
+                }
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded1(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        {
+            orig.Invoke(self);
+            Plugin.logger.LogMessage("HALO HALOO");
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge c)
+                {
+                    c.Gate(self.room.abstractRoom.name);
+                }
+            }
         }
 
         public static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck self, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (self.thrownBy is Player && result.obj is Creature victim)
+            if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(self.abstractPhysicalObject.type, victim);
-                    }
-                }
+                ReportHit(self.abstractPhysicalObject.type, victim);
             }
 
             return orig.Invoke(self, result, eu);
@@ -55,15 +158,9 @@ namespace BingoMode.Challenges
 
         public static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock self, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (self.thrownBy is Player && result.obj is Creature victim)
+            if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(self.abstractPhysicalObject.type, victim);
-                    }
-                }
+                ReportHit(self.abstractPhysicalObject.type, victim);
             }
 
             return orig.Invoke(self, result, eu);
@@ -71,15 +168,9 @@ namespace BingoMode.Challenges
 
         public static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (self.thrownBy is Player && result.obj is Creature victim)
+            if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(self.abstractPhysicalObject.type, victim);
-                    }
-                }
+                ReportHit(self.abstractPhysicalObject.type, victim);
             }
 
             return orig.Invoke(self, result, eu);
@@ -111,6 +202,8 @@ namespace BingoMode.Challenges
                         c.bombed = false;
                     }
                 }
+                BingoData.hitTimeline.Clear();
+                BingoData.heldItemsTime =  new int[ExtEnum<ItemType>.values.Count];
             }
         }
 
@@ -453,21 +546,15 @@ namespace BingoMode.Challenges
             }
         }
 
-        public static void Bee_Attach(On.SporePlant.Bee.orig_Attach orig, SporePlant.Bee self, BodyChunk chunk)
-        {
-            if (chunk.owner is Creature victim && !victim.dead)
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(self.owner.abstractPhysicalObject.type, victim, self.owner);
-                    }
-                }
-            }
-
-            orig.Invoke(self, chunk);
-        }
+        //public static void Bee_Attach(On.SporePlant.Bee.orig_Attach orig, SporePlant.Bee self, BodyChunk chunk)
+        //{
+        //    if (BingoData.BingoMode && self.owner.thrownBy is Player && chunk.owner is Creature victim && !victim.dead)
+        //    {
+        //        ReportHit(self.owner.abstractPhysicalObject.type, victim, self.owner);
+        //    }
+        //
+        //    orig.Invoke(self, chunk);
+        //}
 
         public static void SporeCloud_Update(ILContext il)
         {
@@ -482,15 +569,12 @@ namespace BingoMode.Challenges
                 c.Emit(OpCodes.Ldloc_3);
                 c.EmitDelegate<Action<SporeCloud, int>>((self, i) =>
                 {
-                    Creature victim = self.room.abstractRoom.creatures[i].realizedCreature;
-                    if (!victim.dead && Custom.DistLess(self.pos, victim.mainBodyChunk.pos, self.rad + victim.mainBodyChunk.rad + 20f))
+                    if (!self.slatedForDeletetion && BingoData.BingoMode && self != null && self.killTag != null && self.killTag.creatureTemplate.type == CreatureType.Slugcat)
                     {
-                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                        Creature victim = self.room.abstractRoom.creatures[i].realizedCreature;
+                        if (victim != null && !victim.dead && Custom.DistLess(self.pos, victim.mainBodyChunk.pos, self.rad + victim.mainBodyChunk.rad + 20f))
                         {
-                            if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                            {
-                                c.Hit(ItemType.PuffBall, victim, self);
-                            }
+                            ReportHit(ItemType.PuffBall, victim, self);
                         }
                     }
                 });
@@ -502,14 +586,11 @@ namespace BingoMode.Challenges
         {
             orig.Invoke(self, hitFac, explosion, hitChunk);
 
-            if (self is Creature victim && !victim.dead)
+            if (BingoData.BingoMode && explosion.killTagHolder is Player)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                if (self is Creature victim && !victim.dead)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                    {
-                        c.Hit(explosion.sourceObject.abstractPhysicalObject.type, victim, explosion);
-                    }
+                    ReportHit(explosion.sourceObject.abstractPhysicalObject.type, victim, explosion);
                 }
             }
         }
@@ -528,12 +609,9 @@ namespace BingoMode.Challenges
                 c.Emit(OpCodes.Ldarg_1);
                 c.EmitDelegate<Action<JellyFish, PhysicalObject>>((self, obj) =>
                 {
-                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    if (BingoData.BingoMode && self.thrownBy is Player)
                     {
-                        if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
-                        {
-                            c.Hit(self.abstractPhysicalObject.type, obj as Creature);
-                        }
+                        ReportHit(self.abstractPhysicalObject.type, obj as Creature);
                     }
                 });
             }

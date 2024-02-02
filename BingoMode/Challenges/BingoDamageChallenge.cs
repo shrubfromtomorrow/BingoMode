@@ -18,7 +18,6 @@ namespace BingoMode.Challenges
         public int amount;
         public int current;
         // This prevents the same creatures being hit by the same sources multiple times
-        public Dictionary<Creature, List<UpdatableAndDeletable>> blacklist = [];
 
         public override void UpdateDescription()
         {
@@ -63,18 +62,10 @@ namespace BingoMode.Challenges
             };
         }
 
-        public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm, UpdatableAndDeletable nonPhysicalSource = null)
+        public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
-            if (completed || weaponn == null || victimm == null) return;
-            if (weaponn == weapon && (victimm.Template.type == victim))
+            if (weaponn == weapon && (victim == null || victimm.Template.type == victim))
             {
-                if (nonPhysicalSource != null) 
-                {
-                    if (blacklist.TryGetValue(victimm, out var gruh) && gruh.Contains(nonPhysicalSource)) return;
-                    if (!blacklist.ContainsKey(victimm)) blacklist.Add(victimm, []);
-                    if (blacklist.TryGetValue(victimm, out var list) && !list.Contains(nonPhysicalSource)) list.Add(nonPhysicalSource);
-                }
-
                 current++;
                 UpdateDescription();
                 if (current >= amount) CompleteChallenge();
@@ -84,14 +75,16 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            foreach (var kvp in blacklist)
+            ss:
+            foreach (var kvp in BingoData.blacklist)
             {
+                s:
                 foreach (var item in kvp.Value)
                 {
-                    if (item.slatedForDeletetion || item == null) kvp.Value.Remove(item);
+                    if (item.slatedForDeletetion || item == null) { kvp.Value.Remove(item); goto s; }
                 }
-
-                if (kvp.Value.Count == 0) blacklist.Remove(kvp.Key);
+        
+                if (kvp.Value.Count == 0) { BingoData.blacklist.Remove(kvp.Key); goto ss; }
             }
         }
 
@@ -154,24 +147,10 @@ namespace BingoMode.Challenges
 
         public void AddHooks()
         {
-            On.Spear.HitSomething += Spear_HitSomething;
-            On.Rock.HitSomething += Rock_HitSomething;
-            On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
-            On.PhysicalObject.HitByExplosion += PhysicalObject_HitByExplosion;
-            IL.SporeCloud.Update += SporeCloud_Update;
-            On.SporePlant.Bee.Attach += Bee_Attach;
-            IL.JellyFish.Collide += JellyFish_Collide;
         }
 
         public void RemoveHooks()
         {
-            On.Spear.HitSomething -= Spear_HitSomething;
-            On.Rock.HitSomething -= Rock_HitSomething;
-            On.MoreSlugcats.LillyPuck.HitSomething -= LillyPuck_HitSomething;
-            On.PhysicalObject.HitByExplosion -= PhysicalObject_HitByExplosion;
-            IL.SporeCloud.Update -= SporeCloud_Update;
-            On.SporePlant.Bee.Attach -= Bee_Attach;
-            IL.JellyFish.Collide -= JellyFish_Collide;
         }
     }
 }

@@ -3,6 +3,8 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
+using System.Collections.Generic;
+using MoreSlugcats;
 
 namespace BingoMode.Challenges
 {
@@ -21,12 +23,13 @@ namespace BingoMode.Challenges
             if (type == ItemType.Spear) return translator.Translate("Spears");
             if (type == ItemType.Rock) return translator.Translate("Rocks");
             if (type == ItemType.SporePlant) return translator.Translate("Bee Hives");
+            if (type == ItemType.DataPearl) return translator.Translate("Pearls");
             // Food items
             if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
             if (type == ItemType.EggBugEgg) return translator.Translate("Eggbug Eggs");
             if (type == ItemType.WaterNut) return translator.Translate("Bubble Fruit");
             if (type == ItemType.SlimeMold) return translator.Translate("Slime Mold");
-            if (type == ItemType.BubbleGrass) return translator.Translate("Slime Mold");
+            if (type == ItemType.BubbleGrass) return translator.Translate("Bubble Grass");
             if (type == MSCItemType.GlowWeed) return translator.Translate("Glow Weed");
             if (type == MSCItemType.DandelionPeach) return translator.Translate("Dandelion Peaches");
             if (type == MSCItemType.LillyPuck) return translator.Translate("Lillypucks");
@@ -43,7 +46,60 @@ namespace BingoMode.Challenges
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
         }
 
-        public static string[] BombableOutposts =
+        public static List<string> CreatureOriginRegions(CreatureType type, SlugcatStats.Name slug)
+        {
+            List<string> r = [];
+            switch (type.value)
+            {
+                case "CicadaA":
+                case "CicadaB":
+                    r.AddRange(["SU", "HI", "LF", "SI"]);
+                    if (slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.Add("VS");
+                    break;
+                case "Hazer":
+                    r.AddRange(["HI", "GW", "SL", "DS", "LF"]);
+                    break;
+                case "VultureGrub":
+                    r.AddRange(["HI", "GW", "CC", "LF"]);
+                    break;
+                case "JetFish":
+                    r.Add("SL"); //if (slug == SlugcatStats.Name.Red) r.Add("sb");
+                    break;
+                case "Yeek":
+                    r.Add("OE"); if (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint || slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.AddRange(["SB", "LF"]);
+                    break;
+            }
+
+            return r;
+        }
+
+        public static readonly CreatureType[] Transportable =
+        {
+            CreatureType.JetFish,
+            CreatureType.Hazer,
+            CreatureType.VultureGrub,
+            CreatureType.CicadaA,
+            CreatureType.CicadaB,
+            new("Yeek", false)
+        };
+
+        public static readonly CreatureType[] Pinnable =
+        {
+            CreatureType.CicadaA,
+            CreatureType.CicadaB,
+            CreatureType.Scavenger,
+            CreatureType.BlackLizard,
+            CreatureType.PinkLizard,
+            CreatureType.BlueLizard,
+            CreatureType.YellowLizard,
+            CreatureType.WhiteLizard,
+            CreatureType.GreenLizard,
+            CreatureType.Snail,
+            CreatureType.Centipede,
+            CreatureType.LanternMouse
+        };
+
+        public static readonly string[] BombableOutposts =
         {
             "su_c02",
             "gw_c05",
@@ -101,21 +157,21 @@ namespace BingoMode.Challenges
             return "NULL";
         }
 
-        public static ItemType[] ItemFoodTypes =
+        public static readonly ItemType[] ItemFoodTypes =
         {
             ItemType.DangleFruit,
             ItemType.EggBugEgg,
             ItemType.WaterNut,
             ItemType.SlimeMold,
-            ItemType.Mushroom,
             ItemType.JellyFish,
+            ItemType.Mushroom,
             new("GooieDuck", false),
             new("LillyPuck", false),
             new("DandelionPeach", false),
             new("GlowWeed", false),
         };
 
-        public static CreatureType[] CreatureFoodTypes =
+        public static readonly CreatureType[] CreatureFoodTypes =
         {
             CreatureType.VultureGrub,
             CreatureType.Hazer,
@@ -124,25 +180,25 @@ namespace BingoMode.Challenges
             CreatureType.SmallCentipede
         };
 
-        public static ItemType[] Weapons =
+        public static readonly ItemType[] Weapons =
         {
             ItemType.Spear,
             ItemType.Rock,
             ItemType.ScavengerBomb,
-            ItemType.PuffBall,
-            ItemType.SporePlant,
+            //ItemType.SporePlant,
             ItemType.JellyFish,
+            ItemType.PuffBall,
             new("LillyPuck", false),
         };
 
-        public static ItemType[] StealableStolable =
+        public static readonly ItemType[] StealableStolable =
         {
             ItemType.Spear,
             ItemType.Rock,
             ItemType.ScavengerBomb,
         };
 
-        public static ItemType[] Bannable =
+        public static readonly ItemType[] Bannable =
         {
             ItemType.FlyLure,
             ItemType.Lantern,
@@ -150,12 +206,9 @@ namespace BingoMode.Challenges
             ItemType.VultureMask,
             ItemType.ScavengerBomb,
             ItemType.BubbleGrass,
-            ItemType.DangleFruit,
-            ItemType.SlimeMold,
-            ItemType.WaterNut
         };
 
-        public static CreatureType[] Befriendable =
+        public static readonly CreatureType[] Befriendable =
         {
             CreatureType.CicadaA,
             CreatureType.CicadaB,
@@ -171,7 +224,7 @@ namespace BingoMode.Challenges
             new ("ZoopLizard", false)
         };
 
-        public static PearlType[] CollectablePearls =
+        public static readonly PearlType[] CollectablePearls =
         {
             PearlType.UW,
             PearlType.SH,
@@ -195,7 +248,7 @@ namespace BingoMode.Challenges
             new("VS", false),
         };
 
-        public static ItemType[] CraftableItems =
+        public static readonly ItemType[] CraftableItems =
         {
             ItemType.Rock,
             ItemType.FlareBomb,

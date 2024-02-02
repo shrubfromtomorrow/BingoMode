@@ -26,7 +26,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoDontUseItemChallenge c || c.item != item;
+            return challenge is not BingoDontUseItemChallenge c || (c.item != item && c.isFood != isFood);
         }
 
         public override string ChallengeName()
@@ -40,9 +40,9 @@ namespace BingoMode.Challenges
             AbstractPhysicalObject.AbstractObjectType type;
             if (edible)
             {
-                type = ChallengeUtils.Bannable[UnityEngine.Random.Range(6, 9)];
+                type = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length - (ModManager.MSC ? 5 : 1))];
             } 
-            else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, 6)];
+            else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
             return new BingoDontUseItemChallenge
             {
                 item = type,

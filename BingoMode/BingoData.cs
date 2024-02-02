@@ -9,6 +9,7 @@ using Menu;
 using Menu.Remix;
 using UnityEngine;
 using RWCustom;
+using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode
 {
@@ -23,6 +24,8 @@ namespace BingoMode
         public static List<string>[] possibleTokens = new List<string>[4];
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
+        public static Dictionary<Creature, List<UpdatableAndDeletable>> blacklist = [];
+        public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
 
         public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon);
 
@@ -37,7 +40,9 @@ namespace BingoMode
             {
                 if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock)) challengeTokens.Add(c.unlock);
             }
-            heldItemsTime = new int[ExtEnum<AbstractPhysicalObject.AbstractObjectType>.values.Count];
+            heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
+            blacklist = [];
+            hitTimeline = [];
         }
 
         public static void FinishBingo()

@@ -22,6 +22,10 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
+            if (ChallengeTools.creatureNames == null)
+            {
+                ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
+            }
             description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type>")
                 .Replace("<current>", ValueConverter.ConvertToString(currentEated))
                 .Replace("<amount>", ValueConverter.ConvertToString(amountRequired))
@@ -55,13 +59,13 @@ namespace BingoMode.Challenges
                 randomFood = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length -
                             (ModManager.MSC ? (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet ? 0 : 1) : 4))];
             }
-    
+
             return new BingoEatChallenge()
             {
                 itemFoodType = randomFood,
                 creatureFoodType = randomCreatureFood,
                 isCreature = c,
-                amountRequired = Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
+                amountRequired = UnityEngine.Random.Range(3, 8) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)//Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
             };
         }
     

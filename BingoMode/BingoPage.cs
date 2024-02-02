@@ -20,6 +20,7 @@ namespace BingoMode
         public FSprite pageTitle;
         public SymbolButton rightPage;
         public BigSimpleButton startGame;
+        public SymbolButton randomize;
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -40,6 +41,11 @@ namespace BingoMode
             rightPage.size = new Vector2(45f, 45f);
             rightPage.roundedRect.size = rightPage.size;
             subObjects.Add(rightPage);
+
+            randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "RANDOMIZE", new Vector2(563f, 690f));
+            randomize.size = new Vector2(30f, 30f);
+            randomize.roundedRect.size = randomize.size;
+            subObjects.Add(randomize);
 
             //grid = new BingoGrid(menu, this, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
             //subObjects.Add(grid);
@@ -88,6 +94,20 @@ namespace BingoMode
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
+            }
+
+            if (message == "RANDOMIZE")
+            {
+                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
+                if (grid != null)
+                {
+                    grid.RemoveSprites();
+                    RemoveSubObject(grid);
+                    grid = null;
+                }
+                grid = new BingoGrid(menu, page, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
+                subObjects.Add(grid);
+                menu.PlaySound(SoundID.MENU_Next_Slugcat);
             }
 
             // Also initialize bingo on continue

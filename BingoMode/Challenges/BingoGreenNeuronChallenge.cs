@@ -17,7 +17,8 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Deliver the green neuron to " + (moon ? "Looks to the Moon" : "Five Pebbles"));
+            //this.description = ChallengeTools.IGT.Translate("Deliver the green neuron to " + (moon ? "Looks to the Moon" : "Five Pebbles"));
+            this.description = ChallengeTools.IGT.Translate(moon ? "Reactivate Looks to the Moon" : "Deliver the green neuron to Five Pebbles");
             base.UpdateDescription();
         }
 

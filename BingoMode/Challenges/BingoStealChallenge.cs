@@ -22,7 +22,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Steal [<current>/<amount>] <item> from a Scavenger" + (toll ? " toll" : ""))
+            this.description = ChallengeTools.IGT.Translate("Steal [<current>/<amount>] <item> from " + (toll ? "a Scavenger toll" : "Scavengers"))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount))
                 .Replace("<item>", ChallengeTools.ItemName(subject));

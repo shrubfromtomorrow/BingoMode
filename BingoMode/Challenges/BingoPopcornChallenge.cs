@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
         {
             return new BingoPopcornChallenge
             {
-                amount = UnityEngine.Random.Range(3, 11)
+                amount = UnityEngine.Random.Range(3, 8)
             };
         }
 
