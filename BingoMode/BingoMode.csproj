@@ -96,7 +96,6 @@
     <Compile Include="Challenges\BingoCollectPearlChallenge.cs" />
     <Compile Include="Challenges\BingoCraftChallenge.cs" />
     <Compile Include="Challenges\BingoCreatureGateChallenge.cs" />
-    <Compile Include="Challenges\BingoDeathPitChallenge.cs" />
     <Compile Include="Challenges\BingoDepthsChallenge.cs" />
     <Compile Include="Challenges\BingoDodgeLeviathanChallenge.cs" />
     <Compile Include="Challenges\BingoEchoChallenge.cs" />
@@ -117,6 +116,7 @@
     <Compile Include="Challenges\BingoUnlockChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />
+    <Compile Include="CustomizerDialog.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

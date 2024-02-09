@@ -68,7 +68,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Crafting",
+                "BingoCraftChallenge",
                 "~",
                 ValueConverter.ConvertToString(craftee),
                 "><",
@@ -93,7 +93,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Crafting FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoCraftChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

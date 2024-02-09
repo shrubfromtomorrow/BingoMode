@@ -100,7 +100,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Gating",
+                "BingoCreatureGateChallenge",
                 "~",
                 ValueConverter.ConvertToString(crit),
                 "><",
@@ -131,7 +131,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Gating FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoCreatureGateChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

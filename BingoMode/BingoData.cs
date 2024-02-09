@@ -24,10 +24,17 @@ namespace BingoMode
         public static List<string>[] possibleTokens = new List<string>[4];
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
-        public static Dictionary<Creature, List<UpdatableAndDeletable>> blacklist = [];
+        public static Dictionary<Creature, List<EntityID>> blacklist = [];
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
 
         public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon);
+
+        public static List<Challenge> GetAdequateChallengeList(SlugcatStats.Name slug)
+        {
+            List<Challenge> list = [.. availableBingoChallenges];
+            list.RemoveAll(x => !x.ValidForThisSlugcat(slug));
+            return list;
+        }
 
         public static void InitializeBingo()
         {

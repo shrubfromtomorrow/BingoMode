@@ -87,7 +87,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "RegionBan2",
+                "BingoAllRegionsExcept",
                 "~",
                 region,
                 "><",
@@ -112,7 +112,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Region Ban 2 FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoAllRegionsExcept FromString() encountered an error: " + ex.Message);
             }
         }
 

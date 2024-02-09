@@ -69,7 +69,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Befriending",
+                "BingoTameChallenge",
                 "~",
                 ValueConverter.ConvertToString(crit),
                 "><",
@@ -94,7 +94,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Befriending FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoTameChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

@@ -74,7 +74,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Hatching",
+                "BingoHatchNoodleChallenge",
                 "~",
                 atOnce ? "0" : current.ToString(),
                 "><",
@@ -102,7 +102,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Hatching FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoHatchNoodleChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

@@ -83,7 +83,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Depths",
+                "BingoDepthsChallenge",
                 "~",
                 ValueConverter.ConvertToString(crit),
                 "><",
@@ -108,7 +108,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Depths FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoDepthsChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

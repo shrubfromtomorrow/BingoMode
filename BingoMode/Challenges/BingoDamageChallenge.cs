@@ -25,7 +25,7 @@ namespace BingoMode.Challenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            this.description = ChallengeTools.IGT.Translate("Damage <crit> with <weapon> [<current>/<amount>] times")
+            this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times")
                 .Replace("<crit>", victim == null ? "creatures" : ChallengeTools.creatureNames[victim.Index])
                 .Replace("<weapon>", ChallengeTools.ItemName(weapon))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
@@ -64,7 +64,11 @@ namespace BingoMode.Challenges
 
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
-            if (weaponn == weapon && (victim == null || victimm.Template.type == victim))
+            bool glug = false;
+            if (victimm.Template.type == victim) glug = true;
+            if (victim == null && victimm is not Player) glug = true;
+
+            if (weaponn == weapon && glug)
             {
                 current++;
                 UpdateDescription();
@@ -72,21 +76,21 @@ namespace BingoMode.Challenges
             }
         }
 
-        public override void Update()
-        {
-            base.Update();
-            ss:
-            foreach (var kvp in BingoData.blacklist)
-            {
-                s:
-                foreach (var item in kvp.Value)
-                {
-                    if (item.slatedForDeletetion || item == null) { kvp.Value.Remove(item); goto s; }
-                }
-        
-                if (kvp.Value.Count == 0) { BingoData.blacklist.Remove(kvp.Key); goto ss; }
-            }
-        }
+        //public override void Update()
+        //{
+        //    base.Update();
+        //    ss:
+        //    foreach (var kvp in BingoData.blacklist)
+        //    {
+        //        s:
+        //        foreach (var item in kvp.Value)
+        //        {
+        //            if (item == null) { kvp.Value.Remove(item); goto s; }
+        //        }
+        //
+        //        if (kvp.Value.Count == 0) { BingoData.blacklist.Remove(kvp.Key); goto ss; }
+        //    }
+        //}
 
         public override int Points()
         {
@@ -107,7 +111,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "DmgWithItem",
+                "BingoDamageChallenge",
                 "~",
                 ValueConverter.ConvertToString(weapon),
                 "><",
@@ -141,7 +145,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: DmgWithItem FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoDamageChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Expedition;
 using Menu;
 using Menu.Remix;
+using Menu.Remix.MixedUI;
 using UnityEngine;
 
 namespace BingoMode
@@ -19,11 +20,15 @@ namespace BingoMode
         public HSLColor labelColor;
         public Challenge challenge;
         public string singalText; // singal.
+        public int x;
+        public int y;
 
-        public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, Challenge challenge, string singalText) : base(menu, owner, pos, size)
+        public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
         {
             this.singalText = singalText;
-            this.challenge = challenge;
+            x = xCoord;
+            y = yCoord;
+            challenge = BingoHooks.GlobalBoard.challengeGrid[x, y];
 
             labelColor = Menu.Menu.MenuColor(Menu.Menu.MenuColors.MediumGrey);
 
@@ -31,8 +36,15 @@ namespace BingoMode
             subObjects.Add(bkgRect);
             selectRect = new RoundedRect(menu, owner, pos, size, false);
             subObjects.Add(selectRect);
-            textLabel = new MenuLabel(menu, owner, SplitString(challenge.description), pos, size, false);
+            textLabel = new MenuLabel(menu, owner, "", pos, size, false);
             subObjects.Add(textLabel);
+
+            //randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "randomize_single", new Vector2(size.x * 0.1f, size.y * 0.7f));
+            //randomize.size = size / 4f;
+            //randomize.roundedRect.size = randomize.size;
+            //randomize.symbolSprite.scale = 0.03f * randomize.size.x;
+            //subObjects.Add(randomize);
+            UpdateText();
         }
 
         public string SplitString(string s)
@@ -94,20 +106,13 @@ namespace BingoMode
         public override void Clicked()
         {
             Singal(this, singalText);
-        }
-    }
 
-    public abstract class BingoSettingButton
-    {
-        public BingoSettingButton()
+            menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
+        }
+
+        public void UpdateText()
         {
-
+            textLabel.text = challenge.description.WrapText(false, size.x * 0.8f);
         }
     }
-    //public class AnimationIndex : ExtEnum<AnimationIndex>
-    //{
-    //    public AnimationIndex(string value, bool register = false) : base(value, register)
-    //    {
-    //    }
-    //}
 }

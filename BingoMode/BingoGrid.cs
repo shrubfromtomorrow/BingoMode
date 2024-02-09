@@ -40,7 +40,7 @@ namespace BingoMode
                     float butSize = maxSize / size;
                     float topLeft = -butSize * size / 2f;
                     BingoButton but = new BingoButton(menu, this,
-                    centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f), new Vector2(butSize, butSize), board.challengeGrid[i, j], i + " " + j)
+                    centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f), new Vector2(butSize, butSize), i + " " + j, i, j)
                     {
                         lastPos = pos
                     };

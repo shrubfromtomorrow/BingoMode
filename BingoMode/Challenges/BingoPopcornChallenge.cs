@@ -7,20 +7,23 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoPopcornChallenge : Challenge, IBingoChallenge
     {
-        public int amount;
         public int current;
+        public StrongBox<int> amount = new();
+
+        public List<object> Settings => new() { amount };
 
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
@@ -36,10 +39,9 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            return new BingoPopcornChallenge
-            {
-                amount = UnityEngine.Random.Range(3, 8)
-            };
+            BingoPopcornChallenge ch = new();
+            ch.amount.Value = UnityEngine.Random.Range(3, 8);
+            return ch;
         }
 
         public void Pop()
@@ -48,13 +50,13 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= amount) CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
             }
         }
 
         public override int Points()
         {
-            return amount * 10;
+            return amount.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -71,11 +73,11 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Popcorn",
+                "BingoPopcornChallenge",
                 "~",
                 current.ToString(),
                 "><",
-                amount.ToString(),
+                amount.Value.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -91,7 +93,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount.Value = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -99,7 +101,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Popcorn FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoPopcornChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

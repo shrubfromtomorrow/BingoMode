@@ -90,7 +90,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Restraint",
+                "BingoDontUseItemChallenge",
                 "~",
                 ValueConverter.ConvertToString(item),
                 "><",
@@ -118,7 +118,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Restraint FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoDontUseItemChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

@@ -124,7 +124,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "CollectPearl",
+                "BingoCollectPearlChallenge",
                 "~",
                 specific ? "1" : "0",
                 "><",
@@ -158,7 +158,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: CollectPearl FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoCollectPearlChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

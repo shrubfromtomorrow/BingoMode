@@ -135,7 +135,7 @@ namespace BingoMode
             return won;
         }
 
-        public Challenge RandomBingoChallenge()
+        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false)
         {
             if (BingoData.availableBingoChallenges == null)
             {
@@ -144,6 +144,7 @@ namespace BingoMode
 
             List<Challenge> list = [];
             list.AddRange(BingoData.availableBingoChallenges);
+            if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
             //for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
             //{
             //    list.Add(BingoData.availableBingoChallenges[i]);
@@ -158,7 +159,7 @@ namespace BingoMode
             }
             ch = ch.Generate();
 
-            if (AllChallenges.Count > 0)
+            if (AllChallenges.Count > 0 && type == null && !ignore)
             {
                 for (int i = 0; i < AllChallenges.Count; i++)
                 {
@@ -171,7 +172,7 @@ namespace BingoMode
                 }
             }
 
-            Plugin.logger.LogMessage("Assigned " + ch.ChallengeName());
+            //Plugin.logger.LogMessage("Assigned " + ch.ChallengeName());
             AllChallenges.Add(ch);
             return AllChallenges.Last();
         }
@@ -196,6 +197,7 @@ namespace BingoMode
             try
             {
                 challengeGrid[x, y] = newChallenge;
+                UpdateChallenges();
             }
             catch
             {

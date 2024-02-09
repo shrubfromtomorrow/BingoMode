@@ -185,7 +185,7 @@ namespace BingoMode.Challenges
             ItemType.Spear,
             ItemType.Rock,
             ItemType.ScavengerBomb,
-            //ItemType.SporePlant,
+            ItemType.FlareBomb,
             ItemType.JellyFish,
             ItemType.PuffBall,
             new("LillyPuck", false),

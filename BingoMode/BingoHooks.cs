@@ -67,6 +67,15 @@ namespace BingoMode
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             // Stop the base Expedition HUD from appearing
             IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
+
+            // ficks
+            On.Menu.ChallengeSelectPage.SetUpSelectables += ChallengeSelectPage_SetUpSelectables;
+        }
+
+        public static void ChallengeSelectPage_SetUpSelectables(On.Menu.ChallengeSelectPage.orig_SetUpSelectables orig, ChallengeSelectPage self)
+        {
+            if (self.menu.currentPage == 4) return;
+            orig.Invoke(self);
         }
 
         public static void ProcessManager_PostSwitchMainProcess(ILContext il)
@@ -175,7 +184,7 @@ namespace BingoMode
             bingoPage.TryGetValue(self, out var page);
             self.pages[4].subObjects.Add(page);
             self.pages[4].pos.x -= 1500f;
-            Plugin.logger.LogMessage("Initialized bingo menu page " + self.pages[4] + " " + page);
+           // Plugin.logger.LogMessage("Initialized bingo menu page " + self.pages[4] + " " + page);
         }
 
         public static void ExpeditionMenu_Singal(On.Menu.ExpeditionMenu.orig_Singal orig, ExpeditionMenu self, MenuObject sender, string message)
@@ -192,8 +201,6 @@ namespace BingoMode
 
         public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)
         {
-            orig.Invoke(self, pageIndex);
-
             if (pageIndex == 4)
             {
                 if (bingoPage.TryGetValue(self, out var page))
@@ -207,8 +214,12 @@ namespace BingoMode
                     }
                     page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                     page.subObjects.Add(page.grid);
+                    self.selectedObject = page.randomize;
                 }
+                else self.selectedObject = self.characterSelect.slugcatButtons[0];
             }
+
+            orig.Invoke(self, pageIndex);
         }
 
         // Creating butone

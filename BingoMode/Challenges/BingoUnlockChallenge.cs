@@ -98,7 +98,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: UnlockChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoUnlockChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

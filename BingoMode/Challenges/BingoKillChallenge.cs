@@ -52,7 +52,7 @@ namespace BingoMode.Challenges
                 .Replace("<location>", location != "" ? " in " + location : "")
                 .Replace("<pitorweapon>", deathPit ? " with a death pit" : weapon != null ? " with " + ChallengeTools.ItemName(weapon) : "")
                 .Replace("<starving>", starve ? " while starving" : "")
-                .Replace("<onecycle>", starve ? " in one cycle" : "");
+                .Replace("<onecycle>", oneCycle ? " in one cycle" : "");
             base.UpdateDescription();
         }
 
@@ -73,14 +73,20 @@ namespace BingoMode.Challenges
             {
                 num = 15;
             }
+            num = Mathf.Min(1, num);
             bool onePiece = UnityEngine.Random.value < 0.25f;
             if (onePiece) num = Mathf.CeilToInt(num / 3);
-            ItemType weapo = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 1 : 2))];
+            var clone = ChallengeUtils.Weapons.ToList();
+            clone.RemoveAll(x => x == ItemType.PuffBall || x == ItemType.FlareBomb || x == ItemType.Rock);
+            ItemType weapo = clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
             if ((expeditionCreature.creature == CreatureType.Centipede ||
                 expeditionCreature.creature == CreatureType.Centiwing ||
                 expeditionCreature.creature == CreatureType.SmallCentipede ||
                 expeditionCreature.creature == CreatureType.RedCentipede ||
                 expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = ItemType.PuffBall; 
+            else if ((expeditionCreature.creature == CreatureType.Spider ||
+                expeditionCreature.creature == CreatureType.BigSpider ||
+                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = ItemType.FlareBomb; 
             return new BingoKillChallenge
             {
                 crit = expeditionCreature.creature,

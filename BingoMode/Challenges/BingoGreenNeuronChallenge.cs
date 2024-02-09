@@ -67,7 +67,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Template",
+                "BingoGreenNeuronChallenge",
                 "~",
                 moon ? "1" : "0",
                 "><",
@@ -92,7 +92,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Green Neuron Delivery FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoGreenNeuronChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

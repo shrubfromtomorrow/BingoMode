@@ -133,7 +133,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Transport",
+                "BingoTransportChallenge",
                 "~",
                 from,
                 "><",
@@ -164,7 +164,7 @@ namespace BingoMode.Challenges
             }
             catch (System.Exception ex)
             {
-                ExpLog.Log("ERROR: Transport FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoTransportChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

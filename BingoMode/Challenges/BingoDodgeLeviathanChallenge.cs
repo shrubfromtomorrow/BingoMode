@@ -94,7 +94,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "DodgeLeviathan",
+                "BingoDodgeLeviathanChallenge",
                 "~",
                 completed ? "1" : "0",
                 "><",
@@ -116,7 +116,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: DodgeLeviathan FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoDodgeLeviathanChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

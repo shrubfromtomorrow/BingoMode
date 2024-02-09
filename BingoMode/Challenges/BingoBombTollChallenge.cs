@@ -83,7 +83,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(
             [
-                "BombToll",
+                "BingoBombTollChallenge",
                 "~",
                 roomName,
                 "><",
@@ -111,7 +111,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BombToll FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoBombTollChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

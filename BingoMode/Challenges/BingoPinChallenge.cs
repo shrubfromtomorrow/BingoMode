@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (game.Players == null) return;
+            if (completed || game.Players == null) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 if (this.game.Players[i] != null && this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null)
@@ -72,6 +72,7 @@ namespace BingoMode.Challenges
             }
             for (int k = 0; k < this.spearList.Count; k++)
             {
+                if (spearList[k] == null || spearList[k].room == null || spearList[k].room.world == null || spearList[k].room.world.region == null) continue;
                 if ((this.spearList[k].thrownBy != null && !(this.spearList[k].thrownBy is Player)) || this.spearList[k] == null)
                 {
                     this.spearList.Remove(this.spearList[k]);

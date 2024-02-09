@@ -106,7 +106,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "FeastChallenge",
+                "BingoEatChallenge",
                 "~",
                 ValueConverter.ConvertToString(amountRequired),
                 "><",
@@ -141,7 +141,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: FeastChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoEatChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

@@ -85,7 +85,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "TradeTraded",
+                "BingoTradeTradedChallenge",
                 "~",
                 current.ToString(),
                 "><",
@@ -113,7 +113,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: TradeTraded FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoTradeTradedChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 

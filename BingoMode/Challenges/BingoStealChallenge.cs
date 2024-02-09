@@ -91,7 +91,7 @@ namespace BingoMode.Challenges
         {
             return string.Concat(new string[]
             {
-                "Theft",
+                "BingoStealChallenge",
                 "~",
                 ValueConverter.ConvertToString(subject),
                 "><",
@@ -125,7 +125,7 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: Theft FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoStealChallenge FromString() encountered an error: " + ex.Message);
             }
         }
 
