@@ -30,7 +30,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Crafting");
+            return ChallengeTools.IGT.Translate("Item Crafting");
         }
 
         public override Challenge Generate()

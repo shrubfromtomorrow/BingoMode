@@ -23,6 +23,7 @@ namespace BingoMode.Challenges
     {
         void AddHooks();
         void RemoveHooks();
+        //List<object> Settings();
     }
 
     public class ChallengeHooks

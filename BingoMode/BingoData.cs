@@ -24,6 +24,7 @@ namespace BingoMode
         public static List<string>[] possibleTokens = new List<string>[4];
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
+        // This prevents the same creatures being hit by the same sources multiple times
         public static Dictionary<Creature, List<EntityID>> blacklist = [];
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
 

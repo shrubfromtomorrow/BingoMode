@@ -28,7 +28,7 @@ namespace BingoMode.Challenges
                 .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl)))
                 : ChallengeTools.IGT.Translate("Collect [<current>/<amount>] colored pearls")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount)); ;
+                .Replace("<amount>", ValueConverter.ConvertToString(amount));
             base.UpdateDescription();
         }
 

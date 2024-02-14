@@ -32,7 +32,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Trading traded");
+            return ChallengeTools.IGT.Translate("Trading Already Traded Items");
         }
 
         public override Challenge Generate()

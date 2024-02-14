@@ -35,7 +35,7 @@ namespace BingoMode.Challenges
     
         public override string ChallengeName()
         {
-            return "Eating Food";
+            return ChallengeTools.IGT.Translate("Eating Food");
         }
     
         public override bool Duplicable(Challenge challenge)

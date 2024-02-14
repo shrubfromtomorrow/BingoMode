@@ -73,7 +73,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Echo Bingoing");
+            return ChallengeTools.IGT.Translate("Echo Visiting");
         }
 
         public override string ToString()

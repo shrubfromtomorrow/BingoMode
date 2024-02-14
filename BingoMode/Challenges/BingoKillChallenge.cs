@@ -73,9 +73,10 @@ namespace BingoMode.Challenges
             {
                 num = 15;
             }
-            num = Mathf.Min(1, num);
-            bool onePiece = UnityEngine.Random.value < 0.25f;
-            if (onePiece) num = Mathf.CeilToInt(num / 3);
+            bool onePiece = UnityEngine.Random.value < 0.2f;
+            bool starvv = UnityEngine.Random.value < 0.2f;
+            if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
+            num = Mathf.Max(1, num);
             var clone = ChallengeUtils.Weapons.ToList();
             clone.RemoveAll(x => x == ItemType.PuffBall || x == ItemType.FlareBomb || x == ItemType.Rock);
             ItemType weapo = clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
@@ -91,7 +92,7 @@ namespace BingoMode.Challenges
             {
                 crit = expeditionCreature.creature,
                 amount = num,
-                starve = UnityEngine.Random.value < 0.25f,
+                starve = starvv,
                 oneCycle = onePiece,
                 sub = "",
                 region = "",

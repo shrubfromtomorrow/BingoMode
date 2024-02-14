@@ -32,7 +32,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Noodle hatching");
+            return ChallengeTools.IGT.Translate("Noodlefly Hatching");
         }
 
         public override Challenge Generate()

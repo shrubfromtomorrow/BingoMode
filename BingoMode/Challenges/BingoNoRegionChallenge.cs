@@ -28,7 +28,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Region ban");
+            return ChallengeTools.IGT.Translate("Region Avoiding");
         }
 
         public override Challenge Generate()

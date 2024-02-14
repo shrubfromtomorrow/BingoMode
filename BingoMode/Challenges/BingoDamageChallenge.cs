@@ -17,7 +17,6 @@ namespace BingoMode.Challenges
         public CreatureTemplate.Type victim;
         public int amount;
         public int current;
-        // This prevents the same creatures being hit by the same sources multiple times
 
         public override void UpdateDescription()
         {

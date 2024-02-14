@@ -27,7 +27,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Bombing Tolls");
+            return ChallengeTools.IGT.Translate("Throwing Grenades at Scavenger Tolls");
         }
 
         public override Challenge Generate()

@@ -120,7 +120,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Bingo Spear Pinning");
+            return ChallengeTools.IGT.Translate("Creature Pinning");
         }
 
         public override string ToString()

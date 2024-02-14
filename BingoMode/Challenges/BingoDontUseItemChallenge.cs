@@ -31,7 +31,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Restraint");
+            return ChallengeTools.IGT.Translate("Item Avoiding");
         }
 
         public override Challenge Generate()

@@ -15,15 +15,13 @@ namespace BingoMode.Challenges
     public class BingoPopcornChallenge : Challenge, IBingoChallenge
     {
         public int current;
-        public StrongBox<int> amount = new();
-
-        public List<object> Settings => new() { amount };
+        public StrongBox<int> amound = new();
 
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
+                .Replace("<amount>", ValueConverter.ConvertToString(amound.Value));
             base.UpdateDescription();
         }
 
@@ -34,13 +32,13 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Popcorn making");
+            return ChallengeTools.IGT.Translate("Making Popcorn");
         }
 
         public override Challenge Generate()
         {
             BingoPopcornChallenge ch = new();
-            ch.amount.Value = UnityEngine.Random.Range(3, 8);
+            ch.amound.Value = UnityEngine.Random.Range(3, 8);
             return ch;
         }
 
@@ -50,13 +48,13 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= amount.Value) CompleteChallenge();
+                if (current >= (int)amound.Value) CompleteChallenge();
             }
         }
 
         public override int Points()
         {
-            return amount.Value * 10;
+            return (int)amound.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -77,7 +75,7 @@ namespace BingoMode.Challenges
                 "~",
                 current.ToString(),
                 "><",
-                amount.Value.ToString(),
+                amound.Value.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -93,7 +91,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount.Value = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amound.Value = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -108,12 +106,16 @@ namespace BingoMode.Challenges
         public void AddHooks()
         {
             IL.SeedCob.HitByWeapon += SeedCob_HitByWeapon;
-
         }
 
         public void RemoveHooks()
         {
             IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
+        }
+
+        public List<object> Settings()
+        {
+            return [amound];
         }
     }
 }
