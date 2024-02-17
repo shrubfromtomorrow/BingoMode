@@ -15,17 +15,17 @@ namespace BingoMode.Challenges
     public class BingoStealChallenge : Challenge, IBingoChallenge
     {
         public int current;
-        public int amount;
-        public bool toll;
-        public ItemType subject;
+        public SettingBox<int> amount;
+        public SettingBox<bool> toll;
+        public SettingBox<string> subject;
         public List<EntityID> checkedIDs;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Steal [<current>/<amount>] <item> from " + (toll ? "a Scavenger toll" : "Scavengers"))
+            this.description = ChallengeTools.IGT.Translate("Steal [<current>/<amount>] <item> from " + (toll.Value ? "a Scavenger toll" : "Scavengers"))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount))
-                .Replace("<item>", ChallengeTools.ItemName(subject));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
+                .Replace("<item>", ChallengeTools.ItemName(new(subject.Value)));
             base.UpdateDescription();
         }
 
@@ -42,25 +42,25 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool taxEvasion = UnityEngine.Random.value < 0.5f;
-            ItemType itme = ItemType.Spear;
+            string itme = "Spear";
             if (taxEvasion)
             {
-                itme = UnityEngine.Random.value < 0.5f ? ItemType.Spear : ItemType.DataPearl;
+                itme = UnityEngine.Random.value < 0.5f ? "Spear": "DataPearl";
             }
             else itme = ChallengeUtils.StealableStolable[UnityEngine.Random.Range(0, ChallengeUtils.StealableStolable.Length)];
 
             return new BingoStealChallenge
             {
                 checkedIDs = [],
-                toll = taxEvasion,
-                subject = itme,
-                amount = UnityEngine.Random.Range(1, subject == ItemType.ScavengerBomb ? 3 : 5)
+                toll = new(taxEvasion, "From Scavenger Toll", 0),
+                subject = new(itme, "Item", 1),
+                amount = new(UnityEngine.Random.Range(1, itme == "ScavengerBomb" ? 3 : 5), "Amount", 2)
             };
         }
 
         public override int Points()
         {
-            return amount * 10;
+            return amount.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -75,11 +75,11 @@ namespace BingoMode.Challenges
 
         public void Stoled(AbstractPhysicalObject item, bool tollCheck)
         {
-            if (!completed && item.type == subject && tollCheck == toll && !checkedIDs.Contains(item.ID))
+            if (!completed && item.type.value == subject.Value && tollCheck == toll.Value && !checkedIDs.Contains(item.ID))
             {
                 current++;
                 UpdateDescription();
-                if (current >= amount)
+                if (current >= amount.Value)
                 {
                     CompleteChallenge();
                 }
@@ -93,9 +93,9 @@ namespace BingoMode.Challenges
             {
                 "BingoStealChallenge",
                 "~",
-                ValueConverter.ConvertToString(subject),
+                subject.ToString(),
                 "><",
-                toll ? "1" : "0",
+                toll.ToString(),
                 "><",
                 current.ToString(),
                 "><",
@@ -114,10 +114,10 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                subject = new (array[0], false);
-                toll = (array[1] == "1");
+                subject = SettingBoxFromString(array[0]) as SettingBox<string>;
+                toll = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
@@ -140,5 +140,7 @@ namespace BingoMode.Challenges
             On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update;
             On.SocialEventRecognizer.Theft -= SocialEventRecognizer_Theft;
         }
+
+        public List<object> Settings() => [amount, toll, subject];
     }
 }

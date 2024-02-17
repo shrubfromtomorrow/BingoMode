@@ -8,18 +8,19 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoCraftChallenge : Challenge, IBingoChallenge
     {
-        public ItemType craftee;
+        public SettingBox<string> craftee;
 
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Craft a <item>")
-                .Replace("<item>", ChallengeTools.ItemName(craftee).TrimEnd('s'));
+                .Replace("<item>", ChallengeTools.ItemName(new(craftee.Value)).TrimEnd('s'));
             base.UpdateDescription();
         }
 
@@ -37,13 +38,13 @@ namespace BingoMode.Challenges
         {
             return new BingoCraftChallenge
             {
-                craftee = ChallengeUtils.CraftableItems[UnityEngine.Random.Range(0, ChallengeUtils.CraftableItems.Length)]
+                craftee = new(ChallengeUtils.CraftableItems[UnityEngine.Random.Range(0, ChallengeUtils.CraftableItems.Length)], "Item to Craft", 0)
             };
         }
 
         public void Crafted(ItemType item)
         {
-            if (!completed && item == craftee)
+            if (!completed && item.value == craftee.Value)
             {
                 CompleteChallenge();
             }
@@ -70,7 +71,7 @@ namespace BingoMode.Challenges
             {
                 "BingoCraftChallenge",
                 "~",
-                ValueConverter.ConvertToString(craftee),
+                craftee.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -85,7 +86,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                craftee = new ItemType(array[0], false);
+                craftee = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -106,5 +107,7 @@ namespace BingoMode.Challenges
         {
             On.Player.CraftingResults -= Player_CraftingResults;
         }
+
+        public List<object> Settings() => [craftee];
     }
 }

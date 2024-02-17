@@ -8,15 +8,16 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using CreatureType = CreatureTemplate.Type;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoCreatureGateChallenge : Challenge, IBingoChallenge
     {
-        public int amount;
+        public SettingBox<int> amount;
         public int current;
-        public CreatureType crit;
+        public SettingBox<string> crit;
         public List<string> gates = [];
 
         public override void UpdateDescription()
@@ -27,8 +28,8 @@ namespace BingoMode.Challenges
             }
             this.description = ChallengeTools.IGT.Translate("Carry a <crit> for [<current>/<amount>] gates")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount))
-                .Replace("<crit>", ChallengeTools.creatureNames[crit.Index].TrimEnd('s'));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
             base.UpdateDescription();
         }
 
@@ -46,8 +47,8 @@ namespace BingoMode.Challenges
         {
             return new BingoCreatureGateChallenge
             {
-                amount = UnityEngine.Random.Range(2, 5),
-                crit = ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - (ModManager.MSC ? 0 : 1))]
+                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
+                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - (ModManager.MSC ? 0 : 1))], "Creature Type", 1)
             };
         }
 
@@ -56,7 +57,7 @@ namespace BingoMode.Challenges
             bool g = false;
             for (int i = 0; i < game.Players.Count; i++)
             {
-                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && player.grasps != null && player.grasps.Any(x => x != null && x.grabbed is Creature c && c.Template.type == crit))
+                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && player.grasps != null && player.grasps.Any(x => x != null && x.grabbed is Creature c && c.Template.type.value == crit.Value))
                 {
                     g = true;
                     break;
@@ -69,7 +70,7 @@ namespace BingoMode.Challenges
                 current++;
                 UpdateDescription();
 
-                if (current >= amount) CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
             }
         }
 
@@ -83,7 +84,7 @@ namespace BingoMode.Challenges
 
         public override int Points()
         {
-            return amount * 10;
+            return amount.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -102,7 +103,7 @@ namespace BingoMode.Challenges
             {
                 "BingoCreatureGateChallenge",
                 "~",
-                ValueConverter.ConvertToString(crit),
+                crit.ToString(),
                 "><",
                 current.ToString(),
                 "><",
@@ -121,9 +122,9 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                crit = new(array[0], false);
+                crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[2]) as SettingBox<int>;
                 completed = (array[3] == "1");
                 hidden = (array[4] == "1");
                 revealed = (array[5] == "1");
@@ -144,5 +145,7 @@ namespace BingoMode.Challenges
         {
             On.RegionGate.NewWorldLoaded -= RegionGate_NewWorldLoaded1;
         }
+
+        public List<object> Settings() => [amount, crit];
     }
 }

@@ -15,7 +15,7 @@ namespace BingoMode.Challenges
     public class BingoPopcornChallenge : Challenge, IBingoChallenge
     {
         public int current;
-        public StrongBox<int> amound = new();
+        public SettingBox<int> amound;
 
         public override void UpdateDescription()
         {
@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             BingoPopcornChallenge ch = new();
-            ch.amound.Value = UnityEngine.Random.Range(3, 8);
+            ch.amound = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
             return ch;
         }
 
@@ -75,7 +75,7 @@ namespace BingoMode.Challenges
                 "~",
                 current.ToString(),
                 "><",
-                amound.Value.ToString(),
+                amound.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -91,7 +91,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amound.Value = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amound = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -113,9 +113,6 @@ namespace BingoMode.Challenges
             IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
         }
 
-        public List<object> Settings()
-        {
-            return [amound];
-        }
+        public List<object> Settings() => [amound];
     }
 }

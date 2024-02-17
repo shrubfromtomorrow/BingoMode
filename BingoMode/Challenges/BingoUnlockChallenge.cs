@@ -15,11 +15,11 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoUnlockChallenge : Challenge, IBingoChallenge
     {
-        public string unlock;
+        public SettingBox<string> unlock;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Get the " + unlock + " unlock");
+            description = ChallengeTools.IGT.Translate("Get the " + unlock.Value + " unlock");
             base.UpdateDescription();
         }
 
@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
 
             return new BingoUnlockChallenge
             {
-                unlock = unl
+                unlock = new(unl, "Unlock", 0)
             };
         }
 
@@ -75,7 +75,7 @@ namespace BingoMode.Challenges
             {
                 "BingoUnlockChallenge",
                 "~",
-                unlock,
+                unlock.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -90,7 +90,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                unlock = array[0];
+                unlock = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -122,5 +122,7 @@ namespace BingoMode.Challenges
             tokenColorHook?.Dispose();
             On.CollectToken.Pop -= CollectToken_Pop;
         }
+
+        public List<object> Settings() => [unlock];
     }
 }

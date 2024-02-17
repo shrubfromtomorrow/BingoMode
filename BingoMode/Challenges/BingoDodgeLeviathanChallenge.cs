@@ -129,5 +129,7 @@ namespace BingoMode.Challenges
         {
             On.BigEel.JawsSnap -= BigEel_JawsSnap;
         }
+
+        public List<object> Settings() => [];
     }
 }

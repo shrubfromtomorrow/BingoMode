@@ -15,16 +15,16 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoKillChallenge : Challenge, IBingoChallenge
     {
-        public CreatureType crit; // If null, then means you can kill any creature
-        public ItemType weapon;
-        public int current; //
-        public int amount; //
-        public string region; //
-        public string sub; //
-        public string room; //
-        public bool deathPit; //
-        public bool starve; //
-        public bool oneCycle; //
+        public SettingBox<string> crit; // If "any", then means you can kill any creature
+        public SettingBox<string> weapon;
+        public int current; 
+        public SettingBox<int> amount; 
+        public SettingBox<string> region; 
+        public SettingBox<string> sub; 
+        public SettingBox<string> room; 
+        public SettingBox<bool> deathPit; 
+        public SettingBox<bool> starve; 
+        public SettingBox<bool> oneCycle; 
 
         public override void UpdateDescription()
         {
@@ -35,24 +35,25 @@ namespace BingoMode.Challenges
             string newValue = "Unknown";
             try
             {
-                if (crit.Index >= 0)
+                int indexe = new CreatureType(crit.Value).index;
+                if (indexe >= 0)
                 {
-                    newValue = ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[this.crit.Index]);
+                    newValue = ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[indexe]);
                 }
             }
             catch (Exception ex)
             {
                 ExpLog.Log("Error getting creature name for BingoKillChallenge | " + ex.Message);
             }
-            string location = room != "" ? room : sub != "" ? sub : region != "" ? Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) : "";
+            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             description = ChallengeTools.IGT.Translate("Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle>")
                 .Replace("<current>", current.ToString())
-                .Replace("<amount>", amount.ToString())
-                .Replace("<crit>", crit != null ? ChallengeTools.creatureNames[crit.Index] : "creatures")
+                .Replace("<amount>", amount.Value.ToString())
+                .Replace("<crit>", crit.Value != "_AnyCreature" ? newValue : "creatures")
                 .Replace("<location>", location != "" ? " in " + location : "")
-                .Replace("<pitorweapon>", deathPit ? " with a death pit" : weapon != null ? " with " + ChallengeTools.ItemName(weapon) : "")
-                .Replace("<starving>", starve ? " while starving" : "")
-                .Replace("<onecycle>", oneCycle ? " in one cycle" : "");
+                .Replace("<pitorweapon>", deathPit.Value ? " with a death pit" : weapon.Value != "_AnyWeapon" ? " with " + ChallengeTools.ItemName(new(weapon.Value)) : "")
+                .Replace("<starving>", starve.Value ? " while starving" : "")
+                .Replace("<onecycle>", oneCycle.Value ? " in one cycle" : "");
             base.UpdateDescription();
         }
 
@@ -78,33 +79,34 @@ namespace BingoMode.Challenges
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
             num = Mathf.Max(1, num);
             var clone = ChallengeUtils.Weapons.ToList();
-            clone.RemoveAll(x => x == ItemType.PuffBall || x == ItemType.FlareBomb || x == ItemType.Rock);
-            ItemType weapo = clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
+            clone.RemoveAll(x => x == "PuffBall" || x == "FlareBomb" || x == "Rock");
+            string weapo = clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
             if ((expeditionCreature.creature == CreatureType.Centipede ||
                 expeditionCreature.creature == CreatureType.Centiwing ||
                 expeditionCreature.creature == CreatureType.SmallCentipede ||
                 expeditionCreature.creature == CreatureType.RedCentipede ||
-                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = ItemType.PuffBall; 
+                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = "PuffBall"; 
             else if ((expeditionCreature.creature == CreatureType.Spider ||
                 expeditionCreature.creature == CreatureType.BigSpider ||
-                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = ItemType.FlareBomb; 
+                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = "FlareBomb"; 
             return new BingoKillChallenge
             {
-                crit = expeditionCreature.creature,
-                amount = num,
-                starve = starvv,
-                oneCycle = onePiece,
-                sub = "",
-                region = "",
-                room = "",
-                weapon = weapo
+                crit = new(expeditionCreature.creature.value, "Creature Type", 0),
+                amount = new(num, "Amount", 1),
+                starve = new(starvv, "While Starving", 2),
+                oneCycle = new(onePiece, "In one Cycle", 3),
+                sub = new("", "Subregion", 4),
+                region = new("", "Region", 5),
+                room = new("", "Room", 6),
+                weapon = new(weapo, "Weapon Used", 7),
+                deathPit = new(false, "Via a Death Pit", 8)
             };
         }
 
         public override void Update()
         {
             base.Update();
-            if (oneCycle && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (oneCycle.Value && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.current != 0)
                 {
@@ -117,11 +119,11 @@ namespace BingoMode.Challenges
 
         public void DeathPit(Creature c, Player p)
         {
-            if (!deathPit || c == null || game == null || !CritInLocation(c)) return;
-            if (starve && !p.Malnourished) return;
-            CreatureType type = c.abstractCreature.creatureTemplate.type;
-            bool flag = crit == null || type == crit;
-            if (!flag && crit == CreatureType.DaddyLongLegs && type == CreatureType.BrotherLongLegs && (c as DaddyLongLegs).colorClass)
+            if (!deathPit.Value || c == null || game == null || !CritInLocation(c)) return;
+            if (starve.Value && !p.Malnourished) return;
+            string type = c.abstractCreature.creatureTemplate.type.value;
+            bool flag = crit == null || type == crit.Value;
+            if (!flag && crit.Value == "DaddyLongLegs" && type == "CreatureType.BrotherLongLegs" && (c as DaddyLongLegs).colorClass)
             {
                 flag = true;
             }
@@ -129,7 +131,7 @@ namespace BingoMode.Challenges
             {
                 this.current++;
                 this.UpdateDescription();
-                if (this.current >= this.amount)
+                if (this.current >= this.amount.Value)
                 {
                     this.CompleteChallenge();
                 }
@@ -138,17 +140,17 @@ namespace BingoMode.Challenges
 
         public bool CritInLocation(Creature crit)
         {
-            string location = room != "" ? room : sub != "" ? sub : region != "" ? Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) : "boowomp";
+            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "boowomp";
             AbstractRoom rom = crit.room.abstractRoom;
-            if (location == room)
+            if (location == room.Value)
             {
                 return rom.name == location;
             }
-            else if (location == sub)
+            else if (location == sub.Value)
             {
                 return rom.subregionName == location || rom.altSubregionName == location;
             }
-            else if (location == region)
+            else if (location == region.Value)
             {
                 return rom.world.region.name == location;
             }
@@ -166,16 +168,16 @@ namespace BingoMode.Challenges
             try
             {
                 float num = 1f;
-                CreatureTemplate.Type critTarget = this.crit;
+                CreatureTemplate.Type critTarget = new(crit.Value);
                 if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
                 {
                     num = 1.35f;
                 }
-                if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear && this.crit == CreatureTemplate.Type.DaddyLongLegs)
+                if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear && crit.Value == "DaddyLongLegs")
                 {
                     critTarget = CreatureTemplate.Type.BrotherLongLegs;
                 }
-                result = (int)((float)(ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature c) => c.creature == critTarget).points * this.amount) * num) * (int)(this.hidden ? 2f : 1f);
+                result = (int)((float)(ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature c) => c.creature == critTarget).points * this.amount.Value) * num) * (int)(this.hidden ? 2f : 1f);
             }
             catch (Exception ex)
             {
@@ -197,21 +199,37 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
+            Plugin.logger.LogMessage(amount.ToString());
+            Plugin.logger.LogMessage(deathPit.ToString());
             return string.Concat(new string[]
             {
                 "BingoKillChallenge",
                 "~",
-                crit == null ? "NULL" : ValueConverter.ConvertToString<CreatureTemplate.Type>(this.crit),
+                crit.ToString(),
                 "><",
-                ValueConverter.ConvertToString<int>(this.amount),
+                weapon.ToString(),
                 "><",
-                ValueConverter.ConvertToString<int>(this.current),
+                amount.ToString(),
                 "><",
-                this.completed ? "1" : "0",
+                current.ToString(),
                 "><",
-                this.hidden ? "1" : "0",
+                region.ToString(),
                 "><",
-                this.revealed ? "1" : "0"
+                sub.ToString(),
+                "><",
+                room.ToString(),
+                "><",
+                oneCycle.ToString(),
+                "><",
+                deathPit.ToString(),
+                "><",
+                starve.ToString(),
+                "><",
+                completed ? "1" : "0",
+                "><",
+                hidden ? "1" : "0",
+                "><",
+                revealed ? "1" : "0"
             });
         }
 
@@ -230,12 +248,19 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                crit = array[0] == "NULL" ? null : new CreatureType(array[0], false);
-                amount = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                completed = (array[3] == "1");
-                hidden = (array[4] == "1");
-                revealed = (array[5] == "1");
+                crit = SettingBoxFromString(array[0]) as SettingBox<string>;
+                weapon = SettingBoxFromString(array[1]) as SettingBox<string>;
+                amount = SettingBoxFromString(array[2]) as SettingBox<int>;
+                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                region = SettingBoxFromString(array[4]) as SettingBox<string>;
+                sub = SettingBoxFromString(array[5]) as SettingBox<string>;
+                room = SettingBoxFromString(array[6]) as SettingBox<string>;
+                oneCycle = SettingBoxFromString(array[7]) as SettingBox<bool>;
+                deathPit = SettingBoxFromString(array[8]) as SettingBox<bool>;
+                starve = SettingBoxFromString(array[9]) as SettingBox<bool>;
+                completed = (array[10] == "1");
+                hidden = (array[11] == "1");
+                revealed = (array[12] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -251,11 +276,11 @@ namespace BingoMode.Challenges
 
         public override void CreatureKilled(Creature c, int playerNumber)
         {
-            if (deathPit || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c)) return;
-            if (starve && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
+            if (deathPit.Value || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c)) return;
+            if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
             CreatureType type = c.abstractCreature.creatureTemplate.type;
-            bool flag = crit == null || type == crit;
-            if (!flag && crit == CreatureType.DaddyLongLegs && type == CreatureType.BrotherLongLegs && (c as DaddyLongLegs).colorClass)
+            bool flag = crit == null || type.value == crit.Value;
+            if (!flag && crit.Value == "DaddyLongLegs" && type == CreatureType.BrotherLongLegs && (c as DaddyLongLegs).colorClass)
             {
                 flag = true;
             }
@@ -264,7 +289,7 @@ namespace BingoMode.Challenges
                 this.current++;
                 ExpLog.Log("Player " + (playerNumber + 1).ToString() + " killed " + type.value);
                 this.UpdateDescription();
-                if (this.current >= this.amount)
+                if (this.current >= this.amount.Value)
                 {
                     this.CompleteChallenge();
                 }
@@ -275,7 +300,7 @@ namespace BingoMode.Challenges
         {
             if (BingoData.hitTimeline.TryGetValue(c.abstractCreature.ID, out var list))
             {
-                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == weapon) return true;
+                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value)) return true;
             }
             return false;
         }
@@ -289,5 +314,7 @@ namespace BingoMode.Challenges
         {
             IL.Creature.Update -= Creature_UpdateIL;
         }
+
+        public List<object> Settings() => [crit, weapon, amount, region, sub, room, oneCycle, deathPit, starve];
     }
 }

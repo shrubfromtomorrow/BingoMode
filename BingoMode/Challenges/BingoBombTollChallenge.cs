@@ -2,6 +2,8 @@
 using MoreSlugcats;
 using System;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace BingoMode.Challenges
 {
@@ -9,14 +11,14 @@ namespace BingoMode.Challenges
     public class BingoBombTollChallenge : Challenge, IBingoChallenge
     {
         public bool bombed;
-        public bool pass;
-        public string roomName;
+        public SettingBox<bool> pass;
+        public SettingBox<string> roomName;
 
         public override void UpdateDescription()
         {
-            string region = roomName.Substring(0, 2);
-            description = ChallengeTools.IGT.Translate("Throw a grenade at the <toll> scavenger toll" + (pass ? " and pass it" : ""))
-                .Replace("<toll>", Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) + (roomName == "gw_c05" ? " surface" : roomName == "gw_c11" ? " underground" : ""));
+            string region = roomName.Value.Substring(0, 2);
+            description = ChallengeTools.IGT.Translate("Throw a grenade at the <toll> scavenger toll" + (pass.Value ? " and pass it" : ""))
+                .Replace("<toll>", Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) + (roomName.Value == "gw_c05" ? " surface" : roomName.Value == "gw_c11" ? " underground" : ""));
             base.UpdateDescription();
         }
 
@@ -36,17 +38,17 @@ namespace BingoMode.Challenges
 
             return new BingoBombTollChallenge
             {
-                pass = false,
-                roomName = toll
+                pass = new(UnityEngine.Random.value < 0.5f, "Pass the Toll", 0),
+                roomName = new(toll, "Scavenger Toll", 1)
             };
         }
 
         public void Boom(string room)
         {
-            if (!completed && roomName == room.ToLowerInvariant())
+            if (!completed && roomName.Value == room.ToLowerInvariant())
             {
                 Plugin.logger.LogMessage("bombed");
-                if (!pass)
+                if (!pass.Value)
                 {
                     CompleteChallenge();
                     return;
@@ -57,7 +59,7 @@ namespace BingoMode.Challenges
 
         public void Pass(string room)
         {
-            if (!completed && bombed && roomName == room.ToLowerInvariant())
+            if (!completed && bombed && roomName.Value == room.ToLowerInvariant())
             {
                 bombed = false;
                 CompleteChallenge();
@@ -85,9 +87,9 @@ namespace BingoMode.Challenges
             [
                 "BingoBombTollChallenge",
                 "~",
-                roomName,
+                roomName.ToString(),
                 "><",
-                pass ? "1" : "0",
+                pass.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -102,8 +104,8 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                roomName = array[0];
-                pass = (array[1] == "1");
+                roomName = SettingBoxFromString(array[0]) as SettingBox<string>;
+                pass = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -126,5 +128,7 @@ namespace BingoMode.Challenges
             On.ScavengerBomb.Explode -= ScavengerBomb_Explode;
             On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update2;
         }
+
+        public List<object> Settings() => [pass, roomName];
     }
 }

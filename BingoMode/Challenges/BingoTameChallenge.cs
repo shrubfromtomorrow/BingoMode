@@ -13,12 +13,12 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoTameChallenge : Challenge, IBingoChallenge
     {
-        public CreatureTemplate.Type crit;
+        public SettingBox<string> crit;
 
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Befriend a <crit>")
-                .Replace("<crit>", ChallengeTools.creatureNames[(int)crit].TrimEnd('s'));
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'));
             base.UpdateDescription();
         }
 
@@ -38,13 +38,13 @@ namespace BingoMode.Challenges
 
             return new BingoTameChallenge
             {
-                crit = crug
+                crit = new(crug, "Creature Type", 0)
             };
         }
 
         public void Fren(CreatureTemplate.Type friend)
         {
-            if (!completed && friend == crit)
+            if (!completed && friend.value == crit.Value)
             {
                 CompleteChallenge();
             }
@@ -71,7 +71,7 @@ namespace BingoMode.Challenges
             {
                 "BingoTameChallenge",
                 "~",
-                ValueConverter.ConvertToString(crit),
+                crit.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -86,7 +86,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                crit = new(array[0], false);
+                crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -107,5 +107,7 @@ namespace BingoMode.Challenges
         {
             On.FriendTracker.Update -= FriendTracker_Update;
         }
+
+        public List<object> Settings() => [crit];
     }
 }

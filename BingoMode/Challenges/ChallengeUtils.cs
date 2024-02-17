@@ -46,10 +46,10 @@ namespace BingoMode.Challenges
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
         }
 
-        public static List<string> CreatureOriginRegions(CreatureType type, SlugcatStats.Name slug)
+        public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)
         {
             List<string> r = [];
-            switch (type.value)
+            switch (type)
             {
                 case "CicadaA":
                 case "CicadaB":
@@ -73,30 +73,30 @@ namespace BingoMode.Challenges
             return r;
         }
 
-        public static readonly CreatureType[] Transportable =
+        public static readonly string[] Transportable =
         {
-            CreatureType.JetFish,
-            CreatureType.Hazer,
-            CreatureType.VultureGrub,
-            CreatureType.CicadaA,
-            CreatureType.CicadaB,
-            new("Yeek", false)
+            "JetFish",
+            "Hazer",
+            "VultureGrub",
+            "CicadaA",
+            "CicadaB",
+            "Yeek"
         };
 
-        public static readonly CreatureType[] Pinnable =
+        public static readonly string[] Pinnable =
         {
-            CreatureType.CicadaA,
-            CreatureType.CicadaB,
-            CreatureType.Scavenger,
-            CreatureType.BlackLizard,
-            CreatureType.PinkLizard,
-            CreatureType.BlueLizard,
-            CreatureType.YellowLizard,
-            CreatureType.WhiteLizard,
-            CreatureType.GreenLizard,
-            CreatureType.Snail,
-            CreatureType.Centipede,
-            CreatureType.LanternMouse
+            "CicadaA",
+            "CicadaB",
+            "Scavenger",
+            "BlackLizard",
+            "PinkLizard",
+            "BlueLizard",
+            "YellowLizard",
+            "WhiteLizard",
+            "GreenLizard",
+            "Snail",
+            "Centipede",
+            "LanternMouse"
         };
 
         public static readonly string[] BombableOutposts =
@@ -108,9 +108,9 @@ namespace BingoMode.Challenges
             "ug_toll",
         };
 
-        public static string NameForPearl(PearlType pearl)
+        public static string NameForPearl(string pearl)
         {
-            switch (pearl.value)
+            switch (pearl)
             {
                 case "SU":
                     return "Light Blue";
@@ -157,112 +157,112 @@ namespace BingoMode.Challenges
             return "NULL";
         }
 
-        public static readonly ItemType[] ItemFoodTypes =
+        public static readonly string[] ItemFoodTypes =
         {
-            ItemType.DangleFruit,
-            ItemType.EggBugEgg,
-            ItemType.WaterNut,
-            ItemType.SlimeMold,
-            ItemType.JellyFish,
-            ItemType.Mushroom,
-            new("GooieDuck", false),
-            new("LillyPuck", false),
-            new("DandelionPeach", false),
-            new("GlowWeed", false),
+            "DangleFruit",
+            "EggBugEgg",
+            "WaterNut",
+            "SlimeMold",
+            "JellyFish",
+            "Mushroom",
+            "GooieDuck",
+            "LillyPuck",
+            "DandelionPeach",
+            "GlowWeed"
         };
 
-        public static readonly CreatureType[] CreatureFoodTypes =
+        public static readonly string[] CreatureFoodTypes =
         {
-            CreatureType.VultureGrub,
-            CreatureType.Hazer,
-            CreatureType.SmallNeedleWorm,
-            CreatureType.Fly,
-            CreatureType.SmallCentipede
+            "VultureGrub",
+            "Hazer",
+            "SmallNeedleWorm",
+            "Fly",
+            "SmallCentipede"
         };
 
-        public static readonly ItemType[] Weapons =
+        public static readonly string[] Weapons =
         {
-            ItemType.Spear,
-            ItemType.Rock,
-            ItemType.ScavengerBomb,
-            ItemType.FlareBomb,
-            ItemType.JellyFish,
-            ItemType.PuffBall,
-            new("LillyPuck", false),
+            "Spear",
+            "Rock",
+            "ScavengerBomb",
+            "FlareBomb",
+            "JellyFish",
+            "PuffBall",
+            "LillyPuck"
         };
 
-        public static readonly ItemType[] StealableStolable =
+        public static readonly string[] StealableStolable =
         {
-            ItemType.Spear,
-            ItemType.Rock,
-            ItemType.ScavengerBomb,
+            "Spear",
+            "Rock",
+            "ScavengerBomb"
         };
 
-        public static readonly ItemType[] Bannable =
+        public static readonly string[] Bannable =
         {
-            ItemType.FlyLure,
-            ItemType.Lantern,
-            ItemType.PuffBall,
-            ItemType.VultureMask,
-            ItemType.ScavengerBomb,
-            ItemType.BubbleGrass,
+            "FlyLure",
+            "Lantern",
+            "PuffBall",
+            "VultureMask",
+            "ScavengerBomb",
+            "BubbleGrass"
         };
 
-        public static readonly CreatureType[] Befriendable =
+        public static readonly string[] Befriendable =
         {
-            CreatureType.CicadaA,
-            CreatureType.CicadaB,
-            CreatureType.GreenLizard,
-            CreatureType.PinkLizard,
-            CreatureType.YellowLizard,
-            CreatureType.BlackLizard,
-            CreatureType.CyanLizard,
-            CreatureType.WhiteLizard,
-            CreatureType.BlueLizard,
-            new ("EelLizard", false),
-            new ("SpitLizard", false),
-            new ("ZoopLizard", false)
+            "CicadaA",
+            "CicadaB",
+            "GreenLizard",
+            "PinkLizard",
+            "YellowLizard",
+            "BlackLizard",
+            "CyanLizard",
+            "WhiteLizard",
+            "BlueLizard",
+            "EelLizard",
+            "SpitLizard",
+            "ZoopLizard"
         };
 
-        public static readonly PearlType[] CollectablePearls =
+        public static readonly string[] CollectablePearls =
         {
-            PearlType.UW,
-            PearlType.SH,
-            PearlType.LF_bottom,
-            PearlType.LF_west,
-            PearlType.SL_moon,
-            PearlType.SL_bridge,
-            PearlType.SL_chimney,
-            PearlType.DS,
-            PearlType.CC,
-            PearlType.GW,
-            PearlType.HI,
-            PearlType.SB_filtration,
-            PearlType.SB_ravine,
-            PearlType.SU,
-            PearlType.SI_top,
-            PearlType.SI_west,
-            new("SI_chat3", false),
-            new("SI_chat4", false),
-            new("SI_chat5", false),
-            new("VS", false),
+            "UW",
+            "SH",
+            "LF_bottom",
+            "LF_west",
+            "SL_moon",
+            "SL_bridge",
+            "SL_chimney",
+            "DS",
+            "CC",
+            "GW",
+            "HI",
+            "SB_filtration",
+            "SB_ravine",
+            "SU",
+            "SI_top",
+            "SI_west",
+            "SI_chat3",
+            "SI_chat4",
+            "SI_chat5",
+            "VS"
         };
 
-        public static readonly ItemType[] CraftableItems =
+        public static readonly string[] CraftableItems =
         {
-            ItemType.Rock,
-            ItemType.FlareBomb,
-            ItemType.SporePlant,
-            ItemType.ScavengerBomb,
-            ItemType.VultureMask,
-            ItemType.SlimeMold,
-            ItemType.FirecrackerPlant,
-            ItemType.PuffBall,
-            ItemType.Mushroom,
-            new("GlowWeed", false),
-            new("GooieDuck", false),
-            new("FireEgg", false),
-            new("SingularityBomb", false)
+            "Rock",
+            "FlareBomb",
+            "SporePlant",
+            "ScavengerBomb",
+            "VultureMask",
+            "SlimeMold",
+            "FirecrackerPlant",
+            "PuffBall",
+            "Mushroom",
+            "GlowWeed",
+            "GooieDuck",
+            "FireEgg",
+            "SingularityBomb"
         };
     }
 }

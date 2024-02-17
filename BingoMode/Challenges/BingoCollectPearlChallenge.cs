@@ -8,27 +8,28 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoCollectPearlChallenge : Challenge, IBingoChallenge
     {
-        public PearlType pearl;
+        public SettingBox<string> pearl; //PearlType
         public List<string> collected;
         public string region;
         public int current;
-        public int amount;
-        public bool specific;
+        public SettingBox<int> amount;
+        public SettingBox<bool> specific;
 
         public override void UpdateDescription()
         {
-            this.description = specific ? ChallengeTools.IGT.Translate("Collect the <pearl> pearl from <region>")
-                .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)))
-                .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl)))
+            this.description = specific.Value ? ChallengeTools.IGT.Translate("Collect the <pearl> pearl from <region>")
+                .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer)))
+                .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl.Value)))
                 : ChallengeTools.IGT.Translate("Collect [<current>/<amount>] colored pearls")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
@@ -46,16 +47,16 @@ namespace BingoMode.Challenges
         {
             if (completed) return;
 
-            if (specific)
+            if (specific.Value)
             {
-                if (type == pearl) CompleteChallenge();
+                if (type.value == pearl.Value) CompleteChallenge();
             }
             else
             {
                 current++;
                 collected.Add(type.value);
                 UpdateDescription();
-                if (current >= amount) CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
             }
         }
 
@@ -71,7 +72,7 @@ namespace BingoMode.Challenges
                 {
                     for (int g = 0; g < game.Players[i].realizedCreature.grasps.Length; g++)
                     {
-                        if (game.Players[i].realizedCreature.grasps[g] != null && game.Players[i].realizedCreature.grasps[g].grabbed is DataPearl p && ((!specific && DataPearl.PearlIsNotMisc(p.AbstractPearl.dataPearlType) && !collected.Contains(p.AbstractPearl.dataPearlType.value)) || specific))
+                        if (game.Players[i].realizedCreature.grasps[g] != null && game.Players[i].realizedCreature.grasps[g].grabbed is DataPearl p && ((!specific.Value && DataPearl.PearlIsNotMisc(p.AbstractPearl.dataPearlType) && !collected.Contains(p.AbstractPearl.dataPearlType.value)) || specific.Value))
                         {
                             PickedUp(p.AbstractPearl.dataPearlType);
                         }
@@ -83,23 +84,19 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool specifi = UnityEngine.Random.value < 0.5f;
+            string p = "nopearl";
             BingoCollectPearlChallenge chal = new()
             {
-                specific = specifi
+                specific = new SettingBox<bool>(specifi, "Specific Pearl", 0)
             };
             if (specifi)
             {
-                var porl = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
-                string regio = porl.value.Substring(0, 2);
-                chal.pearl = porl;
-                chal.region = regio;
-                Plugin.logger.LogMessage($"Generated pearl {porl} from {regio}");
+                p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
             }
-            else
-            {
-                chal.collected = [];
-                chal.amount = UnityEngine.Random.Range(2, 7);
-            }
+            chal.collected = [];
+            chal.pearl = new(p, "Pearl", 1);
+            chal.region = p.Substring(0, 2);
+            chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
 
             return chal;
         }
@@ -126,9 +123,9 @@ namespace BingoMode.Challenges
             {
                 "BingoCollectPearlChallenge",
                 "~",
-                specific ? "1" : "0",
+                specific.ToString(),
                 "><",
-                specific ?  ValueConverter.ConvertToString(pearl) : "nopearl",
+                specific.Value ? pearl.ToString() : "nopearl",
                 "><",
                 current.ToString(),
                 "><",
@@ -147,13 +144,14 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                specific = (array[0] == "1");
-                pearl = specific ? new PearlType(array[1], false) : null;
+                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                pearl = specific.Value ? SettingBoxFromString(array[1]) as SettingBox<string> : null;
+                region = pearl == null ? "noregion" : pearl.Value.Substring(0, 2);
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                completed = (array[3] == "1");
-                hidden = (array[4] == "1");
-                revealed = (array[5] == "1");
+                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                completed = (array[4] == "1");
+                hidden = (array[5] == "1");
+                revealed = (array[6] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -169,5 +167,7 @@ namespace BingoMode.Challenges
         public void RemoveHooks()
         {
         }
+
+        public List<object> Settings() => [region, amount, specific, pearl];
     }
 }

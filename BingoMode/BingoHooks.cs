@@ -29,6 +29,26 @@ namespace BingoMode
             On.Expedition.ChallengeOrganizer.SetupChallengeTypes += ChallengeOrganizer_SetupChallengeTypes;
             // Remove all hooks while at it
             On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
+            // Add the bingo challenges when loading challenges from string
+            IL.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromStringIL;
+        }
+
+        public static void ExpeditionCoreFile_FromStringIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld("Expedition.ChallengeOrganizer", "availableChallengeTypes")
+                ))
+            {
+                c.EmitDelegate<Func<List<Challenge>, List<Challenge>>>((orig) =>
+                {
+                    orig.AddRange(BingoData.availableBingoChallenges);
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogMessage("ExpeditionCoreFile_FromStringIL threw!!! " + il);
         }
 
         public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
@@ -63,10 +83,9 @@ namespace BingoMode
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
             IL.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
 
-            // Add Bingo HUD
+            // Add Bingo HUD and Stop the base Expedition HUD from appearing
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
-            // Stop the base Expedition HUD from appearing
-            IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
+            //IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
 
             // ficks
             On.Menu.ChallengeSelectPage.SetUpSelectables += ChallengeSelectPage_SetUpSelectables;
@@ -136,32 +155,34 @@ namespace BingoMode
             else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 2 :(( " + il);
         }
 
-        public static void HUD_InitSinglePlayerHudIL(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdsfld("ModManager", "Expedition")
-                ))
-            {
-                c.EmitDelegate<Func<bool, bool>>((orig) =>
-                {
-                    orig &= !BingoData.BingoMode;
-
-                    return orig;
-                });
-            }
-            else Plugin.logger.LogError(nameof(HUD_InitSinglePlayerHudIL) + " Threw :(( " + il);
-        }
+        //public static void HUD_InitSinglePlayerHudIL(ILContext il)
+        //{
+        //    ILCursor c = new(il);
+        //
+        //    if (c.TryGotoNext(MoveType.After,
+        //        x => x.MatchLdsfld("ModManager", "Expedition")
+        //        ))
+        //    {
+        //        c.EmitDelegate<Func<bool, bool>>((orig) =>
+        //        {
+        //            orig &= !BingoData.BingoMode;
+        //
+        //            return orig;
+        //        });
+        //    }
+        //    else Plugin.logger.LogError(nameof(HUD_InitSinglePlayerHudIL) + " Threw :(( " + il);
+        //}
 
         public static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
-            orig.Invoke(self, cam);
-
+            bool exp = ModManager.Expedition;
             if (BingoData.BingoMode)
             {
+                ModManager.Expedition = false;
                 self.AddPart(new BingoHUD(self));
             }
+            orig.Invoke(self, cam);
+            ModManager.Expedition = exp;
         }
 
         public static void ExpeditionMenu_ctor(On.Menu.ExpeditionMenu.orig_ctor orig, ExpeditionMenu self, ProcessManager manager)

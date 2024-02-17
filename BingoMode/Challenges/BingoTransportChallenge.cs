@@ -13,10 +13,10 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoTransportChallenge : Challenge, IBingoChallenge
     {
-        public string from;
-        public string to;
-        public List<EntityID> origins = [];
-        public CreatureType crit;
+        public SettingBox<string> from;
+        public SettingBox<string> to;
+        public SettingBox<string> crit;
+        public List<EntityID> origins = []; // Save this later
 
         public override void UpdateDescription()
         {
@@ -25,9 +25,9 @@ namespace BingoMode.Challenges
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             description = ChallengeTools.IGT.Translate("Transport a <crit><from><to>")
-                .Replace("<crit>", ChallengeTools.creatureNames[crit.index].TrimEnd('s'))
-                .Replace("<from>", from != "null" ? (to == "null" ? " out of " : " from ") + Region.GetRegionFullName(from, ExpeditionData.slugcatPlayer) : "")
-                .Replace("<to>", to != "null" ? $" to {Region.GetRegionFullName(to, ExpeditionData.slugcatPlayer)}" : "");
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'))
+                .Replace("<from>", from.Value != "null" ? (to.Value == "null" ? " out of " : " from ") + Region.GetRegionFullName(from.Value, ExpeditionData.slugcatPlayer) : "")
+                .Replace("<to>", to.Value != "null" ? $" to {Region.GetRegionFullName(to.Value, ExpeditionData.slugcatPlayer)}" : "");
             base.UpdateDescription();
         }
 
@@ -45,29 +45,29 @@ namespace BingoMode.Challenges
         {
             // hate this this took me like half an hour
             SlugcatStats.Name slug = ExpeditionData.slugcatPlayer;
-            CreatureType[] possible = ChallengeUtils.Transportable.Where(x => slug != MoreSlugcatsEnums.SlugcatStatsName.Saint || !new List<string>(){ "CicadaA", "CicadaB" }.Contains(x.value)).ToArray();
-            CreatureType crug = possible[Random.Range(0, possible.Length - (ModManager.MSC && slug != SlugcatStats.Name.Red && slug != MoreSlugcatsEnums.SlugcatStatsName.Spear && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer ? 0 : 1))];
+            string[] possible = ChallengeUtils.Transportable.Where(x => slug != MoreSlugcatsEnums.SlugcatStatsName.Saint || !new List<string>(){ "CicadaA", "CicadaB" }.Contains(x)).ToArray();
+            string crug = possible[Random.Range(0, possible.Length - (ModManager.MSC && slug != SlugcatStats.Name.Red && slug != MoreSlugcatsEnums.SlugcatStatsName.Spear && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer ? 0 : 1))];
             List<string> origRegions = ChallengeUtils.CreatureOriginRegions(crug, slug);
-            List<string> allRegions = crug == CreatureType.JetFish ? ["SB"] : [.. SlugcatStats.getSlugcatStoryRegions(slug), .. SlugcatStats.getSlugcatOptionalRegions(slug)];
+            List<string> allRegions = crug == "JetFish" ? ["SB"] : [.. SlugcatStats.getSlugcatStoryRegions(slug), .. SlugcatStats.getSlugcatOptionalRegions(slug)];
             string fromage = Random.value < 0.5f ? "null" : origRegions[Random.Range(0, origRegions.Count)];
             allRegions.Remove(fromage);
             allRegions.Remove("MS");
-            string toto = from == null || Random.value < 0.5f ? allRegions[Random.Range(0, allRegions.Count)] : "null";
+            string toto = fromage == "null" || Random.value < 0.5f ? allRegions[Random.Range(0, allRegions.Count)] : "null";
             return new BingoTransportChallenge
             {
-                from = fromage,
-                to = toto,
-                crit = crug,
+                from = new(fromage, "From Region", 0),
+                to = new(toto, "To Region", 1),
+                crit = new(crug, "Creature Type", 2),
                 origins = []
             };
         }
 
         public void Grabbed(Creature c)
         {
-            if (!completed && c.Template.type == crit)
+            if (!completed && c.Template.type.value == crit.Value)
             {
                 string rr = c.room.world.region.name;
-                if ((rr == from || from == "null") && !origins.Contains(c.abstractCreature.ID))
+                if ((rr == from.Value || from.Value == "null") && !origins.Contains(c.abstractCreature.ID))
                 {
                     origins.Add(c.abstractCreature.ID);
                     Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
@@ -81,7 +81,7 @@ namespace BingoMode.Challenges
             Plugin.logger.LogMessage(from);
             Plugin.logger.LogMessage(to);
             Plugin.logger.LogMessage("---------");
-            if (regionName != to && to != "null") return;
+            if (regionName != to.Value && to.Value != "null") return;
             Plugin.logger.LogMessage("went thru");
             bool g = false;
             for (int i = 0; i < game.Players.Count; i++)
@@ -90,7 +90,7 @@ namespace BingoMode.Challenges
                 {
                     foreach (var cc in player.room.updateList)
                     {
-                        if (cc is Creature crib && crib.Template.type == crit && origins.Contains(crib.abstractCreature.ID))
+                        if (cc is Creature crib && crib.Template.type.value == crit.Value && origins.Contains(crib.abstractCreature.ID))
                         {
                             Plugin.logger.LogMessage("WIN");
                             g = true;
@@ -135,11 +135,11 @@ namespace BingoMode.Challenges
             {
                 "BingoTransportChallenge",
                 "~",
-                from,
+                from.ToString(),
                 "><",
-                to,
+                to.ToString(),
                 "><",
-                ValueConverter.ConvertToString(crit),
+                crit.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -154,9 +154,9 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                from = array[0];
-                to = array[1];
-                crit = new(array[2], false);
+                from = SettingBoxFromString(array[0]) as SettingBox<string>;
+                to = SettingBoxFromString(array[1]) as SettingBox<string>;
+                crit = SettingBoxFromString(array[2]) as SettingBox<string>;
                 completed = (array[3] == "1");
                 hidden = (array[4] == "1");
                 revealed = (array[5] == "1");
@@ -179,5 +179,7 @@ namespace BingoMode.Challenges
             On.Player.SlugcatGrab -= Player_SlugcatGrab;
             On.RegionGate.NewWorldLoaded -= RegionGate_NewWorldLoaded2;
         }
+
+        public List<object> Settings() => [from, to, crit];
     }
 }

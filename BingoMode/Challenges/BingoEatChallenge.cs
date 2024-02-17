@@ -8,15 +8,16 @@ using Expedition;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoEatChallenge : Challenge, IBingoChallenge
     {
-        public ItemType itemFoodType;
-        public CreatureType creatureFoodType;
-        public int amountRequired;
+        public SettingBox<string> foodType;
+        public SettingBox<int> amountRequired;
         public int currentEated;
         public bool isCreature;
 
@@ -28,8 +29,8 @@ namespace BingoMode.Challenges
             }
             description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type>")
                 .Replace("<current>", ValueConverter.ConvertToString(currentEated))
-                .Replace("<amount>", ValueConverter.ConvertToString(amountRequired))
-                .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[creatureFoodType.Index]) : ChallengeTools.ItemName(itemFoodType));
+                .Replace("<amount>", ValueConverter.ConvertToString(amountRequired.Value))
+                .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureType(foodType.Value).Index]) : ChallengeTools.ItemName(new(foodType.Value)));
             base.UpdateDescription();
         }
     
@@ -40,19 +41,18 @@ namespace BingoMode.Challenges
     
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoEatChallenge || (isCreature ? (challenge as BingoEatChallenge).creatureFoodType != creatureFoodType : (challenge as BingoEatChallenge).itemFoodType != itemFoodType);
+            return challenge is not BingoEatChallenge || (challenge as BingoEatChallenge).foodType != foodType;
         }
     
         public override Challenge Generate()
         {
-            // Choose random food, if Riv is selected then make glowweed available
-            ItemType randomFood = null;
-            CreatureType randomCreatureFood = null;
             bool c = UnityEngine.Random.value < 0.5f;
-    
+
+            // Choose random food, if Riv is selected then make glowweed available
+            string randomFood;
             if (c)
             {
-                randomCreatureFood = ChallengeUtils.CreatureFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.CreatureFoodTypes.Length)];
+                randomFood = ChallengeUtils.CreatureFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.CreatureFoodTypes.Length)];
             }
             else
             {
@@ -62,10 +62,9 @@ namespace BingoMode.Challenges
 
             return new BingoEatChallenge()
             {
-                itemFoodType = randomFood,
-                creatureFoodType = randomCreatureFood,
+                foodType = new(randomFood, "Food type", 0),
                 isCreature = c,
-                amountRequired = UnityEngine.Random.Range(3, 8) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)//Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
+                amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 3 : 1), "Amount", 1)//Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
             };
         }
     
@@ -76,17 +75,20 @@ namespace BingoMode.Challenges
     
         public override int Points()
         {
-            return Mathf.RoundToInt(6 * FoodDifficultyMultiplier()) * amountRequired * (hidden ? 2 : 1);
+            return Mathf.RoundToInt(6 * FoodDifficultyMultiplier()) * amountRequired.Value * (hidden ? 2 : 1);
         }
     
         public float FoodDifficultyMultiplier()
         {
-            if (!isCreature && itemFoodType == ItemType.DangleFruit) return 0.5f;
-            if (!isCreature && itemFoodType == ItemType.SlimeMold) return 1.33f;
-            if (!isCreature && itemFoodType == MSCItemType.GlowWeed) return 1.66f;
-            if (!isCreature && itemFoodType == MSCItemType.DandelionPeach) return 1.33f;
-            if (isCreature && creatureFoodType == CreatureType.SmallNeedleWorm) return 1.5f;
-            if (isCreature && creatureFoodType == CreatureType.Fly) return 0.33f;
+            switch (foodType.Value)
+            {
+                case "DangleFruit": return 0.5f;
+                case "SlimeMold": return 1.33f;
+                case "GlowWeed": return 1.66f;
+                case "DandelionPeach": return 1.33f;
+                case "SmallNeedleWorm": return 1.5f;
+                case "Fly": return 0.33f;
+            }
     
             return 1f;
         }
@@ -94,11 +96,11 @@ namespace BingoMode.Challenges
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
             if (thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
-                (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type == creatureFoodType) : (p.abstractPhysicalObject.type == itemFoodType)))
+                (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
             {
                 currentEated++;
                 UpdateDescription();
-                if (currentEated >= amountRequired) CompleteChallenge();
+                if (currentEated >= amountRequired.Value) CompleteChallenge();
             }
         }
     
@@ -108,13 +110,13 @@ namespace BingoMode.Challenges
             {
                 "BingoEatChallenge",
                 "~",
-                ValueConverter.ConvertToString(amountRequired),
+                amountRequired.ToString(),
                 "><",
-                ValueConverter.ConvertToString(currentEated),
+                currentEated.ToString(),
                 "><",
                 isCreature ? "1" : "0",
                 "><",
-                isCreature ? ValueConverter.ConvertToString(creatureFoodType.value) : ValueConverter.ConvertToString(itemFoodType.value),
+                foodType.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -129,11 +131,10 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                amountRequired = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
                 currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 isCreature = (array[2] == "1");
-                if (isCreature) creatureFoodType = new(array[3], false);
-                else itemFoodType = new(array[3], false);
+                foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
@@ -154,5 +155,7 @@ namespace BingoMode.Challenges
         {
             On.Player.ObjectEaten -= Player_ObjectEaten;
         }
+
+        public List<object> Settings() => [foodType, amountRequired];
     }
 }

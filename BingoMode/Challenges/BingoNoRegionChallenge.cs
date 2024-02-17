@@ -13,11 +13,11 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoNoRegionChallenge : Challenge, IBingoChallenge
     {
-        public string region;
+        public SettingBox<string> region;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Do not enter " + region);
+            this.description = ChallengeTools.IGT.Translate("Do not enter " + region.Value);
             base.UpdateDescription();
         }
 
@@ -37,14 +37,14 @@ namespace BingoMode.Challenges
 
             return new BingoNoRegionChallenge
             {
-                region = regiones[UnityEngine.Random.Range(0, regiones.Length)],
+                region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0),
                 completed = true,
             };
         }
 
         public void Entered(string regionName)
         {
-            if (completed && region == regionName)
+            if (completed && region.Value == regionName)
             {
                 completed = false;
             }
@@ -67,11 +67,12 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
+            Plugin.logger.LogMessage(region.ToString());
             return string.Concat(new string[]
             {
                 "BingoNoRegionChallenge",
                 "~",
-                region,
+                region.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -86,7 +87,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                region = array[0];
+                region = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -107,5 +108,7 @@ namespace BingoMode.Challenges
         {
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion1;
         }
+
+        public List<object> Settings() => [region];
     }
 }

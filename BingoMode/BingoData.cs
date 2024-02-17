@@ -28,7 +28,7 @@ namespace BingoMode
         public static Dictionary<Creature, List<EntityID>> blacklist = [];
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
 
-        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon);
+        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
         public static List<Challenge> GetAdequateChallengeList(SlugcatStats.Name slug)
         {
@@ -46,7 +46,7 @@ namespace BingoMode
             challengeTokens.Clear();
             foreach (Challenge challenge in BingoHooks.GlobalBoard.AllChallenges)
             {
-                if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock)) challengeTokens.Add(c.unlock);
+                if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock.Value)) challengeTokens.Add(c.unlock.Value);
             }
             heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
             blacklist = [];

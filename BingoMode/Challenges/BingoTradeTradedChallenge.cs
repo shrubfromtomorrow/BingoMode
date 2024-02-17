@@ -13,15 +13,15 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoTradeTradedChallenge : Challenge, IBingoChallenge
     {
-        public int amount;
+        public SettingBox<int> amount;
         public int current;
-        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader
+        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader (Save this later)
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount == 1 ? "item" : "items") + " from Scavenger Merchants to others")
+            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount.Value == 1 ? "item" : "items") + " from Scavenger Merchants to others")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
@@ -39,7 +39,7 @@ namespace BingoMode.Challenges
         {
             return new BingoTradeTradedChallenge
             {
-                amount = UnityEngine.Random.Range(1, 4),
+                amount = new(UnityEngine.Random.Range(1, 4), "Amount of Items", 0),
                 traderItems = []
             };
         }
@@ -53,7 +53,7 @@ namespace BingoMode.Challenges
                 traderItems.Remove(item);
                 current++;
                 UpdateDescription();
-                if (current >= amount)
+                if (current >= amount.Value)
                 {
                     CompleteChallenge();
                 }
@@ -105,7 +105,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -126,5 +126,7 @@ namespace BingoMode.Challenges
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift2;
         }
+
+        public List<object> Settings() => [amount];
     }
 }

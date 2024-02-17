@@ -6,18 +6,20 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
+    using static ChallengeHooks;
     // Literally copied from base game, to add the starving thing easily, and to customize which echoes appear
     public class BingoEchoChallenge : Challenge, IBingoChallenge
     {
-        public GhostWorldPresence.GhostID ghost;
-        public bool starve;
+        public SettingBox<string> ghost; //GhostWorldPresence.GhostID
+        public SettingBox<bool> starve;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Visit the <echo_location> Echo" + (starve ? " while starving" : "")).Replace("<echo_location>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(ghost.value, ExpeditionData.slugcatPlayer)));
+            description = ChallengeTools.IGT.Translate("Visit the <echo_location> Echo" + (starve.Value ? " while starving" : "")).Replace("<echo_location>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(ghost.Value, ExpeditionData.slugcatPlayer)));
             base.UpdateDescription();
         }
 
@@ -26,11 +28,11 @@ namespace BingoMode.Challenges
             base.Update();
             for (int i = 0; i < game.Players.Count; i++)
             {
-                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && (!starve || player.Malnourished))
+                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && (!starve.Value || player.Malnourished))
                 {
                     for (int j = 0; j < player.room.updateList.Count; j++)
                     {
-                        if (player.room.updateList[j] is Ghost && game.Players[i].world.worldGhost != null && (player.room.updateList[j] as Ghost).onScreenCounter > 30 && game.Players[i].world.worldGhost.ghostID.value == ghost.value)
+                        if (player.room.updateList[j] is Ghost && game.Players[i].world.worldGhost != null && (player.room.updateList[j] as Ghost).onScreenCounter > 30 && game.Players[i].world.worldGhost.ghostID.value == ghost.Value)
                         {
                             CompleteChallenge();
                         }
@@ -56,8 +58,8 @@ namespace BingoMode.Challenges
             }
             return new BingoEchoChallenge
             {
-                ghost = new(list[Random.Range(0, list.Count)], false),
-                starve = Random.value < 0.25f
+                ghost = new(list[Random.Range(0, list.Count)], "Region", 0),
+                starve = new(Random.value < 0.25f, "While Starving", 1)
             };
         }
 
@@ -68,7 +70,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoEchoChallenge c || c.ghost.value != ghost.value;
+            return challenge is not BingoEchoChallenge c || c.ghost.Value != ghost.Value;
         }
 
         public override string ChallengeName()
@@ -82,9 +84,9 @@ namespace BingoMode.Challenges
             [
                 "BingoEchoChallenge",
                 "~",
-                ValueConverter.ConvertToString(this.ghost),
+                ghost.ToString(),
                 "><",
-                starve ? "1" : "0",
+                starve.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -99,8 +101,8 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                ghost = new GhostWorldPresence.GhostID(array[0], false);
-                starve = (array[1] == "1");
+                ghost = SettingBoxFromString(array[0]) as SettingBox<string>;
+                starve = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -119,5 +121,7 @@ namespace BingoMode.Challenges
         public void RemoveHooks()
         {
         }
+
+        public List<object> Settings() => [ghost, starve];
     }
 }

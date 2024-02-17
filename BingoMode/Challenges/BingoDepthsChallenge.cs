@@ -8,13 +8,14 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using CreatureType = CreatureTemplate.Type;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoDepthsChallenge : Challenge, IBingoChallenge
     {
-        public CreatureType crit;
+        public SettingBox<string> crit;
 
         public override void UpdateDescription()
         {
@@ -23,7 +24,7 @@ namespace BingoMode.Challenges
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             description = ChallengeTools.IGT.Translate("Drop a <crit> into the depths drop room")
-                .Replace("<crit>", ChallengeTools.creatureNames[crit.Index].TrimEnd('s'));
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
             base.UpdateDescription();
         }
 
@@ -41,7 +42,7 @@ namespace BingoMode.Challenges
         {
             return new BingoDepthsChallenge
             {
-                crit = UnityEngine.Random.value < 0.5f ? CreatureType.Hazer : CreatureType.VultureGrub
+                crit = new(UnityEngine.Random.value < 0.5f ? "Hazer" : "VultureGrub", "Creature Type", 0)
             };
         }
 
@@ -55,7 +56,7 @@ namespace BingoMode.Challenges
                 {
                     for (int j = 0; j < player.room.updateList.Count; j++)
                     {
-                        if (player.room.updateList[j] is Creature c && c.Template.type == crit && c.mainBodyChunk != null && c.mainBodyChunk.pos.y < 1000f)
+                        if (player.room.updateList[j] is Creature c && c.Template.type.value == crit.Value && c.mainBodyChunk != null && c.mainBodyChunk.pos.y < 1000f)
                         {
                             CompleteChallenge();
                         }
@@ -85,7 +86,7 @@ namespace BingoMode.Challenges
             {
                 "BingoDepthsChallenge",
                 "~",
-                ValueConverter.ConvertToString(crit),
+                crit.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -100,7 +101,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                crit = new(array[0], false);
+                crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -119,5 +120,7 @@ namespace BingoMode.Challenges
         public void RemoveHooks()
         {
         }
+
+        public List<object> Settings() => [crit];
     }
 }

@@ -16,18 +16,122 @@ using System.Linq;
 using System.Reflection;
 using MonoMod.RuntimeDetour;
 using static Rewired.Controller;
+using Menu.Remix;
+using Menu.Remix.MixedUI.ValueTypes;
+using System.Runtime;
 
 namespace BingoMode.Challenges
 {
+
+    public class SettingBox<T> : IStrongBox // Basically just strongbox but i needed morer data to store (i dont know if this works to be honest)
+    {
+        public Type type;
+        public string name;
+        public int index;
+        public int[] locks; // mutually exclusive settings
+        public T Value;
+        public SettingBox(T value, string displayName, int index, int[] locks = null)
+        {
+            Value = value;
+            type = typeof(T);
+            name = displayName;
+            this.index = index;
+            this.locks = locks;
+        }
+
+        object IStrongBox.Value
+        {
+            get
+            {
+                return Value;
+            }
+            set
+            {
+                Value = (T)((object)value);
+            }
+        }
+
+        public override string ToString()
+        {
+            string excl = "NULL";
+            if (locks != null)
+            {
+                excl = locks[0].ToString();
+                for (int i = 1; i < locks.Length; i++)
+                {
+                    excl += "," + locks[i];
+                }
+            }
+            return string.Concat(
+                type.ToString(),
+                "|",
+                ValueConverter.ConvertToString(Value),
+                "|",
+                name,
+                "|",
+                index.ToString(),
+                "|",
+                excl
+                );
+        }
+    }
+
     public interface IBingoChallenge
     {
         void AddHooks();
         void RemoveHooks();
-        //List<object> Settings();
+        List<object> Settings();
     }
 
     public class ChallengeHooks
     {
+        public static object SettingBoxFromString(string save)
+        {
+            string[] settings = save.Split('|');
+            try
+            {
+                Plugin.logger.LogMessage("Attempting to recreate settingbox from string:");
+                object bocks = null;
+                int[] locks = null;
+                if (settings[4] != "NULL")
+                {
+                    List<int> tempLocks = [];
+                    foreach (var g in settings[4].Split(','))
+                    {
+                        tempLocks.Add(int.Parse(g));
+                    }
+                    locks = tempLocks.ToArray();
+                }
+                switch (settings[0])
+                {
+                    case "Int32":
+                    case "System.Int32":
+                        Plugin.logger.LogMessage("Generating it as int!");
+                        bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), locks);
+                        break;
+                    case "Boolean":
+                    case "System.Boolean":
+                        Plugin.logger.LogMessage("Generating it as bool!");
+                        bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), locks);
+                        break;
+                    case "String":
+                    case "System.String":
+                        Plugin.logger.LogMessage("Generating it as string!");
+                        bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), locks);
+                        break;
+                }
+                Plugin.logger.LogMessage("Recreation successful!");
+                Plugin.logger.LogMessage("Final grug: " + bocks.ToString());
+                return bocks;
+            }
+            catch(Exception ex)
+            {
+                foreach (var j in settings)
+                {
+                    Plugin.logger.LogMessage(j);
+                }; throw new("Failed to recreate SettingBox from string!!!" + ex); }
+        }
+
         // Runtime detour hooks
         public static Hook tokenColorHook;
 
@@ -449,7 +553,7 @@ namespace BingoMode.Challenges
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && !c.moon)
+                if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && !c.moon.Value)
                 {
                     c.Delivered();
                 }
@@ -464,7 +568,7 @@ namespace BingoMode.Challenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && c.moon)
+                    if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && c.moon.Value)
                     {
                         c.Delivered();
                     }
@@ -712,11 +816,11 @@ namespace BingoMode.Challenges
             {
                 return;
             }
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoUnlockChallenge b && b.unlock == d.tokenString))
+            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString))
             {
                 foreach (Challenge ch in BingoHooks.GlobalBoard.AllChallenges)
                 {
-                    if (ch is BingoUnlockChallenge b && b.unlock == (d.tokenString + (d.isRed ? "-safari" : "")))
+                    if (ch is BingoUnlockChallenge b && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
                         ch.CompleteChallenge();
                         if (BingoData.challengeTokens.Contains(d.tokenString)) BingoData.challengeTokens.Remove(d.tokenString);

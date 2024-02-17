@@ -7,18 +7,19 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoAllRegionsExcept : Challenge, IBingoChallenge
     {
-        public string region;
+        public SettingBox<string> region;
         public List<string> regionsToEnter;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter all regions except " + region);
+            this.description = ChallengeTools.IGT.Translate("Enter all regions except " + region.Value);
             base.UpdateDescription();
         }
 
@@ -42,14 +43,14 @@ namespace BingoMode.Challenges
 
             return new BingoAllRegionsExcept
             {
-                region = regionn,
+                region = new(regionn, "Region", 0),
                 regionsToEnter = regiones
             };
         }
 
         public void Entered(string regionName)
         {
-            if (completed && region == regionName)
+            if (completed && region.Value == regionName)
             {
                 completed = false;
                 regionsToEnter.Add("failed");
@@ -89,7 +90,7 @@ namespace BingoMode.Challenges
             {
                 "BingoAllRegionsExcept",
                 "~",
-                region,
+                region.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -104,7 +105,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                region = array[0];
+                region = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
@@ -125,5 +126,7 @@ namespace BingoMode.Challenges
         {
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion2;
         }
+
+        public List<object> Settings() => [region];
     }
 }

@@ -7,21 +7,22 @@ using UnityEngine;
 using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     public class BingoHatchNoodleChallenge : Challenge, IBingoChallenge
     {
-        public int amount;
+        public SettingBox<int> amount;
         public int current;
-        public bool atOnce;
+        public SettingBox<bool> atOnce;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce ? " at once" : ""))
+            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " at once" : ""))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
@@ -40,8 +41,8 @@ namespace BingoMode.Challenges
             bool onc = UnityEngine.Random.value < 0.5f;
             return new BingoHatchNoodleChallenge
             {
-                atOnce = onc,
-                amount = UnityEngine.Random.Range(2, onc ? 3 : 6)
+                atOnce = new(onc, "At Once", 0),
+                amount = new(UnityEngine.Random.Range(2, onc ? 3 : 6), "Amount", 1)
             };
         }
 
@@ -51,13 +52,13 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= amount) CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
             }
         }
 
         public override int Points()
         {
-            return amount * 10;
+            return amount.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -76,9 +77,11 @@ namespace BingoMode.Challenges
             {
                 "BingoHatchNoodleChallenge",
                 "~",
-                atOnce ? "0" : current.ToString(),
+                atOnce.Value ? "0" : current.ToString(),
                 "><",
                 amount.ToString(),
+                "><",
+                atOnce.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -94,10 +97,11 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                completed = (array[2] == "1");
-                hidden = (array[3] == "1");
-                revealed = (array[4] == "1");
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                atOnce = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                completed = (array[3] == "1");
+                hidden = (array[4] == "1");
+                revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -115,5 +119,8 @@ namespace BingoMode.Challenges
         {
             On.SmallNeedleWorm.PlaceInRoom -= SmallNeedleWorm_PlaceInRoom;
         }
+
+        public List<object> Settings() => [atOnce, amount];
+        public List<string> SettingNames() => ["At Once", "Amount"];
     }
 }

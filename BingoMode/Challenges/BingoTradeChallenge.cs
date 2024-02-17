@@ -14,14 +14,14 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoTradeChallenge : Challenge, IBingoChallenge
     {
-        public int amount;
+        public SettingBox<int> amount;
         public int current;
         public List<EntityID> bannedIDs;
 
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] worth of value to Scavenger Merchants")
-                .Replace("<amount>", ValueConverter.ConvertToString(amount))
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
                 .Replace("<current>", ValueConverter.ConvertToString(current));
             base.UpdateDescription();
         }
@@ -42,7 +42,7 @@ namespace BingoMode.Challenges
 
             return new BingoTradeChallenge
             {
-                amount = amou,
+                amount = new(amou, "Value", 0),
                 bannedIDs = []
             };
         }
@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
                 bannedIDs.Add(ID);
                 UpdateDescription();
 
-                if (!completed && current >= amount)
+                if (!completed && current >= amount.Value)
                 {
                     CompleteChallenge();
                 }
@@ -65,7 +65,7 @@ namespace BingoMode.Challenges
 
         public override int Points()
         {
-            return amount * 10;
+            return amount.Value * 10;
         }
 
         public override bool CombatRequired()
@@ -102,7 +102,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
@@ -123,5 +123,7 @@ namespace BingoMode.Challenges
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift1;
         }
+
+        public List<object> Settings() => [amount];
     }
 }

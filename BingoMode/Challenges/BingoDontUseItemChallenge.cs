@@ -8,6 +8,7 @@ using Expedition;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
@@ -15,12 +16,12 @@ namespace BingoMode.Challenges
     //Using counts as either throwing an item, or holding it for more than 5 seconds
     public class BingoDontUseItemChallenge : Challenge, IBingoChallenge
     {
-        public AbstractPhysicalObject.AbstractObjectType item;
+        public SettingBox<string> item;
         public bool isFood;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>").Replace("<item>", ChallengeTools.ItemName(item));
+            this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>").Replace("<item>", ChallengeTools.ItemName(new(item.Value)));
             base.UpdateDescription();
         }
 
@@ -37,7 +38,7 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool edible = UnityEngine.Random.value < 0.5f;
-            AbstractPhysicalObject.AbstractObjectType type;
+            string type;
             if (edible)
             {
                 type = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length - (ModManager.MSC ? 5 : 1))];
@@ -45,7 +46,7 @@ namespace BingoMode.Challenges
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
             return new BingoDontUseItemChallenge
             {
-                item = type,
+                item = new(type, "Item type", 0),
                 isFood = edible,
                 completed = true
             };
@@ -53,7 +54,7 @@ namespace BingoMode.Challenges
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
-            if (used == item)
+            if (used.value == item.Value)
             {
                 completed = false;
                 //
@@ -67,7 +68,7 @@ namespace BingoMode.Challenges
             if (isFood) return;
             for (int i = 0; i < BingoData.heldItemsTime.Length; i++)
             {
-                if (i == (int)item && BingoData.heldItemsTime[i] > 200) Used(item); 
+                if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value)); 
             }
         }
 
@@ -92,7 +93,7 @@ namespace BingoMode.Challenges
             {
                 "BingoDontUseItemChallenge",
                 "~",
-                ValueConverter.ConvertToString(item),
+                item.ToString(),
                 "><",
                 isFood ? "1" : "0",
                 "><",
@@ -109,7 +110,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                item = new(array[0], false);
+                item = SettingBoxFromString(array[0]) as SettingBox<string>;
                 isFood = (array[1] == "1");
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
@@ -133,5 +134,7 @@ namespace BingoMode.Challenges
             On.Player.ThrowObject -= Player_ThrowObject;
             On.Player.GrabUpdate -= Player_GrabUpdate;
         }
+
+        public List<object> Settings() => [item];
     }
 }
