@@ -42,7 +42,7 @@ namespace BingoMode.Challenges
         {
             return new BingoDepthsChallenge
             {
-                crit = new(UnityEngine.Random.value < 0.5f ? "Hazer" : "VultureGrub", "Creature Type", 0)
+                crit = new(UnityEngine.Random.value < 0.5f ? "Hazer" : "VultureGrub", "Creature Type", 0, listName: "depths")
             };
         }
 

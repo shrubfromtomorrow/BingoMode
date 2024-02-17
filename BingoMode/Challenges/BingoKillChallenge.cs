@@ -91,14 +91,14 @@ namespace BingoMode.Challenges
                 expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = "FlareBomb"; 
             return new BingoKillChallenge
             {
-                crit = new(expeditionCreature.creature.value, "Creature Type", 0),
+                crit = new(expeditionCreature.creature.value, "Creature Type", 0, listName: "creatures"),
                 amount = new(num, "Amount", 1),
                 starve = new(starvv, "While Starving", 2),
                 oneCycle = new(onePiece, "In one Cycle", 3),
-                sub = new("", "Subregion", 4),
-                region = new("", "Region", 5),
-                room = new("", "Room", 6),
-                weapon = new(weapo, "Weapon Used", 7),
+                sub = new("", "Subregion", 4, listName: "regions"),
+                region = new("", "Region", 5, listName: "regions"),
+                room = new("", "Room", 6, listName: "regions"),
+                weapon = new(weapo, "Weapon Used", 7, listName: "weapons"),
                 deathPit = new(false, "Via a Death Pit", 8)
             };
         }

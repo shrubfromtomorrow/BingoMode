@@ -55,9 +55,9 @@ namespace BingoMode.Challenges
             string toto = fromage == "null" || Random.value < 0.5f ? allRegions[Random.Range(0, allRegions.Count)] : "null";
             return new BingoTransportChallenge
             {
-                from = new(fromage, "From Region", 0),
-                to = new(toto, "To Region", 1),
-                crit = new(crug, "Creature Type", 2),
+                from = new(fromage, "From Region", 0, listName: "regions"),
+                to = new(toto, "To Region", 1, listName: "regions"),
+                crit = new(crug, "Creature Type", 2, listName: "transport"),
                 origins = []
             };
         }

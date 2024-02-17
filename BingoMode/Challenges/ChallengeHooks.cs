@@ -30,13 +30,15 @@ namespace BingoMode.Challenges
         public int index;
         public int[] locks; // mutually exclusive settings
         public T Value;
-        public SettingBox(T value, string displayName, int index, int[] locks = null)
+        public string listName;
+        public SettingBox(T value, string displayName, int index, int[] locks = null, string listName = null)
         {
             Value = value;
             type = typeof(T);
             name = displayName;
             this.index = index;
             this.locks = locks;
+            this.listName = listName;
         }
 
         object IStrongBox.Value
@@ -126,10 +128,13 @@ namespace BingoMode.Challenges
             }
             catch(Exception ex)
             {
+                Plugin.logger.LogMessage("Errored guy:");
                 foreach (var j in settings)
                 {
                     Plugin.logger.LogMessage(j);
-                }; throw new("Failed to recreate SettingBox from string!!!" + ex); }
+                }; 
+                throw new("Failed to recreate SettingBox from string!!!" + ex); 
+            }
         }
 
         // Runtime detour hooks

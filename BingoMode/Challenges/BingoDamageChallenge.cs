@@ -57,8 +57,8 @@ namespace BingoMode.Challenges
 
             return new BingoDamageChallenge
             {
-                weapon = new(wep, "Weapon", 0),
-                victim = new(crit, "Creature Type", 1),
+                weapon = new(wep, "Weapon", 0, listName: "weapons"),
+                victim = new(crit, "Creature Type", 1, listName: "creatures"),
                 amount = new(amound, "Amount", 2),
             };
         }

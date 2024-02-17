@@ -10,6 +10,8 @@ using Menu.Remix;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using BingoMode.Challenges;
+using Menu.Remix.MixedUI.ValueTypes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BingoMode
 {
@@ -38,8 +40,7 @@ namespace BingoMode
         public VerticalSlider slider;
         public float sliderF;
         public const int maxItems = 10;
-        public ChallengeSetting setting;
-        public StrongBox<object> tess;
+        public List<ChallengeSetting> challengeSettings;
         public MenuTab tab;
         public MenuTabWrapper wrapper;
 
@@ -141,11 +142,17 @@ namespace BingoMode
             tab._Update();
             tab._GrafUpdate(0f);
 
-            if (owner.challenge is BingoPopcornChallenge chh)
+            ResetSettings(owner.challenge as IBingoChallenge);
+        }
+
+        public void ResetSettings(IBingoChallenge ch)
+        {
+            challengeSettings = [];
+            for (int i = 0; i < ch.Settings().Count; i++)
             {
-                tess = new StrongBox<object>();
-                setting = new ChallengeSetting(this, pages[0], new Vector2(683f - leftAnchor, 384f), 0, chh.Settings()[0]);
-                pages[0].subObjects.Add(setting);
+                ChallengeSetting s = new(this, pages[0], new Vector2(663f - leftAnchor, 289f + 30f * i), i, ch.Settings()[i]);
+                challengeSettings.Add(s);
+                pages[0].subObjects.Add(s);
             }
         }
 
@@ -195,7 +202,16 @@ namespace BingoMode
 
             if (onSettings)
             {
-                setting.pos = new Vector2(683f - leftAnchor, 384f) + pagePos;
+                Vector2 origPos = new Vector2(683f - leftAnchor, 459f) + pagePos;
+                float dif = 200f / (maxItems / 2f);
+                float sliderDif = dif * (challengeSettings.Count - (maxItems/2f) + 1);
+
+                for (int i = 0; i < challengeSettings.Count; i++)
+                {
+                    challengeSettings[i].pos = origPos - new Vector2(0f, dif * i - sliderDif * (1f - sliderF));
+                    if (challengeSettings[i].lastPos == new Vector2(-10000, -10000)) challengeSettings[i].lastPos = challengeSettings[i].pos;
+                    //challengeSettings[i].field.bumpBehav.greyedOut = testLabels[i].maxAlpha < 0.2f;
+                }
 
                 for (int i = 0; i < testLabels.Length; i++)
                 {
@@ -217,8 +233,11 @@ namespace BingoMode
                     testLabels[i].buttonBehav.greyedOut = testLabels[i].maxAlpha < 0.2f;
                 }
 
-                setting.pos = new Vector2(-10000, -10000);
-                setting.lastPos = new Vector2(-10000, -10000);
+                for (int i = 0; i < challengeSettings.Count; i++)
+                {
+                    challengeSettings[i].pos = new Vector2(-10000, -10000);
+                    challengeSettings[i].lastPos = challengeSettings[i].pos;
+                }
             }
 
             tab._GrafUpdate(timeStacker);
@@ -226,6 +245,20 @@ namespace BingoMode
 
         public void UpdateChallenge()
         {
+            if (owner.challenge is BingoEatChallenge c)
+            {
+                c.isCreature = ChallengeUtils.FoodTypes.IndexOf(c.foodType.Value) > 9;
+            }
+            else if (owner.challenge is BingoDontUseItemChallenge cc)
+            {
+                var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
+                cc.isFood = l.IndexOf(cc.item.Value) < (l.Length - 6);
+            }
+            else if (owner.challenge is BingoVistaChallenge ccc)
+            {
+                ccc.location = ChallengeTools.VistaLocations[ccc.room.Value];
+                ccc.region = ccc.room.Value.Substring(0, 2);
+            }
             owner.challenge.UpdateDescription();
             owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
@@ -292,13 +325,17 @@ namespace BingoMode
             owner.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(ch, true);
             BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge);
             UpdateChallenge();
+            foreach (var s in challengeSettings)
+            {
+                pages[0].RemoveSubObject(s);
+            }
+            ResetSettings(owner.challenge as IBingoChallenge);
         }
 
         public void NewValue(object value)
         {
             //tess = value;
             UpdateChallenge();
-            Plugin.logger.LogMessage((owner.challenge as BingoPopcornChallenge).amound.Value);
         }
 
         public class TypeButton : ButtonTemplate
@@ -360,37 +397,41 @@ namespace BingoMode
 
         public class ChallengeSetting : PositionedMenuObject
         {
-            //public OpUpdown intField;
-            //public OpTextBox stringField;
-            //public OpCheckBox boolField;
-            //public OpListBox listField;
-            //public Configurable<int> iConf;
-            //public Configurable<string> sConf;
-            //public Configurable<bool> bConf;
-            //public Configurable<string> lConf;
             public ConfigurableBase conf;
             public UIconfig field;
             public UIelementWrapper cWrapper;
+            public MenuLabel label;
             public object value;
 
-            public ChallengeSetting(CustomizerDialog menu, MenuObject owner, Vector2 pos, int index, object value, bool list = false) : base(menu, owner, pos)
+            public ChallengeSetting(CustomizerDialog menu, MenuObject owner, Vector2 pos, int index, object value) : base(menu, owner, pos)
             {
-                if (value is StrongBox<int>)
+                label = new MenuLabel(menu, owner, "", pos - new Vector2(100f, 0f), default, false);
+                label.label.anchorX = 1f;
+                label.label.anchorY = 0f;
+                owner.subObjects.Add(label);
+                if (value is SettingBox<int> i)
                 {
-                    this.value = value as StrongBox<int>;
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting" + index, 1, new ConfigAcceptableRange<int>(0, 500));
-                    field = new OpUpdown(true, conf, pos, 200f);
+                    this.value = i;
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting" + index, i.Value, new ConfigAcceptableRange<int>(1, 500));
+                    field = new OpUpdown(true, conf, pos + new Vector2(100f, 0f), 100f);
                     field.OnChange += UpdootInt;
+                    label.text = i.name;
                 }
-                else if (value is StrongBox<string>)
+                else if (value is SettingBox<string> s)
                 {
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting" + index, "helo", (ConfigAcceptableBase)null);
-                    field = list ? new OpListBox(conf as Configurable<string>, pos, 200f, new string[] { "nuts", "nutst" }) : new OpTextBox(conf, pos, 200f);
+                    this.value = s;
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting" + index, s.Value, (ConfigAcceptableBase)null);
+                    field = new OpComboBox(conf as Configurable<string>, pos + new Vector2(100f, 0f), 100f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName) : ["Whoops errore"]);
+                    field.OnChange += UpdootString;
+                    label.text = s.name;
                 }
-                else if (value is StrongBox<bool>)
+                else if (value is SettingBox<bool> b)
                 {
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting" + index, false, (ConfigAcceptableBase)null);
-                    field = new OpCheckBox(conf as Configurable<bool>, pos);
+                    this.value = b;
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting" + index, b.Value, (ConfigAcceptableBase)null);
+                    field = new OpCheckBox(conf as Configurable<bool>, pos + new Vector2(100f, 0f));
+                    field.OnChange += UpdootBool;
+                    label.text = b.name;
                 }
                 else
                 {
@@ -409,7 +450,19 @@ namespace BingoMode
 
             public void UpdootInt()
             {
-                (value as StrongBox<int>).Value = int.Parse(field.value);
+                (value as SettingBox<int>).Value = (field as OpUpdown).GetValueInt();
+                (menu as CustomizerDialog).NewValue(field.value);
+            }
+
+            public void UpdootString()
+            {
+                (value as SettingBox<string>).Value = field.value;
+                (menu as CustomizerDialog).NewValue(field.value);
+            }
+
+            public void UpdootBool()
+            {
+                (value as SettingBox<bool>).Value = (field as OpCheckBox).GetValueBool();
                 (menu as CustomizerDialog).NewValue(field.value);
             }
 
@@ -421,6 +474,7 @@ namespace BingoMode
                 {
                     field.pos = pos;
                 }
+                label.pos = pos;
             }
         }
     }

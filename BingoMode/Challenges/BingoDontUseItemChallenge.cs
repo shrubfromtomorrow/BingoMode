@@ -41,12 +41,12 @@ namespace BingoMode.Challenges
             string type;
             if (edible)
             {
-                type = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length - (ModManager.MSC ? 5 : 1))];
+                type = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.FoodTypes.Length - (ModManager.MSC ? 5 : 1))];
             } 
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
             return new BingoDontUseItemChallenge
             {
-                item = new(type, "Item type", 0),
+                item = new(type, "Item type", 0, listName: "banitem"),
                 isFood = edible,
                 completed = true
             };

@@ -141,16 +141,34 @@ namespace BingoMode
             else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 1 :(( " + il);
 
             if (b.TryGotoNext(MoveType.After,
-                x => x.MatchLdstr("Cycle complete, saving run data")
+                x => x.MatchEndfinally(),
+                x => x.MatchLdloc(38)
                 ))
             {
-                b.EmitDelegate(() =>
+                Plugin.logger.LogMessage(b.Prev);
+                b.Emit(OpCodes.Ldarg_0);
+                b.Emit(OpCodes.Ldloc, 38);
+                b.EmitDelegate<Action<WinState, int>>((self, num7) =>
                 {
                     if (BingoData.BingoMode) 
                     {
                         ExpeditionGame.expeditionComplete = GlobalBoard.CheckWin();
+                        Plugin.logger.LogMessage(num7);
+                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        {
+                            if (challenge is BingoAchievementChallenge a)
+                            {
+                                a.CheckAchievementProgress(self);
+                            }
+                            if (challenge.completed)
+                            {
+                                num7++;
+                            }
+                        }
+                        Plugin.logger.LogMessage(num7);
                     }
                 });
+                Plugin.logger.LogMessage(b.Next);
             }
             else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 2 :(( " + il);
         }

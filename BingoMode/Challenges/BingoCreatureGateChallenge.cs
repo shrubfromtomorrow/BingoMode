@@ -48,7 +48,7 @@ namespace BingoMode.Challenges
             return new BingoCreatureGateChallenge
             {
                 amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
-                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - (ModManager.MSC ? 0 : 1))], "Creature Type", 1)
+                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - (ModManager.MSC ? 0 : 1))], "Creature Type", 1, listName: "transport")
             };
         }
 

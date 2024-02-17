@@ -5,6 +5,7 @@ using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 using System.Collections.Generic;
 using MoreSlugcats;
+using System.Linq;
 
 namespace BingoMode.Challenges
 {
@@ -14,6 +15,40 @@ namespace BingoMode.Challenges
         {
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
+        }
+
+        public static string[] GetCorrectListForChallenge(string listName)
+        {
+            string ln = listName;
+            bool addEmpty = false;
+            if (ln[0] == '_')
+            {
+                addEmpty = true;
+                ln = ln.Substring(1);
+            }
+            switch (ln)
+            {
+                case "transport": return Transportable;
+                case "pin": return Pinnable;
+                case "tolls": return BombableOutposts;
+                case "food": return FoodTypes;
+                case "weapons": return Weapons;
+                case "theft": return StealableStolable;
+                case "ban": return Bannable;
+                case "friend": return Befriendable;
+                case "pearls": return CollectablePearls;
+                case "craft": return CraftableItems;
+                case "regions": return [.. SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.getSlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "echoes": return [.. GhostWorldPresence.GhostID.values.entries];
+                case "creatures": return [.. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
+                case "depths": return ["Hazer", "VultureGrub"];
+                case "banitem": return [.. FoodTypes, .. Bannable];
+                case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
+                case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
+                case "expobject": return ["FirecrackerPlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
+                case "vista": return [.. ChallengeTools.VistaLocations.Keys];
+            }
+            return ["Whoops something went wrong"];
         }
 
         public static string ChallengeTools_ItemName(On.Expedition.ChallengeTools.orig_ItemName orig, ItemType type)
@@ -157,7 +192,7 @@ namespace BingoMode.Challenges
             return "NULL";
         }
 
-        public static readonly string[] ItemFoodTypes =
+        public static readonly string[] FoodTypes =
         {
             "DangleFruit",
             "EggBugEgg",
@@ -168,11 +203,7 @@ namespace BingoMode.Challenges
             "GooieDuck",
             "LillyPuck",
             "DandelionPeach",
-            "GlowWeed"
-        };
-
-        public static readonly string[] CreatureFoodTypes =
-        {
+            "GlowWeed",
             "VultureGrub",
             "Hazer",
             "SmallNeedleWorm",

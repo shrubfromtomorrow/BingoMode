@@ -94,7 +94,7 @@ namespace BingoMode.Challenges
                 p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
             }
             chal.collected = [];
-            chal.pearl = new(p, "Pearl", 1);
+            chal.pearl = new(p, "Pearl", 1, listName: "pearls");
             chal.region = p.Substring(0, 2);
             chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
 
@@ -168,6 +168,6 @@ namespace BingoMode.Challenges
         {
         }
 
-        public List<object> Settings() => [region, amount, specific, pearl];
+        public List<object> Settings() => [amount, specific, pearl];
     }
 }

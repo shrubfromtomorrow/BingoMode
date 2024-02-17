@@ -49,8 +49,8 @@ namespace BingoMode.Challenges
             return new BingoPinChallenge
             {
                 target = new(Mathf.FloorToInt(Random.Range(4, 8) / (r == "multi" ? 2.5f : 1f)), "Amount", 0),
-                crit = new(c, "Creature Type", 1),
-                region = new(r, "Region", 2),
+                crit = new(c, "Creature Type", 1, listName: "creatures"),
+                region = new(r, "Region", 2, listName: "regions"),
             };
         }
     
@@ -136,7 +136,7 @@ namespace BingoMode.Challenges
                 "><",
                 crit.ToString(),
                 "><",
-                region,
+                region.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",

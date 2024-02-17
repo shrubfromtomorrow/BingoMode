@@ -52,17 +52,17 @@ namespace BingoMode.Challenges
             string randomFood;
             if (c)
             {
-                randomFood = ChallengeUtils.CreatureFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.CreatureFoodTypes.Length)];
+                randomFood = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(10, ChallengeUtils.FoodTypes.Length)];
             }
             else
             {
-                randomFood = ChallengeUtils.ItemFoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.ItemFoodTypes.Length -
+                randomFood = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(0, 9 -
                             (ModManager.MSC ? (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet ? 0 : 1) : 4))];
             }
 
             return new BingoEatChallenge()
             {
-                foodType = new(randomFood, "Food type", 0),
+                foodType = new(randomFood, "Food type", 0, listName: "food"),
                 isCreature = c,
                 amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 3 : 1), "Amount", 1)//Mathf.RoundToInt(Mathf.Lerp(3, Mathf.Lerp(6, 10, UnityEngine.Random.value), ExpeditionData.challengeDifficulty)) * (isCreature && creatureFoodType == CreatureType.Fly ? 3 : 1)
             };

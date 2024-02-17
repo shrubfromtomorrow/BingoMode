@@ -39,7 +39,7 @@ namespace BingoMode.Challenges
             return new BingoBombTollChallenge
             {
                 pass = new(UnityEngine.Random.value < 0.5f, "Pass the Toll", 0),
-                roomName = new(toll, "Scavenger Toll", 1)
+                roomName = new(toll, "Scavenger Toll", 1, listName: "tolls")
             };
         }
 

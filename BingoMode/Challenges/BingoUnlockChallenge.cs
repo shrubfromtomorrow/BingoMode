@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
 
             return new BingoUnlockChallenge
             {
-                unlock = new(unl, "Unlock", 0)
+                unlock = new(unl, "Unlock", 0, listName: "unlocks")
             };
         }
 

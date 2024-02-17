@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
 
             return new BingoAllRegionsExcept
             {
-                region = new(regionn, "Region", 0),
+                region = new(regionn, "Region", 0, listName: "regions"),
                 regionsToEnter = regiones
             };
         }

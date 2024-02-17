@@ -86,7 +86,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 moon = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                completed = (array[12] == "1");
+                completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
                 UpdateDescription();

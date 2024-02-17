@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
 
             return new BingoTameChallenge
             {
-                crit = new(crug, "Creature Type", 0)
+                crit = new(crug, "Creature Type", 0, listName: "friend")
             };
         }
 

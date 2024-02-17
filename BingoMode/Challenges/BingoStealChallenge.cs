@@ -53,7 +53,7 @@ namespace BingoMode.Challenges
             {
                 checkedIDs = [],
                 toll = new(taxEvasion, "From Scavenger Toll", 0),
-                subject = new(itme, "Item", 1),
+                subject = new(itme, "Item", 1, listName: "theft"),
                 amount = new(UnityEngine.Random.Range(1, itme == "ScavengerBomb" ? 3 : 5), "Amount", 2)
             };
         }
