@@ -16,35 +16,51 @@ namespace BingoMode
     {
         public ExpeditionCoreFile core;
         public Challenge[,] challengeGrid; // The challenges will be treated as coordinates on a grid for convenience
+        //public Challenge[,] ghostGrid;
         public List<IntVector2> currentWinLine; // A list of grid coordinates
         public List<Challenge> AllChallenges;
         public int size;
+        public int lastSize;
 
         public BingoBoard()
         {
             size = 5;
+            lastSize = 5;
             GenerateBoard(size);
             currentWinLine = [];
         }
 
-        public void GenerateBoard(int size)
+        public void GenerateBoard(int size, bool changeSize = false)
         {
             Plugin.logger.LogMessage("Generating bored");
-            AllChallenges = [];
-            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
-            challengeGrid = new Challenge[size, size];
-            ExpeditionData.ClearActiveChallengeList();
+            if (!changeSize)
+            {
+                AllChallenges = [];
+                BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
+                challengeGrid = new Challenge[size, size];
+                ExpeditionData.ClearActiveChallengeList();
+            }
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
+                    if (challengeGrid[i, j] != null)
+                    {
+                        //if (changeSize)
+                        //{
+                        //    ghostGrid[i, j] = challengeGrid[i, j];
+                        //}
+                        continue;
+                    }
                 redo:
                     challengeGrid[i, j] = RandomBingoChallenge();
                     if (challengeGrid[i, j] == null) goto redo;
                     ExpeditionData.challengeList.Add(challengeGrid[i, j]);
+                    //ghostGrid[i, j] = challengeGrid[i, j];
                 }
             }
             UpdateChallenges();
+            lastSize = size;
         }
 
         public void UpdateChallenges()

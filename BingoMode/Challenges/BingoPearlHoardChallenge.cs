@@ -53,7 +53,7 @@ namespace BingoMode.Challenges
             {
                 common = new(flag, "Common Pearls", 0),
                 amount = new((int)Mathf.Lerp(2f, 5f, ExpeditionData.challengeDifficulty), "Amount", 1),
-                region = new(text, "From Region", 2, listName: "regions")
+                region = new(text, "In Region", 2, listName: "regions")
             };
         }
 

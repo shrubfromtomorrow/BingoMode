@@ -44,6 +44,7 @@ namespace BingoMode
         List<ChallengeSetting> challengeSettings;
         MenuTab tab;
         MenuTabWrapper wrapper;
+        float num;
 
         public CustomizerDialog(ProcessManager manager, BingoButton owner) : base(manager)
         {
@@ -51,6 +52,7 @@ namespace BingoMode
             leftAnchor = screenOffsets[0];
             rightAnchor = screenOffsets[1];
             this.owner = owner;
+            Vector2 outOfBounds = new Vector2(10000, 10000);
 
             pageTitle = new FSprite("customizer", true);
             pageTitle.SetAnchor(0.5f, 0.5f);
@@ -67,16 +69,13 @@ namespace BingoMode
             pages[0].subObjects.Add(page);
 
             dividers = new FSprite[3];
-            float num = 85f;
+            num = 85f;
             float num2 = LabelTest.GetWidth(Translate("CLOSE"), false) + 10f;
             if (num2 > num)
             {
                 num = num2;
             }
-            closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", new Vector2(683f - num / 2f, 220f), new Vector2(num, 35f))
-            {
-                lastPos = pos
-            };
+            closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", outOfBounds, new Vector2(num, 35f));
             pages[0].subObjects.Add(closeButton);
 
             for (int i = 0; i < 3; i++)
@@ -89,9 +88,8 @@ namespace BingoMode
                 pages[0].Container.AddChild(dividers[i]);
             }
 
-            randomize = new SymbolButton(this, pages[0], "Sandbox_Randomize", "RANDOMIZE_VARIABLE", new Vector2(663f - leftAnchor, 489f))
+            randomize = new SymbolButton(this, pages[0], "Sandbox_Randomize", "RANDOMIZE_VARIABLE", outOfBounds)
             {
-                lastPos = pos,
                 size = new Vector2(40f, 40f)
             };
             randomize.roundedRect.size = new Vector2(40f, 40f);
@@ -99,9 +97,8 @@ namespace BingoMode
             randomize.symbolSprite.scale = 1f;
             pages[0].subObjects.Add(randomize);
 
-            settings = new SymbolButton(this, pages[0], "settingscog", "CHALLENGE_SETTINGS", new Vector2(813f - leftAnchor, 489f))
+            settings = new SymbolButton(this, pages[0], "settingscog", "CHALLENGE_SETTINGS", outOfBounds)
             {
-                lastPos = pos,
                 size = new Vector2(40f, 40f)
             };
             settings.roundedRect.size = new Vector2(40f, 40f);
@@ -109,9 +106,8 @@ namespace BingoMode
             settings.symbolSprite.scale = 1f;
             pages[0].subObjects.Add(settings);
 
-            types = new SymbolButton(this, pages[0], "custommenu", "CHALLENGE_TYPES", new Vector2(513f - leftAnchor, 489f))
+            types = new SymbolButton(this, pages[0], "custommenu", "CHALLENGE_TYPES", outOfBounds)
             {
-                lastPos = pos,
                 size = new Vector2(40f, 40f)
             };
             types.roundedRect.size = new Vector2(40f, 40f);
@@ -122,9 +118,14 @@ namespace BingoMode
             opening = true;
             targetAlpha = 1f;
             UpdateChallenge();
-            onSettings = false;
+            onSettings = true;
 
             slider = new VerticalSlider(this, pages[0], "", new Vector2(843f - leftAnchor, 294f), new Vector2(30f, 160f), BingoEnums.CustomizerSlider, true) { floatValue = 1f };
+            foreach (var line in slider.lineSprites)
+            {
+                line.alpha = 0f;
+            }
+            slider.subtleSliderNob.outerCircle.alpha = 0f;
             pages[0].subObjects.Add(slider);
 
             testList = [.. BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer)];
@@ -148,10 +149,18 @@ namespace BingoMode
 
         public void ResetSettings(IBingoChallenge ch)
         {
+            if (challengeSettings != null)
+            {
+                foreach (var s in challengeSettings)
+                {
+                    s.Remove();
+                    pages[0].RemoveSubObject(s);
+                }
+            }
             challengeSettings = [];
             for (int i = 0; i < ch.Settings().Count; i++)
             {
-                ChallengeSetting s = new(this, pages[0], new Vector2(663f - leftAnchor, 289f + 30f * i), i, ch.Settings()[i]);
+                ChallengeSetting s = new(this, pages[0], new Vector2(683f - leftAnchor, 449f), i, ch.Settings()[i]);
                 challengeSettings.Add(s);
                 pages[0].subObjects.Add(s);
             }
@@ -187,6 +196,11 @@ namespace BingoMode
             {
                 dividers[i].alpha = darkSprite.alpha;
             }
+            foreach (var line in slider.lineSprites)
+            {
+                line.alpha = uAlpha;
+            }
+            slider.subtleSliderNob.outerCircle.alpha = uAlpha;
             Vector2 pagePos = Vector2.Lerp(pages[0].lastPos, pages[0].pos, timeStacker);
             dividers[0].SetPosition(new Vector2(683f - leftAnchor, 534f) + pagePos);
             dividers[1].SetPosition(new Vector2(683f - leftAnchor, 484f) + pagePos);
@@ -200,6 +214,11 @@ namespace BingoMode
 
             page.pos = new Vector2((onSettings ? 813f : 513f) - 5f - leftAnchor, 508f);
             page.label.color = onSettings ? settings.roundedRect.sprites[settings.roundedRect.SideSprite(0)].color : types.roundedRect.sprites[types.roundedRect.SideSprite(0)].color;
+
+            closeButton.pos = new Vector2(683f - num / 2f, 220f);
+            randomize.pos = new Vector2(663f - leftAnchor, 489f);
+            settings.pos = new Vector2(813f - leftAnchor, 489f);
+            types.pos = new Vector2(513f - leftAnchor, 489f);
 
             if (onSettings)
             {
@@ -261,6 +280,11 @@ namespace BingoMode
                 ccc.location = ChallengeTools.VistaLocations[ccc.room.Value];
                 ccc.region = ccc.room.Value.Substring(0, 2);
             }
+            else if (owner.challenge is BingoDamageChallenge cccc)
+            {
+                Plugin.logger.LogMessage(cccc.weapon.Value);
+                Plugin.logger.LogMessage(cccc.victim.Value);
+            }
             owner.challenge.UpdateDescription();
             owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
@@ -304,11 +328,6 @@ namespace BingoMode
                 description.RemoveFromContainer();
                 manager.StopSideProcess(this);
                 closing = false;
-                //for (int i = 0; i < testLabels.Length; i++)
-                //{
-                //    pages[0].RemoveSubObject(testLabels[i]);
-                //}
-                //setting.c.OI.config.configurables.Remove("_ChallengeSetting0");
                 tab._Unload();
                 testList.Clear();
             }
@@ -327,10 +346,6 @@ namespace BingoMode
             owner.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(ch, true);
             BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge);
             UpdateChallenge();
-            foreach (var s in challengeSettings)
-            {
-                pages[0].RemoveSubObject(s);
-            }
             ResetSettings(owner.challenge as IBingoChallenge);
         }
 
@@ -431,7 +446,7 @@ namespace BingoMode
                 if (value is SettingBox<int> i)
                 {
                     this.value = i;
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting" + index, i.Value, new ConfigAcceptableRange<int>(1, 500));
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting", i.Value, new ConfigAcceptableRange<int>(1, 500));
                     field = new OpUpdown(true, conf, pos, 60f);
                     field.OnChange += UpdootInt;
                     label.text = i.name;
@@ -440,7 +455,7 @@ namespace BingoMode
                 else if (value is SettingBox<string> s)
                 {
                     this.value = s;
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting" + index, s.Value, (ConfigAcceptableBase)null);
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting", s.Value, (ConfigAcceptableBase)null);
                     field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName) : ["Whoops errore"]);
                     field.OnChange += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
@@ -451,7 +466,7 @@ namespace BingoMode
                 else if (value is SettingBox<bool> b)
                 {
                     this.value = b;
-                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting" + index, b.Value, (ConfigAcceptableBase)null);
+                    conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting", b.Value, (ConfigAcceptableBase)null);
                     field = new OpCheckBox(conf as Configurable<bool>, pos);
                     field.OnChange += UpdootBool;
                     label.text = b.name;
@@ -491,6 +506,7 @@ namespace BingoMode
 
             public void UpdootString()
             {
+                Plugin.logger.LogMessage("new value: " + field.value);
                 (value as SettingBox<string>).Value = field.value;
                 (menu as CustomizerDialog).UpdateChallenge();
             }
@@ -523,6 +539,18 @@ namespace BingoMode
                 field.myContainer.alpha = alpharad;
 
                 lastAlpha = alpharad;
+            }
+
+            public void Remove()
+            {
+                //MenuModList.ModButton.RainWorldDummy.config.configurables.Remove("_ChallengeSetting");
+                label.RemoveSprites();
+                owner.RemoveSubObject(label);
+                field.Hide();
+                (menu as CustomizerDialog).tab._RemoveItem(field);
+                field.Unload();
+                (menu as CustomizerDialog).wrapper.wrappers.Remove(field);
+                (menu as CustomizerDialog).wrapper.subObjects.Remove(cWrapper);
             }
         }
     }

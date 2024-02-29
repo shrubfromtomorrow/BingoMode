@@ -31,6 +31,11 @@ namespace BingoMode
             GenerateBoardButtons();
         }
 
+        public override void RemoveSprites()
+        {
+            base.RemoveSprites();
+        }
+
         public void GenerateBoardButtons()
         {
             for (int i = 0; i < board.challengeGrid.GetLength(0); i++)

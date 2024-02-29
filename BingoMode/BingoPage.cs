@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Expedition;
 using Menu;
 using Menu.Remix;
+using Menu.Remix.MixedUI;
 using UnityEngine;
 
 namespace BingoMode
@@ -21,6 +22,11 @@ namespace BingoMode
         public SymbolButton rightPage;
         public BigSimpleButton startGame;
         public SymbolButton randomize;
+        public OpHoldButton unlocksButton;
+        public UIelementWrapper unlockWrapper;
+        public MenuTabWrapper menuTabWrapper;
+        public SymbolButton plusButton;
+        public SymbolButton minusButton;
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -31,7 +37,7 @@ namespace BingoMode
 
             pageTitle = new FSprite("bingotitle");
             pageTitle.SetAnchor(0.5f, 0f);
-            pageTitle.x = 680f;
+            pageTitle.x = 683f;
             pageTitle.y = 680f;
             pageTitle.shader = menu.manager.rainWorld.Shaders["MenuText"];
             Container.AddChild(pageTitle);
@@ -52,8 +58,24 @@ namespace BingoMode
 
             startGame = new BigSimpleButton(menu, this, "BEGIN", "STARTBINGO",
                 new Vector2(menu.manager.rainWorld.screenSize.x * 0.75f, 40f),
-                new Vector2(200f, 40f), FLabelAlignment.Center, true);
+                new Vector2(150f, 40f), FLabelAlignment.Center, true);
             subObjects.Add(startGame);
+
+            menuTabWrapper = new MenuTabWrapper(menu, this);
+            subObjects.Add(menuTabWrapper);
+            unlocksButton = new OpHoldButton(new Vector2(menu.manager.rainWorld.screenSize.x * 0.75f, 100f), new Vector2(150f, 50f), menu.Translate("CONFIGURE<LINE>PERKS & BURDENS").Replace("<LINE>", "\r\n"), 20f);
+            unlocksButton.OnPressDone += UnlocksButton_OnPressDone;
+            unlocksButton.description = " ";
+            unlockWrapper = new UIelementWrapper(this.menuTabWrapper, this.unlocksButton);
+
+            minusButton = new SymbolButton(menu, this, "minus", "REMOVESIZE", new Vector2(643f, 620f));
+            minusButton.size = new Vector2(40f, 40f);
+            minusButton.roundedRect.size = this.minusButton.size;
+            subObjects.Add(this.minusButton);
+            plusButton = new SymbolButton(menu, this, "plus", "ADDSIZE", new Vector2(693f, 620f));
+            plusButton.size = new Vector2(40f, 40f);
+            plusButton.roundedRect.size = this.plusButton.size;
+            subObjects.Add(this.plusButton);
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -98,19 +120,36 @@ namespace BingoMode
 
             if (message == "RANDOMIZE")
             {
-                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
-                if (grid != null)
-                {
-                    grid.RemoveSprites();
-                    RemoveSubObject(grid);
-                    grid = null;
-                }
-                grid = new BingoGrid(menu, page, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
-                subObjects.Add(grid);
-                menu.PlaySound(SoundID.MENU_Next_Slugcat);
+                Regen();
+            }
+
+            if (message == "ADDSIZE")
+            {
+                BingoHooks.GlobalBoard.size += 1;
+                Regen();
+            }
+
+            if (message == "REMOVESIZE")
+            {
+                BingoHooks.GlobalBoard.size = Mathf.Max(1, BingoHooks.GlobalBoard.size - 1);
+                Regen();
             }
 
             // Also initialize bingo on continue
+        }
+
+        public void Regen()
+        {
+            BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
+            if (grid != null)
+            {
+                grid.RemoveSprites();
+                RemoveSubObject(grid);
+                grid = null;
+            }
+            grid = new BingoGrid(menu, page, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
+            subObjects.Add(grid);
+            menu.PlaySound(SoundID.MENU_Next_Slugcat);
         }
 
         public override void GrafUpdate(float timeStacker)
@@ -126,6 +165,21 @@ namespace BingoMode
         {
             base.RemoveSprites();
             pageTitle.RemoveFromContainer();
+        }
+
+        public void UnlocksButton_OnPressDone(UIfocusable trigger)
+        {
+            UnlockDialog unlockDialog = new UnlockDialog(menu.manager, (menu as ExpeditionMenu).challengeSelect);
+            unlocksButton.Reset();
+            unlocksButton.greyedOut = true;
+            menu.manager.ShowDialog(unlockDialog);
+            //unlockDialog.pages[0].Container.AddChild(this.levelSprite);
+            //unlockDialog.pages[0].Container.AddChild(this.levelSprite2);
+            //unlockDialog.pages[0].Container.AddChild(this.levelContainer);
+            //unlockDialog.pages[0].Container.AddChild(this.currentLevelLabel.label);
+            //unlockDialog.pages[0].Container.AddChild(this.nextLevelLabel.label);
+            //unlockDialog.pages[0].Container.AddChild(this.levelOverloadLabel.label);
+            //unlockDialog.pages[0].Container.AddChild(this.pointsLabel.label);
         }
     }
 }

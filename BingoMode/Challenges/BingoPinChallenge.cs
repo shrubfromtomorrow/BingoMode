@@ -176,6 +176,6 @@ namespace BingoMode.Challenges
         {
         }
     
-        public List<object> Settings() => [region, crit];
+        public List<object> Settings() => [region, crit, target];
     }
 }

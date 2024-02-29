@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
             string text = list[UnityEngine.Random.Range(0, list.Count)];
             return new BingoPearlDeliveryChallenge
             {
-                region = new(text, "Pearl", 0, listName: "regions")
+                region = new(text, "Pearl from Region", 0, listName: "regions")
             };
         }
 

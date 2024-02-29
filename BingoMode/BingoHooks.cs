@@ -89,6 +89,32 @@ namespace BingoMode
 
             // ficks
             On.Menu.ChallengeSelectPage.SetUpSelectables += ChallengeSelectPage_SetUpSelectables;
+
+            // unlocks butone
+            On.Menu.UnlockDialog.Singal += UnlockDialog_Singal;
+            On.Menu.UnlockDialog.Update += UnlockDialog_Update;
+        }
+
+        private static void UnlockDialog_Update(On.Menu.UnlockDialog.orig_Update orig, UnlockDialog self)
+        {
+            orig.Invoke(self);
+
+            if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag) && pag.unlocksButton.greyedOut)
+            {
+                self.pageTitle.x = pag.pos.x + 685f;
+                self.pageTitle.y = pag.pos.y + 680f;
+            }
+        }
+
+        private static void UnlockDialog_Singal(On.Menu.UnlockDialog.orig_Singal orig, UnlockDialog self, MenuObject sender, string message)
+        {
+            orig.Invoke(self, sender, message);
+
+            if (message == "CLOSE" && bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
+            {
+                pag.unlocksButton.greyedOut = false;
+                pag.unlocksButton.Reset();
+            } 
         }
 
         public static void ChallengeSelectPage_SetUpSelectables(On.Menu.ChallengeSelectPage.orig_SetUpSelectables orig, ChallengeSelectPage self)
@@ -199,6 +225,8 @@ namespace BingoMode
                 ModManager.Expedition = false;
                 self.AddPart(new BingoHUD(self));
             }
+            if (self.rainWorld == null) Plugin.logger.LogMessage("rw null");
+            if (self.rainWorld.options == null) Plugin.logger.LogMessage("op null");
             orig.Invoke(self, cam);
             ModManager.Expedition = exp;
         }
