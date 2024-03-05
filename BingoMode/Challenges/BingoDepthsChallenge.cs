@@ -1,14 +1,8 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Menu.Remix;
-using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+﻿using Expedition;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using CreatureType = CreatureTemplate.Type;
-using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
@@ -16,6 +10,9 @@ namespace BingoMode.Challenges
     public class BingoDepthsChallenge : Challenge, IBingoChallenge
     {
         public SettingBox<string> crit;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {

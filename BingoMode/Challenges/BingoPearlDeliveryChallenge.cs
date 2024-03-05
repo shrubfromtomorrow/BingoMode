@@ -11,6 +11,9 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> region;
         public int iterator = -1;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {

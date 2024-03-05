@@ -1,12 +1,8 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Menu.Remix;
+﻿using Expedition;
 using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
@@ -14,6 +10,9 @@ namespace BingoMode.Challenges
     public class BingoTameChallenge : Challenge, IBingoChallenge
     {
         public SettingBox<string> crit;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -24,7 +23,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTameChallenge s || s.crit != crit;
+            return challenge is not BingoTameChallenge;
         }
 
         public override string ChallengeName()

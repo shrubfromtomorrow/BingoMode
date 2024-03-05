@@ -1,12 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Menu.Remix;
+﻿using Expedition;
 using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
@@ -24,7 +23,10 @@ namespace BingoMode.Challenges
         public SettingBox<string> room; 
         public SettingBox<bool> deathPit; 
         public SettingBox<bool> starve; 
-        public SettingBox<bool> oneCycle; 
+        public SettingBox<bool> oneCycle;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -188,7 +190,7 @@ namespace BingoMode.Challenges
 
         public override void Reset()
         {
-            this.current = 0;
+            current = 0;
             base.Reset();
         }
 
@@ -276,6 +278,7 @@ namespace BingoMode.Challenges
 
         public override void CreatureKilled(Creature c, int playerNumber)
         {
+            Plugin.logger.LogMessage("killed " + this);
             if (deathPit.Value || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c)) return;
             if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
             CreatureType type = c.abstractCreature.creatureTemplate.type;

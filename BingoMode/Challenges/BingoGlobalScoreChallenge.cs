@@ -14,6 +14,9 @@ namespace BingoMode.Challenges
     {
         public SettingBox<int> target;
         public int score;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -42,7 +45,7 @@ namespace BingoMode.Challenges
 
         public override void Reset()
         {
-            this.score = 0;
+            score = 0;
             base.Reset();
         }
 
@@ -68,6 +71,7 @@ namespace BingoMode.Challenges
 
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
+            Plugin.logger.LogMessage("creaturekil global score " + this);
             if (this.completed || this.game == null || crit == null)
             {
                 return;

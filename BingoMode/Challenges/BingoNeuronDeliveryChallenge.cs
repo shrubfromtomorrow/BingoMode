@@ -14,6 +14,9 @@ namespace BingoMode.Challenges
     {
         public SettingBox<int> neurons;
         public int delivered;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
@@ -57,7 +60,7 @@ namespace BingoMode.Challenges
 
         public override void Reset()
         {
-            this.delivered = 0;
+            delivered = 0;
             base.Reset();
         }
 

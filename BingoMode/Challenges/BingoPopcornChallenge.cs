@@ -1,13 +1,10 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
@@ -16,12 +13,15 @@ namespace BingoMode.Challenges
     {
         public int current;
         public SettingBox<int> amound;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
-                .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amound.Value));
+            description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
+                .Replace("<current>", current.ToString())
+                .Replace("<amount>", amound.Value.ToString());
             base.UpdateDescription();
         }
 
@@ -54,12 +54,18 @@ namespace BingoMode.Challenges
 
         public override int Points()
         {
-            return (int)amound.Value * 10;
+            return 20;
         }
 
         public override bool CombatRequired()
         {
             return false;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            current = 0;
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
@@ -96,6 +102,7 @@ namespace BingoMode.Challenges
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
                 UpdateDescription();
+                Plugin.logger.LogMessage(description);
             }
             catch (Exception ex)
             {

@@ -14,6 +14,7 @@ using Steamworks;
 
 namespace BingoMode
 {
+    using BingoMode.Challenges;
     using BingoSteamworks;
 
     public class BingoHUD : HudPart
@@ -167,7 +168,6 @@ namespace BingoMode
             public void Update()
             {
                 label.text = SplitString(challenge.description);//challenge.completed ? "YES" : "NO";
-
                 if (show && MouseOver && owner.mouseDown)
                 {
                     sprite.color = Color.blue;

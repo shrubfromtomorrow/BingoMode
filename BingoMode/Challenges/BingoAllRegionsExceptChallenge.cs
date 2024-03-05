@@ -1,13 +1,8 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Menu.Remix;
-using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+﻿using Expedition;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
@@ -15,7 +10,10 @@ namespace BingoMode.Challenges
     public class BingoAllRegionsExcept : Challenge, IBingoChallenge
     {
         public SettingBox<string> region;
-        public List<string> regionsToEnter;
+        public List<string> regionsToEnter = [];
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -31,6 +29,12 @@ namespace BingoMode.Challenges
         public override string ChallengeName()
         {
             return ChallengeTools.IGT.Translate("Entering all Regions Except X");
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            regionsToEnter = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
         }
 
         public override Challenge Generate()
@@ -58,8 +62,8 @@ namespace BingoMode.Challenges
             }
             else if (!completed && regionsToEnter.Contains(regionName))
             {
+                Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
-                foreach (var s in regionsToEnter) Plugin.logger.LogMessage(s);
 
                 if (regionsToEnter.Count == 0)
                 {
@@ -92,6 +96,8 @@ namespace BingoMode.Challenges
                 "~",
                 region.ToString(),
                 "><",
+                string.Join("|", regionsToEnter),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 hidden ? "1" : "0",
@@ -106,9 +112,10 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 region = SettingBoxFromString(array[0]) as SettingBox<string>;
-                completed = (array[1] == "1");
-                hidden = (array[2] == "1");
-                revealed = (array[3] == "1");
+                regionsToEnter = array[1].Split('|').ToList();
+                completed = (array[2] == "1");
+                hidden = (array[3] == "1");
+                revealed = (array[4] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

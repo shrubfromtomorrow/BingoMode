@@ -19,6 +19,7 @@ namespace BingoMode
     public static class BingoData
     {
         public static bool BingoMode = false;
+        public static Dictionary<SlugcatStats.Name, int> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[4];
@@ -28,7 +29,7 @@ namespace BingoMode
         public static Dictionary<Creature, List<EntityID>> blacklist = [];
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
 
-        public static bool MoonDead => BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
+        public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
         public static List<Challenge> GetAdequateChallengeList(SlugcatStats.Name slug)
         {
@@ -41,10 +42,10 @@ namespace BingoMode
         {
             BingoMode = true;
             appliedChallenges = [];
-            HookAll(BingoHooks.GlobalBoard.AllChallenges, true);
+            HookAll(ExpeditionData.challengeList, true);
 
             challengeTokens.Clear();
-            foreach (Challenge challenge in BingoHooks.GlobalBoard.AllChallenges)
+            foreach (Challenge challenge in ExpeditionData.challengeList)
             {
                 if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock.Value)) challengeTokens.Add(c.unlock.Value);
             }

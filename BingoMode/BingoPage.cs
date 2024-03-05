@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using BingoMode.Challenges;
 using Expedition;
 using Menu;
 using Menu.Remix;
@@ -107,11 +108,29 @@ namespace BingoMode
                 menu.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = ExpeditionData.slugcatPlayer;
                 menu.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
 
+                List<string> bannedRegions = [];
+                foreach (var ch in ExpeditionData.challengeList)
+                {
+                    if (ch is BingoNoRegionChallenge r) bannedRegions.Add(r.region.Value);
+                    if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
+                }
+            reset:
                 ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                foreach (var banned in bannedRegions) 
+                {
+                    if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto reset;
+                }
+
+                foreach (var kvp in menu.manager.rainWorld.progression.mapDiscoveryTextures)
+                {
+                    menu.manager.rainWorld.progression.mapDiscoveryTextures[kvp.Key] = null;
+                }
 
                 BingoData.InitializeBingo();
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
+                ExpeditionData.earnedPassages++;
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = BingoHooks.GlobalBoard.size;
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);

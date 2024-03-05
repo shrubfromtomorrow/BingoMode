@@ -344,7 +344,7 @@ namespace BingoMode
         public void AssignChallenge(Challenge ch = null)
         {
             owner.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(ch, true);
-            BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge);
+            BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge, -1);
             UpdateChallenge();
             ResetSettings(owner.challenge as IBingoChallenge);
         }

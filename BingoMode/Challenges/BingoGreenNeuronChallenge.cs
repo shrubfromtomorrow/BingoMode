@@ -1,13 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Menu.Remix;
-using MoreSlugcats;
-using UnityEngine;
-using Expedition;
+﻿using Expedition;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
@@ -15,6 +9,9 @@ namespace BingoMode.Challenges
     public class BingoGreenNeuronChallenge : Challenge, IBingoChallenge
     {
         public SettingBox<bool> moon;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {

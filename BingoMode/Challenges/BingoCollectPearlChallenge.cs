@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Expedition;
+using Menu.Remix;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Menu.Remix;
-using MoreSlugcats;
-using UnityEngine;
-using Expedition;
-using System.Collections.Generic;
-using System.Linq;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
-using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
@@ -16,11 +12,14 @@ namespace BingoMode.Challenges
     public class BingoCollectPearlChallenge : Challenge, IBingoChallenge
     {
         public SettingBox<string> pearl; //PearlType
-        public List<string> collected;
+        public List<string> collected = [];
         public string region;
         public int current;
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -35,7 +34,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCollectPearlChallenge c || c.specific != specific;
+            return challenge is not BingoCollectPearlChallenge c || c.specific.Value != specific.Value;
         }
 
         public override string ChallengeName()
@@ -87,18 +86,25 @@ namespace BingoMode.Challenges
             string p = "nopearl";
             BingoCollectPearlChallenge chal = new()
             {
-                specific = new SettingBox<bool>(specifi, "Specific Pearl", 0)
+                specific = new SettingBox<bool>(specifi, "Specific Pearl", 0),
+                collected = []
             };
             if (specifi)
             {
                 p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
             }
-            chal.collected = [];
             chal.pearl = new(p, "Pearl", 1, listName: "pearls");
             chal.region = p.Substring(0, 2);
             chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
 
             return chal;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            current = 0;
+            collected = [];
         }
 
         public override int Points()
@@ -116,7 +122,6 @@ namespace BingoMode.Challenges
             return true;
         }
 
-        // Save and load `collected`
         public override string ToString()
         {
             return string.Concat(new string[]
@@ -135,7 +140,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                string.Join("cLtD", collected)
             });
         }
 
@@ -152,6 +159,9 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                string[] arr = Regex.Split(array[7], "cLtD");
+                collected = [.. arr];
+
                 UpdateDescription();
             }
             catch (Exception ex)

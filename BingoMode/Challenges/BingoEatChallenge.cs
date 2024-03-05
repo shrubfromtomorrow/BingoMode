@@ -1,15 +1,12 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
-using UnityEngine;
-using Expedition;
-using ItemType = AbstractPhysicalObject.AbstractObjectType;
-using CreatureType = CreatureTemplate.Type;
-using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
-using System.Runtime.CompilerServices;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using CreatureType = CreatureTemplate.Type;
 
 namespace BingoMode.Challenges
 {
@@ -20,6 +17,9 @@ namespace BingoMode.Challenges
         public SettingBox<int> amountRequired;
         public int currentEated;
         public bool isCreature;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -41,7 +41,7 @@ namespace BingoMode.Challenges
     
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoEatChallenge || (challenge as BingoEatChallenge).foodType != foodType;
+            return challenge is not BingoEatChallenge c || c.foodType.Value != foodType.Value;
         }
     
         public override Challenge Generate()
@@ -103,7 +103,13 @@ namespace BingoMode.Challenges
                 if (currentEated >= amountRequired.Value) CompleteChallenge();
             }
         }
-    
+
+        public override void Reset()
+        {
+            base.Reset();
+            currentEated = 0;
+        }
+
         public override string ToString()
         {
             return string.Concat(new string[]

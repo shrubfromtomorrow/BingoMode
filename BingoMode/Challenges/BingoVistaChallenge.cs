@@ -1,13 +1,13 @@
 ﻿using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using RWCustom;
 
 namespace BingoMode.Challenges
 {
@@ -17,6 +17,9 @@ namespace BingoMode.Challenges
         public SettingBox<string> room;
         public string region;
         public Vector2 location;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void Update()
         {

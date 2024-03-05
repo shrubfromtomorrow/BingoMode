@@ -3,7 +3,6 @@ using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -16,6 +15,9 @@ namespace BingoMode.Challenges
         public SettingBox<bool> common;
         public SettingBox<string> region;
         public SettingBox<int> amount;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {

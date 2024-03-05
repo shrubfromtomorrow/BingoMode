@@ -1,9 +1,8 @@
 ﻿using Expedition;
 using MoreSlugcats;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.Challenges
@@ -13,6 +12,11 @@ namespace BingoMode.Challenges
     public class BingoAchievementChallenge : Challenge, IBingoChallenge
     {
         public SettingBox<string> ID; //WinState.EndgameID
+
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Earn <achievement_name> passage").Replace("<achievement_name>", ChallengeTools.IGT.Translate(WinState.PassageDisplayName(new(ID.Value))));
@@ -127,10 +131,13 @@ namespace BingoMode.Challenges
 
         public void AddHooks()
         {
+            //IL.WinState.CycleCompleted += WinState_CycleCompleted;
         }
 
         public void RemoveHooks()
         {
+
+            //IL.WinState.CycleCompleted -= WinState_CycleCompleted;
         }
 
         public List<object> Settings() => [ID];

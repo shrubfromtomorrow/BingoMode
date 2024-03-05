@@ -1,11 +1,10 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
-using UnityEngine;
-using Expedition;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
 
 namespace BingoMode.Challenges
@@ -17,6 +16,9 @@ namespace BingoMode.Challenges
         public SettingBox<string> to;
         public SettingBox<string> crit;
         public List<EntityID> origins = []; // Save this later
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -77,7 +79,7 @@ namespace BingoMode.Challenges
 
         public void Gated(string regionName)
         {
-            Plugin.logger.LogMessage(regionName + " " + ValueConverter.ConvertToString(crit));
+            Plugin.logger.LogMessage(regionName + " " + ValueConverter.ConvertToString(crit.Value));
             Plugin.logger.LogMessage(from);
             Plugin.logger.LogMessage(to);
             Plugin.logger.LogMessage("---------");
@@ -110,7 +112,7 @@ namespace BingoMode.Challenges
         public override void Reset()
         {
             base.Reset();
-            origins.Clear();
+            origins = [];
         }
 
         public override int Points()

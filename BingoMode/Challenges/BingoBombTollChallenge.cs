@@ -1,9 +1,8 @@
 ﻿using Expedition;
 using MoreSlugcats;
 using System;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
@@ -13,6 +12,9 @@ namespace BingoMode.Challenges
         public bool bombed;
         public SettingBox<bool> pass;
         public SettingBox<string> roomName;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -64,6 +66,12 @@ namespace BingoMode.Challenges
                 bombed = false;
                 CompleteChallenge();
             }
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            bombed = false;
         }
 
         public override int Points()

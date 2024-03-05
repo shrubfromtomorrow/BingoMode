@@ -9,6 +9,7 @@ using RWCustom;
 using Menu;
 using Menu.Remix;
 using UnityEngine;
+using BingoMode.Challenges;
 
 namespace BingoMode
 {
@@ -18,16 +19,16 @@ namespace BingoMode
         public Challenge[,] challengeGrid; // The challenges will be treated as coordinates on a grid for convenience
         //public Challenge[,] ghostGrid;
         public List<IntVector2> currentWinLine; // A list of grid coordinates
-        public List<Challenge> AllChallenges;
         public int size;
         public int lastSize;
+        public List<Challenge> recreateList;
 
         public BingoBoard()
         {
             size = 5;
             lastSize = 5;
-            GenerateBoard(size);
             currentWinLine = [];
+            recreateList = [];
         }
 
         public void GenerateBoard(int size, bool changeSize = false)
@@ -35,11 +36,11 @@ namespace BingoMode
             Plugin.logger.LogMessage("Generating bored");
             if (!changeSize)
             {
-                AllChallenges = [];
                 BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
                 challengeGrid = new Challenge[size, size];
                 ExpeditionData.ClearActiveChallengeList();
             }
+            int dex = 0;
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
@@ -52,11 +53,10 @@ namespace BingoMode
                         //}
                         continue;
                     }
-                redo:
                     challengeGrid[i, j] = RandomBingoChallenge();
-                    if (challengeGrid[i, j] == null) goto redo;
-                    ExpeditionData.challengeList.Add(challengeGrid[i, j]);
+                    //(challengeGrid[i, j] as IBingoChallenge).Index = dex;
                     //ghostGrid[i, j] = challengeGrid[i, j];
+                    dex++;
                 }
             }
             UpdateChallenges();
@@ -65,7 +65,7 @@ namespace BingoMode
 
         public void UpdateChallenges()
         {
-            foreach (Challenge c in AllChallenges)
+            foreach (Challenge c in ExpeditionData.challengeList)
             {
                 c.UpdateDescription();
             }
@@ -161,10 +161,6 @@ namespace BingoMode
             List<Challenge> list = [];
             list.AddRange(BingoData.availableBingoChallenges);
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
-            //for (int i = 0; i < BingoData.availableBingoChallenges.Count; i++)
-            //{
-            //    list.Add(BingoData.availableBingoChallenges[i]);
-            //}
 
         resette:
             Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
@@ -175,11 +171,11 @@ namespace BingoMode
             }
             ch = ch.Generate();
 
-            if (AllChallenges.Count > 0 && type == null && !ignore)
+            if (ExpeditionData.challengeList.Count > 0 && type == null && !ignore)
             {
-                for (int i = 0; i < AllChallenges.Count; i++)
+                for (int i = 0; i < ExpeditionData.challengeList.Count; i++)
                 {
-                    if (!AllChallenges[i].Duplicable(ch))
+                    if (!ExpeditionData.challengeList[i].Duplicable(ch))
                     {
                         list.Remove(ch);
                         ch = null;
@@ -188,36 +184,50 @@ namespace BingoMode
                 }
             }
 
-            //Plugin.logger.LogMessage("Assigned " + ch.ChallengeName());
-            AllChallenges.Add(ch);
-            return AllChallenges.Last();
+            if (ch == null) goto resette;
+            ExpeditionData.challengeList.Add(ch);
+            return ExpeditionData.challengeList.Last();
         }
 
-        //public List<Challenge> AllChallengeList()
-        //{
-        //    List<Challenge> chacha = [];
-        //
-        //    for (int i = 0; i < challengeGrid.GetLength(0); i++)
-        //    {
-        //        for (int j = 0; j < challengeGrid.GetLength(1); j++)
-        //        {
-        //            chacha.Add(challengeGrid[i, j]);
-        //        }
-        //    }
-        //
-        //    return chacha;
-        //}
+        public void RecreateFromList()
+        {
+            if (recreateList != null && recreateList.Count > 0)
+            {
+                int next = 0;
+                for (int i = 0; i < size; i++)
+                {
+                    for (int j = 0; j < size; j++)
+                    {
+                        //if (recreateList.Count < next + 1)
+                        //{
+                        //    challengeGrid[i, j] = RandomBingoChallenge();
+                        //}
+                        //else 
+                        challengeGrid[i, j] = recreateList[next];
+                        //(challengeGrid[i, j] as IBingoChallenge).Index = next;
+                        //Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]} with index {(challengeGrid[i, j] as IBingoChallenge).Index}");
+                        next++;
+                    }
+                }
+                recreateList = [];
+                Plugin.logger.LogMessage("Recreated list from thinj yipe");
+            }
+        }
 
-        public void SetChallenge(int x, int y, Challenge newChallenge)
+        public void SetChallenge(int x, int y, Challenge newChallenge, int index)
         {
             try
             {
+                int g1 = index == -1 ? ExpeditionData.challengeList.IndexOf(challengeGrid[x, y]) : index;
+                //(newChallenge as IBingoChallenge).Index = g1;
+                ExpeditionData.challengeList.Remove(challengeGrid[x, y]);
                 challengeGrid[x, y] = newChallenge;
+                ExpeditionData.challengeList.Insert(g1, challengeGrid[x, y]);
                 UpdateChallenges();
             }
-            catch
+            catch (Exception e)
             {
-                Plugin.logger.LogError("Invalid bingo board coordinates or challenge null :(");
+                Plugin.logger.LogError("Invalid bingo board coordinates or challenge null :( " + e);
             }
         }
 

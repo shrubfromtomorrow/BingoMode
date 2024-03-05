@@ -1,28 +1,21 @@
-﻿using UnityEngine;
-using RWCustom;
+﻿using Expedition;
+using Menu.Remix;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Mono.Cecil;
-using MonoMod.Utils;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using Expedition;
-using ItemType = AbstractPhysicalObject.AbstractObjectType;
-using CreatureType = CreatureTemplate.Type;
-using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using System.Linq;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
-using static Rewired.Controller;
-using Menu.Remix;
-using Menu.Remix.MixedUI.ValueTypes;
-using System.Runtime;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+using CreatureType = CreatureTemplate.Type;
+using ItemType = AbstractPhysicalObject.AbstractObjectType;
+using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 
 namespace BingoMode.Challenges
 {
-
     public class SettingBox<T> : IStrongBox // Basically just strongbox but i needed morer data to store (i dont know if this works to be honest)
     {
         public Type type;
@@ -83,6 +76,9 @@ namespace BingoMode.Challenges
         void AddHooks();
         void RemoveHooks();
         List<object> Settings();
+        int Index { get; set; }
+        bool Locked { get; set; }
+        bool Failed { get; set; }
     }
 
     public class ChallengeHooks
@@ -158,6 +154,27 @@ namespace BingoMode.Challenges
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
             IL.FlareBomb.Update += FlareBomb_Update;
+        }
+
+        public static void WinState_CycleCompleted(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(
+                x => x.MatchStloc(40),
+                x => x.MatchLdloc(40),
+                x => x.MatchIsinst<AchievementChallenge>()
+                ))
+            {
+                c.Index++;
+                c.Emit(OpCodes.Ldloc, 40);
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<Challenge, WinState>>((ch, self) =>
+                {
+                    if (ch is BingoAchievementChallenge c) c.CheckAchievementProgress(self);
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, WinState_CycleCompleted il fucked up " + il);
         }
 
         public static void FlareBomb_Update(ILContext il)
@@ -821,9 +838,9 @@ namespace BingoMode.Challenges
             {
                 return;
             }
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString))
+            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && ExpeditionData.challengeList.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString))
             {
-                foreach (Challenge ch in BingoHooks.GlobalBoard.AllChallenges)
+                foreach (Challenge ch in ExpeditionData.challengeList)
                 {
                     if (ch is BingoUnlockChallenge b && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
@@ -889,7 +906,7 @@ namespace BingoMode.Challenges
                 b.Emit(OpCodes.Ldloc, 72);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
-                    if (BingoHooks.GlobalBoard.AllChallenges.Any(x => x is BingoGreenNeuronChallenge))
+                    if (ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge))
                     {
                         AbstractPhysicalObject startItem = new (room.world, ItemType.NSHSwarmer, null, pos, room.game.GetNewID());
                         room.abstractRoom.entities.Add(startItem);

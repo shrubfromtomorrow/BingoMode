@@ -79,6 +79,7 @@ namespace BingoMode.Challenges
             creatureNames[(int)CreatureType.SmallNeedleWorm] = ChallengeTools.IGT.Translate("Small Noodleflies");
             creatureNames[(int)CreatureType.VultureGrub] = ChallengeTools.IGT.Translate("Vulture Grubs");
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
+            creatureNames[(int)MoreSlugcatsEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
         }
 
         public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)

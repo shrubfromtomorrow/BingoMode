@@ -1,11 +1,10 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using Expedition;
 using Menu.Remix;
-using UnityEngine;
-using Expedition;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
-using System.Linq;
 
 namespace BingoMode.Challenges
 {
@@ -20,7 +19,10 @@ namespace BingoMode.Challenges
         public SettingBox<string> region;
         public List<string> pinRegions = [];
         public SettingBox<string> crit;
-    
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>")
@@ -108,9 +110,9 @@ namespace BingoMode.Challenges
     
         public override void Reset()
         {
-            this.current = 0;
-            this.pinList = [];
-            this.spearList = [];
+            current = 0;
+            pinList = [];
+            spearList = [];
             base.Reset();
         }
     

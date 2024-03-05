@@ -15,6 +15,9 @@ using Mono.Cecil;
 namespace BingoMode
 {
     using Challenges;
+    using System.Globalization;
+    using System.Security.Policy;
+    using System.Text.RegularExpressions;
 
     public class BingoHooks
     {
@@ -31,11 +34,25 @@ namespace BingoMode
             On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
             // Add the bingo challenges when loading challenges from string
             IL.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromStringIL;
+            On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
+        }
+
+        public static void ExpeditionCoreFile_FromString(On.Expedition.ExpeditionCoreFile.orig_FromString orig, ExpeditionCoreFile self, string saveString)
+        {
+            if (GlobalBoard != null)
+            {
+                GlobalBoard.challengeGrid = new Challenge[GlobalBoard.size, GlobalBoard.size];
+                GlobalBoard.recreateList = [];
+            }
+            orig.Invoke(self, saveString); // IL hook
+            if (GlobalBoard != null) GlobalBoard.RecreateFromList();
         }
 
         public static void ExpeditionCoreFile_FromStringIL(ILContext il)
         {
             ILCursor c = new(il);
+            ILCursor b = new(il);
+            ILCursor a = new(il);
 
             if (c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld("Expedition.ChallengeOrganizer", "availableChallengeTypes")
@@ -48,14 +65,67 @@ namespace BingoMode
                     return orig;
                 });
             }
-            else Plugin.logger.LogMessage("ExpeditionCoreFile_FromStringIL threw!!! " + il);
+            else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 1 threw!!! " + il);
+
+            if (b.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("[CONTENT]")
+                ))
+            {
+                b.Index += 5;
+                b.Emit(OpCodes.Ldloc, 0);
+                b.Emit(OpCodes.Ldloc, 7);
+                b.Emit(OpCodes.Ldelem_Ref);
+                b.EmitDelegate<Action<string>>((text) =>
+                {
+                    BingoData.BingoSaves = [];
+                    try
+                    {
+                        if (text.StartsWith("BINGOS:") && Regex.Split(text, ":")[1] != "")
+                        {
+                            string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
+                            for (int i = 0; i < array.Length; i++)
+                            {
+                                string[] array2 = array[i].Split('#');
+                                BingoData.BingoSaves[new(array2[0])] = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                            }
+                        }
+                    }
+                    catch (Exception e) { Plugin.logger.LogError("Failed to do that!!!" + e); }
+                });
+            }
+            else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 2 threw!!! " + il);
+
+            if (a.TryGotoNext(
+                x => x.MatchLdcI4(6),
+                x => x.MatchNewarr<System.String>(),
+                x => x.MatchDup(),
+                x => x.MatchLdcI4(0),
+                x => x.MatchLdstr("["),
+                x => x.MatchStelemRef(),
+                x => x.MatchDup(),
+                x => x.MatchLdcI4(1),
+                x => x.MatchLdloc(27)
+                ))
+            {
+                a.Emit(OpCodes.Ldloc, 30);
+                a.Emit(OpCodes.Ldloc, 27);
+                a.EmitDelegate<Action<Challenge, SlugcatStats.Name>>((c, slug) =>
+                {
+                    if (GlobalBoard != null && ExpeditionData.slugcatPlayer == slug)
+                    {
+                        Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
+                        GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[slug].Last());
+                    }
+                });
+            }
+            else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 3 threw!!! " + il);
         }
 
         public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
         {
             orig.Invoke();
 
-            try { BingoData.HookAll(GlobalBoard.AllChallenges, false); } catch { }
+            try { BingoData.HookAll(ExpeditionData.challengeList, false); } catch { }
         }
 
         public static void ChallengeOrganizer_SetupChallengeTypes(On.Expedition.ChallengeOrganizer.orig_SetupChallengeTypes orig)
@@ -87,12 +157,57 @@ namespace BingoMode
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             //IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
 
-            // ficks
+            // Ficks
             On.Menu.ChallengeSelectPage.SetUpSelectables += ChallengeSelectPage_SetUpSelectables;
 
-            // unlocks butone
+            // Unlocks butone
             On.Menu.UnlockDialog.Singal += UnlockDialog_Singal;
             On.Menu.UnlockDialog.Update += UnlockDialog_Update;
+
+            // Passage butone
+            On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
+
+            // Saving and loaading shit
+            IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
+        }
+
+        private static void ExpeditionCoreFile_ToStringIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("<expC>")
+                ))
+            {
+                c.Index++;
+                c.EmitDelegate<Func<List<string>, List<string>>>((orig) =>
+                {
+                    string text = "";
+                    for (int i = 0; i < BingoData.BingoSaves.Count; i++)
+                    {
+                        text += BingoData.BingoSaves.ElementAt(i).Key + "#" + ValueConverter.ConvertToString(BingoData.BingoSaves.ElementAt(i).Value);
+                        if (i < BingoData.BingoSaves.Count - 1)
+                        {
+                            text += "<>";
+                        }
+                    }
+                    orig.Add("BINGOS:" + text);
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError(nameof(ExpeditionCoreFile_ToStringIL) + " Threw :(( " + il);
+        }
+
+        private static void SleepAndDeathScreen_ctor(On.Menu.SleepAndDeathScreen.orig_ctor orig, SleepAndDeathScreen self, ProcessManager manager, ProcessManager.ProcessID ID)
+        {
+            orig.Invoke(self, manager, ID);
+
+            if (!ExpeditionGame.activeUnlocks.Contains("unl-passage") && BingoData.BingoMode)
+            {
+                ExpLog.Log("Add Expedition Passage but bingo");
+                self.AddExpeditionPassageButton();
+            }
         }
 
         private static void UnlockDialog_Update(On.Menu.UnlockDialog.orig_Update orig, UnlockDialog self)
@@ -264,6 +379,51 @@ namespace BingoMode
                 self.UpdatePage(4);
                 self.MovePage(new Vector2(1500f, 0f));
             }
+            if (message == "LOADBINGO")
+            {
+                if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
+                {
+                    Plugin.logger.LogMessage("aguga");
+                    BingoData.InitializeBingo();
+                    int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer];
+                    Plugin.logger.LogMessage(size);
+                    GlobalBoard.challengeGrid = new Challenge[size, size];
+                    int chIndex = 0;
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size; j++)
+                        {
+                            GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
+                            ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
+                            chIndex++;
+                        }
+                    }
+                }
+
+                if (ModManager.CoopAvailable)
+                {
+                    for (int i = 1; i < self.manager.rainWorld.options.JollyPlayerCount; i++)
+                    {
+                        self.manager.rainWorld.RequestPlayerSignIn(i, null);
+                    }
+                    for (int j = self.manager.rainWorld.options.JollyPlayerCount; j < 4; j++)
+                    {
+                        self.manager.rainWorld.DeactivatePlayer(j);
+                    }
+                }
+
+                self.manager.arenaSitting = null;
+                self.manager.rainWorld.progression.currentSaveState = null;
+                self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = ExpeditionData.slugcatPlayer;
+
+                if (self.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer))
+                {
+                    Expedition.Expedition.coreFile.Save(false);
+                    self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load;
+                    self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
+                    self.PlaySound(SoundID.MENU_Continue_Game);
+                }
+            }
         }
 
         public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)
@@ -272,6 +432,7 @@ namespace BingoMode
             {
                 if (bingoPage.TryGetValue(self, out var page))
                 {
+                    Plugin.logger.LogMessage("regenerating here at ExpeditionMenu_UpdatePage");
                     GlobalBoard.GenerateBoard(GlobalBoard.size);
                     if (page.grid != null)
                     {
@@ -292,6 +453,22 @@ namespace BingoMode
         // Creating butone
         public static void CharacterSelectPage_UpdateStats(On.Menu.CharacterSelectPage.orig_UpdateStats orig, CharacterSelectPage self)
         {
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
+            {
+                SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
+                if (saveGameData != null)
+                {
+                    self.slugcatDescription.text = "";
+                    if (!newBingoButton.TryGetValue(self, out _))
+                    {
+                        newBingoButton.Add(self, new HoldButton(self.menu, self, "CONTINUE\nBINGO", "LOADBINGO", new Vector2(590f, 180f), 30f));
+                    }
+                    newBingoButton.TryGetValue(self, out var bb);
+                    self.subObjects.Add(bb);
+                    self.abandonButton.Show();
+                    return;
+                }
+            }
             orig.Invoke(self);
 
             self.confirmExpedition.pos.x += 90;

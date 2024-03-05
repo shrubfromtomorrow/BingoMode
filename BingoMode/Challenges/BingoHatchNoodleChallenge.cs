@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Expedition;
+using Menu.Remix;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Menu.Remix;
-using MoreSlugcats;
-using UnityEngine;
-using Expedition;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace BingoMode.Challenges
 {
@@ -17,6 +13,9 @@ namespace BingoMode.Challenges
         public SettingBox<int> amount;
         public int current;
         public SettingBox<bool> atOnce;
+        public int Index { get; set; }
+        public bool Locked { get; set; }
+        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -69,6 +68,12 @@ namespace BingoMode.Challenges
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
             return true;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            current = 0;
         }
 
         public override string ToString()
