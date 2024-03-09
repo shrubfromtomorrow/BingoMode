@@ -4,6 +4,7 @@ using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
@@ -91,6 +92,12 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
+            string text = "";
+            foreach (var kvp in traderItems)
+            {
+                text += kvp.Key.ToString() + "|" + kvp.Value.ToString() + ",";
+            }
+            text.TrimEnd(',');
             return string.Concat(new string[]
             {
                 "BingoTradeTradedChallenge",
@@ -98,6 +105,8 @@ namespace BingoMode.Challenges
                 current.ToString(),
                 "><",
                 amount.ToString(),
+                "><",
+                text,
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -114,6 +123,13 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                traderItems = [];
+                string[] dict = array[2].Split(',');
+                foreach (var s in dict)
+                {
+                    string[] kv = s.Split('|');
+                    traderItems[EntityID.FromString(kv[0])] = EntityID.FromString(kv[1]);
+                }
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");

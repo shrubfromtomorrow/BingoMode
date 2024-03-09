@@ -32,11 +32,11 @@ namespace BingoMode.BingoSteamworks
             char type = message[0];
             message = message.Substring(1);
 
+            string[] data = message.Split(new char[] { ';' });
             switch (type)
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    string[] data = message.Split(new char[] { ';' });
                     if (data.Length < 2)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);

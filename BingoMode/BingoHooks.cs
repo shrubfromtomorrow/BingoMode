@@ -113,7 +113,7 @@ namespace BingoMode
                 {
                     if (GlobalBoard != null && ExpeditionData.slugcatPlayer == slug)
                     {
-                        Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
+                        //Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
                         GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[slug].Last());
                     }
                 });
@@ -286,7 +286,6 @@ namespace BingoMode
                 x => x.MatchLdloc(38)
                 ))
             {
-                Plugin.logger.LogMessage(b.Prev);
                 b.Emit(OpCodes.Ldarg_0);
                 b.Emit(OpCodes.Ldloc, 38);
                 b.EmitDelegate<Action<WinState, int>>((self, num7) =>
@@ -309,7 +308,6 @@ namespace BingoMode
                         Plugin.logger.LogMessage(num7);
                     }
                 });
-                Plugin.logger.LogMessage(b.Next);
             }
             else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 2 :(( " + il);
         }
@@ -383,10 +381,10 @@ namespace BingoMode
             {
                 if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
                 {
-                    Plugin.logger.LogMessage("aguga");
+                    //Plugin.logger.LogMessage("aguga");
                     BingoData.InitializeBingo();
                     int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer];
-                    Plugin.logger.LogMessage(size);
+                    //Plugin.logger.LogMessage(size);
                     GlobalBoard.challengeGrid = new Challenge[size, size];
                     int chIndex = 0;
                     for (int i = 0; i < size; i++)

@@ -88,7 +88,7 @@ namespace BingoMode.Challenges
             string[] settings = save.Split('|');
             try
             {
-                Plugin.logger.LogMessage("Attempting to recreate settingbox from string:");
+                //Plugin.logger.LogMessage("Attempting to recreate settingbox from string:");
                 object bocks = null;
                 int[] locks = null;
                 if (settings[4] != "NULL")
@@ -104,22 +104,22 @@ namespace BingoMode.Challenges
                 {
                     case "Int32":
                     case "System.Int32":
-                        Plugin.logger.LogMessage("Generating it as int!");
+                        //Plugin.logger.LogMessage("Generating it as int!");
                         bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), locks);
                         break;
                     case "Boolean":
                     case "System.Boolean":
-                        Plugin.logger.LogMessage("Generating it as bool!");
+                        //Plugin.logger.LogMessage("Generating it as bool!");
                         bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), locks);
                         break;
                     case "String":
                     case "System.String":
-                        Plugin.logger.LogMessage("Generating it as string!");
+                        //Plugin.logger.LogMessage("Generating it as string!");
                         bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), locks);
                         break;
                 }
-                Plugin.logger.LogMessage("Recreation successful!");
-                Plugin.logger.LogMessage("Final grug: " + bocks.ToString());
+                //Plugin.logger.LogMessage("Recreation successful!");
+                //Plugin.logger.LogMessage("Final grug: " + bocks.ToString());
                 return bocks;
             }
             catch(Exception ex)
@@ -129,7 +129,7 @@ namespace BingoMode.Challenges
                 {
                     Plugin.logger.LogMessage(j);
                 }; 
-                throw new("Failed to recreate SettingBox from string!!!" + ex); 
+                Plugin.logger.LogError("Failed to recreate SettingBox from string!!!" + ex); 
             }
         }
 

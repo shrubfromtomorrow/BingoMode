@@ -15,7 +15,7 @@ namespace BingoMode
     using System.Linq;
     using System.Runtime.InteropServices;
 
-    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.1")]
+    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool AppliedAlreadyDontDoItAgainPlease;
@@ -26,7 +26,7 @@ namespace BingoMode
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
-            //On.RainWorld.Update += RainWorld_Update;
+            On.RainWorld.Update += RainWorld_Update;
         }
 
         // Receiving data from yuh (networking)
@@ -51,6 +51,10 @@ namespace BingoMode
             //    }
             //}
 
+            if (SteamTest.g != null)
+            {
+            }
+
             // How the fuck does this work
             IntPtr[] messges = new IntPtr[16];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
@@ -68,7 +72,7 @@ namespace BingoMode
                     Buffer.BlockCopy(data, 0, chars, 0, data.Length);
                     string message = new string(chars, 0, chars.Length);
                     Plugin.logger.LogMessage(message);
-                    InnerWorkings.MessageReceived(message);
+                    //InnerWorkings.MessageReceived(message);
                 }
             }
         }
@@ -86,7 +90,7 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                //SteamTest.Apply();
+                SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
                 BingoEnums.Register();

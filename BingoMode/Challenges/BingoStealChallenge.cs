@@ -126,6 +126,7 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                checkedIDs = [];
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -112,6 +112,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                bannedIDs = [];
                 UpdateDescription();
             }
             catch (Exception ex)
