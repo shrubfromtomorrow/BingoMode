@@ -15,7 +15,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> target;
         public int amount;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -120,6 +120,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoItemHoardChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

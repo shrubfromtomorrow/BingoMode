@@ -69,6 +69,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Mathematics">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -91,6 +94,7 @@
     <Compile Include="BingoPage.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
+    <Compile Include="BingoLoseScreen.cs" />
     <Compile Include="BingoWinScreen.cs" />
     <Compile Include="Challenges\BingoAchievementChallenge.cs" />
     <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />

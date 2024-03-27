@@ -12,7 +12,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> region;
         public int iterator = -1;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -47,11 +47,11 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            string[] slugcatStoryRegions = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer);
+            string[] slugcatStoryRegions = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
             List<string> list = new List<string>();
             for (int i = 0; i < slugcatStoryRegions.Length; i++)
             {
-                if (!ChallengeTools.PearlRegionBlackList.Contains(slugcatStoryRegions[i]))
+                if (!ChallengeTools.PearlRegionBlackList().Contains(slugcatStoryRegions[i]))
                 {
                     list.Add(slugcatStoryRegions[i]);
                 }
@@ -118,6 +118,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoPearlDeliveryChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

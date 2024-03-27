@@ -10,6 +10,8 @@ using Menu;
 using Menu.Remix;
 using UnityEngine;
 using BingoMode.Challenges;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 
 namespace BingoMode
 {
@@ -17,16 +19,13 @@ namespace BingoMode
     {
         public ExpeditionCoreFile core;
         public Challenge[,] challengeGrid; // The challenges will be treated as coordinates on a grid for convenience
-        //public Challenge[,] ghostGrid;
         public List<IntVector2> currentWinLine; // A list of grid coordinates
         public int size;
-        public int lastSize;
         public List<Challenge> recreateList;
 
         public BingoBoard()
         {
             size = 5;
-            lastSize = 5;
             currentWinLine = [];
             recreateList = [];
         }
@@ -34,33 +33,40 @@ namespace BingoMode
         public void GenerateBoard(int size, bool changeSize = false)
         {
             Plugin.logger.LogMessage("Generating bored");
-            if (!changeSize)
-            {
-                BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
-                challengeGrid = new Challenge[size, size];
-                ExpeditionData.ClearActiveChallengeList();
+            Challenge[,] ghostGrid = new Challenge[size, size];
+            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
+            ExpeditionData.ClearActiveChallengeList();
+            if (changeSize)
+            { 
+                ghostGrid = challengeGrid;
             }
-            int dex = 0;
+            challengeGrid = new Challenge[size, size];
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
+                    if (changeSize)
+                    {
+                        if (!(i + 1 > ghostGrid.GetLength(0) || j + 1 > ghostGrid.GetLength(1)) && ghostGrid[i, j] != null)
+                        {
+                            challengeGrid[i, j] = ghostGrid[i, j];
+                            if (!ExpeditionData.challengeList.Contains(challengeGrid[i, j])) ExpeditionData.challengeList.Add(challengeGrid[i, j]);
+                            continue;
+                        }
+                    }
                     if (challengeGrid[i, j] != null)
                     {
-                        //if (changeSize)
-                        //{
-                        //    ghostGrid[i, j] = challengeGrid[i, j];
-                        //}
                         continue;
                     }
                     challengeGrid[i, j] = RandomBingoChallenge();
-                    //(challengeGrid[i, j] as IBingoChallenge).Index = dex;
-                    //ghostGrid[i, j] = challengeGrid[i, j];
-                    dex++;
                 }
             }
+            Plugin.logger.LogMessage("Current challenge list");
+            foreach (var gruh in ExpeditionData.challengeList)
+            {
+                Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
+            }
             UpdateChallenges();
-            lastSize = size;
         }
 
         public void UpdateChallenges()
@@ -71,7 +77,7 @@ namespace BingoMode
             }
         }
 
-        public bool CheckWin()
+        public bool CheckWin(bool bias = false)
         {
             bool won = false;
 
@@ -81,7 +87,8 @@ namespace BingoMode
                 bool line = true;
                 for (int j = 0; j < size; j++)
                 {
-                    line &= challengeGrid[i, j].completed;
+                    var ch = challengeGrid[i, j];
+                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
@@ -101,7 +108,8 @@ namespace BingoMode
                     bool line = true;
                     for (int j = 0; j < size; j++)
                     {
-                        line &= challengeGrid[j, i].completed;
+                        var ch = challengeGrid[j, i];
+                        line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
@@ -120,7 +128,8 @@ namespace BingoMode
                 bool line = true;
                 for (int i = 0; i < size; i++)
                 {
-                    line &= challengeGrid[i, i].completed;
+                    var ch = challengeGrid[i, i];
+                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
@@ -137,7 +146,8 @@ namespace BingoMode
                 bool line = true;
                 for (int i = 0; i < size; i++)
                 {
-                    line &= challengeGrid[size - 1 - i, i].completed;
+                    var ch = challengeGrid[size - 1 - i, i];
+                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
@@ -151,7 +161,7 @@ namespace BingoMode
             return won;
         }
 
-        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false)
+        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, bool add = true)
         {
             if (BingoData.availableBingoChallenges == null)
             {
@@ -185,13 +195,13 @@ namespace BingoMode
             }
 
             if (ch == null) goto resette;
-            ExpeditionData.challengeList.Add(ch);
-            return ExpeditionData.challengeList.Last();
+            if (add) ExpeditionData.challengeList.Add(ch);
+            return ch;
         }
 
         public void RecreateFromList()
         {
-            if (recreateList != null && recreateList.Count > 0)
+            if (recreateList != null && recreateList.Count == size * size)
             {
                 int next = 0;
                 for (int i = 0; i < size; i++)
@@ -205,13 +215,14 @@ namespace BingoMode
                         //else 
                         challengeGrid[i, j] = recreateList[next];
                         //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                        //Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]} with index {(challengeGrid[i, j] as IBingoChallenge).Index}");
+                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]} with index {(challengeGrid[i, j] as IBingoChallenge).Index}");
                         next++;
                     }
                 }
                 recreateList = [];
                 Plugin.logger.LogMessage("Recreated list from thinj yipe");
             }
+            //else GenerateBoard(size);
         }
 
         public void SetChallenge(int x, int y, Challenge newChallenge, int index)
@@ -228,6 +239,49 @@ namespace BingoMode
             catch (Exception e)
             {
                 Plugin.logger.LogError("Invalid bingo board coordinates or challenge null :( " + e);
+            }
+        }
+
+        public override string ToString()
+        {
+            string text = string.Join("bChG", ExpeditionData.challengeList);
+            Plugin.logger.LogMessage("Bingo board to string:\n" + text);
+            return text;
+        }
+        
+        public void FromString(string text)
+        {
+            Plugin.logger.LogMessage("Bingo board from string:\n" + text);
+            ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
+            string[] challenges = Regex.Split(text, "bChG");
+            int size = Mathf.FloorToInt(challenges.Length / 2f);
+            int next = 0;
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    try
+                    {
+                        string[] array10 = Regex.Split(challenges[i], "#");
+                        string[] array11 = Regex.Split(array10[1], "~");
+                        string type = array11[0];
+                        string text2 = array11[1];
+                        Challenge challenge = (Challenge)Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == type).GetType());
+                        challenge.FromString(text2);
+                        ExpLog.Log(challenge.description);
+                        if (!ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer))
+                        {
+                            ExpeditionData.allChallengeLists.Add(ExpeditionData.slugcatPlayer, new List<Challenge>());
+                        }
+                        ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Add(challenge);
+                        challengeGrid[i, j] = challenge;
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.logger.LogError("ERROR: Problem recreating challenge type with reflection in bingoboard.fromstring: " + ex.Message);
+                    }
+                    next++;
+                }
             }
         }
 

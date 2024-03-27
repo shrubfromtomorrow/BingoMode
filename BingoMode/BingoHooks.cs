@@ -1,22 +1,18 @@
-﻿using System;
+﻿using Expedition;
+using Menu;
+using Menu.Remix;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Expedition;
-using Menu;
-using Menu.Remix;
 using UnityEngine;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using Mono.Cecil;
 
 namespace BingoMode
 {
     using Challenges;
     using System.Globalization;
-    using System.Security.Policy;
     using System.Text.RegularExpressions;
 
     public class BingoHooks
@@ -53,6 +49,7 @@ namespace BingoMode
             ILCursor c = new(il);
             ILCursor b = new(il);
             ILCursor a = new(il);
+            ILCursor d = new(il);
 
             if (c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld("Expedition.ChallengeOrganizer", "availableChallengeTypes")
@@ -113,12 +110,53 @@ namespace BingoMode
                 {
                     if (GlobalBoard != null && ExpeditionData.slugcatPlayer == slug)
                     {
-                        //Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
+                        Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
                         GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[slug].Last());
                     }
                 });
             }
             else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 3 threw!!! " + il);
+
+            if (d.TryGotoNext(MoveType.Before,
+                x => x.MatchLdstr("ERROR: Problem recreating challenge type with reflection: ")
+                ))
+            {
+                d.Emit(OpCodes.Ldloc, 28);
+                d.Emit(OpCodes.Ldloc, 27);
+                d.EmitDelegate<Action<string[], SlugcatStats.Name>>((array11, name) =>
+                {
+                    try
+                    {
+                        string t = array11[0];
+                        Challenge challenge = (Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == t).GetType()) as Challenge).Generate();
+                        if (challenge != null)
+                        {
+                            Plugin.logger.LogInfo("Regenerating broken challenge " + challenge);
+                            if (!ExpeditionData.allChallengeLists.ContainsKey(name))
+                            {
+                                ExpeditionData.allChallengeLists.Add(name, []);
+                            }
+                            ExpeditionData.allChallengeLists[name].Add(challenge);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.logger.LogError("Error while regenerating broken challenge, call that shit inception fr how did this happen: " + ex);
+                        Challenge challenge = Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == "BingoDodgeLeviathanChallenge").GetType()) as Challenge;
+                        challenge.FromString(array11[1]);
+                        if (challenge != null)
+                        {
+                            Plugin.logger.LogInfo("Regenerating broken challenge");
+                            if (!ExpeditionData.allChallengeLists.ContainsKey(name))
+                            {
+                                ExpeditionData.allChallengeLists.Add(name, []);
+                            }
+                            ExpeditionData.allChallengeLists[name].Add(challenge);
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 4 threw!!! " + il);
         }
 
         public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
@@ -255,6 +293,11 @@ namespace BingoMode
                         self.currentMainLoop = new BingoWinScreen(self);
                         self.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                     }
+                    if (orig == BingoEnums.BingoLoseScreen)
+                    {
+                        self.currentMainLoop = new BingoLoseScreen(self);
+                        self.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    }
                 });
             }
             else Plugin.logger.LogError(nameof(ProcessManager_PostSwitchMainProcess) + " Threw :(( " + il);
@@ -271,7 +314,7 @@ namespace BingoMode
             {
                 c.EmitDelegate<Func<ProcessManager.ProcessID, ProcessManager.ProcessID>>((orig) =>
                 {
-                    if (orig == ExpeditionEnums.ProcessID.ExpeditionWinScreen)
+                    if (BingoData.BingoMode)
                     {
                         orig = BingoEnums.BingoWinScreen;
                     }
@@ -282,30 +325,15 @@ namespace BingoMode
             else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 1 :(( " + il);
 
             if (b.TryGotoNext(MoveType.After,
-                x => x.MatchEndfinally(),
-                x => x.MatchLdloc(38)
+                x => x.MatchLdstr("Cycle complete, saving run data"),
+                x => x.MatchCallOrCallvirt("Expedition.ExpLog", "Log")
                 ))
             {
-                b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 38);
-                b.EmitDelegate<Action<WinState, int>>((self, num7) =>
+                b.EmitDelegate(() =>
                 {
                     if (BingoData.BingoMode) 
                     {
                         ExpeditionGame.expeditionComplete = GlobalBoard.CheckWin();
-                        Plugin.logger.LogMessage(num7);
-                        foreach (Challenge challenge in ExpeditionData.challengeList)
-                        {
-                            if (challenge is BingoAchievementChallenge a)
-                            {
-                                a.CheckAchievementProgress(self);
-                            }
-                            if (challenge.completed)
-                            {
-                                num7++;
-                            }
-                        }
-                        Plugin.logger.LogMessage(num7);
                     }
                 });
             }

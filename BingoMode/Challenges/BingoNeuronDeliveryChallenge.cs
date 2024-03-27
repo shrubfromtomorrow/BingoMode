@@ -15,7 +15,7 @@ namespace BingoMode.Challenges
         public SettingBox<int> neurons;
         public int delivered;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
@@ -50,6 +50,7 @@ namespace BingoMode.Challenges
                 {
                     this.delivered = this.game.rainWorld.progression.currentSaveState.miscWorldSaveData.SLOracleState.totNeuronsGiven;
                     this.UpdateDescription();
+                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                 }
                 if (!this.completed && this.delivered >= this.neurons.Value)
                 {
@@ -120,6 +121,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoNeuronDeliveryChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

@@ -11,12 +11,12 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> unlock;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Get the " + unlock.Value + " unlock");
+            description = "Get the " + ChallengeTools.IGT.Translate(unlock.Value) + " unlock";
             base.UpdateDescription();
         }
 
@@ -96,6 +96,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoUnlockChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

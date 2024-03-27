@@ -11,7 +11,7 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> crit;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -94,6 +94,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoTameChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

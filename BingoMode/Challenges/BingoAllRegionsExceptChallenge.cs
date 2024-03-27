@@ -12,7 +12,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> region;
         public List<string> regionsToEnter = [];
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -34,12 +34,12 @@ namespace BingoMode.Challenges
         public override void Reset()
         {
             base.Reset();
-            regionsToEnter = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
+            regionsToEnter = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
         }
 
         public override Challenge Generate()
         {
-            List<string> regiones = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
+            List<string> regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
             regiones.Remove(regionn);
 
@@ -58,6 +58,7 @@ namespace BingoMode.Challenges
             {
                 completed = false;
                 regionsToEnter.Add("failed");
+                Failed = true;
                 return;
             }
             else if (!completed && regionsToEnter.Contains(regionName))
@@ -70,6 +71,7 @@ namespace BingoMode.Challenges
                     CompleteChallenge();
                 }
                 UpdateDescription();
+                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
             }
         }
 
@@ -121,6 +123,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoAllRegionsExcept FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

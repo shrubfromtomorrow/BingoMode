@@ -25,7 +25,7 @@ namespace BingoMode.Challenges
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get { return false; } set { } }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -51,9 +51,9 @@ namespace BingoMode.Challenges
             description = ChallengeTools.IGT.Translate("Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
-                .Replace("<crit>", crit.Value != "_AnyCreature" ? newValue : "creatures")
+                .Replace("<crit>", crit.Value != "Any Creature" ? newValue : "creatures")
                 .Replace("<location>", location != "" ? " in " + location : "")
-                .Replace("<pitorweapon>", deathPit.Value ? " with a death pit" : weapon.Value != "_AnyWeapon" ? " with " + ChallengeTools.ItemName(new(weapon.Value)) : "")
+                .Replace("<pitorweapon>", deathPit.Value ? " with a death pit" : weapon.Value != "Any Weapon" ? " with " + ChallengeTools.ItemName(new(weapon.Value)) : "")
                 .Replace("<starving>", starve.Value ? " while starving" : "")
                 .Replace("<onecycle>", oneCycle.Value ? " in one cycle" : "");
             base.UpdateDescription();
@@ -80,9 +80,11 @@ namespace BingoMode.Challenges
             bool starvv = UnityEngine.Random.value < 0.2f;
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
             num = Mathf.Max(1, num);
-            var clone = ChallengeUtils.Weapons.ToList();
+            List<string> clone = ChallengeUtils.Weapons.ToList();
             clone.RemoveAll(x => x == "PuffBall" || x == "FlareBomb" || x == "Rock");
-            string weapo = clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
+            bool doWeapon = UnityEngine.Random.value < 0.5f;
+            bool doCreature = !doWeapon || UnityEngine.Random.value < 0.8f;
+            string weapo = doWeapon ? "Any Weapon" : clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
             if ((expeditionCreature.creature == CreatureType.Centipede ||
                 expeditionCreature.creature == CreatureType.Centiwing ||
                 expeditionCreature.creature == CreatureType.SmallCentipede ||
@@ -93,7 +95,7 @@ namespace BingoMode.Challenges
                 expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = "FlareBomb"; 
             return new BingoKillChallenge
             {
-                crit = new(expeditionCreature.creature.value, "Creature Type", 0, listName: "creatures"),
+                crit = new(doCreature ? expeditionCreature.creature.value : "Any Creature", "Creature Type", 0, listName: "creatures"),
                 amount = new(num, "Amount", 1),
                 starve = new(starvv, "While Starving", 2),
                 oneCycle = new(onePiece, "In one Cycle", 3),
@@ -201,8 +203,6 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
-            Plugin.logger.LogMessage(amount.ToString());
-            Plugin.logger.LogMessage(deathPit.ToString());
             return string.Concat(new string[]
             {
                 "BingoKillChallenge",
@@ -268,6 +268,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoKillChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 
@@ -292,6 +293,7 @@ namespace BingoMode.Challenges
                 this.current++;
                 ExpLog.Log("Player " + (playerNumber + 1).ToString() + " killed " + type.value);
                 this.UpdateDescription();
+                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                 if (this.current >= this.amount.Value)
                 {
                     this.CompleteChallenge();
@@ -303,7 +305,7 @@ namespace BingoMode.Challenges
         {
             if (BingoData.hitTimeline.TryGetValue(c.abstractCreature.ID, out var list))
             {
-                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value)) return true;
+                if (weapon.Value == "Any Weapon" || (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value))) return true;
             }
             return false;
         }

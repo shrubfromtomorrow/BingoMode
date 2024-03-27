@@ -14,7 +14,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> ID; //WinState.EndgameID
 
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -126,18 +126,19 @@ namespace BingoMode.Challenges
             catch (System.Exception ex)
             {
                 ExpLog.Log("ERROR: BingoAchievementChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 
         public void AddHooks()
         {
-            //IL.WinState.CycleCompleted += WinState_CycleCompleted;
+            IL.WinState.CycleCompleted += WinState_CycleCompleted;
         }
 
         public void RemoveHooks()
         {
 
-            //IL.WinState.CycleCompleted -= WinState_CycleCompleted;
+            IL.WinState.CycleCompleted -= WinState_CycleCompleted;
         }
 
         public List<object> Settings() => [ID];

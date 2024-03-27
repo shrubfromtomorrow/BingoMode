@@ -13,7 +13,7 @@ namespace BingoMode.Challenges
         public SettingBox<bool> pass;
         public SettingBox<string> roomName;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -122,6 +122,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoBombTollChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

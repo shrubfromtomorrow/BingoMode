@@ -17,7 +17,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> crit;
         public List<string> gates = [];
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -69,6 +69,7 @@ namespace BingoMode.Challenges
                 gates.Add(roomName);
                 current++;
                 UpdateDescription();
+                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
 
                 if (current >= amount.Value) CompleteChallenge();
             }
@@ -109,6 +110,8 @@ namespace BingoMode.Challenges
                 "><",
                 amount.ToString(),
                 "><",
+                string.Join("|", gates),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 hidden ? "1" : "0",
@@ -125,14 +128,16 @@ namespace BingoMode.Challenges
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                completed = (array[3] == "1");
-                hidden = (array[4] == "1");
-                revealed = (array[5] == "1");
+                gates = array[3].Split('|').ToList();
+                completed = (array[4] == "1");
+                hidden = (array[5] == "1");
+                revealed = (array[6] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoCreatureGateChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

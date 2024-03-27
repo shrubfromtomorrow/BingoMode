@@ -10,7 +10,7 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> region;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -31,7 +31,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer);
+            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
 
             return new BingoNoRegionChallenge
             {
@@ -45,6 +45,7 @@ namespace BingoMode.Challenges
             if (completed && region.Value == regionName)
             {
                 completed = false;
+                Failed = true;
             }
         }
 
@@ -94,6 +95,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoNoRegionChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

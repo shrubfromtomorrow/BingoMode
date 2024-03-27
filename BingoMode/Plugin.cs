@@ -1,7 +1,9 @@
 ﻿using BepInEx;
-using System.Security.Permissions;
-using System.Security;
 using Steamworks;
+using System;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Permissions;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -9,11 +11,8 @@ using Steamworks;
 
 namespace BingoMode
 {
-    using Challenges;
     using BingoSteamworks;
-    using System;
-    using System.Linq;
-    using System.Runtime.InteropServices;
+    using Challenges;
 
     [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.3")]
     public class Plugin : BaseUnityPlugin
@@ -51,10 +50,6 @@ namespace BingoMode
             //    }
             //}
 
-            if (SteamTest.g != null)
-            {
-            }
-
             // How the fuck does this work
             IntPtr[] messges = new IntPtr[16];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
@@ -90,7 +85,7 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                SteamTest.Apply();
+                //SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
                 BingoEnums.Register();

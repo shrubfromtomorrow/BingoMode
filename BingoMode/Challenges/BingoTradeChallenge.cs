@@ -15,7 +15,7 @@ namespace BingoMode.Challenges
         public int current;
         public List<EntityID> bannedIDs;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -55,6 +55,7 @@ namespace BingoMode.Challenges
                 current += pnts;
                 bannedIDs.Add(ID);
                 UpdateDescription();
+                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
 
                 if (!completed && current >= amount.Value)
                 {
@@ -118,6 +119,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoTradeChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

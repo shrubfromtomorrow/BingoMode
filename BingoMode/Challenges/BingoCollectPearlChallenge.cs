@@ -18,7 +18,7 @@ namespace BingoMode.Challenges
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -54,7 +54,8 @@ namespace BingoMode.Challenges
             {
                 current++;
                 collected.Add(type.value);
-                UpdateDescription();
+                UpdateDescription(); 
+                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
             }
         }
@@ -167,6 +168,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoCollectPearlChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

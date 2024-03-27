@@ -16,7 +16,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> region;
         public SettingBox<int> amount;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
             {
                 flag = true;
             }
-            string[] array = SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer);
+            string[] array = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
             if (array.Contains("HR"))
             {
                 List<string> list = array.ToList<string>();
@@ -140,6 +140,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoPearlHoardChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

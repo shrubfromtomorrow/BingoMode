@@ -38,9 +38,9 @@ namespace BingoMode.Challenges
                 case "friend": return Befriendable;
                 case "pearls": return CollectablePearls;
                 case "craft": return CraftableItems;
-                case "regions": return [.. SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.getSlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "regions": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries];
-                case "creatures": return [.. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
+                case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return ["Hazer", "VultureGrub"];
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
@@ -214,6 +214,7 @@ namespace BingoMode.Challenges
 
         public static readonly string[] Weapons =
         {
+            "Any Weapon",
             "Spear",
             "Rock",
             "ScavengerBomb",

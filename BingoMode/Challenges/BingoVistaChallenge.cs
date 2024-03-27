@@ -18,7 +18,7 @@ namespace BingoMode.Challenges
         public string region;
         public Vector2 location;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void Update()
@@ -73,21 +73,25 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            List<string> list = new List<string>();
-            for (int i = 0; i < ChallengeTools.VistaLocations.Keys.Count; i++)
+            List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
+            foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
             {
-                if (SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(Regex.Split(ChallengeTools.VistaLocations.ElementAt(i).Key, "_")[0]))
+                if (SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(keyValuePair.Key))
                 {
-                    list.Add(ChallengeTools.VistaLocations.ElementAt(i).Key);
+                    foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
+                    {
+                        list.Add(new ValueTuple<string, string>(keyValuePair.Key, keyValuePair2.Key));
+                    }
                 }
             }
-            string text = list[UnityEngine.Random.Range(0, list.Count)];
-            string text2 = Regex.Split(text, "_")[0];
-            Vector2 vector = ChallengeTools.VistaLocations[text];
+            ValueTuple<string, string> valueTuple = list[UnityEngine.Random.Range(0, list.Count)];
+            string item = valueTuple.Item1;
+            string item2 = valueTuple.Item2;
+            Vector2 vector = ChallengeTools.VistaLocations[item][item2];
             BingoVistaChallenge vistaChallenge = new BingoVistaChallenge
             {
-                region = text2,
-                room = new(text, "Room", 0, listName: "vista"),
+                region = item,
+                room = new(item2, "Room", 0, listName: "vista"),
                 location = vector
             };
             ModifyVistaCandidates(vistaChallenge);
@@ -166,6 +170,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoVistaChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

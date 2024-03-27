@@ -9,7 +9,7 @@ using Menu;
 
 namespace BingoMode
 {
-    public class BingoWinScreen : Menu.Menu
+    public class BingoLoseScreen : Menu.Menu
     {
         public MenuScene bgScene;
         public float leftOffset;
@@ -18,7 +18,7 @@ namespace BingoMode
         public SimpleButton continueButton;
         public BingoGrid grid;
 
-        public BingoWinScreen(ProcessManager manager) : base(manager, BingoEnums.BingoWinScreen)
+        public BingoLoseScreen(ProcessManager manager) : base(manager, BingoEnums.BingoLoseScreen)
         {
             manager.musicPlayer?.MenuRequestsSong("RW_65 - Garden", 100f, 50f);
             
@@ -51,7 +51,7 @@ namespace BingoMode
 
         public override void Singal(MenuObject sender, string message)
         {
-            if (message == "CONTINUE")
+            if (message == "you failed lol")
             {
                 manager.RequestMainProcessSwitch(ExpeditionEnums.ProcessID.ExpeditionMenu);
             }

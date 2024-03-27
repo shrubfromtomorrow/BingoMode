@@ -58,6 +58,7 @@ namespace BingoMode
         {
             ExpeditionData.ClearActiveChallengeList();
             BingoMode = false;
+            Expedition.Expedition.coreFile.Save(false);
         }
 
         public static void HookAll(IEnumerable<Challenge> challenges, bool add)
@@ -116,7 +117,7 @@ namespace BingoMode
                 if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
-                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && SlugcatStats.getSlugcatStoryRegions(slug).Concat(SlugcatStats.getSlugcatOptionalRegions(slug)).Contains(kvp.Key.ToUpperInvariant()))
+                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && SlugcatStats.SlugcatStoryRegions(slug).Concat(SlugcatStats.SlugcatOptionalRegions(slug)).Contains(kvp.Key.ToUpperInvariant()))
                     {
                         Plugin.logger.LogMessage("ACCESSIBLE SAFARI: " + kvp.Value[n].value + "-safari");
                         possibleTokens[2].Add(kvp.Value[n].value + "-safari");

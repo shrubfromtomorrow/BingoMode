@@ -17,7 +17,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> crit;
         public List<EntityID> origins = []; // Save this later
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
             string[] possible = ChallengeUtils.Transportable.Where(x => slug != MoreSlugcatsEnums.SlugcatStatsName.Saint || !new List<string>(){ "CicadaA", "CicadaB" }.Contains(x)).ToArray();
             string crug = possible[Random.Range(0, possible.Length - (ModManager.MSC && slug != SlugcatStats.Name.Red && slug != MoreSlugcatsEnums.SlugcatStatsName.Spear && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer ? 0 : 1))];
             List<string> origRegions = ChallengeUtils.CreatureOriginRegions(crug, slug);
-            List<string> allRegions = crug == "JetFish" ? ["SB"] : [.. SlugcatStats.getSlugcatStoryRegions(slug), .. SlugcatStats.getSlugcatOptionalRegions(slug)];
+            List<string> allRegions = crug == "JetFish" ? ["SB"] : [.. SlugcatStats.SlugcatStoryRegions(slug), .. SlugcatStats.SlugcatOptionalRegions(slug)];
             string fromage = Random.value < 0.5f ? "null" : origRegions[Random.Range(0, origRegions.Count)];
             allRegions.Remove(fromage);
             allRegions.Remove("MS");
@@ -73,6 +73,7 @@ namespace BingoMode.Challenges
                 {
                     origins.Add(c.abstractCreature.ID);
                     Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
+                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                 }
             }
         }
@@ -143,6 +144,8 @@ namespace BingoMode.Challenges
                 "><",
                 crit.ToString(),
                 "><",
+                string.Join("|", origins),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 hidden ? "1" : "0",
@@ -159,14 +162,23 @@ namespace BingoMode.Challenges
                 from = SettingBoxFromString(array[0]) as SettingBox<string>;
                 to = SettingBoxFromString(array[1]) as SettingBox<string>;
                 crit = SettingBoxFromString(array[2]) as SettingBox<string>;
-                completed = (array[3] == "1");
-                hidden = (array[4] == "1");
-                revealed = (array[5] == "1");
+                string[] arr = array[3].Split('|');
+                origins = [];
+                Plugin.logger.LogMessage("Transport challenge origins list from string!");
+                foreach (var a in arr)
+                {
+                    Plugin.logger.LogMessage(a);
+                    origins.Add(EntityID.FromString(a));
+                }
+                completed = (array[4] == "1");
+                hidden = (array[5] == "1");
+                revealed = (array[6] == "1");
                 UpdateDescription();
             }
             catch (System.Exception ex)
             {
                 ExpLog.Log("ERROR: BingoTransportChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

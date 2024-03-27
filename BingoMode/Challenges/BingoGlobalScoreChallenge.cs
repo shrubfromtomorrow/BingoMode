@@ -15,12 +15,12 @@ namespace BingoMode.Challenges
         public SettingBox<int> target;
         public int score;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Earn <score_target> points from creature kills [<current_score>/<score_target>]").Replace("<score_target>", ValueConverter.ConvertToString<int>(target.Value)).Replace("<current_score>", ValueConverter.ConvertToString<int>(this.score));
+            this.description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills").Replace("<score_target>", ValueConverter.ConvertToString<int>(target.Value)).Replace("<current_score>", ValueConverter.ConvertToString<int>(this.score));
             base.UpdateDescription();
         }
 
@@ -92,6 +92,7 @@ namespace BingoMode.Challenges
                 }));
             }
             UpdateDescription();
+            if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
             if (score >= target.Value)
             {
                 score = target.Value;
@@ -132,6 +133,7 @@ namespace BingoMode.Challenges
             catch (Exception ex)
             {
                 ExpLog.Log("ERROR: BingoGlobalScoreChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

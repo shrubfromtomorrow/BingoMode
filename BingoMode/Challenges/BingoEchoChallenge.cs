@@ -14,7 +14,7 @@ namespace BingoMode.Challenges
         public SettingBox<string> ghost; //GhostWorldPresence.GhostID
         public SettingBox<bool> starve;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -51,7 +51,7 @@ namespace BingoMode.Challenges
             List<string> list = [];
             for (int i = 0; i < ExtEnum<GhostWorldPresence.GhostID>.values.entries.Count; i++)
             {
-                if (ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] != "NoGhost" && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "MS")) && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "SL") || !(ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint)) && SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]))
+                if (ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] != "NoGhost" && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "MS")) && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "SL") || !(ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint)) && SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]))
                 {
                     list.Add(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]);
                 }
@@ -111,6 +111,7 @@ namespace BingoMode.Challenges
             catch (System.Exception ex)
             {
                 ExpLog.Log("ERROR: BingoEchoChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
 

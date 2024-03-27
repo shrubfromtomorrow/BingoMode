@@ -1,56 +1,50 @@
-﻿using Menu;
-using static Menu.Menu;
-using UnityEngine;
-using RWCustom;
-using Menu.Remix.MixedUI;
-using System;
+﻿using BingoMode.Challenges;
 using Expedition;
-using System.Collections.Generic;
+using Menu;
 using Menu.Remix;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using BingoMode.Challenges;
+using Menu.Remix.MixedUI;
 using Menu.Remix.MixedUI.ValueTypes;
-using static System.Net.Mime.MediaTypeNames;
+using RWCustom;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace BingoMode
 {
     public class CustomizerDialog : Dialog
     {
+        readonly int[] maxItems = [10, 5];
         float leftAnchor;
-        float rightAnchor;
-        BingoButton owner;
-        FSprite pageTitle;
-        SimpleButton closeButton;
-        FSprite[] dividers;
         bool opening;
         bool closing;
         float uAlpha;
         float currentAlpha;
         float lastAlpha;
         float targetAlpha;
+        float sliderF;
+        float num;
+        bool onSettings;
+        bool lastOnSettings;
+        BingoButton owner;
+        FSprite pageTitle;
+        SimpleButton closeButton;
+        FSprite[] dividers;
         FLabel description;
         MenuLabel page;
         SymbolButton randomize;
         SymbolButton settings;
         SymbolButton types;
-        bool onSettings;
-        bool lastOnSettings;
         List<Challenge> testList;
         TypeButton[] testLabels;
         VerticalSlider slider;
-        float sliderF;
-        int[] maxItems = [10, 5];
         List<ChallengeSetting> challengeSettings;
         MenuTab tab;
         MenuTabWrapper wrapper;
-        float num;
 
         public CustomizerDialog(ProcessManager manager, BingoButton owner) : base(manager)
         {
             float[] screenOffsets = Custom.GetScreenOffsets();
             leftAnchor = screenOffsets[0];
-            rightAnchor = screenOffsets[1];
             this.owner = owner;
             Vector2 outOfBounds = new Vector2(10000, 10000);
 
@@ -117,7 +111,6 @@ namespace BingoMode
 
             opening = true;
             targetAlpha = 1f;
-            UpdateChallenge();
             onSettings = true;
 
             slider = new VerticalSlider(this, pages[0], "", new Vector2(843f - leftAnchor, 294f), new Vector2(30f, 160f), BingoEnums.CustomizerSlider, true) { floatValue = 1f };
@@ -145,6 +138,7 @@ namespace BingoMode
             tab._GrafUpdate(0f);
 
             ResetSettings(owner.challenge as IBingoChallenge);
+            UpdateChallenge();
         }
 
         public void ResetSettings(IBingoChallenge ch)
@@ -277,8 +271,12 @@ namespace BingoMode
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
-                ccc.location = ChallengeTools.VistaLocations[ccc.room.Value];
+                Plugin.logger.LogMessage("Vista thing");
+                Plugin.logger.LogMessage(ccc.room.Value);
+                Plugin.logger.LogMessage(ccc.region);
                 ccc.region = ccc.room.Value.Substring(0, 2);
+                Plugin.logger.LogMessage(ccc.region);
+                ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
             }
             else if (owner.challenge is BingoDamageChallenge cccc)
             {
@@ -448,7 +446,7 @@ namespace BingoMode
                     this.value = i;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting", i.Value, new ConfigAcceptableRange<int>(1, 500));
                     field = new OpUpdown(true, conf, pos, 60f);
-                    field.OnChange += UpdootInt;
+                    field.OnValueChanged += UpdootInt;
                     label.text = i.name;
                     offSet = new Vector2(5f, -2.5f);
                 }
@@ -457,7 +455,7 @@ namespace BingoMode
                     this.value = s;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting", s.Value, (ConfigAcceptableBase)null);
                     field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName) : ["Whoops errore"]);
-                    field.OnChange += UpdootString;
+                    field.OnValueChanged += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
                     (field as OpComboBox).OnListClose += UnfocusThing;
                     label.text = s.name;
@@ -468,7 +466,7 @@ namespace BingoMode
                     this.value = b;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting", b.Value, (ConfigAcceptableBase)null);
                     field = new OpCheckBox(conf as Configurable<bool>, pos);
-                    field.OnChange += UpdootBool;
+                    field.OnValueChanged += UpdootBool;
                     label.text = b.name;
                     offSet = new Vector2(5f, 0f);
                 }
@@ -498,20 +496,20 @@ namespace BingoMode
                 (menu as CustomizerDialog).FocusOn(this);
             }
 
-            public void UpdootInt()
+            public void UpdootInt(UIconfig config, string v, string oldV)
             {
                 (value as SettingBox<int>).Value = (field as OpUpdown).GetValueInt();
                 (menu as CustomizerDialog).UpdateChallenge();
             }
 
-            public void UpdootString()
+            public void UpdootString(UIconfig config, string v, string oldV)
             {
                 Plugin.logger.LogMessage("new value: " + field.value);
                 (value as SettingBox<string>).Value = field.value;
                 (menu as CustomizerDialog).UpdateChallenge();
             }
 
-            public void UpdootBool()
+            public void UpdootBool(UIconfig config, string v, string oldV)
             {
                 (value as SettingBox<bool>).Value = (field as OpCheckBox).GetValueBool();
                 (menu as CustomizerDialog).UpdateChallenge();

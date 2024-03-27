@@ -20,7 +20,7 @@ namespace BingoMode.Challenges
         public List<string> pinRegions = [];
         public SettingBox<string> crit;
         public int Index { get; set; }
-        public bool Locked { get; set; }
+        public bool RequireSave { get; set; }
         public bool Failed { get; set; }
 
         public override void UpdateDescription()
@@ -42,7 +42,7 @@ namespace BingoMode.Challenges
         {
             string r = "";
             string c = Random.value < 0.5f ? "_AnyCreature" : ChallengeUtils.Pinnable[Random.Range(0, ChallengeUtils.Pinnable.Length)];
-            List<string> regions = [.. SlugcatStats.getSlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.getSlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+            List<string> regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
             regions.Remove("ss");
             float radom = Random.value;
             if (radom < 0.33f) r = regions[Random.Range(0, regions.Count)];
@@ -88,6 +88,7 @@ namespace BingoMode.Challenges
                     this.current++;
                     if (region.Value == "multi") pinRegions.Add(rr);
                     this.UpdateDescription();
+                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                     this.spearList.Remove(this.spearList[k]);
                     return;
                 }
@@ -167,6 +168,7 @@ namespace BingoMode.Challenges
             catch (System.Exception ex)
             {
                 ExpLog.Log("ERROR: BingoPinChallenge FromString() encountered an error: " + ex.Message);
+                throw ex;
             }
         }
     

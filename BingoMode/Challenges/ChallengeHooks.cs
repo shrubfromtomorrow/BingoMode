@@ -49,13 +49,17 @@ namespace BingoMode.Challenges
         public override string ToString()
         {
             string excl = "NULL";
-            if (locks != null)
+            //if (locks != null)
+            //{
+            //    excl = locks[0].ToString();
+            //    for (int i = 1; i < locks.Length; i++)
+            //    {
+            //        excl += "," + locks[i];
+            //    }
+            //}
+            if (listName != null)
             {
-                excl = locks[0].ToString();
-                for (int i = 1; i < locks.Length; i++)
-                {
-                    excl += "," + locks[i];
-                }
+                excl = listName;
             }
             return string.Concat(
                 type.ToString(),
@@ -77,7 +81,7 @@ namespace BingoMode.Challenges
         void RemoveHooks();
         List<object> Settings();
         int Index { get; set; }
-        bool Locked { get; set; }
+        bool RequireSave { get; set; }
         bool Failed { get; set; }
     }
 
@@ -90,32 +94,34 @@ namespace BingoMode.Challenges
             {
                 //Plugin.logger.LogMessage("Attempting to recreate settingbox from string:");
                 object bocks = null;
-                int[] locks = null;
+                //int[] locks = null;
+                string listName = null;
                 if (settings[4] != "NULL")
                 {
-                    List<int> tempLocks = [];
-                    foreach (var g in settings[4].Split(','))
-                    {
-                        tempLocks.Add(int.Parse(g));
-                    }
-                    locks = tempLocks.ToArray();
+                    //List<int> tempLocks = [];
+                    //foreach (var g in settings[4].Split(','))
+                    //{
+                    //    tempLocks.Add(int.Parse(g));
+                    //}
+                    //locks = tempLocks.ToArray();
+                    listName = settings[4];
                 }
                 switch (settings[0])
                 {
                     case "Int32":
                     case "System.Int32":
                         //Plugin.logger.LogMessage("Generating it as int!");
-                        bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), locks);
+                        bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), null, listName);
                         break;
                     case "Boolean":
                     case "System.Boolean":
                         //Plugin.logger.LogMessage("Generating it as bool!");
-                        bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), locks);
+                        bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), null, listName);
                         break;
                     case "String":
                     case "System.String":
                         //Plugin.logger.LogMessage("Generating it as string!");
-                        bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), locks);
+                        bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), null, listName);
                         break;
                 }
                 //Plugin.logger.LogMessage("Recreation successful!");
@@ -129,7 +135,8 @@ namespace BingoMode.Challenges
                 {
                     Plugin.logger.LogMessage(j);
                 }; 
-                Plugin.logger.LogError("Failed to recreate SettingBox from string!!!" + ex); 
+                Plugin.logger.LogError("Failed to recreate SettingBox from string!!!" + ex);
+                return null;
             }
         }
 
@@ -154,6 +161,19 @@ namespace BingoMode.Challenges
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
             IL.FlareBomb.Update += FlareBomb_Update;
+            On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
+        }
+
+        public static void Challenge_CompleteChallenge(On.Expedition.Challenge.orig_CompleteChallenge orig, Challenge self)
+        {
+            if (self is IBingoChallenge c && c.RequireSave && !self.revealed)
+            {
+                self.revealed = true;
+                return;
+            }
+                
+            orig.Invoke(self);
+            if (BingoData.BingoMode) Expedition.Expedition.coreFile.Save(false);
         }
 
         public static void WinState_CycleCompleted(ILContext il)
@@ -161,13 +181,13 @@ namespace BingoMode.Challenges
             ILCursor c = new(il);
 
             if (c.TryGotoNext(
-                x => x.MatchStloc(40),
-                x => x.MatchLdloc(40),
-                x => x.MatchIsinst<AchievementChallenge>()
+                x => x.MatchStloc(42),
+                x => x.MatchLdloc(42),
+                x => x.MatchIsinst("Expedition.AchievementChallenge")
                 ))
             {
                 c.Index++;
-                c.Emit(OpCodes.Ldloc, 40);
+                c.Emit(OpCodes.Ldloc, 42);
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Action<Challenge, WinState>>((ch, self) =>
                 {
@@ -285,7 +305,7 @@ namespace BingoMode.Challenges
             ILCursor c = new(il);
         
             if (c.TryGotoNext(
-                x => x.MatchLdstr("Fell out of room!")
+                x => x.MatchLdstr("{0} Fell out of room!")
                 ) && 
                 c.TryGotoNext(MoveType.After,
                 x => x.MatchCallOrCallvirt<Creature>("Die")
@@ -404,6 +424,14 @@ namespace BingoMode.Challenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
+                    if (ExpeditionData.challengeList[j] is IBingoChallenge g && g.RequireSave)
+                    {
+                        if (survived && ExpeditionData.challengeList[j].revealed)
+                        {
+                            ExpeditionData.challengeList[j].CompleteChallenge();
+                        }
+                        ExpeditionData.challengeList[j].revealed = false;
+                    }
                     if (ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
                     {
                         c.bombed = false;
@@ -413,6 +441,11 @@ namespace BingoMode.Challenges
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();
                 BingoData.heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
+
+                if (!BingoHooks.GlobalBoard.CheckWin(true))
+                {
+                    game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
+                }
             }
         }
 
@@ -876,24 +909,26 @@ namespace BingoMode.Challenges
             if (c.TryGotoNext(
                 x => x.MatchLdfld("PlacedObject", "active")
                 ) && 
-                c.TryGotoNext(
+                c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld("ModManager", "Expedition")
                 ))
             {
-                c.Index++;
+                Plugin.logger.LogMessage(c.Prev);
+
                 c.Emit(OpCodes.Ldarg_0);
-                c.Emit(OpCodes.Ldloc, 21);
+                c.Emit(OpCodes.Ldloc, 23);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     if (self.roomSettings.placedObjects[i].data is CollectToken.CollectTokenData c && BingoData.challengeTokens.Contains(c.tokenString)) orig = false;
                     return orig;
                 });
             }
-            else Plugin.logger.LogMessage("Challenge room loaded threw!!! " + il);
+            else Plugin.logger.LogError("Challenge room loaded threw!!! " + il);
         }
         
         public static void Room_LoadedGreenNeuron(ILContext il)
         {
+            Plugin.logger.LogMessage("Ass " + il);
             ILCursor b = new(il);
             if (b.TryGotoNext(
                 x => x.MatchLdsfld("Expedition.ExpeditionData", "startingDen")
