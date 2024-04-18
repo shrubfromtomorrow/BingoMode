@@ -20,12 +20,12 @@ namespace BingoMode.Challenges
         public static string[] GetCorrectListForChallenge(string listName)
         {
             string ln = listName;
-            bool addEmpty = false;
-            if (ln[0] == '_')
-            {
-                addEmpty = true;
-                ln = ln.Substring(1);
-            }
+            //bool addEmpty = false;
+            //if (ln[0] == '_')
+            //{
+            //    addEmpty = true;
+            //    ln = ln.Substring(1);
+            //}
             switch (ln)
             {
                 case "transport": return Transportable;
@@ -38,8 +38,8 @@ namespace BingoMode.Challenges
                 case "friend": return Befriendable;
                 case "pearls": return CollectablePearls;
                 case "craft": return CraftableItems;
-                case "regions": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
-                case "echoes": return [.. GhostWorldPresence.GhostID.values.entries];
+                case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return ["Hazer", "VultureGrub"];
                 case "banitem": return [.. FoodTypes, .. Bannable];

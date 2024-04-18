@@ -93,6 +93,7 @@
     <Compile Include="BingoHooks.cs" />
     <Compile Include="BingoPage.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
+    <Compile Include="BingoSteamworks\LobbySettings.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoLoseScreen.cs" />
     <Compile Include="BingoWinScreen.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Challenges\BingoVistaChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />
+    <Compile Include="CreateLobbyDialog.cs" />
     <Compile Include="CustomizerDialog.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,6 +8,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Steamworks;
 
 namespace BingoMode
 {
@@ -271,17 +272,8 @@ namespace BingoMode
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
-                Plugin.logger.LogMessage("Vista thing");
-                Plugin.logger.LogMessage(ccc.room.Value);
-                Plugin.logger.LogMessage(ccc.region);
                 ccc.region = ccc.room.Value.Substring(0, 2);
-                Plugin.logger.LogMessage(ccc.region);
                 ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
-            }
-            else if (owner.challenge is BingoDamageChallenge cccc)
-            {
-                Plugin.logger.LogMessage(cccc.weapon.Value);
-                Plugin.logger.LogMessage(cccc.victim.Value);
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();

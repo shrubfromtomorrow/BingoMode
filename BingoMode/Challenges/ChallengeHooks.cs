@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -83,9 +84,10 @@ namespace BingoMode.Challenges
         int Index { get; set; }
         bool RequireSave { get; set; }
         bool Failed { get; set; }
+        //List<int> TeamsCompleted { get; set; }
     }
 
-    public class ChallengeHooks
+    public static class ChallengeHooks
     {
         public static object SettingBoxFromString(string save)
         {
@@ -140,6 +142,11 @@ namespace BingoMode.Challenges
             }
         }
 
+        public static void LockoutChallenge(this Challenge self)
+        {
+            self.hidden = true;
+        }
+
         // Runtime detour hooks
         public static Hook tokenColorHook;
 
@@ -162,16 +169,44 @@ namespace BingoMode.Challenges
             IL.PuffBall.Explode += PuffBall_Explode;
             IL.FlareBomb.Update += FlareBomb_Update;
             On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
+            IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
+        }
+
+        public static void Challenge_CompleteChallengeIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("unl-passage")
+                ))
+            {
+                c.Index++;
+                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                {
+                    if (BingoData.BingoMode) orig = false;
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, Challenge_CompleteChallengeIL il fucked up " + il);
         }
 
         public static void Challenge_CompleteChallenge(On.Expedition.Challenge.orig_CompleteChallenge orig, Challenge self)
         {
-            if (self is IBingoChallenge c && c.RequireSave && !self.revealed)
+            if (self is IBingoChallenge c)
             {
-                self.revealed = true;
-                return;
+                if (self.hidden) return; // Hidden means locked out here in bingo
+                if (c.RequireSave && !self.revealed)
+                {
+                    self.revealed = true;
+                    return;
+                }
             }
-                
+
+            if (SteamTest.LobbyMembers.Count > 0)
+            {
+                SteamTest.BroadcastCompletedChallenge(self);
+            }
+
             orig.Invoke(self);
             if (BingoData.BingoMode) Expedition.Expedition.coreFile.Save(false);
         }
@@ -183,7 +218,7 @@ namespace BingoMode.Challenges
             if (c.TryGotoNext(
                 x => x.MatchStloc(42),
                 x => x.MatchLdloc(42),
-                x => x.MatchIsinst("Expedition.AchievementChallenge")
+                x => x.MatchIsinst<AchievementChallenge>()
                 ))
             {
                 c.Index++;
@@ -657,10 +692,9 @@ namespace BingoMode.Challenges
             ILCursor c = new(il);
 
             if (c.TryGotoNext(
-                x => x.MatchCallOrCallvirt<SeedCob>("Open")
+                x => x.MatchLdsfld<ModManager>("MSC")
                 ))
             {
-                c.Index++;
                 c.Emit(OpCodes.Ldarg_1);
                 c.EmitDelegate<Action<Weapon>>((weapon) =>
                 {
@@ -849,19 +883,22 @@ namespace BingoMode.Challenges
 
         public static bool MiscProgressionData_GetTokenCollected(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_string_bool orig, PlayerProgression.MiscProgressionData self, string tokenString, bool sandbox)
         {
+            Plugin.logger.LogMessage("Checkunlock " + tokenString);
             if (BingoData.challengeTokens.Contains(tokenString)) return false;
             return orig.Invoke(self, tokenString, sandbox);
         }
 
         public static bool MiscProgressionData_GetTokenCollected_SlugcatUnlockID(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_SlugcatUnlockID orig, PlayerProgression.MiscProgressionData self, MultiplayerUnlocks.SlugcatUnlockID classToken)
         {
+            Plugin.logger.LogMessage("Checkunlock " + classToken.value);
             if (BingoData.challengeTokens.Contains(classToken.value)) return false;
             return orig.Invoke(self, classToken);
         }
 
         public static bool MiscProgressionData_GetTokenCollected_SafariUnlockID(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_SafariUnlockID orig, PlayerProgression.MiscProgressionData self, MultiplayerUnlocks.SafariUnlockID safariToken)
         {
-            if (BingoData.challengeTokens.Contains(safariToken.value)) return false;
+            Plugin.logger.LogMessage("Checkunlock " + safariToken.value + "-safari");
+            if (BingoData.challengeTokens.Contains(safariToken.value + "-safari")) return false;
             return orig.Invoke(self, safariToken);
         }
 
@@ -871,14 +908,14 @@ namespace BingoMode.Challenges
             {
                 return;
             }
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString) && ExpeditionData.challengeList.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString))
+            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString + (d.isRed ? "-safari" : "")) && ExpeditionData.challengeList.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString + (d.isRed ? "-safari" : "")))
             {
                 foreach (Challenge ch in ExpeditionData.challengeList)
                 {
                     if (ch is BingoUnlockChallenge b && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
                         ch.CompleteChallenge();
-                        if (BingoData.challengeTokens.Contains(d.tokenString)) BingoData.challengeTokens.Remove(d.tokenString);
+                        if (BingoData.challengeTokens.Contains(d.tokenString)) BingoData.challengeTokens.Remove(d.tokenString + (d.isRed ? "-safari" : ""));
                     }
                 }
 
@@ -899,7 +936,7 @@ namespace BingoMode.Challenges
         public delegate Color orig_TokenColor(CollectToken self);
         public static Color CollectToken_TokenColor_get(orig_TokenColor orig, CollectToken self)
         {
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString)) return new Color(1f,1f,1f,1f);
+            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString + (d.isRed ? "-safari" : ""))) return Color.white;//Color.Lerp(orig.Invoke(self), Color.white, 0.8f);
             else return orig.Invoke(self);
         }
 
@@ -919,7 +956,7 @@ namespace BingoMode.Challenges
                 c.Emit(OpCodes.Ldloc, 23);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
-                    if (self.roomSettings.placedObjects[i].data is CollectToken.CollectTokenData c && BingoData.challengeTokens.Contains(c.tokenString)) orig = false;
+                    if (self.roomSettings.placedObjects[i].data is CollectToken.CollectTokenData c && BingoData.challengeTokens.Contains(c.tokenString + (c.isRed ? "-safari" : ""))) orig = false;
                     return orig;
                 });
             }
@@ -928,7 +965,7 @@ namespace BingoMode.Challenges
         
         public static void Room_LoadedGreenNeuron(ILContext il)
         {
-            Plugin.logger.LogMessage("Ass " + il);
+            //Plugin.logger.LogMessage("Ass " + il);
             ILCursor b = new(il);
             if (b.TryGotoNext(
                 x => x.MatchLdsfld("Expedition.ExpeditionData", "startingDen")
@@ -943,7 +980,7 @@ namespace BingoMode.Challenges
                 {
                     if (ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge))
                     {
-                        AbstractPhysicalObject startItem = new (room.world, ItemType.NSHSwarmer, null, pos, room.game.GetNewID());
+                        AbstractPhysicalObject startItem = new (room.world, ItemType.NSHSwarmer, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID());
                         room.abstractRoom.entities.Add(startItem);
                         startItem.Realize();
                         //Player player = room.game.Players[0].realizedCreature as Player;
@@ -968,6 +1005,7 @@ namespace BingoMode.Challenges
                 if (ExpeditionData.challengeList[j] is BingoEatChallenge c)
                 {
                     c.FoodEated(edible);
+                    Plugin.logger.LogMessage("Eated fo " + edible);
                 }
                 else if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood && edible is PhysicalObject p)
                 {

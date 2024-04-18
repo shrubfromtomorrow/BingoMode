@@ -114,7 +114,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 region = SettingBoxFromString(array[0]) as SettingBox<string>;
-                regionsToEnter = array[1].Split('|').ToList();
+                regionsToEnter = [.. array[1].Split('|')];
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");

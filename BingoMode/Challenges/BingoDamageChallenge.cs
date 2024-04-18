@@ -26,7 +26,7 @@ namespace BingoMode.Challenges
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times")
-                .Replace("<crit>", victim.Value == "_AnyCreature" ? "creatures" : ChallengeTools.creatureNames[new CreatureType(victim.Value).Index])
+                .Replace("<crit>", victim.Value == "Any Creature" ? "creatures" : ChallengeTools.creatureNames[new CreatureType(victim.Value).Index])
                 .Replace("<weapon>", ChallengeTools.ItemName(new(weapon.Value)))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
             string wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
 
             string crit;
-            if (UnityEngine.Random.value < 0.3f) crit = "_AnyCreature";
+            if (UnityEngine.Random.value < 0.3f) crit = "Any Creature";
             else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature.value;
             int amound = UnityEngine.Random.Range(2, 7);
 
@@ -67,7 +67,7 @@ namespace BingoMode.Challenges
             Plugin.logger.LogMessage("hit " + weaponn.value + " " + weapon.Value);
             bool glug = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;
-            if (victim.Value == "_AnyCreature" && victimm is not Player) glug = true;
+            if (victim.Value == "Any Creature" && victimm is not Player) glug = true;
 
             if (weaponn.value.ToLowerInvariant() == weapon.Value.ToLowerInvariant() && glug)
             {

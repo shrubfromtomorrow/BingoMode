@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Expedition;
-using RWCustom;
-using Menu;
-using Menu.Remix;
-using UnityEngine;
+﻿using BingoMode.BingoSteamworks;
 using BingoMode.Challenges;
+using Expedition;
+using Menu;
+using RWCustom;
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Security.Cryptography;
+using UnityEngine;
 
 namespace BingoMode
 {
@@ -66,6 +61,7 @@ namespace BingoMode
             {
                 Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
             }
+            SteamTest.UpdateOnlineBingo();
             UpdateChallenges();
         }
 
@@ -74,6 +70,18 @@ namespace BingoMode
             foreach (Challenge c in ExpeditionData.challengeList)
             {
                 c.UpdateDescription();
+            }
+            ExpeditionMenu self = BingoData.globalMenu;
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.grid != null)
+            {
+                if (page.grid != null)
+                {
+                    page.grid.RemoveSprites();
+                    page.RemoveSubObject(page.grid);
+                    page.grid = null;
+                }
+                page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
+                page.subObjects.Add(page.grid);
             }
         }
 
@@ -161,7 +169,7 @@ namespace BingoMode
             return won;
         }
 
-        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, bool add = true)
+        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false)
         {
             if (BingoData.availableBingoChallenges == null)
             {
@@ -195,12 +203,13 @@ namespace BingoMode
             }
 
             if (ch == null) goto resette;
-            if (add) ExpeditionData.challengeList.Add(ch);
+            if (!ExpeditionData.challengeList.Contains(ch) && !ignore) ExpeditionData.challengeList.Add(ch);
             return ch;
         }
 
         public void RecreateFromList()
         {
+            Plugin.logger.LogMessage("Recreating from list " + (recreateList != null ? recreateList.Count : "SHITS NULL"));
             if (recreateList != null && recreateList.Count == size * size)
             {
                 int next = 0;
@@ -219,10 +228,16 @@ namespace BingoMode
                         next++;
                     }
                 }
-                recreateList = [];
                 Plugin.logger.LogMessage("Recreated list from thinj yipe");
+                Plugin.logger.LogMessage("Current recreated challenge list");
+                foreach (var gruh in ExpeditionData.challengeList)
+                {
+                    Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
+                }
+                SteamTest.UpdateOnlineBingo();
+                UpdateChallenges();
             }
-            //else GenerateBoard(size);
+            recreateList = [];
         }
 
         public void SetChallenge(int x, int y, Challenge newChallenge, int index)
@@ -230,10 +245,11 @@ namespace BingoMode
             try
             {
                 int g1 = index == -1 ? ExpeditionData.challengeList.IndexOf(challengeGrid[x, y]) : index;
-                //(newChallenge as IBingoChallenge).Index = g1;
+                Plugin.logger.LogMessage("Inserting ch to " + g1);
                 ExpeditionData.challengeList.Remove(challengeGrid[x, y]);
                 challengeGrid[x, y] = newChallenge;
                 ExpeditionData.challengeList.Insert(g1, challengeGrid[x, y]);
+                SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
             }
             catch (Exception e)
@@ -254,16 +270,18 @@ namespace BingoMode
             Plugin.logger.LogMessage("Bingo board from string:\n" + text);
             ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
             string[] challenges = Regex.Split(text, "bChG");
-            int size = Mathf.FloorToInt(challenges.Length / 2f);
+            size = Mathf.FloorToInt(Mathf.Sqrt(challenges.Length));
             int next = 0;
+            foreach (var gu in challenges) Plugin.logger.LogWarning(gu);
+            challengeGrid = new Challenge[size, size];
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
+                    Plugin.logger.LogMessage("S - " + challenges.Length);
                     try
                     {
-                        string[] array10 = Regex.Split(challenges[i], "#");
-                        string[] array11 = Regex.Split(array10[1], "~");
+                        string[] array11 = Regex.Split(challenges[next], "~");
                         string type = array11[0];
                         string text2 = array11[1];
                         Challenge challenge = (Challenge)Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == type).GetType());
@@ -278,11 +296,12 @@ namespace BingoMode
                     }
                     catch (Exception ex)
                     {
-                        Plugin.logger.LogError("ERROR: Problem recreating challenge type with reflection in bingoboard.fromstring: " + ex.Message);
+                        Plugin.logger.LogError("ERROR: Problem recreating challenge \"" + challenges[next] + "\" with reflection in bingoboard.fromstring: " + ex.Message);
                     }
                     next++;
                 }
             }
+            UpdateChallenges();
         }
 
         public void CompleteChallengeAt(int x, int y)

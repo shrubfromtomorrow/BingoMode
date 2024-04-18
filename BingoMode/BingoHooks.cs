@@ -27,7 +27,7 @@ namespace BingoMode
             // Ignoring bingo challenges in bingo (has to be done here)
             On.Expedition.ChallengeOrganizer.SetupChallengeTypes += ChallengeOrganizer_SetupChallengeTypes;
             // Remove all hooks while at it
-            On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
+            //On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
             // Add the bingo challenges when loading challenges from string
             IL.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromStringIL;
             On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
@@ -41,6 +41,13 @@ namespace BingoMode
                 GlobalBoard.recreateList = [];
             }
             orig.Invoke(self, saveString); // IL hook
+            if (GlobalBoard != null)
+            {
+                for (int i = 0; i < GlobalBoard.recreateList.Count; i++)
+                {
+                    Plugin.logger.LogMessage(i + " - " + GlobalBoard.recreateList[i]);
+                }
+            }
             if (GlobalBoard != null) GlobalBoard.RecreateFromList();
         }
 
@@ -159,12 +166,12 @@ namespace BingoMode
             else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 4 threw!!! " + il);
         }
 
-        public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
-        {
-            orig.Invoke();
-
-            try { BingoData.HookAll(ExpeditionData.challengeList, false); } catch { }
-        }
+       //public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
+       //{
+       //    orig.Invoke();
+       //
+       //    try { BingoData.HookAll(ExpeditionData.challengeList, false); } catch { }
+       //}
 
         public static void ChallengeOrganizer_SetupChallengeTypes(On.Expedition.ChallengeOrganizer.orig_SetupChallengeTypes orig)
         {
@@ -207,6 +214,46 @@ namespace BingoMode
 
             // Saving and loaading shit
             IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
+            On.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToString;
+
+            // Preventing expedition antics
+            IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
+
+            //Custom den
+            On.Expedition.ExpeditionGame.ExpeditionRandomStarts += ExpeditionGame_ExpeditionRandomStarts;
+        }
+
+        private static string ExpeditionGame_ExpeditionRandomStarts(On.Expedition.ExpeditionGame.orig_ExpeditionRandomStarts orig, RainWorld rainWorld, SlugcatStats.Name slug)
+        {
+            if (BingoData.BingoMode) return BingoData.RandomBingoDen(slug);
+            else return orig.Invoke(rainWorld, slug);
+        }
+
+        private static string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
+        {
+            Plugin.logger.LogMessage("Current challenge list tostring");
+            foreach (var gruh in ExpeditionData.challengeList)
+            {
+                Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
+            }
+            return orig.Invoke(self);
+        }
+
+        private static void RainWorldGame_GoToDeathScreen(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld("ModManager", "Expedition")
+                ))
+            {
+                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                {
+                    if (BingoData.BingoMode) orig = false;
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogMessage("RainWorldGame_GoToDeathScreen IL failed!!!! " + il);
         }
 
         private static void ExpeditionCoreFile_ToStringIL(ILContext il)
@@ -375,8 +422,10 @@ namespace BingoMode
         public static void ExpeditionMenu_ctor(On.Menu.ExpeditionMenu.orig_ctor orig, ExpeditionMenu self, ProcessManager manager)
         {
             orig.Invoke(self, manager);
-
+            if (ExpeditionData.challengeList != null && ExpeditionData.challengeList.Count > 0) BingoData.HookAll(ExpeditionData.challengeList, false);
             self.pages.Add(new Page(self, null, "BINGO", 4));
+            BingoData.globalMenu = self;
+            BingoData.MultiplayerGame = false;
         }
 
         public static void ExpeditionMenu_InitMenuPages(On.Menu.ExpeditionMenu.orig_InitMenuPages orig, ExpeditionMenu self)
@@ -420,7 +469,7 @@ namespace BingoMode
                         for (int j = 0; j < size; j++)
                         {
                             GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
-                            ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
+                            //ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
                             chIndex++;
                         }
                     }

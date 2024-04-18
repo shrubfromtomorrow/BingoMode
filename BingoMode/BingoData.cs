@@ -13,12 +13,16 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode
 {
+    using BingoSteamworks;
     using Challenges;
     using MoreSlugcats;
+    using System.IO;
+    using System.Text.RegularExpressions;
 
     public static class BingoData
     {
-        public static bool BingoMode = false;
+        public static bool BingoMode;
+        public static bool MultiplayerGame;
         public static Dictionary<SlugcatStats.Name, int> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
@@ -28,6 +32,9 @@ namespace BingoMode
         // This prevents the same creatures being hit by the same sources multiple times
         public static Dictionary<Creature, List<EntityID>> blacklist = [];
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
+        public static ExpeditionMenu globalMenu;
+        public static LobbySettings globalSettings = new LobbySettings();
+        public static string BingoDen = "random";
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
@@ -42,12 +49,17 @@ namespace BingoMode
         {
             BingoMode = true;
             appliedChallenges = [];
+            HookAll(ExpeditionData.challengeList, false);
             HookAll(ExpeditionData.challengeList, true);
 
             challengeTokens.Clear();
             foreach (Challenge challenge in ExpeditionData.challengeList)
             {
-                if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock.Value)) challengeTokens.Add(c.unlock.Value);
+                if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock.Value))
+                {
+                    challengeTokens.Add(c.unlock.Value);
+                    Plugin.logger.LogMessage("Addunlock " + c.unlock.Value);
+                }
             }
             heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
             blacklist = [];
@@ -61,20 +73,111 @@ namespace BingoMode
             Expedition.Expedition.coreFile.Save(false);
         }
 
+        // Mostly taken from vanilla game
+        public static string RandomBingoDen(SlugcatStats.Name slug)
+        {
+            if (BingoDen != "random") return BingoDen;
+
+            List<string> bannedRegions = [];
+            foreach (Challenge ch in ExpeditionData.challengeList)
+            {
+                if (ch is BingoAllRegionsExcept a)
+                {
+                    bannedRegions.Add(a.region.Value);
+                }
+                else if (ch is BingoNoRegionChallenge b)
+                {
+                    bannedRegions.Add(b.region.Value);
+                }
+            }
+
+            Dictionary<string, int> dictionary = [];
+            Dictionary<string, List<string>> dictionary2 = [];
+            List<string> list2 = SlugcatStats.SlugcatStoryRegions(slug);
+            if (File.Exists(AssetManager.ResolveFilePath("randomstarts.txt")))
+            {
+                string[] array = File.ReadAllLines(AssetManager.ResolveFilePath("randomstarts.txt"));
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (!array[i].StartsWith("//") && array[i].Length > 0)
+                    {
+                        string text = Regex.Split(array[i], "_")[0];
+                        if (ExpeditionGame.lastRandomRegion != text && !bannedRegions.Contains(text))
+                        {
+                            if (!dictionary2.ContainsKey(text))
+                            {
+                                dictionary2.Add(text, new List<string>());
+                            }
+                            if (list2.Contains(text))
+                            {
+                                dictionary2[text].Add(array[i]);
+                            }
+                            else if (ModManager.MSC && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow))
+                            {
+                                if (text == "OE" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Gourmand))
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                                if (text == "LC" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Artificer))
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                                if (text == "MS" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Rivulet) && array[i] != "MS_S07")
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                            }
+
+                            if (dictionary2[text].Contains(array[i]) && !dictionary.ContainsKey(text))
+                            {
+                                dictionary.Add(text, ExpeditionGame.GetRegionWeight(text));
+                            }
+                        }
+                    }
+                }
+                System.Random random = new();
+                int maxValue = dictionary.Values.Sum();
+                int randomIndex = random.Next(0, maxValue);
+                string key = dictionary.First(delegate (KeyValuePair<string, int> x)
+                {
+                    randomIndex -= x.Value;
+                    return randomIndex < 0;
+                }).Key;
+                ExpeditionGame.lastRandomRegion = key;
+                int num = (from list in dictionary2.Values
+                           select list.Count).Sum();
+                string text2 = dictionary2[key].ElementAt(UnityEngine.Random.Range(0, dictionary2[key].Count - 1));
+                ExpLog.Log(string.Format("{0} | {1} valid regions for {2} with {3} possible dens", new object[]
+                {
+                    text2,
+                    dictionary.Keys.Count,
+                    slug.value,
+                    num
+                }));
+                return text2;
+            }
+            return "SU_S01";
+        }
+
         public static void HookAll(IEnumerable<Challenge> challenges, bool add)
         {
             if (!BingoMode) return;
             // literally what is this syntax
             foreach (IBingoChallenge challenge in from challenge in challenges where challenge is IBingoChallenge select challenge)
             {
-                string name = challenge.GetType().Name;
-                Plugin.logger.LogMessage(name);
+                string name = (challenge as Challenge).ChallengeName();
+                Plugin.logger.LogMessage("Hooking " + name);
                 if (add && !appliedChallenges.Contains(name))
                 {
                     challenge.AddHooks();
                     appliedChallenges.Add(name);
+                    Plugin.logger.LogMessage("Adding this one");
                 }
-                else if (!add) challenge.RemoveHooks();
+                else if (!add)
+                {
+                    challenge.RemoveHooks();
+                    Plugin.logger.LogMessage("Removing this one");
+                }
             }
         }
 
@@ -90,7 +193,6 @@ namespace BingoMode
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
                     if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
-                    if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
                         Plugin.logger.LogMessage("ACCESSIBLE BLUE: " + kvp.Value[n].value);
@@ -104,6 +206,8 @@ namespace BingoMode
                 {
                     if (!Custom.rainWorld.regionGoldTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
+                    if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;
+                    if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                     if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
                         Plugin.logger.LogMessage("ACCESSIBLE GOLD: " + kvp.Value[n].value);
@@ -115,6 +219,8 @@ namespace BingoMode
             {
                 if (!Custom.rainWorld.regionRedTokensAccessibility.ContainsKey(kvp.Key)) continue;
                 if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
+                if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;
+                if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
                     if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && SlugcatStats.SlugcatStoryRegions(slug).Concat(SlugcatStats.SlugcatOptionalRegions(slug)).Contains(kvp.Key.ToUpperInvariant()))

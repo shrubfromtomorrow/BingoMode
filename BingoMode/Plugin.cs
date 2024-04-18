@@ -50,6 +50,7 @@ namespace BingoMode
             //    }
             //}
 
+            if (!BingoData.MultiplayerGame) return;
             // How the fuck does this work
             IntPtr[] messges = new IntPtr[16];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
@@ -67,7 +68,7 @@ namespace BingoMode
                     Buffer.BlockCopy(data, 0, chars, 0, data.Length);
                     string message = new string(chars, 0, chars.Length);
                     Plugin.logger.LogMessage(message);
-                    //InnerWorkings.MessageReceived(message);
+                    InnerWorkings.MessageReceived(message);
                 }
             }
         }
@@ -85,7 +86,7 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                //SteamTest.Apply();
+                SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
                 BingoEnums.Register();

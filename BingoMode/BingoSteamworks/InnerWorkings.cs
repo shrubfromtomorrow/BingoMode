@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Steamworks;
+using BingoMode.Challenges;
 
 namespace BingoMode.BingoSteamworks
 {
@@ -31,7 +32,7 @@ namespace BingoMode.BingoSteamworks
         {
             char type = message[0];
             message = message.Substring(1);
-
+            Plugin.logger.LogMessage("MESSAGE TYPE IS " + type + " " + (type == '!'));
             string[] data = message.Split(new char[] { ';' });
             switch (type)
             {
@@ -45,7 +46,9 @@ namespace BingoMode.BingoSteamworks
 
                     if (int.TryParse(data[0], out int x) && int.TryParse(data[1], out int y))
                     {
-                        BingoHooks.GlobalBoard.challengeGrid[x, y].completed = !BingoHooks.GlobalBoard.challengeGrid[x, y].completed;
+                        Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
+                        if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
+                        else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         return true;
                     }
                     else
@@ -53,6 +56,29 @@ namespace BingoMode.BingoSteamworks
                         Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
+                // Update board
+                case '*':
+                    string challenjes = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "challenges");
+                    try
+                    {
+                        BingoHooks.GlobalBoard.FromString(challenjes);
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
+                        SteamTest.LeaveLobby();
+                    }
+                    return false;
+                // Begin game
+                case '!':
+                    if (SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+                    {
+                        page.startGame.buttonBehav.greyedOut = false;
+                        page.startGame.Clicked();
+                        return true;
+                    }
+                    return false;
             }
 
             return false;

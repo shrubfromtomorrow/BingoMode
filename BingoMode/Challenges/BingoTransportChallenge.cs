@@ -28,8 +28,8 @@ namespace BingoMode.Challenges
             }
             description = ChallengeTools.IGT.Translate("Transport a <crit><from><to>")
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'))
-                .Replace("<from>", from.Value != "null" ? (to.Value == "null" ? " out of " : " from ") + Region.GetRegionFullName(from.Value, ExpeditionData.slugcatPlayer) : "")
-                .Replace("<to>", to.Value != "null" ? $" to {Region.GetRegionFullName(to.Value, ExpeditionData.slugcatPlayer)}" : "");
+                .Replace("<from>", from.Value != "Any Region" ? (to.Value == "Any Region" ? " out of " : " from ") + Region.GetRegionFullName(from.Value, ExpeditionData.slugcatPlayer) : "")
+                .Replace("<to>", to.Value != "Any Region" ? $" to {Region.GetRegionFullName(to.Value, ExpeditionData.slugcatPlayer)}" : "");
             base.UpdateDescription();
         }
 
@@ -51,10 +51,10 @@ namespace BingoMode.Challenges
             string crug = possible[Random.Range(0, possible.Length - (ModManager.MSC && slug != SlugcatStats.Name.Red && slug != MoreSlugcatsEnums.SlugcatStatsName.Spear && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer ? 0 : 1))];
             List<string> origRegions = ChallengeUtils.CreatureOriginRegions(crug, slug);
             List<string> allRegions = crug == "JetFish" ? ["SB"] : [.. SlugcatStats.SlugcatStoryRegions(slug), .. SlugcatStats.SlugcatOptionalRegions(slug)];
-            string fromage = Random.value < 0.5f ? "null" : origRegions[Random.Range(0, origRegions.Count)];
+            string fromage = Random.value < 0.5f ? "Any Region" : origRegions[Random.Range(0, origRegions.Count)];
             allRegions.Remove(fromage);
             allRegions.Remove("MS");
-            string toto = fromage == "null" || Random.value < 0.5f ? allRegions[Random.Range(0, allRegions.Count)] : "null";
+            string toto = fromage == "Any Region" || Random.value < 0.5f ? allRegions[Random.Range(0, allRegions.Count)] : "Any Region";
             return new BingoTransportChallenge
             {
                 from = new(fromage, "From Region", 0, listName: "regions"),
@@ -69,7 +69,7 @@ namespace BingoMode.Challenges
             if (!completed && c.Template.type.value == crit.Value)
             {
                 string rr = c.room.world.region.name;
-                if ((rr == from.Value || from.Value == "null") && !origins.Contains(c.abstractCreature.ID))
+                if ((rr == from.Value || from.Value == "Any Region") && !origins.Contains(c.abstractCreature.ID))
                 {
                     origins.Add(c.abstractCreature.ID);
                     Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
@@ -84,7 +84,7 @@ namespace BingoMode.Challenges
             Plugin.logger.LogMessage(from);
             Plugin.logger.LogMessage(to);
             Plugin.logger.LogMessage("---------");
-            if (regionName != to.Value && to.Value != "null") return;
+            if (regionName != to.Value && to.Value != "Any Region") return;
             Plugin.logger.LogMessage("went thru");
             bool g = false;
             for (int i = 0; i < game.Players.Count; i++)
@@ -134,6 +134,7 @@ namespace BingoMode.Challenges
         // Origins later
         public override string ToString()
         {
+            Plugin.logger.LogMessage(string.Join("|", origins));
             return string.Concat(new string[]
             {
                 "BingoTransportChallenge",
@@ -165,10 +166,13 @@ namespace BingoMode.Challenges
                 string[] arr = array[3].Split('|');
                 origins = [];
                 Plugin.logger.LogMessage("Transport challenge origins list from string!");
-                foreach (var a in arr)
+                if (arr != null && arr.Length > 0)
                 {
-                    Plugin.logger.LogMessage(a);
-                    origins.Add(EntityID.FromString(a));
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        Plugin.logger.LogMessage(arr[i]);
+                        if (arr[i] != string.Empty) origins.Add(EntityID.FromString(arr[i]));
+                    }
                 }
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");

@@ -1,22 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Expedition;
+﻿using Expedition;
 using HUD;
-using Menu;
-using Menu.Remix;
-using UnityEngine;
 using RWCustom;
-using Steamworks;
+using UnityEngine;
 
 namespace BingoMode
 {
-    using BingoMode.Challenges;
-    using BingoSteamworks;
-
     public class BingoHUD : HudPart
     {
         public BingoBoard board;
@@ -122,6 +110,11 @@ namespace BingoMode
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
+                if (hud == null) Plugin.logger.LogMessage("ERROR 1");
+                if (owner == null) Plugin.logger.LogMessage("ERROR 2");
+                if (pos == null) Plugin.logger.LogMessage("ERROR 3");
+                if (container == null) Plugin.logger.LogMessage("ERROR 4");
+                if (challenge == null) Plugin.logger.LogMessage("ERROR 5");
                 this.hud = hud;
                 this.pos = pos;
                 this.size = size;
@@ -173,13 +166,14 @@ namespace BingoMode
                     sprite.color = Color.blue;
                     if (owner.MousePressed)
                     {
-                        challenge.completed = !challenge.completed;
+                        challenge.CompleteChallenge();//.completed = !challenge.completed;
                         //CSteamID id = (CSteamID)76561198140779563;
                         //SteamNetworkingIdentity identity = new SteamNetworkingIdentity();
                         //identity.SetSteamID(id);
                         //InnerWorkings.SendMessage($"#{x - 1};{y}", identity);
                     }
                 }
+                else if (challenge.hidden) sprite.color = new Color(0.01f, 0.01f, 0.01f);
                 else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 else sprite.color = Color.grey;
             }

@@ -129,7 +129,7 @@ namespace BingoMode.Challenges
                 foreach (var s in dict)
                 {
                     string[] kv = s.Split('|');
-                    traderItems[EntityID.FromString(kv[0])] = EntityID.FromString(kv[1]);
+                    if (kv[0] != string.Empty && kv[1] != string.Empty) traderItems[EntityID.FromString(kv[0])] = EntityID.FromString(kv[1]);
                 }
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");

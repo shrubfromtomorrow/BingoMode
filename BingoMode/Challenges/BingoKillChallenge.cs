@@ -14,7 +14,7 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoKillChallenge : Challenge, IBingoChallenge
     {
-        public SettingBox<string> crit; // If "any", then means you can kill any creature
+        public SettingBox<string> crit;
         public SettingBox<string> weapon;
         public int current; 
         public SettingBox<int> amount; 
@@ -47,7 +47,7 @@ namespace BingoMode.Challenges
             {
                 ExpLog.Log("Error getting creature name for BingoKillChallenge | " + ex.Message);
             }
-            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
+            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             description = ChallengeTools.IGT.Translate("Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
@@ -100,7 +100,7 @@ namespace BingoMode.Challenges
                 starve = new(starvv, "While Starving", 2),
                 oneCycle = new(onePiece, "In one Cycle", 3),
                 sub = new("", "Subregion", 4, listName: "regions"),
-                region = new("", "Region", 5, listName: "regions"),
+                region = new("Any Region", "Region", 5, listName: "regions"),
                 room = new("", "Room", 6, listName: "regions"),
                 weapon = new(weapo, "Weapon Used", 7, listName: "weapons"),
                 deathPit = new(false, "Via a Death Pit", 8)
@@ -110,7 +110,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (oneCycle.Value && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (!completed && oneCycle.Value && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.current != 0)
                 {
@@ -144,7 +144,7 @@ namespace BingoMode.Challenges
 
         public bool CritInLocation(Creature crit)
         {
-            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "boowomp";
+            string location = room.Value != "" ? room.Value : sub.Value != "" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "boowomp";
             AbstractRoom rom = crit.room.abstractRoom;
             if (location == room.Value)
             {

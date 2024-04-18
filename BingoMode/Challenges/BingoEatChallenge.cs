@@ -95,7 +95,8 @@ namespace BingoMode.Challenges
     
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
-            if (thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
+            if (thisEdibleIsShit is PhysicalObject gasd) Plugin.logger.LogMessage($"Eated: {gasd.abstractPhysicalObject.type}. Our type: {foodType.Value}");
+            if (!completed && thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
             {
                 currentEated++;
@@ -152,6 +153,11 @@ namespace BingoMode.Challenges
                 ExpLog.Log("ERROR: BingoEatChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
+        }
+
+        public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
+        {
+            return slugcat.value != "Spear";
         }
 
         public void AddHooks()
