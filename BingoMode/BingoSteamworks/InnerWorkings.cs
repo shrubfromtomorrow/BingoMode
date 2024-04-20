@@ -57,25 +57,26 @@ namespace BingoMode.BingoSteamworks
                         return false;
                     }
                 // Update board
-                case '*':
-                    string challenjes = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "challenges");
-                    try
-                    {
-                        BingoHooks.GlobalBoard.FromString(challenjes);
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
-                        SteamTest.LeaveLobby();
-                    }
-                    return false;
+                //case '*':
+                //    string challenjes = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "challenges");
+                //    try
+                //    {
+                //        BingoHooks.GlobalBoard.FromString(challenjes);
+                //        return true;
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
+                //        SteamTest.LeaveLobby();
+                //    }
+                //    return false;
                 // Begin game
                 case '!':
                     if (SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
                         page.startGame.buttonBehav.greyedOut = false;
                         page.startGame.Clicked();
+                        SteamTest.LeaveLobby();
                         return true;
                     }
                     return false;

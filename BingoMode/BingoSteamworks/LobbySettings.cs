@@ -25,6 +25,7 @@ namespace BingoMode.BingoSteamworks
         public AllowUnlocks perks;
         public AllowUnlocks burdens;
         public List<string> bannedMods; //Ids
+        public int maxPlayers;
 
         public LobbySettings()
         {
@@ -37,6 +38,7 @@ namespace BingoMode.BingoSteamworks
             perks = AllowUnlocks.Any;
             burdens = AllowUnlocks.Any;
             bannedMods.Clear();
+            maxPlayers = 0;
         }
     }
 }

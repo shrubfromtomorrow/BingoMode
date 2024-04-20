@@ -93,6 +93,7 @@
     <Compile Include="BingoHooks.cs" />
     <Compile Include="BingoPage.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
+    <Compile Include="BingoSteamworks\LobbyFilters.cs" />
     <Compile Include="BingoSteamworks\LobbySettings.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
     <Compile Include="BingoLoseScreen.cs" />

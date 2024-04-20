@@ -221,6 +221,30 @@ namespace BingoMode
 
             //Custom den
             On.Expedition.ExpeditionGame.ExpeditionRandomStarts += ExpeditionGame_ExpeditionRandomStarts;
+
+            // Multiplayer lobbies slider
+            On.Menu.ExpeditionMenu.SliderSetValue += ExpeditionMenu_SliderSetValue;
+            On.Menu.ExpeditionMenu.ValueOfSlider += ExpeditionMenu_ValueOfSlider;
+        }
+
+        private static float ExpeditionMenu_ValueOfSlider(On.Menu.ExpeditionMenu.orig_ValueOfSlider orig, ExpeditionMenu self, Slider slider)
+        {
+            if (slider.ID == BingoEnums.MultiplayerSlider && bingoPage.TryGetValue(self, out var page))
+            {
+                return page.ValueOfSlider(slider);
+            }
+
+            return orig.Invoke(self, slider);
+        }
+
+        private static void ExpeditionMenu_SliderSetValue(On.Menu.ExpeditionMenu.orig_SliderSetValue orig, ExpeditionMenu self, Slider slider, float f)
+        {
+            orig.Invoke(self, slider, f);
+
+            if (slider.ID == BingoEnums.MultiplayerSlider && bingoPage.TryGetValue(self, out var page))
+            {
+                page.SliderSetValue(slider, f);
+            }
         }
 
         private static string ExpeditionGame_ExpeditionRandomStarts(On.Expedition.ExpeditionGame.orig_ExpeditionRandomStarts orig, RainWorld rainWorld, SlugcatStats.Name slug)
