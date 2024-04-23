@@ -122,6 +122,10 @@ namespace BingoMode.BingoSteamworks
                 {
                     page.AddLobbies(JoinableLobbies);
                 }
+                else
+                {
+                    Plugin.logger.LogError("FAILED TO ADD FRIENDS' LOBBIES");
+                }
                 return;
             }
 
@@ -230,7 +234,14 @@ namespace BingoMode.BingoSteamworks
                 LeaveLobby();
                 return;
             }
-            Plugin.logger.LogMessage("Set team number to " + team);
+            Plugin.logger.LogMessage("Set team number to " + team); 
+            if (!int.TryParse(SteamMatchmaking.GetLobbyData(lobbyID, "maxPlayers"), out int maxPayne))
+            {
+                Plugin.logger.LogError("FAILED TO PARSE MAX PAYNE HIT VIDEO GAME FROM LOBBY");
+                LeaveLobby();
+                return;
+            }
+            BingoData.globalSettings.maxPlayers = maxPayne;
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");
             try
             {

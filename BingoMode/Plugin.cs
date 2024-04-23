@@ -8,6 +8,7 @@ using System.Security.Permissions;
 #pragma warning disable CS0618
 [module: UnverifiableCode]
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
+#pragma warning restore CS0618
 
 namespace BingoMode
 {
@@ -60,14 +61,14 @@ namespace BingoMode
                 {
                     SteamNetworkingMessage_t netMessage = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messges[i]);
 
-                    Plugin.logger.LogMessage("RECEIVED MESSAG???");
+                    logger.LogMessage("RECEIVED MESSAG???");
 
                     byte[] data = new byte[netMessage.m_cbSize];
                     Marshal.Copy(netMessage.m_pData, data, 0, data.Length);
                     char[] chars = new char[data.Length / sizeof(char)];
                     Buffer.BlockCopy(data, 0, chars, 0, data.Length);
                     string message = new string(chars, 0, chars.Length);
-                    Plugin.logger.LogMessage(message);
+                    logger.LogMessage(message);
                     InnerWorkings.MessageReceived(message);
                 }
             }

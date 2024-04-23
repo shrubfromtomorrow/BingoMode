@@ -11,7 +11,6 @@ using Steamworks;
 namespace BingoMode
 {
     using BingoSteamworks;
-    using System;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -157,7 +156,7 @@ namespace BingoMode
             distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
             nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
 
-            slider = new VerticalSlider(menu, this, "", new Vector2(380f, 47f), new Vector2(30f, 500f), BingoEnums.MultiplayerSlider, true) { floatValue = 1f };
+            slider = new VerticalSlider(menu, this, "", new Vector2(375f, 47f), new Vector2(30f, 500f), BingoEnums.MultiplayerSlider, true) { floatValue = 1f };
             foreach (var line in slider.lineSprites)
             {
                 line.alpha = 0f;
@@ -198,6 +197,7 @@ namespace BingoMode
             {
                 expMenu.UpdatePage(1);
                 expMenu.MovePage(new Vector2(-1500f, 0f));
+                return;
             }
 
             if (message == "STARTBINGO")
@@ -247,38 +247,39 @@ namespace BingoMode
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
                 SteamTest.BroadcastStartGame();
+                return;
             }
 
             if (message == "RANDOMIZE")
             {
                 Regen(false);
+                return;
             }
 
             if (message == "ADDSIZE")
             {
                 BingoHooks.GlobalBoard.size += 1;
                 Regen(true);
+                return;
             }
 
             if (message == "REMOVESIZE")
             {
                 BingoHooks.GlobalBoard.size = Mathf.Max(1, BingoHooks.GlobalBoard.size - 1);
                 Regen(true);
+                return;
             }
 
             if (message == "CREATE_LOBBY")
             {
                 SteamTest.CreateLobby();
-            }
-
-            if (message == "JOIN_LOBBY")
-            {
-                SteamTest.GetJoinableLobbies();
+                return;
             }
 
             if (message == "LEAVE_LOBBY")
             {
                 SteamTest.LeaveLobby();
+                return;
             }
 
             if (message == "SWITCH_MULTIPLAYER")
@@ -290,6 +291,7 @@ namespace BingoMode
                 {
                     line.alpha = ff;
                 }
+                return;
             }
 
             if (message == "REFRESH_SEARCH")
@@ -298,44 +300,58 @@ namespace BingoMode
 
                 //SteamTest.GetJoinableLobbies();
                 foundLobbies = [];
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo((CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "GamsaGamsaGamsaGamsaGamsaGamsass's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
                 CreateDisplayedLobbies();
+                return;
             }
 
             if (message == "TOGGLE_FRIENDSONLY")
             {
                 SteamTest.CurrentFilters.friendsOnly = !SteamTest.CurrentFilters.friendsOnly;
                 friendsNoFriends.symbolSprite.SetElementByName(SteamTest.CurrentFilters.friendsOnly ? "Kill_Slugcat" : "Multiplayer_Death");
+                return;
+            }
+
+            if (message.StartsWith("JOIN-"))
+            {
+                if (ulong.TryParse(message.Split('-')[1], out ulong lobid))
+                {
+                    Plugin.logger.LogMessage(lobid);
+                    var call = SteamMatchmaking.JoinLobby((CSteamID)lobid);
+                    SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
+                }
+                else Plugin.logger.LogError("FAILED TO PARSE LOBBY ULONG FROM " + message);
+                return;
             }
         }
 
@@ -519,7 +535,7 @@ namespace BingoMode
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens"), System.Globalization.NumberStyles.Any));
 
                     Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Game mode - {gameMode}, Perks - {perks}, Burdens - {burdens}");
-                    foundLobbies.Add(new LobbyInfo(lobby, name, maxPlayers, currentPlayers, lockout, gameMode, perks, burdens));
+                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, gameMode, perks, burdens));
                 }
                 catch (System.Exception e)
                 {
@@ -560,8 +576,11 @@ namespace BingoMode
             public FLabel nameLabel;
             public FLabel playerLabel;
             public float maxAlpha;
+            public SimpleButton clicky;
+            BingoPage page;
+            public InfoPanel panel;
 
-            public LobbyInfo(CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool gameMode, AllowUnlocks perks, AllowUnlocks burdens)
+            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool gameMode, AllowUnlocks perks, AllowUnlocks burdens)
             {
                 this.lobbyID = lobbyID;
                 this.name = name;
@@ -571,6 +590,7 @@ namespace BingoMode
                 this.gameMode = gameMode;
                 this.perks = perks;
                 this.burdens = burdens;
+                this.page = page;
 
                 nameLabel = new FLabel(Custom.GetFont(), name)
                 {
@@ -578,6 +598,11 @@ namespace BingoMode
                     anchorX = 0,
                 };
                 playerLabel = new FLabel(Custom.GetFont(), currentPlayers + "/" + maxPlayers);
+
+                clicky = new SimpleButton(page.menu, page, "", "JOIN-" + lobbyID.ToString(), default, new Vector2(352f, 20f));
+                page.subObjects.Add(clicky);
+
+                panel = new InfoPanel(page, this);
             }
 
             public void Draw(Vector2 origPos, float timeStacker)
@@ -588,12 +613,131 @@ namespace BingoMode
                 float a = Mathf.Clamp01(maxAlpha); // - 0.5f * Mathf.Abs(Mathf.Sin(Mathf.Lerp(buttonBehav.lastSin, buttonBehav.sin, timeStacker) / 30f * Mathf.PI))
                 nameLabel.alpha = a;
                 playerLabel.alpha = a;
+
+                foreach (var sprit in clicky.roundedRect.sprites)
+                {
+                    sprit.alpha = 0f;
+                }
+                clicky.roundedRect.fillAlpha = 0f;
+                clicky.roundedRect.lasFillAplha = 0f;
+
+                clicky.pos = origPos - new Vector2(5f, 10f);
+                clicky.buttonBehav.greyedOut = a < 0.5f;
+
+                panel.visible = clicky.IsMouseOverMe && a > 0.5f;
+                panel.Draw(origPos + new Vector2(350f, 0f));
             }
 
             public void Remove()
             {
                 nameLabel.RemoveFromContainer();
                 playerLabel.RemoveFromContainer();
+                page.RemoveSubObject(clicky);
+                panel.Remove();
+            }
+
+            public class InfoPanel
+            {
+                public FSprite[] border = new FSprite[4];
+                public FSprite background;
+                public FLabel[] labels = new FLabel[5];
+                public bool visible;
+                readonly float width = 180f;
+                readonly float height = 80f;
+
+                public InfoPanel(BingoPage page, LobbyInfo info)
+                {
+                    background = new FSprite("pixel")
+                    {
+                        scaleX = width,
+                        scaleY = height,
+                        anchorX = 0f,
+                        anchorY = 0f,
+                        color = new Color(0.001f, 0.001f, 0.001f),
+                        alpha = 0.9f
+                    };
+                    page.Container.AddChild(background);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        border[i] = new FSprite("pixel")
+                        {
+                            anchorX = 0f,
+                            anchorY = 0f,
+                            scaleX = width,
+                            scaleY = 2f,
+                            shader = page.menu.manager.rainWorld.Shaders["MenuText"]
+                        };
+                        page.Container.AddChild(border[i]);
+                    }
+                    for (int i = 2; i < 4; i++)
+                    {
+                        border[i] = new FSprite("pixel")
+                        {
+                            anchorX = 0f,
+                            anchorY = 0f,
+                            scaleX = 2f,
+                            scaleY = height,
+                            shader = page.menu.manager.rainWorld.Shaders["MenuText"]
+                        };
+                        page.Container.AddChild(border[i]);
+                    }
+                    for (int i = 0; i < 5; i++)
+                    {
+                        labels[i] = new FLabel(Custom.GetFont(), "")
+                        {
+                            shader = page.menu.manager.rainWorld.Shaders["MenuText"],
+                            anchorX = 0f,
+                            anchorY = 0f,
+                            alignment = FLabelAlignment.Center
+                        };
+                        page.Container.AddChild(labels[i]);
+                    }
+
+                    labels[0].text = "Lockout: " + (info.lockout ? "Yes" : "No");
+                    labels[1].text = "Game Mode: " + (info.gameMode ? "Teams" : "Versus");
+                    labels[2].text = "Perks: " + (info.perks == AllowUnlocks.Any ? "Allowed" : info.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
+                    labels[3].text = "Burdens: " + (info.burdens == AllowUnlocks.Any ? "Allowed" : info.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
+                    labels[4].text = "Banned cheat mods: TO-DO";//(info. ? "YES" : "NO");
+                }
+
+                public void Draw(Vector2 pos)
+                {
+                    pos.y -= height / 2f;
+                    for (int i = 0; i < border.Length; i++)
+                    {
+                        border[i].isVisible = visible;
+                    }
+                    for (int i = 0; i < labels.Length; i++)
+                    {
+                        labels[i].isVisible = visible;
+                    }
+                    background.isVisible = visible;
+                    border[0].SetPosition(pos);
+                    border[1].SetPosition(pos + new Vector2(0f, height));
+                    border[2].SetPosition(pos);
+                    border[3].SetPosition(pos + new Vector2(width, 0f));
+                    background.SetPosition(pos);
+                    float xDif = width / 2f;
+                    float yDif = height / 5f;
+                    labels[0].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 4f));
+                    labels[1].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 3f));
+                    labels[2].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 2f));
+                    labels[3].SetPosition(pos + new Vector2(xDif, 1.5f + yDif));
+                    labels[4].SetPosition(pos + new Vector2(xDif, 1.5f));
+                }
+
+                public void Remove()
+                {
+                    for (int i = 0; i < border.Length; i++)
+                    {
+                        border[i].RemoveFromContainer();
+                    }
+                    for (int i = 0; i < labels.Length; i++)
+                    {
+                        labels[i].RemoveFromContainer();
+                    }
+                    background.RemoveFromContainer();
+                }
             }
         }
     }
