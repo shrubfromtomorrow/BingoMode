@@ -63,7 +63,6 @@ namespace BingoMode
             page = new MenuLabel(this, pages[0], ">                 <", default, new Vector2(50f, 6f), false);
             pages[0].subObjects.Add(page);
 
-            dividers = new FSprite[3];
             num = 85f;
             float num2 = LabelTest.GetWidth(Translate("CLOSE"), false) + 10f;
             if (num2 > num)
@@ -73,6 +72,7 @@ namespace BingoMode
             closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", outOfBounds, new Vector2(num, 35f));
             pages[0].subObjects.Add(closeButton);
 
+            dividers = new FSprite[3];
             for (int i = 0; i < 3; i++)
             {
                 dividers[i] = new FSprite("pixel")
@@ -316,6 +316,10 @@ namespace BingoMode
             {
                 pageTitle.RemoveFromContainer();
                 description.RemoveFromContainer();
+                for (int i = 0; i < 3; i++)
+                {
+                    dividers[i].RemoveFromContainer();
+                }
                 manager.StopSideProcess(this);
                 closing = false;
                 tab._Unload();

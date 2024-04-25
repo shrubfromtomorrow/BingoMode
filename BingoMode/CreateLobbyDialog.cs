@@ -9,10 +9,289 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
+using System.Runtime;
+using BingoMode.BingoSteamworks;
 
 namespace BingoMode
 {
-    internal class CreateLobbyDialog
+    public class CreateLobbyDialog : Dialog, CheckBox.IOwnCheckBox
     {
+        float leftAnchor;
+        bool opening;
+        bool closing;
+        float uAlpha;
+        float currentAlpha;
+        float lastAlpha;
+        float targetAlpha;
+        float num;
+        BingoPage owner;
+        FSprite pageTitle;
+        SimpleButton closeButton;
+        SimpleButton createButton;
+        CheckBox lockout;
+        CheckBox gameMode;
+        CheckBox friendsOnly;
+        CheckBox banCheats;
+        CheckBox[] perks;
+        CheckBox[] burdens;
+        FLabel[] labels;
+        FSprite[] dividers;
+
+        public CreateLobbyDialog(ProcessManager manager, BingoPage owner) : base(manager)
+        {
+            float[] screenOffsets = Custom.GetScreenOffsets();
+            leftAnchor = screenOffsets[0];
+            this.owner = owner;
+            Vector2 outOfBounds = new Vector2(10000f, 10000f);
+
+            pageTitle = new FSprite("createlobby", true);
+            pageTitle.SetAnchor(0.5f, 0.5f);
+            pageTitle.x = 683f;
+            pageTitle.y = 715f;
+            pageTitle.shader = manager.rainWorld.Shaders["MenuText"];
+            pages[0].Container.AddChild(pageTitle);
+
+            num = 85f;
+            float num2 = LabelTest.GetWidth(Translate("CLOSE"), false) + 10f;
+            if (num2 > num)
+            {
+                num = num2;
+            }
+            closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", outOfBounds, new Vector2(num, 35f));
+            pages[0].subObjects.Add(closeButton);
+            createButton = new SimpleButton(this, pages[0], Translate("CREATE"), "CREATE", outOfBounds, new Vector2(num, 35f));
+            pages[0].subObjects.Add(createButton);
+
+            lockout = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Lockout: ", "LOCKOUT");
+            lockout.label.label.alignment = FLabelAlignment.Right;
+            pages[0].subObjects.Add(lockout);
+            gameMode = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Teams mode: ", "GAMEMODE");
+            gameMode.label.label.alignment = FLabelAlignment.Right;
+            pages[0].subObjects.Add(gameMode);
+            friendsOnly = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Friends only: ", "FRIENDS");
+            friendsOnly.label.label.alignment = FLabelAlignment.Right;
+            pages[0].subObjects.Add(friendsOnly);
+            banCheats = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Ban cheat mods: ", "CHEATS");
+            banCheats.label.label.alignment = FLabelAlignment.Right;
+            pages[0].subObjects.Add(banCheats);
+
+            perks = new CheckBox[3];
+            burdens = new CheckBox[3];
+            string[] texts = { "Allowed - ", "Disabled - ", "Host decides - " };
+            for (int i = 0; i < 3; i++)
+            {
+                perks[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "PERJ" + i.ToString());
+                perks[i].label.label.alignment = FLabelAlignment.Right;
+                pages[0].subObjects.Add(perks[i]);
+                burdens[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "BURJ" + i.ToString());
+                burdens[i].label.label.alignment = FLabelAlignment.Right;
+                pages[0].subObjects.Add(burdens[i]);
+            }
+
+            labels = new FLabel[2];
+            for (int i = 0; i < 2; i++)
+            {
+                labels[i] = new FLabel(Custom.GetFont(), i == 0 ? "Perks:" : "Burdens:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
+                pages[0].Container.AddChild(labels[i]);
+            }
+
+            dividers = new FSprite[2];
+            for (int i = 0; i < 2; i++)
+            {
+                dividers[i] = new FSprite("pixel")
+                {
+                    scaleY = 2,
+                    scaleX = 400,
+                };
+                pages[0].Container.AddChild(dividers[i]);
+            }
+
+            targetAlpha = 1f;
+            opening = true;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            lastAlpha = currentAlpha;
+            currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, 0.2f);
+            if (opening && pages[0].pos.y <= 0.01f)
+            {
+                opening = false;
+            }
+            if (closing && Math.Abs(currentAlpha - targetAlpha) < 0.09f)
+            {
+                pageTitle.RemoveFromContainer();
+                labels[0].RemoveFromContainer();
+                labels[1].RemoveFromContainer();
+                for (int i = 0; i < 2; i++)
+                {
+                    dividers[i].RemoveFromContainer();
+                }
+                manager.StopSideProcess(this);
+                closing = false;
+            }
+            closeButton.buttonBehav.greyedOut = opening;
+            createButton.buttonBehav.greyedOut = opening;
+        }
+
+        public override void GrafUpdate(float timeStacker)
+        {
+            base.GrafUpdate(timeStacker);
+
+            if (opening || closing)
+            {
+                uAlpha = Mathf.Pow(Mathf.Max(0f, Mathf.Lerp(lastAlpha, currentAlpha, timeStacker)), 1.5f);
+                darkSprite.alpha = uAlpha * 0.95f;
+            }
+            pages[0].pos.y = Mathf.Lerp(manager.rainWorld.options.ScreenSize.y + 100f, 0.01f, (uAlpha < 0.999f) ? uAlpha : 1f);
+
+            Vector2 pagePos = Vector2.Lerp(pages[0].lastPos, pages[0].pos, timeStacker);
+
+            pageTitle.SetPosition(new Vector2(683f - leftAnchor, 685f) + pagePos);
+
+            float xPos = 670f;
+            float yTop = 578f;
+            lockout.pos = new Vector2(xPos, yTop);
+            gameMode.pos = new Vector2(xPos, yTop - 30f);
+            friendsOnly.pos = new Vector2(xPos, yTop - 60f);
+            banCheats.pos = new Vector2(xPos, yTop - 90f);
+
+            for (int i = 0; i < 3; i++)
+            {
+                perks[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 150f);
+                burdens[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 200f);
+            }
+
+            labels[0].SetPosition(pagePos + new Vector2(xPos, yTop - 115f));
+            labels[1].SetPosition(pagePos + new Vector2(xPos, yTop - 165f)); 
+            
+            for (int i = 0; i < 2; i++)
+            {
+                dividers[i].alpha = darkSprite.alpha;
+            }
+            dividers[0].SetPosition(pagePos + new Vector2(xPos, yTop - 100f));
+            dividers[1].SetPosition(pagePos + new Vector2(xPos, yTop - 215f));
+
+            closeButton.pos = new Vector2(683f - num - 10f, yTop - 265f);
+            createButton.pos = new Vector2(683f + 10f, yTop - 265f);
+        }
+
+        public override void Singal(MenuObject sender, string message)
+        {
+            base.Singal(sender, message);
+            switch (message)
+            {
+                case "CLOSE":
+                    closing = true;
+                    targetAlpha = 0f;
+                    break;
+                case "CREATE":
+                    SteamTest.CreateLobby();
+                    closing = true;
+                    targetAlpha = 0f;
+                    // Disable all the shit in bingo page
+                    break;
+            }
+        }
+
+        public bool GetChecked(CheckBox box)
+        {
+            if (box.IDString == null) return false;
+            if (box.IDString.StartsWith("PERJ"))
+            {
+                int i = int.Parse(box.IDString.Substring(4), System.Globalization.NumberStyles.Any);
+                switch (i)
+                {
+                    case 0:
+                        return BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Any;
+                    case 1:
+                        return BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.None;
+                    case 2:
+                        return BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited;
+                }
+                return false;
+            }
+            if (box.IDString.StartsWith("BURJ"))
+            {
+                int i = int.Parse(box.IDString.Substring(4), System.Globalization.NumberStyles.Any);
+                switch (i)
+                {
+                    case 0:
+                        return BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.Any;
+                    case 1:
+                        return BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.None;
+                    case 2:
+                        return BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.Inherited;
+                }
+                return false;
+            }
+            switch (box.IDString)
+            {
+                case "LOCKOUT":
+                    return BingoData.globalSettings.lockout;
+                case "GAMEMODE":
+                    return BingoData.globalSettings.gameMode;
+                case "FRIENDS":
+                    return BingoData.globalSettings.friendsOnly;
+                case "CHEATS":
+                    return BingoData.globalSettings.banMods;
+            }
+            return false;
+        }
+
+        public void SetChecked(CheckBox box, bool c)
+        {
+            if (box.IDString == null) return;
+            if (box.IDString.StartsWith("PERJ"))
+            {
+                int i = int.Parse(box.IDString.Substring(4), System.Globalization.NumberStyles.Any);
+                switch (i)
+                {
+                    case 0:
+                        BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.Any;
+                        break;
+                    case 1:
+                        BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.None;
+                        break;
+                    case 2:
+                        BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.Inherited;
+                        break;
+                }
+                return;
+            }
+            if (box.IDString.StartsWith("BURJ"))
+            {
+                int i = int.Parse(box.IDString.Substring(4), System.Globalization.NumberStyles.Any);
+                switch (i)
+                {
+                    case 0:
+                        BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.Any;
+                        break;
+                    case 1:
+                        BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.None;
+                        break;
+                    case 2:
+                        BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.Inherited;
+                        break;
+                }
+                return;
+            }
+            switch (box.IDString)
+            {
+                case "LOCKOUT":
+                    BingoData.globalSettings.lockout = c;
+                    break;
+                case "GAMEMODE":
+                    BingoData.globalSettings.gameMode = c;
+                    break;
+                case "FRIENDS":
+                    BingoData.globalSettings.friendsOnly = c;
+                    break;
+                case "CHEATS":
+                    BingoData.globalSettings.banMods = c;
+                    break;
+            }
+        }
     }
 }

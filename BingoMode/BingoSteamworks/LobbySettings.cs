@@ -24,12 +24,11 @@ namespace BingoMode.BingoSteamworks
         public bool friendsOnly;
         public AllowUnlocks perks;
         public AllowUnlocks burdens;
-        public List<string> bannedMods; //Ids
+        public bool banMods; //Ids
         public int maxPlayers;
 
         public LobbySettings()
         {
-            bannedMods = [];
         }
 
         public void Reset()
@@ -37,7 +36,6 @@ namespace BingoMode.BingoSteamworks
             lockout = false;
             perks = AllowUnlocks.Any;
             burdens = AllowUnlocks.Any;
-            bannedMods.Clear();
             maxPlayers = 0;
         }
     }

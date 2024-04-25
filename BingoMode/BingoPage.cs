@@ -272,7 +272,7 @@ namespace BingoMode
 
             if (message == "CREATE_LOBBY")
             {
-                SteamTest.CreateLobby();
+                menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this));
                 return;
             }
 
