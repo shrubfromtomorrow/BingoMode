@@ -219,7 +219,7 @@ namespace BingoMode
             // Preventing expedition antics
             IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
 
-            //Custom den
+            // Custom den
             On.Expedition.ExpeditionGame.ExpeditionRandomStarts += ExpeditionGame_ExpeditionRandomStarts;
 
             // Multiplayer lobbies slider

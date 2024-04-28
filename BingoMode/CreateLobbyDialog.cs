@@ -36,9 +36,11 @@ namespace BingoMode
         CheckBox[] burdens;
         FLabel[] labels;
         FSprite[] dividers;
+        bool inLobby;
 
-        public CreateLobbyDialog(ProcessManager manager, BingoPage owner) : base(manager)
+        public CreateLobbyDialog(ProcessManager manager, BingoPage owner, bool inLobby = false, bool host = false) : base(manager)
         {
+            this.inLobby = inLobby;
             float[] screenOffsets = Custom.GetScreenOffsets();
             leftAnchor = screenOffsets[0];
             this.owner = owner;
@@ -59,20 +61,27 @@ namespace BingoMode
             }
             closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", outOfBounds, new Vector2(num, 35f));
             pages[0].subObjects.Add(closeButton);
-            createButton = new SimpleButton(this, pages[0], Translate("CREATE"), "CREATE", outOfBounds, new Vector2(num, 35f));
-            pages[0].subObjects.Add(createButton);
+            if (!inLobby)
+            {
+                createButton = new SimpleButton(this, pages[0], "CREATE", "CREATE", outOfBounds, new Vector2(num, 35f));
+                pages[0].subObjects.Add(createButton);
+            }
 
             lockout = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Lockout: ", "LOCKOUT");
             lockout.label.label.alignment = FLabelAlignment.Right;
+            lockout.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(lockout);
             gameMode = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Teams mode: ", "GAMEMODE");
             gameMode.label.label.alignment = FLabelAlignment.Right;
+            gameMode.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(gameMode);
             friendsOnly = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Friends only: ", "FRIENDS");
             friendsOnly.label.label.alignment = FLabelAlignment.Right;
+            friendsOnly.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(friendsOnly);
             banCheats = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Ban cheat mods: ", "CHEATS");
             banCheats.label.label.alignment = FLabelAlignment.Right;
+            banCheats.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(banCheats);
 
             perks = new CheckBox[3];
@@ -86,6 +95,8 @@ namespace BingoMode
                 burdens[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "BURJ" + i.ToString());
                 burdens[i].label.label.alignment = FLabelAlignment.Right;
                 pages[0].subObjects.Add(burdens[i]);
+                perks[i].buttonBehav.greyedOut = inLobby && !host;
+                burdens[i].buttonBehav.greyedOut = inLobby && !host;
             }
 
             labels = new FLabel[2];
@@ -132,7 +143,7 @@ namespace BingoMode
                 closing = false;
             }
             closeButton.buttonBehav.greyedOut = opening;
-            createButton.buttonBehav.greyedOut = opening;
+            if (!inLobby) createButton.buttonBehav.greyedOut = opening;
         }
 
         public override void GrafUpdate(float timeStacker)
@@ -173,8 +184,9 @@ namespace BingoMode
             dividers[0].SetPosition(pagePos + new Vector2(xPos, yTop - 100f));
             dividers[1].SetPosition(pagePos + new Vector2(xPos, yTop - 215f));
 
-            closeButton.pos = new Vector2(683f - num - 10f, yTop - 265f);
-            createButton.pos = new Vector2(683f + 10f, yTop - 265f);
+            float xxx = inLobby ? 683f - num / 2f : 683f - num - 10f;
+            closeButton.pos = new Vector2(xxx, yTop - 265f);
+            if (!inLobby) createButton.pos = new Vector2(683f + 10f, yTop - 265f);
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -190,7 +202,6 @@ namespace BingoMode
                     SteamTest.CreateLobby();
                     closing = true;
                     targetAlpha = 0f;
-                    // Disable all the shit in bingo page
                     break;
             }
         }
@@ -258,7 +269,6 @@ namespace BingoMode
                         BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.Inherited;
                         break;
                 }
-                return;
             }
             if (box.IDString.StartsWith("BURJ"))
             {
@@ -275,7 +285,6 @@ namespace BingoMode
                         BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.Inherited;
                         break;
                 }
-                return;
             }
             switch (box.IDString)
             {
@@ -291,6 +300,10 @@ namespace BingoMode
                 case "CHEATS":
                     BingoData.globalSettings.banMods = c;
                     break;
+            }
+            if (inLobby)
+            {
+
             }
         }
     }

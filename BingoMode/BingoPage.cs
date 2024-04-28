@@ -49,6 +49,9 @@ namespace BingoMode
         public VerticalSlider slider;
         public float sliderF;
         readonly int maxItems = 21;
+        public bool inLobby;
+        public MenuLabel lobbyName;
+        public SymbolButton lobbySettingsInfo;
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -115,24 +118,6 @@ namespace BingoMode
             divider.anchorX = 0f;
             Container.AddChild(divider);
 
-            createLobby = new SymbolButton(menu, this, "plus", "CREATE_LOBBY", default);
-            createLobby.size = new Vector2(35f, 35f);
-            createLobby.roundedRect.size = createLobby.size;
-            createLobby.symbolSprite.scale = 0.9f;
-            subObjects.Add(createLobby);
-
-            friendsNoFriends = new SymbolButton(menu, this, "Multiplayer_Death", "TOGGLE_FRIENDSONLY", default);
-            friendsNoFriends.size = new Vector2(35f, 35f);
-            friendsNoFriends.roundedRect.size = friendsNoFriends.size;
-            friendsNoFriends.symbolSprite.scale = 0.9f;
-            subObjects.Add(friendsNoFriends);
-
-            refreshSearch = new SymbolButton(menu, this, "Menu_Symbol_Repeats", "REFRESH_SEARCH", default);
-            refreshSearch.size = new Vector2(35f, 35f);
-            refreshSearch.roundedRect.size = refreshSearch.size;
-            refreshSearch.symbolSprite.scale = 1.2f;
-            subObjects.Add(refreshSearch);
-
             tab = new MenuTab();
             Container.AddChild(tab._container);
             tab._Activate();
@@ -140,21 +125,8 @@ namespace BingoMode
             tab._GrafUpdate(0f);
 
             distanceFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_DistanceFilterBingo", "Near", (ConfigAcceptableBase)null);
-            distanceFilter = new OpComboBox(distanceFilterConf as Configurable<string>, default, 100f, ["Near", "Far", "Worldwide"]);
-            distanceFilter.OnValueChanged += DistanceFilter_OnValueChanged;
-
             nameFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_NameFilterBingo", "", (ConfigAcceptableBase)null);
-            nameFilter = new OpTextBox(nameFilterConf as Configurable<string>, default, 140f);
-            nameFilter.allowSpace = true;
-            nameFilter.OnValueChanged += NameFilter_OnValueChanged;
-
-            tab.AddItems(
-            [
-                distanceFilter,
-                nameFilter
-            ]);
-            distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
-            nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
+            CreateSearchPage();
 
             slider = new VerticalSlider(menu, this, "", new Vector2(375f, 47f), new Vector2(30f, 500f), BingoEnums.MultiplayerSlider, true) { floatValue = 1f };
             foreach (var line in slider.lineSprites)
@@ -187,6 +159,40 @@ namespace BingoMode
 
             SteamTest.CurrentFilters.distance = num;
             SteamTest.GetJoinableLobbies();
+        }
+
+        public void Switch(bool toInLobby, bool create) // (nintendo reference
+        {
+            if (inLobby == toInLobby) return;
+            inLobby = toInLobby;
+            if (toInLobby)
+            {
+                expMenu.exitButton.buttonBehav.greyedOut = true;
+                rightPage.buttonBehav.greyedOut = true;
+                startGame.buttonBehav.greyedOut = !create;
+                randomize.buttonBehav.greyedOut = !create;
+                plusButton.buttonBehav.greyedOut = !create;
+                minusButton.buttonBehav.greyedOut = !create;
+                multiButton.menuLabel.text = "Leave Lobby";
+                multiButton.signalText = "LEAVE_LOBBY";
+                grid.Switch(!create);
+                CreateLobbyPage();
+                RemoveSearchPage();
+                return;
+            }
+
+            expMenu.exitButton.buttonBehav.greyedOut = false;
+            rightPage.buttonBehav.greyedOut = false;
+            startGame.buttonBehav.greyedOut = false;
+            randomize.buttonBehav.greyedOut = false;
+            plusButton.buttonBehav.greyedOut = false;
+            minusButton.buttonBehav.greyedOut = false;
+            multiButton.menuLabel.text = "Multiplayer";
+            multiButton.signalText = "SWITCH_MULTIPLAYER";
+            grid.Switch(false);
+
+            CreateSearchPage();
+            RemoveLobbyPage();
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -313,21 +319,7 @@ namespace BingoMode
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "GamsaGamsaGamsaGamsaGamsaGamsass's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
+                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's ls lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
                 foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
@@ -352,6 +344,16 @@ namespace BingoMode
                 }
                 else Plugin.logger.LogError("FAILED TO PARSE LOBBY ULONG FROM " + message);
                 return;
+            }
+
+            if (message == "CHANGE_SETTINGS")
+            {
+                menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this, true, true));
+            }
+
+            if (message == "INFO_SETTINGS")
+            {
+                menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this, true, false));
             }
         }
 
@@ -381,22 +383,32 @@ namespace BingoMode
             divider.x = multiMenuBg.pos.x + .5f;
             divider.y = 583f;
 
-            createLobby.pos.x = multiMenuBg.pos.x + 338f;
-            createLobby.pos.y = divider.y + 5.25f;
+            if (!inLobby)
+            {
+                createLobby.pos.x = multiMenuBg.pos.x + 338f;
+                createLobby.pos.y = divider.y + 5.25f;
 
-            friendsNoFriends.pos.x = createLobby.pos.x - 40f;
-            friendsNoFriends.pos.y = createLobby.pos.y;
+                friendsNoFriends.pos.x = createLobby.pos.x - 40f;
+                friendsNoFriends.pos.y = createLobby.pos.y;
 
-            refreshSearch.pos.x = friendsNoFriends.pos.x - 40f;
-            refreshSearch.pos.y = createLobby.pos.y;
+                refreshSearch.pos.x = friendsNoFriends.pos.x - 40f;
+                refreshSearch.pos.y = createLobby.pos.y;
 
-            distanceFilter.PosX = refreshSearch.pos.x - 105f;
-            distanceFilter.PosY = createLobby.pos.y + 5f;
+                distanceFilter.PosX = refreshSearch.pos.x - 105f;
+                distanceFilter.PosY = createLobby.pos.y + 5f;
 
-            nameFilter.PosX = distanceFilter.PosX - 145f;
-            nameFilter.PosY = createLobby.pos.y + 5f;
+                nameFilter.PosX = distanceFilter.PosX - 145f;
+                nameFilter.PosY = createLobby.pos.y + 5f;
 
-            if (foundLobbies != null && foundLobbies.Count > 0) DrawDisplayedLobbies(timeStacker);
+                if (foundLobbies != null && foundLobbies.Count > 0) DrawDisplayedLobbies(timeStacker);
+                return;
+            }
+
+            lobbyName.pos.x = divider.x + 190f;
+            lobbyName.pos.y = divider.y + 25.25f;
+
+            lobbySettingsInfo.pos.x = multiMenuBg.pos.x + 338f;
+            lobbySettingsInfo.pos.y = divider.y + 5.25f;
         }
 
         public override void Update()
@@ -421,21 +433,97 @@ namespace BingoMode
         {
             base.RemoveSprites();
             pageTitle.RemoveFromContainer();
+            unlocksButton.Hide();
+            tab.RemoveItems(unlocksButton);
+            unlocksButton.Unload();
+            menuTabWrapper.wrappers.Remove(unlocksButton);
+            menuTabWrapper.subObjects.Remove(unlockWrapper);
+            if (inLobby) RemoveLobbyPage();
+            else RemoveSearchPage();
+        }
+
+        public void CreateLobbyPage()
+        {
+            // players
+            // - name with a color corresponding to the team
+            // - assign to next team (host only)
+            // - kick (host only)
+            // - host gets a crown icon
+            // dividers
+            lobbyName = new MenuLabel(expMenu, this, SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name"), default, default, true);
+            subObjects.Add(lobbyName);
+            Plugin.logger.LogMessage("ASHOL " + SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) + " - " + SteamTest.selfIdentity.GetSteamID());
+            bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
+            Plugin.logger.LogFatal(isHost);
+            lobbySettingsInfo = new SymbolButton(expMenu, this, isHost ? "settingscog" : "Menu_InfoI", isHost ? "CHANGE_SETTINGS" : "INFO_SETTINGS", default);
+            lobbySettingsInfo.size = new Vector2(35f, 35f);
+            lobbySettingsInfo.roundedRect.size = lobbySettingsInfo.size;
+            lobbySettingsInfo.symbolSprite.scale = 0.9f;
+            subObjects.Add(lobbySettingsInfo);
+        }
+
+        public void RemoveLobbyPage()
+        {
+            lobbyName.RemoveSprites();
+            lobbySettingsInfo.RemoveSprites();
+            RemoveSubObject(lobbyName);
+            RemoveSubObject(lobbySettingsInfo);
+        }
+
+        public void CreateSearchPage()
+        {
+            createLobby = new SymbolButton(menu, this, "plus", "CREATE_LOBBY", default);
+            createLobby.size = new Vector2(35f, 35f);
+            createLobby.roundedRect.size = createLobby.size;
+            createLobby.symbolSprite.scale = 0.9f;
+            subObjects.Add(createLobby);
+
+            friendsNoFriends = new SymbolButton(menu, this, "Multiplayer_Death", "TOGGLE_FRIENDSONLY", default);
+            friendsNoFriends.size = new Vector2(35f, 35f);
+            friendsNoFriends.roundedRect.size = friendsNoFriends.size;
+            friendsNoFriends.symbolSprite.scale = 0.9f;
+            subObjects.Add(friendsNoFriends);
+
+            refreshSearch = new SymbolButton(menu, this, "Menu_Symbol_Repeats", "REFRESH_SEARCH", default);
+            refreshSearch.size = new Vector2(35f, 35f);
+            refreshSearch.roundedRect.size = refreshSearch.size;
+            refreshSearch.symbolSprite.scale = 1.2f;
+            subObjects.Add(refreshSearch);
+
+            distanceFilter = new OpComboBox(distanceFilterConf as Configurable<string>, default, 100f, ["Near", "Far", "Worldwide"]);
+            distanceFilter.OnValueChanged += DistanceFilter_OnValueChanged;
+
+            nameFilter = new OpTextBox(nameFilterConf as Configurable<string>, default, 140f);
+            nameFilter.allowSpace = true;
+            nameFilter.OnValueChanged += NameFilter_OnValueChanged;
+
+            tab.AddItems(
+            [
+                distanceFilter,
+                nameFilter
+            ]);
+            distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
+            nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
+        }
+
+        public void RemoveSearchPage()
+        {
+            createLobby.RemoveSprites();
+            friendsNoFriends.RemoveSprites();
+            refreshSearch.RemoveSprites();
+            RemoveSubObject(createLobby);
+            RemoveSubObject(friendsNoFriends);
+            RemoveSubObject(refreshSearch);
             distanceFilter.Hide();
             nameFilter.Hide();
-            unlocksButton.Hide();
-            tab.RemoveItems(distanceFilter, nameFilter, unlocksButton);
+            tab.RemoveItems(distanceFilter, nameFilter);
             distanceFilter.Unload();
             nameFilter.Unload();
-            unlocksButton.Unload();
             menuTabWrapper.wrappers.Remove(distanceFilter);
             menuTabWrapper.wrappers.Remove(nameFilter);
-            menuTabWrapper.wrappers.Remove(unlocksButton);
             menuTabWrapper.subObjects.Remove(distanceFilterWrapper);
             menuTabWrapper.subObjects.Remove(nameFilterWrapper);
-            menuTabWrapper.subObjects.Remove(unlockWrapper);
             RemoveLobbiesSprites();
-            RemoveSubObject(slider);
         }
 
         public void RemoveLobbiesSprites()
@@ -466,16 +554,15 @@ namespace BingoMode
             {
                 foreach (var perj in unlockDialog.perkButtons)
                 {
-                    perj.buttonBehav.greyedOut = perj.buttonBehav.greyedOut || BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any;
+                    perj.buttonBehav.greyedOut = perj.buttonBehav.greyedOut || BingoData.globalSettings.perks == AllowUnlocks.None;
                 }
                 foreach (var bur in unlockDialog.burdenButtons)
                 {
-                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens != AllowUnlocks.Any;
+                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None;
                 }
             }
             menu.manager.ShowDialog(unlockDialog);
         }
-
 
         public void CreateDisplayedLobbies()
         {

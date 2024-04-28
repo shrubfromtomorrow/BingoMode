@@ -36,6 +36,14 @@ namespace BingoMode
             base.RemoveSprites();
         }
 
+        public void Switch(bool off)
+        {
+            foreach (var butone in challengeButtons)
+            {
+                butone.buttonBehav.greyedOut = off;
+            }
+        }
+
         public void GenerateBoardButtons()
         {
             for (int i = 0; i < board.challengeGrid.GetLength(0); i++)

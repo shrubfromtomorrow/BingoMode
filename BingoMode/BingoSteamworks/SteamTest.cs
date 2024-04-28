@@ -138,6 +138,10 @@ namespace BingoMode.BingoSteamworks
         public static void LeaveLobby()
         {
             SteamMatchmaking.LeaveLobby(CurrentLobby);
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+            {
+                page.Switch(false, false);
+            }
             Plugin.logger.LogMessage("Left lobby " + CurrentLobby);
             LobbyMembers.Clear();
             CurrentLobby = default;
@@ -181,6 +185,11 @@ namespace BingoMode.BingoSteamworks
             CurrentLobby = lobbyID;
             UpdateOnlineBingo();
             SteamMatchmaking.SetLobbyJoinable(lobbyID, true);
+
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+            {
+                page.Switch(true, true);
+            }
         }
 
         public static void OnLobbyEntered(LobbyEnter_t callback, bool bIOFailure)
@@ -212,36 +221,22 @@ namespace BingoMode.BingoSteamworks
                 }
             }
 
-            Plugin.logger.LogMessage("Setting lobby settings");
-            BingoData.globalSettings.lockout = SteamMatchmaking.GetLobbyData(lobbyID, "lockout") == "1";
-            BingoData.globalSettings.gameMode = SteamMatchmaking.GetLobbyData(lobbyID, "gameMode") == "1";
-            if (!int.TryParse(SteamMatchmaking.GetLobbyData(lobbyID, "perks"), out int perjs) || int.TryParse(SteamMatchmaking.GetLobbyData(lobbyID, "burdens"), out int burjens))
-            {
-                Plugin.logger.LogError("FAILED TO PARSE PERKS AND OR BURDEN SETTINGS FROM LOBBY");
-                LeaveLobby();
-                return;
-            }
-            BingoData.globalSettings.perks = (LobbySettings.AllowUnlocks)perjs;
-            BingoData.globalSettings.burdens = (LobbySettings.AllowUnlocks)burjens;
-            Plugin.logger.LogMessage("Success!");
-
-            Plugin.logger.LogMessage("Resetting activated perks and burdens");
-            if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
-            if (BingoData.globalSettings.burdens != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
-            if (!int.TryParse(SteamMatchmaking.GetLobbyData(lobbyID, "nextTeam"), out team))
+            FetchLobbySettings(); 
+            if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "nextTeam"), out team))
             {
                 Plugin.logger.LogError("FAILED TO PARSE NEXT TEAM FROM LOBBY");
                 LeaveLobby();
                 return;
             }
-            Plugin.logger.LogMessage("Set team number to " + team); 
-            if (!int.TryParse(SteamMatchmaking.GetLobbyData(lobbyID, "maxPlayers"), out int maxPayne))
+            Plugin.logger.LogMessage("Set team number to " + team);
+            if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "maxPlayers"), out int maxPayne))
             {
                 Plugin.logger.LogError("FAILED TO PARSE MAX PAYNE HIT VIDEO GAME FROM LOBBY");
                 LeaveLobby();
                 return;
             }
             BingoData.globalSettings.maxPlayers = maxPayne;
+
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");
             try
             {
@@ -264,6 +259,26 @@ namespace BingoMode.BingoSteamworks
                 member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(lobbyID, i));
                 InnerWorkings.SendMessage($"Hello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
             }
+        }
+
+        public static void FetchLobbySettings()
+        {
+            Plugin.logger.LogMessage("Setting lobby settings");
+            BingoData.globalSettings.lockout = SteamMatchmaking.GetLobbyData(CurrentLobby, "lockout") == "1";
+            BingoData.globalSettings.gameMode = SteamMatchmaking.GetLobbyData(CurrentLobby, "gameMode") == "1";
+            if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "perks"), out int perjs) || int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens"), out int burjens))
+            {
+                Plugin.logger.LogError("FAILED TO PARSE PERKS AND OR BURDEN SETTINGS FROM LOBBY");
+                LeaveLobby();
+                return;
+            }
+            BingoData.globalSettings.perks = (LobbySettings.AllowUnlocks)perjs;
+            BingoData.globalSettings.burdens = (LobbySettings.AllowUnlocks)burjens;
+            Plugin.logger.LogMessage("Success!");
+
+            Plugin.logger.LogMessage("Resetting activated perks and burdens");
+            if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+            if (BingoData.globalSettings.burdens != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
         }
 
         public static void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
@@ -324,6 +339,8 @@ namespace BingoMode.BingoSteamworks
                 Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
                 LeaveLobby();
             }
+
+            FetchLobbySettings();
         }
 
         public static void OnLobbyMatchList(LobbyMatchList_t result, bool bIOFailure)
