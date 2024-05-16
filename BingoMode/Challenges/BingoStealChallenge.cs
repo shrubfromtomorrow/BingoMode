@@ -8,16 +8,13 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoStealChallenge : Challenge, IBingoChallenge
+    public class BingoStealChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> amount;
         public SettingBox<bool> toll;
         public SettingBox<string> subject;
         public List<EntityID> checkedIDs;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -137,18 +134,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update;
             On.SocialEventRecognizer.Theft += SocialEventRecognizer_Theft;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update;
             On.SocialEventRecognizer.Theft -= SocialEventRecognizer_Theft;
         }
 
-        public List<object> Settings() => [amount, toll, subject];
+        public override List<object> Settings() => [amount, toll, subject];
     }
 }

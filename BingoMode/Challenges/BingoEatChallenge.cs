@@ -11,15 +11,12 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoEatChallenge : Challenge, IBingoChallenge
+    public class BingoEatChallenge : BingoChallenge
     {
         public SettingBox<string> foodType;
         public SettingBox<int> amountRequired;
         public int currentEated;
         public bool isCreature;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -160,16 +157,16 @@ namespace BingoMode.Challenges
             return slugcat.value != "Spear";
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.Player.ObjectEaten += Player_ObjectEaten;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.Player.ObjectEaten -= Player_ObjectEaten;
         }
 
-        public List<object> Settings() => [foodType, amountRequired];
+        public override List<object> Settings() => [foodType, amountRequired];
     }
 }

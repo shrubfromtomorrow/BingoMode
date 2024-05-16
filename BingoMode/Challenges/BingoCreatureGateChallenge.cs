@@ -10,15 +10,12 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoCreatureGateChallenge : Challenge, IBingoChallenge
+    public class BingoCreatureGateChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
         public SettingBox<string> crit;
         public List<string> gates = [];
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -141,16 +138,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.RegionGate.NewWorldLoaded += RegionGate_NewWorldLoaded1;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.RegionGate.NewWorldLoaded -= RegionGate_NewWorldLoaded1;
         }
 
-        public List<object> Settings() => [amount, crit];
+        public override List<object> Settings() => [amount, crit];
     }
 }

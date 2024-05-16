@@ -6,12 +6,9 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoGreenNeuronChallenge : Challenge, IBingoChallenge
+    public class BingoGreenNeuronChallenge : BingoChallenge
     {
         public SettingBox<bool> moon;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -95,7 +92,7 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.SaveState.ctor += SaveState_ctor;
             On.SLOracleWakeUpProcedure.NextPhase += SLOracleWakeUpProcedure_NextPhase;
@@ -103,7 +100,7 @@ namespace BingoMode.Challenges
             IL.Room.Loaded += Room_LoadedGreenNeuron;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             IL.SaveState.ctor -= SaveState_ctor;
             On.SLOracleWakeUpProcedure.NextPhase -= SLOracleWakeUpProcedure_NextPhase;
@@ -111,6 +108,6 @@ namespace BingoMode.Challenges
             IL.Room.Loaded -= Room_LoadedGreenNeuron;
         }
 
-        public List<object> Settings() => [moon];
+        public override List<object> Settings() => [moon];
     }
 }

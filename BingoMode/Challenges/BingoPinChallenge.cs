@@ -11,7 +11,7 @@ namespace BingoMode.Challenges
 {
     // Copied from vanilla game and modified
     using static ChallengeHooks;
-    public class BingoPinChallenge : Challenge, IBingoChallenge
+    public class BingoPinChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> target;
@@ -20,9 +20,6 @@ namespace BingoMode.Challenges
         public SettingBox<string> region;
         public List<string> pinRegions = [];
         public SettingBox<string> crit;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -177,14 +174,14 @@ namespace BingoMode.Challenges
             }
         }
     
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
     
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
     
-        public List<object> Settings() => [region, crit, target];
+        public override List<object> Settings() => [region, crit, target];
     }
 }

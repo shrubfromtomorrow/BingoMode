@@ -177,8 +177,8 @@ namespace BingoMode
         {
             BingoData.availableBingoChallenges ??= [];
             orig.Invoke();
-            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x is IBingoChallenge).ToList());
-            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => x is not IBingoChallenge).ToList();
+            BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x is BingoChallenge).ToList());
+            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => x is not BingoChallenge).ToList();
         }
 
         public static void Apply()

@@ -9,7 +9,7 @@ using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoCollectPearlChallenge : Challenge, IBingoChallenge
+    public class BingoCollectPearlChallenge : BingoChallenge
     {
         public SettingBox<string> pearl; //PearlType
         public List<string> collected = [];
@@ -17,9 +17,6 @@ namespace BingoMode.Challenges
         public int current;
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -172,14 +169,14 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [amount, specific, pearl];
+        public override List<object> Settings() => [amount, specific, pearl];
     }
 }

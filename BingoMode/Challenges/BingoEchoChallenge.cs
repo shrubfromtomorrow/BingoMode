@@ -9,13 +9,10 @@ namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     // Literally copied from base game, to add the starving thing easily, and to customize which echoes appear
-    public class BingoEchoChallenge : Challenge, IBingoChallenge
+    public class BingoEchoChallenge : BingoChallenge
     {
         public SettingBox<string> ghost; //GhostWorldPresence.GhostID
         public SettingBox<bool> starve;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -115,14 +112,14 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [ghost, starve];
+        public override List<object> Settings() => [ghost, starve];
     }
 }

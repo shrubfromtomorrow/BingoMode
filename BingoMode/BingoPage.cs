@@ -52,6 +52,7 @@ namespace BingoMode
         public bool inLobby;
         public MenuLabel lobbyName;
         public SymbolButton lobbySettingsInfo;
+        public List<PlayerInfo> lobbyPlayers;
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -460,6 +461,8 @@ namespace BingoMode
             lobbySettingsInfo.roundedRect.size = lobbySettingsInfo.size;
             lobbySettingsInfo.symbolSprite.scale = 0.9f;
             subObjects.Add(lobbySettingsInfo);
+
+
         }
 
         public void RemoveLobbyPage()
@@ -552,13 +555,14 @@ namespace BingoMode
             unlocksButton.greyedOut = true;
             if (BingoData.MultiplayerGame)
             {
+                bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
                 foreach (var perj in unlockDialog.perkButtons)
                 {
-                    perj.buttonBehav.greyedOut = perj.buttonBehav.greyedOut || BingoData.globalSettings.perks == AllowUnlocks.None;
+                    perj.buttonBehav.greyedOut = perj.buttonBehav.greyedOut || BingoData.globalSettings.perks == AllowUnlocks.None || (BingoData.globalSettings.perks == AllowUnlocks.Inherited && !isHost);
                 }
                 foreach (var bur in unlockDialog.burdenButtons)
                 {
-                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None;
+                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.perks == AllowUnlocks.Inherited && !isHost);
                 }
             }
             menu.manager.ShowDialog(unlockDialog);
@@ -595,7 +599,7 @@ namespace BingoMode
             {
                 Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
                 foundLobbies[i].maxAlpha = Mathf.InverseLerp(36f, 46f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
-                foundLobbies[i].Draw(origPos, timeStacker);
+                foundLobbies[i].Draw(origPos);
             }
             for (int i = 0; i < lobbyDividers.Length; i++)
             {
@@ -603,6 +607,26 @@ namespace BingoMode
                 lobbyDividers[i].alpha = Mathf.InverseLerp(60f, 70f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
                 lobbyDividers[i].SetPosition(origPos + new Vector2(2f, -12.5f));
             }
+        }
+
+        public void DrawPlayerInfo(float timeStacker)
+        {
+            float refX = Mathf.Lerp(multiMenuBg.lastPos.x, multiMenuBg.pos.x, timeStacker);
+            float dif = 500f / maxItems;
+            float sliderDif = dif * (foundLobbies.Count - maxItems - 1);
+            Vector2 pouse = new Vector2(refX + 10f, 560f);
+            for (int i = 0; i < foundLobbies.Count; i++)
+            {
+                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
+                foundLobbies[i].maxAlpha = Mathf.InverseLerp(36f, 46f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
+                foundLobbies[i].Draw(origPos);
+            }
+            //for (int i = 0; i < lobbyDividers.Length; i++)
+            //{
+            //    Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
+            //    lobbyDividers[i].alpha = Mathf.InverseLerp(60f, 70f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
+            //    lobbyDividers[i].SetPosition(origPos + new Vector2(2f, -12.5f));
+            //}
         }
 
         public void AddLobbies(List<CSteamID> lobbies)
@@ -650,6 +674,45 @@ namespace BingoMode
             return 0f;
         }
 
+        public class PlayerInfo
+        {
+            public CSteamID playerID;
+            public string nickname;
+            public int team;
+            public SymbolButton kick;
+            public SimpleButton cycleTeam;
+            public BingoPage page;
+            public FLabel nameLabel;
+
+            public PlayerInfo(BingoPage page, CSteamID player, bool controls)
+            {
+                this.page = page;
+                nickname = SteamFriends.GetPlayerNickname(player);
+                team = 0;
+                nameLabel = new FLabel(Custom.GetFont(), nickname)
+                {
+                    alignment = FLabelAlignment.Left,
+                    anchorX = 0,
+                };
+                page.Container.AddChild(nameLabel);
+
+                if (controls)
+                {
+
+                }
+            }
+
+            public void Draw(Vector2 origPos)
+            {
+
+            }
+
+            public void Remove()
+            {
+                nameLabel.RemoveFromContainer();
+            }
+        }
+
         public class LobbyInfo
         {
             public CSteamID lobbyID;
@@ -692,7 +755,7 @@ namespace BingoMode
                 panel = new InfoPanel(page, this);
             }
 
-            public void Draw(Vector2 origPos, float timeStacker)
+            public void Draw(Vector2 origPos)
             {
                 Vector2 namePos = origPos;
                 nameLabel.SetPosition(namePos);

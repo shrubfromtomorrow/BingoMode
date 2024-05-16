@@ -7,12 +7,9 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoUnlockChallenge : Challenge, IBingoChallenge
+    public class BingoUnlockChallenge : BingoChallenge
     {
         public SettingBox<string> unlock;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -100,7 +97,7 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.Room.Loaded += Room_LoadedUnlock;
             On.PlayerProgression.MiscProgressionData.GetTokenCollected_string_bool += MiscProgressionData_GetTokenCollected;
@@ -110,7 +107,7 @@ namespace BingoMode.Challenges
             On.CollectToken.Pop += CollectToken_Pop;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
 
             IL.Room.Loaded -= Room_LoadedUnlock;
@@ -121,6 +118,6 @@ namespace BingoMode.Challenges
             On.CollectToken.Pop -= CollectToken_Pop;
         }
 
-        public List<object> Settings() => [unlock];
+        public override List<object> Settings() => [unlock];
     }
 }

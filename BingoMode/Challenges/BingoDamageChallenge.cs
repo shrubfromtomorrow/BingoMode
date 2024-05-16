@@ -9,15 +9,12 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoDamageChallenge : Challenge, IBingoChallenge
+    public class BingoDamageChallenge : BingoChallenge
     {
         public SettingBox<string> weapon;
         public SettingBox<string> victim;
         public SettingBox<int> amount;
         public int current;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -158,14 +155,14 @@ namespace BingoMode.Challenges
             current = 0;
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [weapon, victim, amount];
+        public override List<object> Settings() => [weapon, victim, amount];
     }
 }

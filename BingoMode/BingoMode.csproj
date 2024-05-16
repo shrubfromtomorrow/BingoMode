@@ -101,6 +101,7 @@
     <Compile Include="Challenges\BingoAchievementChallenge.cs" />
     <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />
     <Compile Include="Challenges\BingoBombTollChallenge.cs" />
+    <Compile Include="Challenges\BingoChallenge.cs" />
     <Compile Include="Challenges\BingoCollectPearlChallenge.cs" />
     <Compile Include="Challenges\BingoCraftChallenge.cs" />
     <Compile Include="Challenges\BingoCreatureGateChallenge.cs" />

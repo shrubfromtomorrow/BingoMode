@@ -8,12 +8,9 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoCraftChallenge : Challenge, IBingoChallenge
+    public class BingoCraftChallenge : BingoChallenge
     {
         public SettingBox<string> craftee;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -97,16 +94,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.Player.CraftingResults += Player_CraftingResults;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.Player.CraftingResults -= Player_CraftingResults;
         }
 
-        public List<object> Settings() => [craftee];
+        public override List<object> Settings() => [craftee];
     }
 }

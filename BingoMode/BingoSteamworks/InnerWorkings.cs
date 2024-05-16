@@ -38,15 +38,16 @@ namespace BingoMode.BingoSteamworks
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length < 2)
+                    if (data.Length < 3)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
 
-                    if (int.TryParse(data[0], out int x) && int.TryParse(data[1], out int y))
+                    if (int.TryParse(data[0], out int x) && x != -1 && int.TryParse(data[1], out int y) && y != -1 && int.TryParse(data[2], out int teamCredit))
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
+                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
                         if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
                         else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         return true;
@@ -56,6 +57,7 @@ namespace BingoMode.BingoSteamworks
                         Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
+
                 // Update board
                 //case '*':
                 //    string challenjes = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "challenges");
@@ -70,6 +72,7 @@ namespace BingoMode.BingoSteamworks
                 //        SteamTest.LeaveLobby();
                 //    }
                 //    return false;
+
                 // Begin game
                 case '!':
                     if (SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
@@ -80,6 +83,24 @@ namespace BingoMode.BingoSteamworks
                         return true;
                     }
                     return false;
+
+                case '%':
+                    if (data.Length < 2)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
+
+                    if (int.TryParse(data[0], out int t))
+                    {
+                        SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
+                        return true;
+                    }
+                    else
+                    {
+                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
             }
 
             return false;

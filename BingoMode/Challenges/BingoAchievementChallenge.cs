@@ -9,13 +9,9 @@ namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     // Taken from vanilla and modified
-    public class BingoAchievementChallenge : Challenge, IBingoChallenge
+    public class BingoAchievementChallenge : BingoChallenge
     {
         public SettingBox<string> ID; //WinState.EndgameID
-
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -130,17 +126,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
 
             IL.WinState.CycleCompleted -= WinState_CycleCompleted;
         }
 
-        public List<object> Settings() => [ID];
+        public override List<object> Settings() => [ID];
+
     }
 }

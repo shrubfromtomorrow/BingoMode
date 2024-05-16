@@ -7,12 +7,9 @@ using UnityEngine;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoDodgeLeviathanChallenge : Challenge, IBingoChallenge
+    public class BingoDodgeLeviathanChallenge : BingoChallenge
     {
         public int wasInArea;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -125,16 +122,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.BigEel.JawsSnap += BigEel_JawsSnap;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.BigEel.JawsSnap -= BigEel_JawsSnap;
         }
 
-        public List<object> Settings() => [];
+        public override List<object> Settings() => [];
     }
 }

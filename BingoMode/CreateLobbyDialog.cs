@@ -24,7 +24,6 @@ namespace BingoMode
         float lastAlpha;
         float targetAlpha;
         float num;
-        BingoPage owner;
         FSprite pageTitle;
         SimpleButton closeButton;
         SimpleButton createButton;
@@ -43,10 +42,9 @@ namespace BingoMode
             this.inLobby = inLobby;
             float[] screenOffsets = Custom.GetScreenOffsets();
             leftAnchor = screenOffsets[0];
-            this.owner = owner;
             Vector2 outOfBounds = new Vector2(10000f, 10000f);
 
-            pageTitle = new FSprite("createlobby", true);
+            pageTitle = new FSprite(inLobby ? "lobbysettings" : "createlobby", true);
             pageTitle.SetAnchor(0.5f, 0.5f);
             pageTitle.x = 683f;
             pageTitle.y = 715f;

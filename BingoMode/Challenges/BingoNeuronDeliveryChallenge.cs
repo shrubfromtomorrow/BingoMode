@@ -10,13 +10,10 @@ using UnityEngine;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoNeuronDeliveryChallenge : Challenge, IBingoChallenge
+    public class BingoNeuronDeliveryChallenge : BingoChallenge
     {
         public SettingBox<int> neurons;
         public int delivered;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
@@ -130,14 +127,14 @@ namespace BingoMode.Challenges
             return false;
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [neurons];
+        public override List<object> Settings() => [neurons];
     }
 }

@@ -163,7 +163,7 @@ namespace BingoMode
         {
             if (!BingoMode) return;
             // literally what is this syntax
-            foreach (IBingoChallenge challenge in from challenge in challenges where challenge is IBingoChallenge select challenge)
+            foreach (BingoChallenge challenge in from challenge in challenges where challenge is BingoChallenge select challenge)
             {
                 string name = (challenge as Challenge).ChallengeName();
                 Plugin.logger.LogMessage("Hooking " + name);

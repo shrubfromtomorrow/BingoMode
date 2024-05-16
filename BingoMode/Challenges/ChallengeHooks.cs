@@ -76,16 +76,15 @@ namespace BingoMode.Challenges
         }
     }
 
-    public interface IBingoChallenge
-    {
-        void AddHooks();
-        void RemoveHooks();
-        List<object> Settings();
-        int Index { get; set; }
-        bool RequireSave { get; set; }
-        bool Failed { get; set; }
-        //List<int> TeamsCompleted { get; set; }
-    }
+    //public interface BingoChallenge
+    //{
+    //    void AddHooks();
+    //    void RemoveHooks();
+    //    List<object> Settings();
+    //    bool RequireSave { get; set; }
+    //    bool Failed { get; set; }
+    //    bool[] TeamsCompleted { get; set; }
+    //}
 
     public static class ChallengeHooks
     {
@@ -192,19 +191,20 @@ namespace BingoMode.Challenges
 
         public static void Challenge_CompleteChallenge(On.Expedition.Challenge.orig_CompleteChallenge orig, Challenge self)
         {
-            if (self is IBingoChallenge c)
+            if (self.completed) return;
+            if (self is BingoChallenge c)
             {
                 if (self.hidden) return; // Hidden means locked out here in bingo
-                if (c.RequireSave && !self.revealed)
+                if (c.RequireSave && !self.revealed) // I forgot what this does
                 {
                     self.revealed = true;
                     return;
                 }
-            }
 
-            if (SteamTest.LobbyMembers.Count > 0)
-            {
-                SteamTest.BroadcastCompletedChallenge(self);
+                if (SteamTest.LobbyMembers.Count > 0)
+                {
+                    SteamTest.BroadcastCompletedChallenge(self);
+                }
             }
 
             orig.Invoke(self);
@@ -459,7 +459,7 @@ namespace BingoMode.Challenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is IBingoChallenge g && g.RequireSave)
+                    if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave)
                     {
                         if (survived && ExpeditionData.challengeList[j].revealed)
                         {

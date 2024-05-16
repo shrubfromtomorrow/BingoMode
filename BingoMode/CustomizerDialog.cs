@@ -138,11 +138,11 @@ namespace BingoMode
             tab._Update();
             tab._GrafUpdate(0f);
 
-            ResetSettings(owner.challenge as IBingoChallenge);
+            ResetSettings(owner.challenge as BingoChallenge);
             UpdateChallenge();
         }
 
-        public void ResetSettings(IBingoChallenge ch)
+        public void ResetSettings(BingoChallenge ch)
         {
             if (challengeSettings != null)
             {
@@ -340,7 +340,7 @@ namespace BingoMode
             owner.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(ch, true);
             BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge, -1);
             UpdateChallenge();
-            ResetSettings(owner.challenge as IBingoChallenge);
+            ResetSettings(owner.challenge as BingoChallenge);
         }
 
         public void FocusOn(ChallengeSetting exception)

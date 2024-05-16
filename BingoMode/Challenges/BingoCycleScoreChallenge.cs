@@ -9,13 +9,10 @@ using UnityEngine;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoCycleScoreChallenge : Challenge, IBingoChallenge
+    public class BingoCycleScoreChallenge : BingoChallenge
     {
         public SettingBox<int> target;
         public int score;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -153,14 +150,14 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [target];
+        public override List<object> Settings() => [target];
     }
 }

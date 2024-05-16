@@ -12,7 +12,7 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoKillChallenge : Challenge, IBingoChallenge
+    public class BingoKillChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
         public SettingBox<string> weapon;
@@ -24,9 +24,6 @@ namespace BingoMode.Challenges
         public SettingBox<bool> deathPit; 
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
-        public int Index { get; set; }
-        public bool RequireSave { get { return false; } set { } }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -310,16 +307,16 @@ namespace BingoMode.Challenges
             return false;
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.Creature.Update += Creature_UpdateIL;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             IL.Creature.Update -= Creature_UpdateIL;
         }
 
-        public List<object> Settings() => [crit, weapon, amount, region, sub, room, oneCycle, deathPit, starve];
+        public override List<object> Settings() => [crit, weapon, amount, region, sub, room, oneCycle, deathPit, starve];
     }
 }

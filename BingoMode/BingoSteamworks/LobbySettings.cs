@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Expedition;
-using Steamworks;
-using UnityEngine;
-
-namespace BingoMode.BingoSteamworks
+﻿namespace BingoMode.BingoSteamworks
 {
     public class LobbySettings
     {

@@ -7,13 +7,10 @@ namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
     //Using counts as either throwing an item, or holding it for more than 5 seconds
-    public class BingoDontUseItemChallenge : Challenge, IBingoChallenge
+    public class BingoDontUseItemChallenge : BingoChallenge
     {
         public SettingBox<string> item;
         public bool isFood;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -120,18 +117,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.Player.ThrowObject += Player_ThrowObject;
             On.Player.GrabUpdate += Player_GrabUpdate;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.Player.ThrowObject -= Player_ThrowObject;
             On.Player.GrabUpdate -= Player_GrabUpdate;
         }
 
-        public List<object> Settings() => [item];
+        public override List<object> Settings() => [item];
     }
 }

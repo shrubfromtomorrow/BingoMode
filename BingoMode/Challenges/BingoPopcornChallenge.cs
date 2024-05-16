@@ -9,13 +9,10 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoPopcornChallenge : Challenge, IBingoChallenge
+    public class BingoPopcornChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> amound;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -112,16 +109,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.SeedCob.HitByWeapon += SeedCob_HitByWeapon;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
         }
 
-        public List<object> Settings() => [amound];
+        public override List<object> Settings() => [amound];
     }
 }

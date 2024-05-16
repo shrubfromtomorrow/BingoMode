@@ -10,14 +10,11 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoTradeTradedChallenge : Challenge, IBingoChallenge
+    public class BingoTradeTradedChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
-        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader (Save this later)
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
+        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader (Save this later) (i think i saved this thanks me)
 
         public override void UpdateDescription()
         {
@@ -143,16 +140,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift += ScavengerAI_RecognizeCreatureAcceptingGift2;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift2;
         }
 
-        public List<object> Settings() => [amount];
+        public override List<object> Settings() => [amount];
     }
 }

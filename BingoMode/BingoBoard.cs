@@ -96,7 +96,7 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
+                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
@@ -117,7 +117,7 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
+                        line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
@@ -137,7 +137,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
+                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
@@ -155,7 +155,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    line &= bias ? !(ch as IBingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
+                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
@@ -224,7 +224,7 @@ namespace BingoMode
                         //else 
                         challengeGrid[i, j] = recreateList[next];
                         //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]} with index {(challengeGrid[i, j] as IBingoChallenge).Index}");
+                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
                         next++;
                     }
                 }

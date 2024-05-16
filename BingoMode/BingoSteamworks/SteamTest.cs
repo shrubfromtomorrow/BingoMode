@@ -228,6 +228,7 @@ namespace BingoMode.BingoSteamworks
                 LeaveLobby();
                 return;
             }
+            SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             Plugin.logger.LogMessage("Set team number to " + team);
             if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "maxPlayers"), out int maxPayne))
             {
@@ -418,9 +419,8 @@ namespace BingoMode.BingoSteamworks
             }
             foreach (var id in LobbyMembers)
             {
-                InnerWorkings.SendMessage($"#{x};{y}", id);
+                InnerWorkings.SendMessage($"#{x};{y};{team}", id);
             }
-            LeaveLobby();
         }
 
         public static void BroadcastStartGame()
@@ -433,6 +433,13 @@ namespace BingoMode.BingoSteamworks
                     InnerWorkings.SendMessage("!", id);
                 }
             }
+        }
+
+        public static void SetMemberTeam(CSteamID persone, int newTeam)
+        {
+            SteamNetworkingIdentity receiver = new SteamNetworkingIdentity();
+            receiver.SetSteamID(persone);
+            InnerWorkings.SendMessage("%" + newTeam, receiver);
         }
     }
 }

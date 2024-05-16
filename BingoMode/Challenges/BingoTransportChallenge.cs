@@ -10,15 +10,12 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoTransportChallenge : Challenge, IBingoChallenge
+    public class BingoTransportChallenge : BingoChallenge
     {
         public SettingBox<string> from;
         public SettingBox<string> to;
         public SettingBox<string> crit;
-        public List<EntityID> origins = []; // Save this later
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
+        public List<EntityID> origins = [];
 
         public override void UpdateDescription()
         {
@@ -186,18 +183,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.Player.SlugcatGrab += Player_SlugcatGrab;
             On.RegionGate.NewWorldLoaded += RegionGate_NewWorldLoaded2;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.Player.SlugcatGrab -= Player_SlugcatGrab;
             On.RegionGate.NewWorldLoaded -= RegionGate_NewWorldLoaded2;
         }
 
-        public List<object> Settings() => [from, to, crit];
+        public override List<object> Settings() => [from, to, crit];
     }
 }

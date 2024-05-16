@@ -12,14 +12,11 @@ using UnityEngine;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoVistaChallenge : Challenge, IBingoChallenge
+    public class BingoVistaChallenge : BingoChallenge
     {
         public SettingBox<string> room;
         public string region;
         public Vector2 location;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void Update()
         {
@@ -174,15 +171,15 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [room];
+        public override List<object> Settings() => [room];
 
         public class BingoVistaPoint : UpdatableAndDeletable, IDrawable
         {

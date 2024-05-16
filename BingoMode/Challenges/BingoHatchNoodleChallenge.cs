@@ -8,14 +8,11 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoHatchNoodleChallenge : Challenge, IBingoChallenge
+    public class BingoHatchNoodleChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
         public SettingBox<bool> atOnce;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -117,17 +114,17 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.SmallNeedleWorm.PlaceInRoom += SmallNeedleWorm_PlaceInRoom;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.SmallNeedleWorm.PlaceInRoom -= SmallNeedleWorm_PlaceInRoom;
         }
 
-        public List<object> Settings() => [atOnce, amount];
+        public override List<object> Settings() => [atOnce, amount];
         public List<string> SettingNames() => ["At Once", "Amount"];
     }
 }

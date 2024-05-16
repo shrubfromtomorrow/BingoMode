@@ -7,14 +7,11 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoBombTollChallenge : Challenge, IBingoChallenge
+    public class BingoBombTollChallenge : BingoChallenge
     {
         public bool bombed;
         public SettingBox<bool> pass;
         public SettingBox<string> roomName;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -126,18 +123,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.ScavengerBomb.Explode += ScavengerBomb_Explode;
             On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update2;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.ScavengerBomb.Explode -= ScavengerBomb_Explode;
             On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update2;
         }
 
-        public List<object> Settings() => [pass, roomName];
+        public override List<object> Settings() => [pass, roomName];
     }
 }

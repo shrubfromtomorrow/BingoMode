@@ -7,13 +7,10 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoAllRegionsExcept : Challenge, IBingoChallenge
+    public class BingoAllRegionsExcept : BingoChallenge
     {
         public SettingBox<string> region;
         public List<string> regionsToEnter = [];
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -127,16 +124,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoaderNoRegion2;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion2;
         }
 
-        public List<object> Settings() => [region];
+        public override List<object> Settings() => [region];
     }
 }

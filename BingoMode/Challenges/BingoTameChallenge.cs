@@ -7,12 +7,9 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoTameChallenge : Challenge, IBingoChallenge
+    public class BingoTameChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -98,16 +95,16 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
             On.FriendTracker.Update += FriendTracker_Update;
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
             On.FriendTracker.Update -= FriendTracker_Update;
         }
 
-        public List<object> Settings() => [crit];
+        public override List<object> Settings() => [crit];
     }
 }

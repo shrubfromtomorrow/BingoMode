@@ -7,13 +7,10 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoPearlDeliveryChallenge : Challenge, IBingoChallenge
+    public class BingoPearlDeliveryChallenge : BingoChallenge
     {
         public SettingBox<string> region;
         public int iterator = -1;
-        public int Index { get; set; }
-        public bool RequireSave { get; set; }
-        public bool Failed { get; set; }
 
         public override void UpdateDescription()
         {
@@ -127,14 +124,14 @@ namespace BingoMode.Challenges
             return false;
         }
 
-        public void AddHooks()
+        public override void AddHooks()
         {
         }
 
-        public void RemoveHooks()
+        public override void RemoveHooks()
         {
         }
 
-        public List<object> Settings() => [region];
+        public override List<object> Settings() => [region];
     }
 }
