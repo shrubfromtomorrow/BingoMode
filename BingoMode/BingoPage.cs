@@ -48,11 +48,20 @@ namespace BingoMode
         public FSprite[] lobbyDividers;
         public VerticalSlider slider;
         public float sliderF;
-        readonly int maxItems = 21;
+        readonly int[] maxItems = {21, 16};
         public bool inLobby;
         public MenuLabel lobbyName;
         public SymbolButton lobbySettingsInfo;
         public List<PlayerInfo> lobbyPlayers;
+
+        public static readonly Color[] TEAM_COLOR =
+        {
+            Custom.Desaturate(Color.red, 0.35f),
+            Custom.Desaturate(Color.blue, 0.35f),
+            Custom.Desaturate(Color.green, 0.35f),
+            Custom.Desaturate(Color.yellow, 0.35f),
+            Custom.Desaturate(Color.grey, 0.35f),
+        };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -177,8 +186,8 @@ namespace BingoMode
                 multiButton.menuLabel.text = "Leave Lobby";
                 multiButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
-                CreateLobbyPage();
                 RemoveSearchPage();
+                CreateLobbyPage();
                 return;
             }
 
@@ -192,8 +201,8 @@ namespace BingoMode
             multiButton.signalText = "SWITCH_MULTIPLAYER";
             grid.Switch(false);
 
-            CreateSearchPage();
             RemoveLobbyPage();
+            CreateSearchPage();
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -356,6 +365,45 @@ namespace BingoMode
             {
                 menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this, true, false));
             }
+
+            if (message.StartsWith("KICK-"))
+            {
+                ulong playerId = ulong.Parse(message.Split('-')[1], System.Globalization.NumberStyles.Any);
+                SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
+                kickedPlayer.SetSteamID64(playerId);
+                Plugin.logger.LogMessage("test test test: " + kickedPlayer.GetSteamID());
+                InnerWorkings.SendMessage("@", kickedPlayer);
+                if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+            }
+
+            if (message.StartsWith("SWTEAM-"))
+            {
+                ulong playerId = ulong.Parse(message.Split('-')[1], System.Globalization.NumberStyles.Any);
+                if (playerId == SteamTest.selfIdentity.GetSteamID64())
+                {
+                    int lastTeame = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, new CSteamID(playerId), "playerTeam"), System.Globalization.NumberStyles.Any);
+                    int nextTeame = lastTeame + 1;
+                    if (nextTeame > 4) nextTeame = 0;
+
+                    SteamTest.team = nextTeame;
+                    SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", nextTeame.ToString());
+                    if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                    return;
+                }
+                SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
+                kickedPlayer.SetSteamID64(playerId);
+                int lastTeam = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, new CSteamID(playerId), "playerTeam"), System.Globalization.NumberStyles.Any);
+                int nextTeam = lastTeam + 1;
+                if (nextTeam > 4) nextTeam = 0;
+                InnerWorkings.SendMessage("%;" + nextTeam, kickedPlayer);
+                if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+            }
+        }
+
+        public void ResetPlayerLobby()
+        {
+            RemovePlayerInfoSprites();
+            CreateLobbyPlayers();
         }
 
         public void Regen(bool sizeChange)
@@ -410,6 +458,8 @@ namespace BingoMode
 
             lobbySettingsInfo.pos.x = multiMenuBg.pos.x + 338f;
             lobbySettingsInfo.pos.y = divider.y + 5.25f;
+
+            if (lobbyPlayers != null && lobbyPlayers.Count > 0) DrawPlayerInfo(timeStacker);
         }
 
         public override void Update()
@@ -446,11 +496,8 @@ namespace BingoMode
         public void CreateLobbyPage()
         {
             // players
-            // - name with a color corresponding to the team
             // - assign to next team (host only)
             // - kick (host only)
-            // - host gets a crown icon
-            // dividers
             lobbyName = new MenuLabel(expMenu, this, SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name"), default, default, true);
             subObjects.Add(lobbyName);
             Plugin.logger.LogMessage("ASHOL " + SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) + " - " + SteamTest.selfIdentity.GetSteamID());
@@ -462,7 +509,7 @@ namespace BingoMode
             lobbySettingsInfo.symbolSprite.scale = 0.9f;
             subObjects.Add(lobbySettingsInfo);
 
-
+            CreateLobbyPlayers();
         }
 
         public void RemoveLobbyPage()
@@ -471,6 +518,34 @@ namespace BingoMode
             lobbySettingsInfo.RemoveSprites();
             RemoveSubObject(lobbyName);
             RemoveSubObject(lobbySettingsInfo);
+            RemovePlayerInfoSprites();
+        }
+
+        public void CreateLobbyPlayers()
+        {
+            lobbyPlayers = [];
+            bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
+            foreach (var p in SteamTest.LobbyMembers)
+            {
+                lobbyPlayers.Add(new PlayerInfo(this, p.GetSteamID(), isHost));
+            }
+            lobbyDividers = new FSprite[lobbyPlayers.Count - 1];
+            for (int i = 0; i < lobbyDividers.Length; i++)
+            {
+                lobbyDividers[i] = new FSprite("pixel")
+                {
+                    scaleX = 340f,
+                    scaleY = 1f,
+                    anchorX = 0f
+                };
+                Container.AddChild(lobbyDividers[i]);
+            }
         }
 
         public void CreateSearchPage()
@@ -548,6 +623,25 @@ namespace BingoMode
             }
         }
 
+        public void RemovePlayerInfoSprites()
+        {
+            if (lobbyPlayers != null && lobbyPlayers.Count > 0)
+            {
+                for (int i = 0; i < lobbyPlayers.Count; i++)
+                {
+                    lobbyPlayers[i].Remove();
+                }
+                lobbyPlayers.Clear();
+            }
+            if (lobbyDividers != null)
+            {
+                for (int i = 0; i < lobbyDividers.Length; i++)
+                {
+                    lobbyDividers[i].RemoveFromContainer();
+                }
+            }
+        }
+
         public void UnlocksButton_OnPressDone(UIfocusable trigger)
         {
             UnlockDialog unlockDialog = new UnlockDialog(menu.manager, (menu as ExpeditionMenu).challengeSelect);
@@ -591,19 +685,19 @@ namespace BingoMode
 
         public void DrawDisplayedLobbies(float timeStacker)
         {
-            float refX = Mathf.Lerp(multiMenuBg.lastPos.x, multiMenuBg.pos.x, timeStacker);
-            float dif = 500f / maxItems;
-            float sliderDif = dif * (foundLobbies.Count - maxItems - 1);
-            Vector2 pouse = new Vector2(refX + 10f, 560f);
+            float refX = Mathf.Lerp(multiMenuBg.lastPos.x, multiMenuBg.pos.x, timeStacker) + 10f;
+            float dif = 500f / maxItems[0];
+            float sliderDif = dif * (foundLobbies.Count - maxItems[0] - 1);
+            Vector2 pouse = new Vector2(refX, 560f);
             for (int i = 0; i < foundLobbies.Count; i++)
             {
-                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
+                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems[0] ? 1f : sliderF)));
                 foundLobbies[i].maxAlpha = Mathf.InverseLerp(36f, 46f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
                 foundLobbies[i].Draw(origPos);
             }
             for (int i = 0; i < lobbyDividers.Length; i++)
             {
-                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
+                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems[0] ? 1f : sliderF)));
                 lobbyDividers[i].alpha = Mathf.InverseLerp(60f, 70f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
                 lobbyDividers[i].SetPosition(origPos + new Vector2(2f, -12.5f));
             }
@@ -611,22 +705,22 @@ namespace BingoMode
 
         public void DrawPlayerInfo(float timeStacker)
         {
-            float refX = Mathf.Lerp(multiMenuBg.lastPos.x, multiMenuBg.pos.x, timeStacker);
-            float dif = 500f / maxItems;
-            float sliderDif = dif * (foundLobbies.Count - maxItems - 1);
-            Vector2 pouse = new Vector2(refX + 10f, 560f);
-            for (int i = 0; i < foundLobbies.Count; i++)
+            float refX = Mathf.Lerp(multiMenuBg.lastPos.x, multiMenuBg.pos.x, timeStacker) + 10f;
+            float dif = 500f / maxItems[0];
+            float sliderDif = dif * (lobbyPlayers.Count - maxItems[0] - 1);
+            Vector2 pouse = new Vector2(refX, 560f);
+            for (int i = 0; i < lobbyPlayers.Count; i++)
             {
-                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
-                foundLobbies[i].maxAlpha = Mathf.InverseLerp(36f, 46f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
-                foundLobbies[i].Draw(origPos);
+                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (lobbyPlayers.Count < maxItems[0] ? 1f : sliderF)));
+                lobbyPlayers[i].maxAlpha = Mathf.InverseLerp(36f, 46f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
+                lobbyPlayers[i].Draw(origPos);
             }
-            //for (int i = 0; i < lobbyDividers.Length; i++)
-            //{
-            //    Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (foundLobbies.Count < maxItems ? 1f : sliderF)));
-            //    lobbyDividers[i].alpha = Mathf.InverseLerp(60f, 70f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
-            //    lobbyDividers[i].SetPosition(origPos + new Vector2(2f, -12.5f));
-            //}
+            for (int i = 0; i < lobbyDividers.Length; i++)
+            {
+                Vector2 origPos = pouse - new Vector2(0f, dif * i - sliderDif * (1f - (lobbyPlayers.Count < maxItems[0] ? 1f : sliderF)));
+                lobbyDividers[i].alpha = Mathf.InverseLerp(60f, 70f, origPos.y) - Mathf.InverseLerp(566f, 576f, origPos.y);
+                lobbyDividers[i].SetPosition(origPos + new Vector2(2f, -12.5f));
+            }
         }
 
         public void AddLobbies(List<CSteamID> lobbies)
@@ -679,37 +773,64 @@ namespace BingoMode
             public CSteamID playerID;
             public string nickname;
             public int team;
-            public SymbolButton kick;
+            public SimpleButton kick;
             public SimpleButton cycleTeam;
             public BingoPage page;
             public FLabel nameLabel;
+            public float maxAlpha;
 
             public PlayerInfo(BingoPage page, CSteamID player, bool controls)
             {
                 this.page = page;
-                nickname = SteamFriends.GetPlayerNickname(player);
-                team = 0;
+                team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam"), System.Globalization.NumberStyles.Any);
+                bool isHost = player == SteamTest.selfIdentity.GetSteamID();
+                nickname = isHost ? SteamFriends.GetPersonaName() : SteamFriends.GetPlayerNickname(player);
                 nameLabel = new FLabel(Custom.GetFont(), nickname)
                 {
                     alignment = FLabelAlignment.Left,
                     anchorX = 0,
+                    color = TEAM_COLOR[team]
                 };
                 page.Container.AddChild(nameLabel);
 
                 if (controls)
                 {
-
+                    cycleTeam = new SimpleButton(page.menu, page, "Change team", "SWTEAM-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(90f, 16f));
+                    page.subObjects.Add(cycleTeam);
+                    if (!isHost)
+                    {
+                        kick = new SimpleButton(page.menu, page, "Kick", "KICK-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(40f, 16f));
+                        page.subObjects.Add(kick);
+                    }
                 }
             }
 
             public void Draw(Vector2 origPos)
             {
-
+                nameLabel.SetPosition(origPos);
+                float a = Mathf.Clamp01(maxAlpha);
+                nameLabel.alpha = a;
+                cycleTeam.Container.alpha = a;
+                cycleTeam.pos = origPos + new Vector2(250f, -8f);
+                cycleTeam.lastPos = cycleTeam.pos;
+                if (kick != null)
+                {
+                    kick.Container.alpha = a;
+                    kick.pos = origPos + new Vector2(210f, -8f);
+                    kick.lastPos = kick.pos;
+                }
             }
 
             public void Remove()
             {
                 nameLabel.RemoveFromContainer();
+                cycleTeam.RemoveSprites();
+                page.RemoveSubObject(cycleTeam);
+                if (kick != null)
+                {
+                    kick.RemoveSprites();
+                    page.RemoveSubObject(kick);
+                }
             }
         }
 
@@ -757,9 +878,8 @@ namespace BingoMode
 
             public void Draw(Vector2 origPos)
             {
-                Vector2 namePos = origPos;
-                nameLabel.SetPosition(namePos);
-                playerLabel.SetPosition(namePos + new Vector2(335f, 0f));
+                nameLabel.SetPosition(origPos);
+                playerLabel.SetPosition(origPos + new Vector2(335f, 0f));
                 float a = Mathf.Clamp01(maxAlpha); // - 0.5f * Mathf.Abs(Mathf.Sin(Mathf.Lerp(buttonBehav.lastSin, buttonBehav.sin, timeStacker) / 30f * Mathf.PI))
                 nameLabel.alpha = a;
                 playerLabel.alpha = a;

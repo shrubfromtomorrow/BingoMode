@@ -31,23 +31,24 @@ namespace BingoMode.BingoSteamworks
         public static bool MessageReceived(string message)
         {
             char type = message[0];
-            message = message.Substring(1);
+            //message = message.Substring(1);
             Plugin.logger.LogMessage("MESSAGE TYPE IS " + type + " " + (type == '!'));
-            string[] data = message.Split(new char[] { ';' });
+            string[] data = message.Split(';');
             switch (type)
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length < 3)
+                    if (data.Length < 5)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
 
-                    if (int.TryParse(data[0], out int x) && x != -1 && int.TryParse(data[1], out int y) && y != -1 && int.TryParse(data[2], out int teamCredit))
+                    if (int.TryParse(data[1], out int x) && x != -1 && int.TryParse(data[2], out int y) && y != -1 && int.TryParse(data[3], out int teamCredit) && ulong.TryParse(data[4], out ulong playerCredit))
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
+                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
                         if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
                         else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         return true;
@@ -84,6 +85,7 @@ namespace BingoMode.BingoSteamworks
                     }
                     return false;
 
+                // Change team
                 case '%':
                     if (data.Length < 2)
                     {
@@ -91,16 +93,23 @@ namespace BingoMode.BingoSteamworks
                         return false;
                     }
 
-                    if (int.TryParse(data[0], out int t))
+                    if (int.TryParse(data[1], out int t))
                     {
+                        SteamTest.team = t;
                         SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
                         return true;
                     }
                     else
                     {
-                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
+                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message + " DATA: " + data[1]);
                         return false;
                     }
+
+                // Kick behavior
+                case '@':
+                    if (SteamTest.CurrentLobby == default) return false;
+                    SteamTest.LeaveLobby();
+                    return true;
             }
 
             return false;

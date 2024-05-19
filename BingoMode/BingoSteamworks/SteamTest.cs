@@ -181,6 +181,7 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());
+            SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             // other settings idk
             CurrentLobby = lobbyID;
             UpdateOnlineBingo();
@@ -301,21 +302,29 @@ namespace BingoMode.BingoSteamworks
 
                     break;
                 case 0x0002:
-                    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                    text = "left";
-                    break;
                 case 0x0004:
-                    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                    text = "disconnected from";
-                    break;
                 case 0x0008:
-                    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                    text = "kicked from";
-                    break;
                 case 0x0010:
                     LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                    text = "banned from";
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.inLobby)
+                    {
+                        page.ResetPlayerLobby();
+                    }
+                    text = "left " + callback.m_rgfChatMemberStateChange;
+
                     break;
+                //case 0x0004:
+                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
+                //    text = "disconnected from";
+                //    break;
+                //case 0x0008:
+                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
+                //    text = "kicked from";
+                //    break;
+                //case 0x0010:
+                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
+                //    text = "banned from";
+                //    break;
             }
             Plugin.logger.LogMessage($"User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
 
@@ -328,20 +337,30 @@ namespace BingoMode.BingoSteamworks
 
         public static void OnLobbyDataUpdate(LobbyDataUpdate_t callback)
         {
-            if (callback.m_bSuccess == 0 || callback.m_ulSteamIDLobby != callback.m_ulSteamIDMember || selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
+            if (callback.m_bSuccess == 0 || selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
 
-            string challenjes = SteamMatchmaking.GetLobbyData(CurrentLobby, "challenges");
-            try
+            if (callback.m_ulSteamIDLobby == callback.m_ulSteamIDMember)
             {
-                BingoHooks.GlobalBoard.FromString(challenjes);
-            }
-            catch (Exception e)
-            {
-                Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
-                LeaveLobby();
-            }
+                string challenjes = SteamMatchmaking.GetLobbyData(CurrentLobby, "challenges");
+                try
+                {
+                    BingoHooks.GlobalBoard.FromString(challenjes);
+                }
+                catch (Exception e)
+                {
+                    Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
+                    LeaveLobby();
+                }
 
-            FetchLobbySettings();
+                FetchLobbySettings();
+            }
+            else
+            {
+                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.inLobby)
+                {
+                    page.ResetPlayerLobby();
+                }
+            }
         }
 
         public static void OnLobbyMatchList(LobbyMatchList_t result, bool bIOFailure)
@@ -419,7 +438,7 @@ namespace BingoMode.BingoSteamworks
             }
             foreach (var id in LobbyMembers)
             {
-                InnerWorkings.SendMessage($"#{x};{y};{team}", id);
+                InnerWorkings.SendMessage($"#{x};{y};{team};{selfIdentity.GetSteamID64()}", id);
             }
         }
 

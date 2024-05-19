@@ -167,8 +167,8 @@ namespace BingoMode.Challenges
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
             IL.FlareBomb.Update += FlareBomb_Update;
-            On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
-            IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
+            //On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
+            //IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
         }
 
         public static void Challenge_CompleteChallengeIL(ILContext il)
