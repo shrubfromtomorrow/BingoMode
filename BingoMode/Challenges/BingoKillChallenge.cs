@@ -97,8 +97,8 @@ namespace BingoMode.Challenges
                 amount = new(num, "Amount", 1),
                 starve = new(starvv, "While Starving", 2),
                 oneCycle = new(onePiece, "In one Cycle", 3),
-                sub = new("Any Subregion", "Subregion", 4, listName: "regions"),
-                region = new("Any Region", "Region", 5, listName: "subregions"),
+                sub = new("Any Subregion", "Subregion", 4, listName: "subregions"),
+                region = new("Any Region", "Region", 5, listName: "regions"),
                 //room = new("", "Room", 6, listName: "regions"),
                 weapon = new(weapo, "Weapon Used", 6, listName: "weapons"),
                 deathPit = new(false, "Via a Death Pit", 7)

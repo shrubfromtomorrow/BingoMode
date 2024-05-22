@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using Steamworks;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace BingoMode
 {
+    using BingoSteamworks;
     using Challenges;
-    using System.Globalization;
-    using System.Text.RegularExpressions;
 
     public class BingoHooks
     {
@@ -225,6 +227,9 @@ namespace BingoMode
             // Multiplayer lobbies slider
             On.Menu.ExpeditionMenu.SliderSetValue += ExpeditionMenu_SliderSetValue;
             On.Menu.ExpeditionMenu.ValueOfSlider += ExpeditionMenu_ValueOfSlider;
+
+            // Remove challenge preview list
+            On.Menu.CharacterSelectPage.UpdateChallengePreview += CharacterSelectPage_UpdateChallengePreview;
         }
 
         private static float ExpeditionMenu_ValueOfSlider(On.Menu.ExpeditionMenu.orig_ValueOfSlider orig, ExpeditionMenu self, Slider slider)
@@ -338,7 +343,33 @@ namespace BingoMode
             {
                 pag.unlocksButton.greyedOut = false;
                 pag.unlocksButton.Reset();
-            } 
+            }
+            if (!BingoData.MultiplayerGame || SteamTest.LobbyMembers.Count == 0) return;
+            if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited && message.StartsWith("unl-"))
+            {
+                string perkList = "";
+                foreach (var unl in ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")))
+                {
+                    perkList += ";" + unl;
+                }
+                foreach (var player in SteamTest.LobbyMembers)
+                {
+                    InnerWorkings.SendMessage("p" + perkList, player);
+                }
+            }
+
+            if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.Inherited && message.StartsWith("bur-"))
+            {
+                string burList = "";
+                foreach (var bur in ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")))
+                {
+                    burList += ";" + bur;
+                }
+                foreach (var player in SteamTest.LobbyMembers)
+                {
+                    InnerWorkings.SendMessage("b" + burList, player);
+                }
+            }
         }
 
         public static void ChallengeSelectPage_SetUpSelectables(On.Menu.ChallengeSelectPage.orig_SetUpSelectables orig, ChallengeSelectPage self)
@@ -560,7 +591,7 @@ namespace BingoMode
                     self.slugcatDescription.text = "";
                     if (!newBingoButton.TryGetValue(self, out _))
                     {
-                        newBingoButton.Add(self, new HoldButton(self.menu, self, "CONTINUE\nBINGO", "LOADBINGO", new Vector2(590f, 180f), 30f));
+                        newBingoButton.Add(self, new HoldButton(self.menu, self, "CONTINUE\nBINGO", "LOADBINGO", new Vector2(680f, 210f), 30f));
                     }
                     newBingoButton.TryGetValue(self, out var bb);
                     self.subObjects.Add(bb);
@@ -578,6 +609,35 @@ namespace BingoMode
             }
             newBingoButton.TryGetValue(self, out var button);
             self.subObjects.Add(button);
+        }
+
+        private static void CharacterSelectPage_UpdateChallengePreview(On.Menu.CharacterSelectPage.orig_UpdateChallengePreview orig, CharacterSelectPage self)
+        {
+            orig.Invoke(self);
+
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
+            {
+                if (self.strikethroughs != null)
+                {
+                    for (int i = 0; i < self.strikethroughs.Count; i++)
+                    {
+                        if (self.strikethroughs[i] != null)
+                        {
+                            self.strikethroughs[i].RemoveFromContainer();
+                        }
+                    }
+                }
+                self.strikethroughs = new List<FSprite>();
+                if (self.challengePreviews != null)
+                {
+                    for (int j = 0; j < self.challengePreviews.Count; j++)
+                    {
+                        self.challengePreviews[j].RemoveSprites();
+                        self.challengePreviews[j].RemoveSubObject(self.challengePreviews[j]);
+                    }
+                    self.challengePreviews = new List<MenuLabel>();
+                }
+            }
         }
 
         public static void CharacterSelectPage_ClearStats(On.Menu.CharacterSelectPage.orig_ClearStats orig, CharacterSelectPage self)

@@ -40,52 +40,12 @@ namespace BingoMode.BingoSteamworks
                 lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(OnLobbyDataUpdate);
                 SteamNetworkingSockets.GetIdentity(out selfIdentity);
                 Plugin.logger.LogMessage(selfIdentity.GetSteamID());
-                //CSteamID nacu = (CSteamID)76561198140779563;
-                //SteamNetworkingIdentity nacku = new();
-                //nacku.SetSteamID(nacu);
-                //CSteamID ridg = (CSteamID)76561198357253101;
-                //SteamNetworkingIdentity ridgg = new();
-                //ridgg.SetSteamID(ridg);
-                //
-                //if (selfIdentity.GetSteamID() == nacu)
-                //{
-                //    Plugin.logger.LogMessage("Init send message from nacu!");
-                //
-                //    try
-                //    {
-                //        InnerWorkings.SendMessage("hi i am nacku and im yes", ridgg);
-                //        InnerWorkings.SendMessage("another one!", ridgg);
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Plugin.logger.LogError("FAILED TO SEND MESSAGE AS NACU " + e);
-                //    }
-                //
-                //    //CreateLobby();
-                //}
-                //else
-                //{
-                //    Plugin.logger.LogMessage("Init send message from ridg!");
-                //    try
-                //    {
-                //        InnerWorkings.SendMessage("hi i am righ and im aweosme", nacku);
-                //        InnerWorkings.SendMessage("another one!", nacku);
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Plugin.logger.LogError("FAILED TO SEND MESSAGE AS RIDG " + e);
-                //    }
-                //
-                //    //LookAndJoinFirstLobby();
-                //}
-
-                //SteamNetworkingUtils.SteamNetworkingIdentity_ParseString(out var idelti, bluh);
             }
 
             BingoData.globalSettings.lockout = false;
             BingoData.globalSettings.gameMode = false;
             BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.None;
-            BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.Any;
+            BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.None;
         }
 
         public static void CreateLobby()
@@ -118,7 +78,7 @@ namespace BingoMode.BingoSteamworks
                     }
                 }
 
-                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+                if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                 {
                     page.AddLobbies(JoinableLobbies);
                 }
@@ -164,8 +124,8 @@ namespace BingoMode.BingoSteamworks
             }
 
             Plugin.logger.LogMessage("Resetting activated perks and burdens");
-            if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
-            if (BingoData.globalSettings.burdens != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
+            if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+            if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
             team = 0;
             Plugin.logger.LogMessage("Set team number to " + team);
 
@@ -268,6 +228,8 @@ namespace BingoMode.BingoSteamworks
             Plugin.logger.LogMessage("Setting lobby settings");
             BingoData.globalSettings.lockout = SteamMatchmaking.GetLobbyData(CurrentLobby, "lockout") == "1";
             BingoData.globalSettings.gameMode = SteamMatchmaking.GetLobbyData(CurrentLobby, "gameMode") == "1";
+
+            Plugin.logger.LogMessage("- setting perks burdens");
             if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "perks"), out int perjs) || int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens"), out int burjens))
             {
                 Plugin.logger.LogError("FAILED TO PARSE PERKS AND OR BURDEN SETTINGS FROM LOBBY");
@@ -278,9 +240,19 @@ namespace BingoMode.BingoSteamworks
             BingoData.globalSettings.burdens = (LobbySettings.AllowUnlocks)burjens;
             Plugin.logger.LogMessage("Success!");
 
-            Plugin.logger.LogMessage("Resetting activated perks and burdens");
+            Plugin.logger.LogMessage("Adjusting own perks to the lobby perks");
             if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
             if (BingoData.globalSettings.burdens != LobbySettings.AllowUnlocks.Any) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
+        }
+
+        public static void FetchUnlocks(List<string> unlockables, bool burden)
+        {
+            if (burden) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
+            else ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+            foreach (string unlock in unlockables)
+            {
+                ExpeditionGame.activeUnlocks.Add(unlock);
+            }
         }
 
         public static void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
@@ -452,6 +424,7 @@ namespace BingoMode.BingoSteamworks
                     InnerWorkings.SendMessage("!", id);
                 }
             }
+            SteamTest.LeaveLobby();
         }
 
         public static void SetMemberTeam(CSteamID persone, int newTeam)

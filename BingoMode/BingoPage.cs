@@ -30,7 +30,6 @@ namespace BingoMode
         public SymbolButton minusButton;
 
         // Multiplayer
-        public bool showMultiMenu;
         public SimpleButton multiButton;
         public RoundedRect multiMenuBg;
         public FSprite divider;
@@ -48,11 +47,14 @@ namespace BingoMode
         public FSprite[] lobbyDividers;
         public VerticalSlider slider;
         public float sliderF;
-        readonly int[] maxItems = {21, 16};
+        readonly int[] maxItems = [21, 16];
         public bool inLobby;
         public MenuLabel lobbyName;
         public SymbolButton lobbySettingsInfo;
         public List<PlayerInfo> lobbyPlayers;
+        public float lobbySlideIn;
+        public float lastLobbySlideIn;
+        public float slideStep;
 
         public static readonly Color[] TEAM_COLOR =
         {
@@ -139,11 +141,11 @@ namespace BingoMode
             CreateSearchPage();
 
             slider = new VerticalSlider(menu, this, "", new Vector2(375f, 47f), new Vector2(30f, 500f), BingoEnums.MultiplayerSlider, true) { floatValue = 1f };
-            foreach (var line in slider.lineSprites)
-            {
-                line.alpha = 0f;
-            }
-            slider.subtleSliderNob.outerCircle.alpha = 0f;
+            //foreach (var line in slider.lineSprites)
+            //{
+            //    line.alpha = 0f;
+            //}
+            //slider.subtleSliderNob.outerCircle.alpha = 0f;
             subObjects.Add(slider);
             sliderF = 1f;
         }
@@ -218,6 +220,13 @@ namespace BingoMode
 
             if (message == "STARTBINGO")
             {
+                if (SteamTest.team == 4)  // Spectator
+                {
+
+
+                    return;
+                }
+
                 if (ModManager.JollyCoop && ModManager.CoopAvailable)
                 {
                     for (int i = 1; i < menu.manager.rainWorld.options.JollyPlayerCount; i++)
@@ -300,8 +309,9 @@ namespace BingoMode
 
             if (message == "SWITCH_MULTIPLAYER")
             {
-                showMultiMenu = !showMultiMenu;
-                float ff = slider.subtleSliderNob.outerCircle.alpha == 0f ? 1f : 0f;
+                if (slideStep == 0f) slideStep = 1f;
+                else slideStep = -slideStep;
+                float ff = slideStep == 1f ? 1f : 0f;
                 slider.subtleSliderNob.outerCircle.alpha = ff;
                 foreach (var line in slider.lineSprites)
                 {
@@ -314,26 +324,7 @@ namespace BingoMode
             {
                 RemoveLobbiesSprites();
 
-                //SteamTest.GetJoinableLobbies();
-                foundLobbies = [];
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)0, "Joar's lobby", 4, 1, true, false, AllowUnlocks.Any, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "GamsaGamsaGamsaGamsaGamsaGamsass's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's lobby", 8, 3, false, true, AllowUnlocks.Inherited, AllowUnlocks.Inherited));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)1, "Gamer's ls lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                foundLobbies.Add(new LobbyInfo(this, (CSteamID)2, "Nacu's lobby", 2, 1, true, true, AllowUnlocks.None, AllowUnlocks.None));
-                CreateDisplayedLobbies();
+                SteamTest.GetJoinableLobbies();
                 return;
             }
 
@@ -427,8 +418,15 @@ namespace BingoMode
             pageTitle.x = Mathf.Lerp(owner.page.lastPos.x, owner.page.pos.x, timeStacker) + 680f;
             pageTitle.y = Mathf.Lerp(owner.page.lastPos.y, owner.page.pos.y, timeStacker) + 680f;
 
-            multiMenuBg.pos = Vector2.Lerp(multiButton.lastPos, multiButton.pos, timeStacker) - new Vector2(25f, 625f) + Vector2.left * (!showMultiMenu ? 1000f : 0f);
-
+            float slide = Mathf.Lerp(lastLobbySlideIn, lobbySlideIn, timeStacker);
+            multiMenuBg.pos = Vector2.Lerp(multiButton.lastPos, multiButton.pos, timeStacker) - new Vector2(25f, 625f) + Vector2.left * (1f - Custom.LerpExpEaseInOut(0f, 1f, slide)) * 1000f;
+            lastLobbySlideIn = lobbySlideIn;
+            lobbySlideIn = Mathf.Clamp01(lobbySlideIn + slideStep * 0.05f);
+            slider.pos.x = multiMenuBg.pos.x + 350f;            
+            foreach (var line in slider.lineSprites)
+            {
+                line.x = multiMenuBg.pos.x + 365f; 
+            }
             divider.x = multiMenuBg.pos.x + .5f;
             divider.y = 583f;
 
@@ -495,9 +493,6 @@ namespace BingoMode
 
         public void CreateLobbyPage()
         {
-            // players
-            // - assign to next team (host only)
-            // - kick (host only)
             lobbyName = new MenuLabel(expMenu, this, SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name"), default, default, true);
             subObjects.Add(lobbyName);
             Plugin.logger.LogMessage("ASHOL " + SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) + " - " + SteamTest.selfIdentity.GetSteamID());
@@ -525,11 +520,6 @@ namespace BingoMode
         {
             lobbyPlayers = [];
             bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
-            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
-            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
-            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
-            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
-            lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
             lobbyPlayers.Add(new PlayerInfo(this, SteamTest.selfIdentity.GetSteamID(), isHost));
             foreach (var p in SteamTest.LobbyMembers)
             {
@@ -656,7 +646,7 @@ namespace BingoMode
                 }
                 foreach (var bur in unlockDialog.burdenButtons)
                 {
-                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.perks == AllowUnlocks.Inherited && !isHost);
+                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.burdens == AllowUnlocks.Inherited && !isHost);
                 }
             }
             menu.manager.ShowDialog(unlockDialog);

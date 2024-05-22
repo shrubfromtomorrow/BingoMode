@@ -15,7 +15,7 @@ namespace BingoMode
     public class BingoGrid : PositionedMenuObject
     {
         public BingoBoard board;
-        public List<BingoButton> challengeButtons;
+        public BingoButton[,] challengeButtons;
         public float maxSize;
         public int size;
         public Vector2 centerPos;
@@ -23,7 +23,6 @@ namespace BingoMode
         public BingoGrid(Menu.Menu menu, MenuObject owner, Vector2 centerPos, float maxSize) : base(menu, owner, default)
         {
             board = BingoHooks.GlobalBoard;
-            challengeButtons = [];
             size = board.size;
             this.maxSize = maxSize;
             this.centerPos = centerPos;
@@ -31,21 +30,20 @@ namespace BingoMode
             GenerateBoardButtons();
         }
 
-        public override void RemoveSprites()
-        {
-            base.RemoveSprites();
-        }
-
         public void Switch(bool off)
         {
-            foreach (var butone in challengeButtons)
+            for (int i = 0; i < challengeButtons.GetLength(0); i++)
             {
-                butone.buttonBehav.greyedOut = off;
+                for (int j = 0; j < challengeButtons.GetLength(1); j++)
+                {
+                    challengeButtons[i, j].buttonBehav.greyedOut = off;
+                }
             }
         }
 
         public void GenerateBoardButtons()
         {
+            challengeButtons = new BingoButton[size, size];
             for (int i = 0; i < board.challengeGrid.GetLength(0); i++)
             {
                 for (int j = 0; j < board.challengeGrid.GetLength(1); j++)
@@ -57,9 +55,8 @@ namespace BingoMode
                     {
                         lastPos = pos
                     };
-                    challengeButtons.Add(but);
+                    challengeButtons[i, j] = but;
                     subObjects.Add(but);
-                    //Plugin.logger.LogMessage("Added new bimbo " + but + " at " + but.pos);
                 }
             }
         }

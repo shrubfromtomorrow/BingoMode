@@ -110,6 +110,28 @@ namespace BingoMode.BingoSteamworks
                     if (SteamTest.CurrentLobby == default) return false;
                     SteamTest.LeaveLobby();
                     return true;
+
+                // Force host burdens
+                case 'b':
+                    if (data.Length < 2) return false;
+                    List<string> burjs = [];
+                    for (int i = 1; i < data.Length; i++)
+                    {
+                        burjs.Add(data[1]);
+                    }
+                    SteamTest.FetchUnlocks(burjs, true);
+                    return true;
+
+                // Force host perks
+                case 'p':
+                    if (data.Length < 2) return false;
+                    List<string> perj = [];
+                    for (int i = 1; i < data.Length; i++)
+                    {
+                        perj.Add(data[1]);
+                    }
+                    SteamTest.FetchUnlocks(perj, false);
+                    return true;
             }
 
             return false;
