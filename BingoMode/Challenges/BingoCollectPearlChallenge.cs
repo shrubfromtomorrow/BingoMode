@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using UnityEngine;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 
 namespace BingoMode.Challenges
@@ -27,6 +28,15 @@ namespace BingoMode.Challenges
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            if (specific.Value)
+            {
+                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(0, 1)], [1]);
+            }
+            return new Phrase([new Icon("Symbol_Pearl", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(current, amount.Value)], [1]);
         }
 
         public override bool Duplicable(Challenge challenge)

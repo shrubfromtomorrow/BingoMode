@@ -20,6 +20,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("echo_icon", 1f, Color.white)], []);
+        }
+
         public override void Update()
         {
             base.Update();

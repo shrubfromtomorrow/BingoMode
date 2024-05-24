@@ -23,7 +23,7 @@ namespace BingoMode
     {
         public static bool BingoMode;
         public static bool MultiplayerGame;
-        public static Dictionary<SlugcatStats.Name, int> BingoSaves = []; // slug and board size
+        public static Dictionary<SlugcatStats.Name, BingoSaveData> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[4];
@@ -37,6 +37,25 @@ namespace BingoMode
         public static string BingoDen = "random";
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
+
+        public struct BingoSaveData
+        {
+            public int size;
+            public ulong hostID;
+            public bool isHost;
+
+            public BingoSaveData(int size)
+            {
+                this.size = size;
+            }
+
+            public BingoSaveData(int size, ulong hostID, bool isHost)
+            {
+                this.size = size;
+                this.hostID = hostID;
+                this.isHost = isHost;
+            }
+        }
 
         public static List<Challenge> GetAdequateChallengeList(SlugcatStats.Name slug)
         {

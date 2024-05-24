@@ -21,6 +21,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("Multiplayer_Star", 1f, Color.white), new Counter(score, target.Value)], [1]);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return !(challenge is BingoGlobalScoreChallenge);
@@ -33,7 +38,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            int num = Mathf.RoundToInt(Mathf.Lerp(150f, 300f, ExpeditionData.challengeDifficulty) / 10f) * 10;
+            int num = Mathf.RoundToInt(Mathf.Lerp(150f, 300f, UnityEngine.Random.value) / 10f) * 10;
             return new BingoGlobalScoreChallenge
             {
                 target = new(num, "Target Score", 0)

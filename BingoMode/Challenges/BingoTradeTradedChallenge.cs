@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using UnityEngine;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
@@ -22,6 +23,11 @@ namespace BingoMode.Challenges
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("scav_merchant", 1f, Color.white), new Icon("Menu_Symbol_Shuffle", 1f, Color.white), new Icon("scav_merchant", 1f, Color.white), new Counter(current, amount.Value)], [3]);
         }
 
         public override bool Duplicable(Challenge challenge)

@@ -30,6 +30,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("ShortcutGate", 1f, UnityEngine.Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)), new Counter(current, amount.Value)], [2]);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoCreatureGateChallenge;

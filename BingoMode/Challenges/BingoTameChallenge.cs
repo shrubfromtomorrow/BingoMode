@@ -3,6 +3,7 @@ using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -17,6 +18,8 @@ namespace BingoMode.Challenges
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'));
             base.UpdateDescription();
         }
+
+        public override Phrase ConstructPhrase() => new Phrase([new Icon("FriendB", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))], []);
 
         public override bool Duplicable(Challenge challenge)
         {

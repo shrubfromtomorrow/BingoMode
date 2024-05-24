@@ -90,7 +90,7 @@ namespace BingoMode.BingoSteamworks
             }
 
             SteamMatchmaking.AddRequestLobbyListDistanceFilter((ELobbyDistanceFilter)CurrentFilters.distance);
-            if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("host", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
+            if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("isHost", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
             SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
             lobbyMatchList.Set(call, OnLobbyMatchList);
         }
@@ -133,7 +133,7 @@ namespace BingoMode.BingoSteamworks
             CSteamID lobbyID = (CSteamID)result.m_ulSteamIDLobby;
             string hostName = SteamFriends.GetPersonaName();
             SteamMatchmaking.SetLobbyData(lobbyID, "name", hostName + "'s lobby");
-            SteamMatchmaking.SetLobbyData(lobbyID, "host", hostName);
+            SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
             SteamMatchmaking.SetLobbyData(lobbyID, "maxPlayers", BingoData.globalSettings.maxPlayers.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
@@ -164,7 +164,7 @@ namespace BingoMode.BingoSteamworks
             CSteamID lobbyID = (CSteamID)callback.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
             Plugin.logger.LogMessage("Entered lobby " + callback.m_ulSteamIDLobby + "! ");
-            Plugin.logger.LogMessage($"Name : {SteamMatchmaking.GetLobbyData(lobbyID, "name")}\nHost : {SteamMatchmaking.GetLobbyData(lobbyID, "host")}\nTest : {SteamMatchmaking.GetLobbyData(lobbyID, "testdata")}");
+            Plugin.logger.LogMessage($"Name : {SteamMatchmaking.GetLobbyData(lobbyID, "name")}\nHost : {SteamMatchmaking.GetLobbyData(lobbyID, "isHost")}\nTest : {SteamMatchmaking.GetLobbyData(lobbyID, "testdata")}");
             if (BingoData.globalMenu != null)
             {
                 string slug = SteamMatchmaking.GetLobbyData(lobbyID, "slugcat");

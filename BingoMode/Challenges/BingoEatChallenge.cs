@@ -17,6 +17,7 @@ namespace BingoMode.Challenges
         public SettingBox<int> amountRequired;
         public int currentEated;
         public bool isCreature;
+        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(foodType.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(foodType.Value)), new Counter(currentEated, amountRequired.Value)], [2]);
 
         public override void UpdateDescription()
         {

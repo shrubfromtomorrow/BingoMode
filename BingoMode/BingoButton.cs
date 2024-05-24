@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.Challenges;
+using Expedition;
 using Menu;
 using Menu.Remix.MixedUI;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace BingoMode
         public string singalText; // singal.
         public int x;
         public int y;
+        public Phrase phrase;
 
         public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
         {
@@ -32,11 +34,6 @@ namespace BingoMode
             textLabel = new MenuLabel(menu, owner, "", pos, size, false);
             subObjects.Add(textLabel);
 
-            //randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "randomize_single", new Vector2(size.x * 0.1f, size.y * 0.7f));
-            //randomize.size = size / 4f;
-            //randomize.roundedRect.size = randomize.size;
-            //randomize.symbolSprite.scale = 0.03f * randomize.size.x;
-            //subObjects.Add(randomize);
             UpdateText();
         }
 
@@ -94,10 +91,27 @@ namespace BingoMode
                 selectRect.sprites[j].color = MyColor(timeStacker);
                 selectRect.sprites[j].alpha = num;
             }
+
+            // Phrase biz
+            if (phrase != null)
+            {
+                phrase.centerPos = Vector2.Lerp(lastPos, pos, timeStacker) + Vector2.Lerp(page.lastPos, page.pos, timeStacker) + new Vector2(size.x / 2f, size.y / 2f);
+                phrase.Draw();
+            }
+        }
+
+        public override void RemoveSprites()
+        {
+            base.RemoveSprites();
+            if (phrase != null)
+            {
+                phrase.ClearAll();
+            }
         }
 
         public override void Clicked()
         {
+            if (owner is BingoPage p && p.fromContinueGame) return;
             Singal(this, singalText);
 
             menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
@@ -105,7 +119,18 @@ namespace BingoMode
 
         public void UpdateText()
         {
-            textLabel.text = challenge.description.WrapText(false, size.x * 0.8f);
+            textLabel.text = "";//challenge.description.WrapText(false, size.x * 0.8f);
+            if (phrase != null)
+            {
+                phrase.ClearAll();
+            }
+            phrase = (challenge as BingoChallenge).ConstructPhrase();
+            if (phrase != null)
+            {
+                phrase.AddAll(Container);
+                Plugin.logger.LogMessage(size.x);
+                phrase.scale = size.x / 100f;
+            }
         }
     }
 }

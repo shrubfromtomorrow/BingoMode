@@ -90,6 +90,7 @@ namespace BingoMode
                 SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
+                Futile.atlasManager.LoadAtlas("Atlases/bingoicons");
                 BingoEnums.Register();
                 
                 BingoHooks.Apply();

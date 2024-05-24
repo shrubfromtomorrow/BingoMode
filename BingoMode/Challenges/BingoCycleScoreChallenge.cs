@@ -21,6 +21,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("Multiplayer_Star", 1f, Color.white), new Icon("cycle_limit", 1f, Color.white), new Counter(score, target.Value)], [2]);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return !(challenge is BingoCycleScoreChallenge);
@@ -39,7 +44,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            int num = Mathf.RoundToInt(Mathf.Lerp(20f, 125f, ExpeditionData.challengeDifficulty) / 10f) * 10;
+            int num = Mathf.RoundToInt(Mathf.Lerp(20f, 125f, UnityEngine.Random.value) / 10f) * 10;
             return new BingoCycleScoreChallenge
             {
                 target = new(num, "Target Score", 0)

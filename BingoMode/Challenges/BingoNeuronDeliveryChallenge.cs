@@ -33,6 +33,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("Symbol_Neuron", 1f, Color.white), new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)), new Counter(delivered, neurons.Value)], [2]);
+        }
+
         public override string ChallengeName()
         {
             return ChallengeTools.IGT.Translate("Neuron Gifting");
@@ -76,7 +81,7 @@ namespace BingoMode.Challenges
         {
             return new BingoNeuronDeliveryChallenge
             {
-                neurons = new(Mathf.RoundToInt(UnityEngine.Random.Range(1f, Mathf.Lerp(1f, 4f, Mathf.InverseLerp(0.4f, 1f, ExpeditionData.challengeDifficulty)))), "Amount of Neurons", 0)
+                neurons = new(Mathf.RoundToInt(UnityEngine.Random.Range(1f, Mathf.Lerp(1f, 4f, Mathf.InverseLerp(0.4f, 1f, UnityEngine.Random.value)))), "Amount of Neurons", 0)
             };
         }
 

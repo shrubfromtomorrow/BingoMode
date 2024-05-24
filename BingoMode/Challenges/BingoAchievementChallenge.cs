@@ -19,6 +19,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon(ID.Value + "A", 1f, Color.white)], []);
+        }
+
         public override string ChallengeName()
         {
             return ChallengeTools.IGT.Translate("Passage");

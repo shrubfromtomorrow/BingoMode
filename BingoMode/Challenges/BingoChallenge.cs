@@ -12,10 +12,34 @@ namespace BingoMode.Challenges
         public abstract void AddHooks();
         public abstract void RemoveHooks();
         public abstract List<object> Settings();
-        public bool RequireSave;
+        public bool RequireSave = true;
         public bool Failed;
         public bool[] TeamsCompleted = new bool[4];
         public ulong completeCredit = 0;
+        public virtual Phrase ConstructPhrase() => null;
+        public event Action DescriptionUpdated;
+        //Phrase _phrase;
+        //public Phrase phrase
+        //{
+        //    get
+        //    {
+        //        if (_phrase == null)
+        //        {
+        //            _phrase = ConstructPhrase();
+        //        }
+        //        return _phrase;
+        //    }
+        //    set
+        //    {
+        //        _phrase = value;
+        //    }
+        //}
+
+        public override void UpdateDescription()
+        {
+            base.UpdateDescription();
+            DescriptionUpdated?.Invoke();
+        }
 
         public override void CompleteChallenge()
         {

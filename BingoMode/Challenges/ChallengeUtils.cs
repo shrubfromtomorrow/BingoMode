@@ -6,6 +6,7 @@ using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 using System.Collections.Generic;
 using MoreSlugcats;
 using System.Linq;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -15,6 +16,26 @@ namespace BingoMode.Challenges
         {
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
+        }
+
+        public static string ItemOrCreatureIconName(string thing)
+        {
+            string elementName = ItemSymbol.SpriteNameForItem(new(thing, false), 0);
+            if (elementName == "Futile_White")
+            {
+                elementName = CreatureSymbol.SpriteNameOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, 0));
+            }
+            return elementName;
+        }
+
+        public static Color ItemOrCreatureIconColor(string thing)
+        {
+            Color color = ItemSymbol.ColorForItem(new(thing, false), 0);
+            if (color == Menu.Menu.MenuRGB(Menu.Menu.MenuColors.MediumGrey))
+            {
+                color = CreatureSymbol.ColorOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, 0));
+            }
+            return color;
         }
 
         public static string[] GetCorrectListForChallenge(string listName)

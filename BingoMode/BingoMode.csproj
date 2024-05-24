@@ -132,6 +132,7 @@
     <Compile Include="Challenges\BingoVistaChallenge.cs" />
     <Compile Include="Challenges\ChallengeHooks.cs" />
     <Compile Include="Challenges\ChallengeUtils.cs" />
+    <Compile Include="Challenges\ChallengeDisplay.cs" />
     <Compile Include="CreateLobbyDialog.cs" />
     <Compile Include="CustomizerDialog.cs" />
     <Compile Include="Plugin.cs" />

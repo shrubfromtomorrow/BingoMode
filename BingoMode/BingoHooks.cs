@@ -66,9 +66,9 @@ namespace BingoMode
             {
                 c.EmitDelegate<Func<List<Challenge>, List<Challenge>>>((orig) =>
                 {
-                    orig.AddRange(BingoData.availableBingoChallenges);
+                    List<Challenge> newList = [.. orig, .. BingoData.availableBingoChallenges];
 
-                    return orig;
+                    return newList;
                 });
             }
             else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 1 threw!!! " + il);
@@ -91,8 +91,12 @@ namespace BingoMode
                             string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
                             for (int i = 0; i < array.Length; i++)
                             {
-                                string[] array2 = array[i].Split('#');
-                                BingoData.BingoSaves[new(array2[0])] = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                                string[] array2 = array[i].Split('#'); 
+                                if (array2.Length > 2)
+                                {
+                                    BingoData.BingoSaves[new(array2[0])] = new(int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture), ulong.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture), array2[3] == "1");
+                                }
+                                else BingoData.BingoSaves[new(array2[0])] = new(int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture));
                             }
                         }
                     }
@@ -137,7 +141,7 @@ namespace BingoMode
                     try
                     {
                         string t = array11[0];
-                        Challenge challenge = (Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == t).GetType()) as Challenge).Generate();
+                        Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == t).GetType()) as Challenge).Generate();
                         if (challenge != null)
                         {
                             Plugin.logger.LogInfo("Regenerating broken challenge " + challenge);
@@ -151,7 +155,7 @@ namespace BingoMode
                     catch (Exception ex)
                     {
                         Plugin.logger.LogError("Error while regenerating broken challenge, call that shit inception fr how did this happen: " + ex);
-                        Challenge challenge = Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == "BingoDodgeLeviathanChallenge").GetType()) as Challenge;
+                        Challenge challenge = Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoDodgeLeviathanChallenge").GetType()) as Challenge;
                         challenge.FromString(array11[1]);
                         if (challenge != null)
                         {
@@ -180,7 +184,7 @@ namespace BingoMode
             BingoData.availableBingoChallenges ??= [];
             orig.Invoke();
             BingoData.availableBingoChallenges.AddRange(ChallengeOrganizer.availableChallengeTypes.Where(x => x is BingoChallenge).ToList());
-            ChallengeOrganizer.availableChallengeTypes = ChallengeOrganizer.availableChallengeTypes.Where(x => x is not BingoChallenge).ToList();
+            ChallengeOrganizer.availableChallengeTypes.RemoveAll(x => x is BingoChallenge);
         }
 
         public static void Apply()
@@ -217,6 +221,7 @@ namespace BingoMode
             // Saving and loaading shit
             IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
             On.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToString;
+            On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
 
             // Preventing expedition antics
             IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
@@ -230,6 +235,12 @@ namespace BingoMode
 
             // Remove challenge preview list
             On.Menu.CharacterSelectPage.UpdateChallengePreview += CharacterSelectPage_UpdateChallengePreview;
+        }
+
+        private static void CharacterSelectPage_AbandonButton_OnPressDone(On.Menu.CharacterSelectPage.orig_AbandonButton_OnPressDone orig, CharacterSelectPage self, Menu.Remix.MixedUI.UIfocusable trigger)
+        {
+            BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+            orig.Invoke(self, trigger);
         }
 
         private static float ExpeditionMenu_ValueOfSlider(On.Menu.ExpeditionMenu.orig_ValueOfSlider orig, ExpeditionMenu self, Slider slider)
@@ -299,7 +310,11 @@ namespace BingoMode
                     string text = "";
                     for (int i = 0; i < BingoData.BingoSaves.Count; i++)
                     {
-                        text += BingoData.BingoSaves.ElementAt(i).Key + "#" + ValueConverter.ConvertToString(BingoData.BingoSaves.ElementAt(i).Value);
+                        text += BingoData.BingoSaves.ElementAt(i).Key + "#" + BingoData.BingoSaves.ElementAt(i).Value.size.ToString();
+                        if (BingoData.BingoSaves.ElementAt(i).Value.hostID != default)
+                        {
+                            text += "#" + BingoData.BingoSaves.ElementAt(i).Value.hostID + "#" + (BingoData.BingoSaves.ElementAt(i).Value.isHost ? "1" : "0");
+                        }
                         if (i < BingoData.BingoSaves.Count - 1)
                         {
                             text += "<>";
@@ -506,29 +521,26 @@ namespace BingoMode
             if (self.pagesMoving) return;
             if (message == "NEWBINGO")
             {
-                self.UpdatePage(4);
-                self.MovePage(new Vector2(1500f, 0f));
+                if (bingoPage.TryGetValue(self, out var page))
+                {
+                    self.UpdatePage(4);
+                    Plugin.logger.LogMessage("regenerating here at ExpeditionMenu_Singal");
+                    GlobalBoard.GenerateBoard(GlobalBoard.size);
+                    if (page.grid != null)
+                    {
+                        page.grid.RemoveSprites();
+                        page.RemoveSubObject(page.grid);
+                        page.grid = null;
+                    }
+                    page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
+                    page.subObjects.Add(page.grid);
+                    self.MovePage(new Vector2(1500f, 0f));
+                }
             }
             if (message == "LOADBINGO")
             {
-                if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
-                {
-                    //Plugin.logger.LogMessage("aguga");
-                    BingoData.InitializeBingo();
-                    int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer];
-                    //Plugin.logger.LogMessage(size);
-                    GlobalBoard.challengeGrid = new Challenge[size, size];
-                    int chIndex = 0;
-                    for (int i = 0; i < size; i++)
-                    {
-                        for (int j = 0; j < size; j++)
-                        {
-                            GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
-                            //ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
-                            chIndex++;
-                        }
-                    }
-                }
+                BingoData.InitializeBingo();
+                LoadBingoNoStart();
 
                 if (ModManager.CoopAvailable)
                 {
@@ -554,16 +566,17 @@ namespace BingoMode
                     self.PlaySound(SoundID.MENU_Continue_Game);
                 }
             }
-        }
+            if (message == "TRYREJOIN")
+            {
 
-        public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)
-        {
-            if (pageIndex == 4)
+            }
+            if (message == "CREATELOB")
             {
                 if (bingoPage.TryGetValue(self, out var page))
                 {
-                    Plugin.logger.LogMessage("regenerating here at ExpeditionMenu_UpdatePage");
-                    GlobalBoard.GenerateBoard(GlobalBoard.size);
+                    self.UpdatePage(4);
+                    self.MovePage(new Vector2(1500f, 0f));
+                    LoadBingoNoStart();
                     if (page.grid != null)
                     {
                         page.grid.RemoveSprites();
@@ -572,6 +585,38 @@ namespace BingoMode
                     }
                     page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                     page.subObjects.Add(page.grid);
+                    page.fromContinueGame = true;
+
+                    page.multiButton.buttonBehav.greyedOut = false;
+                    page.multiButton.Clicked();
+                    page.createLobby.buttonBehav.greyedOut = false;
+                    page.createLobby.Clicked();
+                }
+            }
+        }
+
+        public static void LoadBingoNoStart()
+        {
+            int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].size;
+            GlobalBoard.challengeGrid = new Challenge[size, size];
+            int chIndex = 0;
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
+                    //ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
+                    chIndex++;
+                }
+            }
+        }
+
+        public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)
+        {
+            if (pageIndex == 4)
+            {
+                if (bingoPage.TryGetValue(self, out var page))
+                {
                     self.selectedObject = page.randomize;
                 }
                 else self.selectedObject = self.characterSelect.slugcatButtons[0];
@@ -588,10 +633,12 @@ namespace BingoMode
                 SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
                 if (saveGameData != null)
                 {
+                    bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
+                    bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
                     self.slugcatDescription.text = "";
                     if (!newBingoButton.TryGetValue(self, out _))
                     {
-                        newBingoButton.Add(self, new HoldButton(self.menu, self, "CONTINUE\nBINGO", "LOADBINGO", new Vector2(680f, 210f), 30f));
+                        newBingoButton.Add(self, new HoldButton(self.menu, self, isHost ? "CREATE\nLOBBY" : isMultiplayer ? "REJOIN\nLOBBY" : "CONTINUE\nBINGO", isHost ? "CREATELOB" : isMultiplayer ? "TRYREJOIN" : "LOADBINGO", new Vector2(680f, 210f), 30f));
                     }
                     newBingoButton.TryGetValue(self, out var bb);
                     self.subObjects.Add(bb);

@@ -13,12 +13,17 @@ namespace BingoMode.Challenges
     public class BingoItemHoardChallenge : BingoChallenge
     {
         public SettingBox<string> target;
-        public int amount;
+        public SettingBox<int> amount;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Store <amount> <target_item> in the same shelter").Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount)).Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)));
+            this.description = ChallengeTools.IGT.Translate("Store <amount> <target_item> in the same shelter").Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value)).Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Counter(completed ? amount.Value : 0, amount.Value)], [2]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -41,14 +46,14 @@ namespace BingoMode.Challenges
             AbstractPhysicalObject.AbstractObjectType abstractObjectType = ChallengeTools.ObjectTypes[UnityEngine.Random.Range(0, ChallengeTools.ObjectTypes.Count - 1)];
             return new BingoItemHoardChallenge
             {
-                amount = (int)Mathf.Lerp(2f, 8f, ExpeditionData.challengeDifficulty),
+                amount = new((int)Mathf.Lerp(2f, 8f, ExpeditionData.challengeDifficulty), "Amount", 1),
                 target = new(abstractObjectType.value, "Item", 0, listName: "expobject")
             };
         }
 
         public override int Points()
         {
-            int num = 7 * this.amount * (int)(this.hidden ? 2f : 1f);
+            int num = 7 * this.amount.Value * (int)(this.hidden ? 2f : 1f);
             if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Gourmand)
             {
                 num = Mathf.RoundToInt((float)num * 0.75f);
@@ -76,7 +81,7 @@ namespace BingoMode.Challenges
                             num++;
                         }
                     }
-                    if (num >= this.amount)
+                    if (num >= this.amount.Value)
                     {
                         this.CompleteChallenge();
                     }
@@ -107,7 +112,7 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                amount = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[0]) as SettingBox<int>;
                 target = SettingBoxFromString(array[1]) as SettingBox<string>;
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");

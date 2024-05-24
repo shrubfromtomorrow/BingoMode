@@ -55,6 +55,7 @@ namespace BingoMode
         public float lobbySlideIn;
         public float lastLobbySlideIn;
         public float slideStep;
+        public bool fromContinueGame;
 
         public static readonly Color[] TEAM_COLOR =
         {
@@ -213,6 +214,12 @@ namespace BingoMode
 
             if (message == "GOBACK")
             {
+                slideStep = -1f;
+                slider.subtleSliderNob.outerCircle.alpha = 0f;
+                foreach (var line in slider.lineSprites)
+                {
+                    line.alpha = 0f;
+                }
                 expMenu.UpdatePage(1);
                 expMenu.MovePage(new Vector2(-1500f, 0f));
                 return;
@@ -266,7 +273,11 @@ namespace BingoMode
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
                 ExpeditionData.earnedPassages++;
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = BingoHooks.GlobalBoard.size;
+                if (BingoData.MultiplayerGame)
+                {
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID());
+                }
+                else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);

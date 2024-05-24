@@ -16,10 +16,18 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " at once" : ""))
+            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " in one cycle" : ""))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol"))], [atOnce.Value ? 2 : 1]);
+            if (atOnce.Value) p.words.Add(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
+            p.words.Add(new Counter(current, amount.Value));
+            return p;
         }
 
         public override bool Duplicable(Challenge challenge)

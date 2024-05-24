@@ -23,6 +23,11 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(common.Value ? "pearlhoard_normal" : "pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(completed ? amount.Value : 0, amount.Value)], [2]);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return !(challenge is BingoPearlHoardChallenge);

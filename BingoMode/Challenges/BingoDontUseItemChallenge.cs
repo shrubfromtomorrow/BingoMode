@@ -1,5 +1,6 @@
 ﻿using Expedition;
 using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -16,6 +17,11 @@ namespace BingoMode.Challenges
         {
             this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>").Replace("<item>", ChallengeTools.ItemName(new(item.Value)));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("buttonCrossA", 1f, Color.red), new Icon(ChallengeUtils.ItemOrCreatureIconName(item.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(item.Value))], []);
         }
 
         public override bool Duplicable(Challenge challenge)

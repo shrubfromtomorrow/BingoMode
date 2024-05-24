@@ -1,6 +1,7 @@
-﻿using Expedition;
+﻿using BingoMode.Challenges;
+using Expedition;
 using HUD;
-using RWCustom;
+using RWCustom; 
 using UnityEngine;
 
 namespace BingoMode
@@ -14,7 +15,9 @@ namespace BingoMode
         public Vector2 lastMousePosition;
         public bool mouseDown;
         public bool lastMouseDown;
-        public bool show;
+        public bool toggled;
+        public float alpha;
+        public float lastAlpha;
 
         public bool MousePressed => mouseDown && !lastMouseDown;
 
@@ -22,7 +25,7 @@ namespace BingoMode
         {
             pos = new Vector2(20.2f, 725.2f);
             board = BingoHooks.GlobalBoard;
-            show = true;
+            toggled = false;
 
             GenerateBingoGrid();
         }
@@ -35,7 +38,7 @@ namespace BingoMode
             mousePosition = Futile.mousePosition;
 
             lastMouseDown = mouseDown;
-            mouseDown = (Input.GetMouseButton(0));
+            mouseDown = Input.GetMouseButton(0);
 
             for (int i = 0; i < grid.GetLength(0); i++)
             {
@@ -43,6 +46,14 @@ namespace BingoMode
                 {
                     grid[i, j].Update();
                 }
+            }
+
+            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player) // Use later when fading the hud
+            {
+                Player p = hud.owner as Player;
+
+                // Display only if map pressed
+                if (p.input[0].mp && !p.input[1].mp) toggled = !toggled;
             }
         }
 
@@ -56,9 +67,9 @@ namespace BingoMode
                 {
                     float size = 400f / board.size;
                     float topLeft = -size * board.size / 2f;
-                    Vector2 center = new(hud.rainWorld.screenSize.x * 0.175f, hud.rainWorld.screenSize.y * 0.7f);
+                    Vector2 center = new(hud.rainWorld.screenSize.x * 0.1575f, hud.rainWorld.screenSize.y * 0.725f);
                     grid[i, j] = new BingoInfo(hud, this,
-                        center + new Vector2(topLeft + i * size + (i * size * 0.2f) + size / 2f, -topLeft - j * size - (j * size * 0.2f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j], i, j);
+                        center + new Vector2(topLeft + i * size + (i * size * 0.05f) + size / 2f, -topLeft - j * size - (j * size * 0.05f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j], i, j);
                 }
             }
         }
@@ -67,23 +78,19 @@ namespace BingoMode
         {
             base.Draw(timeStacker);
 
-            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player) // Use later when fading the hud
-            {
-                Player p = hud.owner as Player;
+            alpha = Mathf.Clamp01(alpha + 0.1f * (toggled ? 1f : -1f));
 
-                // Display only if map pressed
-                if (p.input[0].mp) show = true;
-                else show = false;
-            }
-
+            float alfa = Mathf.Lerp(lastAlpha, alpha, timeStacker);
             for (int i = 0; i < grid.GetLength(0); i++)
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    grid[i, j].show = show;
+                    grid[i, j].alpha = Custom.LerpCircEaseOut(0f, 1f, alfa);
                     grid[i, j].Draw();
                 }
             }
+
+            lastAlpha = alpha;
         }
 
         public class BingoInfo
@@ -95,9 +102,11 @@ namespace BingoMode
             public float size;
             public Challenge challenge;
             public BingoHUD owner;
-            public bool show;
+            public float alpha;
             public int x;
             public int y;
+            public Phrase phrase;
+            public FContainer container;
 
             public bool MouseOver
             {
@@ -110,11 +119,6 @@ namespace BingoMode
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
-                if (hud == null) Plugin.logger.LogMessage("ERROR 1");
-                if (owner == null) Plugin.logger.LogMessage("ERROR 2");
-                if (pos == null) Plugin.logger.LogMessage("ERROR 3");
-                if (container == null) Plugin.logger.LogMessage("ERROR 4");
-                if (challenge == null) Plugin.logger.LogMessage("ERROR 5");
                 this.hud = hud;
                 this.pos = pos;
                 this.size = size;
@@ -122,11 +126,13 @@ namespace BingoMode
                 this.owner = owner;
                 this.x = x;
                 this.y = y;
+                this.container = container;
+                (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
 
                 sprite = new FSprite("pixel")
                 {
                     scale = size,
-                    alpha = 0.1f,
+                    alpha = 0f,
                     color = Color.grey,
                     x = pos.x, 
                     y = pos.y,
@@ -142,26 +148,26 @@ namespace BingoMode
                 };
                 container.AddChild(sprite);
                 container.AddChild(label);
+                UpdateText();
             }
 
             public void Draw() // Add fading later
             {
-                if (!show)
+                // Phrase biz
+                sprite.alpha = Mathf.Lerp(0f, 0.1f, alpha);
+
+                if (phrase != null)
                 {
-                    sprite.alpha = 0f;
-                    label.alpha = 0f;
-                }
-                else
-                {
-                    sprite.alpha = 0.1f;
-                    label.alpha = 1f;
+                    phrase.SetAlpha(alpha);
+                    phrase.centerPos = pos;// + new Vector2(size / 2f, size / 2f);
+                    phrase.Draw();
                 }
             }
 
             public void Update()
             {
-                label.text = SplitString(challenge.description);//challenge.completed ? "YES" : "NO";
-                if (show && MouseOver && owner.mouseDown)
+                //label.text = SplitString(challenge.description);//challenge.completed ? "YES" : "NO";
+                if (alpha > 0f && MouseOver && owner.mouseDown)
                 {
                     sprite.color = Color.blue;
                     if (owner.MousePressed)
@@ -178,21 +184,18 @@ namespace BingoMode
                 else sprite.color = Color.grey;
             }
 
-            public string SplitString(string s)
+            public void UpdateText()
             {
-                string modified = "";
-                int limit = 0;
-                foreach (var c in s)
+                label.text = "";
+                if (phrase != null)
                 {
-                    limit += 6;
-                    if (limit > size * 0.8f)
-                    {
-                        modified += "\n";
-                        limit = 0;
-                    }
-                    modified += c;
+                    phrase.ClearAll();
                 }
-                return modified;
+                phrase = (challenge as BingoChallenge).ConstructPhrase();
+                if (phrase != null)
+                {
+                    phrase.AddAll(container);
+                }
             }
         }
     }
