@@ -16,6 +16,7 @@ namespace BingoMode
 {
     using BingoSteamworks;
     using Challenges;
+    using System.Security.Cryptography;
 
     public class BingoHooks
     {
@@ -568,7 +569,11 @@ namespace BingoMode
             }
             if (message == "TRYREJOIN")
             {
-
+                if (bingoPage.TryGetValue(self, out var page))
+                {
+                    page.fromContinueGame = true;
+                    SteamTest.GetJoinableLobbies();
+                }
             }
             if (message == "CREATELOB")
             {
@@ -618,6 +623,7 @@ namespace BingoMode
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     self.selectedObject = page.randomize;
+                    page.fromContinueGame = false;
                 }
                 else self.selectedObject = self.characterSelect.slugcatButtons[0];
             }

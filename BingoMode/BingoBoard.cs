@@ -250,7 +250,6 @@ namespace BingoMode
                 challengeGrid[x, y] = newChallenge;
                 ExpeditionData.challengeList.Insert(g1, challengeGrid[x, y]);
                 SteamTest.UpdateOnlineBingo();
-                UpdateChallenges();
             }
             catch (Exception e)
             {

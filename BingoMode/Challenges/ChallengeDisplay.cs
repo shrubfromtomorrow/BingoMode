@@ -21,7 +21,7 @@ namespace BingoMode.Challenges
         public void Draw()
         {
             float horizontalDist = 25f * scale;
-            float verticalDist = 22f * scale;
+            float verticalDist = 25f * scale;
             int iconAmount = words.Count;
             Vector2[] positiones = new Vector2[iconAmount];
             int distToNewLine = newLines.Length == 0 ? (iconAmount - 1) : (newLines[0] - 1);
@@ -59,7 +59,7 @@ namespace BingoMode.Challenges
             for (int i = 0; i < iconAmount; i++)
             {
                 words[i].display.SetPosition(positiones[i]);
-                words[i].display.scale = scale;
+                //words[i].display.scale = scale;
             }
         }
 
@@ -75,7 +75,7 @@ namespace BingoMode.Challenges
         {
             foreach (Word word in words)
             {
-                word.ClearSprites();
+                word.display.RemoveFromContainer();
             }
         }
 
@@ -92,19 +92,14 @@ namespace BingoMode.Challenges
     {
         public FNode display;
 
-        public Word()
+        public Word(float rotation)
         {
-        }
-
-        public void ClearSprites()
-        {
-            display.RemoveFromContainer();
         }
     }
 
     public class Counter : Word
     {
-        public Counter(int current, int max)
+        public Counter(int current, int max) : base(0f)
         {
             display = new FLabel(Custom.GetFont(), $"[{current}/{max}]");
         }
@@ -112,7 +107,7 @@ namespace BingoMode.Challenges
 
     public class Verse : Word
     {
-        public Verse(string text)
+        public Verse(string text) : base(0f)
         {
             display = new FLabel(Custom.GetFont(), text);
         }
@@ -120,12 +115,13 @@ namespace BingoMode.Challenges
 
     public class Icon : Word
     {
-        public Icon(string element, float scale, Color color)
+        public Icon(string element, float scale, Color color, float rotation = 0f) : base(rotation)
         {
             display = new FSprite(element)
             {
                 scale = scale,
-                color = color
+                color = color,
+                rotation = rotation
             };
         }
     }

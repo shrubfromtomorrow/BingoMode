@@ -30,6 +30,16 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new Phrase([new Icon("bingoimpact", 1f, UnityEngine.Color.white)], []);
+            if (weapon.Value != "Any Weapon") phrase.words.Insert(0, new Icon(ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)));
+            if (victim.Value != "Any Creature") phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(victim.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(victim.Value)));
+            phrase.words.Add(new Counter(current, amount.Value));
+            phrase.newLines = [phrase.words.Count - 1];
+            return phrase;
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoDamageChallenge || (challenge as BingoDamageChallenge).weapon != weapon || (challenge as BingoDamageChallenge).victim != victim;
@@ -42,7 +52,6 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            // Eventually make this generate better with weighted numbers based on the creature and items
             List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value];
             string wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
 

@@ -275,7 +275,6 @@ namespace BingoMode
                 ccc.region = ccc.room.Value.Substring(0, 2);
                 ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
             }
-            //(owner.challenge as BingoChallenge).phrase = null;
             owner.challenge.UpdateDescription();
             owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
@@ -331,18 +330,12 @@ namespace BingoMode
             tab._Update();
         }
 
-        public void ASSS()
-        {
-            Plugin.logger.LogMessage(tab.items.Count);
-        }
-
         public void AssignChallenge(Challenge ch = null)
         {
             owner.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(ch, true);
             BingoHooks.GlobalBoard.SetChallenge(owner.x, owner.y, owner.challenge, -1);
             UpdateChallenge();
             ResetSettings(owner.challenge as BingoChallenge);
-            owner.UpdateText();
         }
 
         public void FocusOn(ChallengeSetting exception)

@@ -110,7 +110,9 @@ namespace BingoMode.Challenges
                 switch (settings[0])
                 {
                     case "Int32":
+                    case "Int64":
                     case "System.Int32":
+                    case "System.Int64":
                         //Plugin.logger.LogMessage("Generating it as int!");
                         bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), null, listName);
                         break;

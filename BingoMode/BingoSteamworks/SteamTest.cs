@@ -90,7 +90,8 @@ namespace BingoMode.BingoSteamworks
             }
 
             SteamMatchmaking.AddRequestLobbyListDistanceFilter((ELobbyDistanceFilter)CurrentFilters.distance);
-            if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("isHost", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
+            if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("name", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
+            SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
             SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
             lobbyMatchList.Set(call, OnLobbyMatchList);
         }
@@ -220,6 +221,27 @@ namespace BingoMode.BingoSteamworks
                 SteamNetworkingIdentity member = new SteamNetworkingIdentity();
                 member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(lobbyID, i));
                 InnerWorkings.SendMessage($"Hello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
+            }
+
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+            {
+                if (page.fromContinueGame)
+                {
+                    BingoData.globalMenu.UpdatePage(4);
+                    BingoData.globalMenu.MovePage(new Vector2(1500f, 0f));
+                    if (page.grid != null)
+                    {
+                        page.grid.RemoveSprites();
+                        page.RemoveSubObject(page.grid);
+                        page.grid = null;
+                    }
+                    page.grid = new BingoGrid(BingoData.globalMenu, page, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                    page.subObjects.Add(page.grid);
+                    page.multiButton.buttonBehav.greyedOut = false;
+                    page.multiButton.Clicked();
+                }
+
+                page.Switch(true, false);
             }
         }
 
@@ -421,7 +443,7 @@ namespace BingoMode.BingoSteamworks
                 Plugin.logger.LogMessage("BROADCASTING GAME STARTING TO LOBBY " + CurrentLobby);
                 foreach (var id in LobbyMembers)
                 {
-                    InnerWorkings.SendMessage("!", id);
+                    InnerWorkings.SendMessage("!;" + BingoData.BingoDen, id);
                 }
             }
             SteamTest.LeaveLobby();

@@ -35,7 +35,7 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("Symbol_Neuron", 1f, Color.white), new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)), new Counter(delivered, neurons.Value)], [2]);
+            return new Phrase([new Icon("Symbol_Neuron", 1f, Color.white), new Icon("singlearrow", 1f, Color.white), new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)), new Counter(delivered, neurons.Value)], [3]);
         }
 
         public override string ChallengeName()

@@ -21,7 +21,7 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon(ID.Value + "A", 1f, Color.white)], []);
+            return new Phrase([new Icon("smallEmptyCircle", 1f, Color.white), new Icon(ID.Value + "A", 1f, Color.white), new Icon("smallEmptyCircle", 1f, Color.white)], []);
         }
 
         public override string ChallengeName()

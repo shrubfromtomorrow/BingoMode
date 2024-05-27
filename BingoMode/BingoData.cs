@@ -95,7 +95,8 @@ namespace BingoMode
         // Mostly taken from vanilla game
         public static string RandomBingoDen(SlugcatStats.Name slug)
         {
-            if (BingoDen != "random") return BingoDen;
+            Plugin.logger.LogMessage($"Getting bingo den! - {BingoDen}");
+            if (BingoDen.Trim().ToLowerInvariant() != "random") return BingoDen;
 
             List<string> bannedRegions = [];
             foreach (Challenge ch in ExpeditionData.challengeList)

@@ -28,6 +28,10 @@ namespace BingoMode
         public MenuTabWrapper menuTabWrapper;
         public SymbolButton plusButton;
         public SymbolButton minusButton;
+        public OpTextBox shelterSetting;
+        public ConfigurableBase shelterSettingConf;
+        public UIelementWrapper shelterSettingWrapper;
+        public MenuLabel shelterLabel;
 
         // Multiplayer
         public SimpleButton multiButton;
@@ -42,7 +46,7 @@ namespace BingoMode
         public OpTextBox nameFilter;
         public ConfigurableBase nameFilterConf;
         public UIelementWrapper nameFilterWrapper;
-        public MenuTab tab;
+        //public MenuTab tab;
         public List<LobbyInfo> foundLobbies;
         public FSprite[] lobbyDividers;
         public VerticalSlider slider;
@@ -63,7 +67,7 @@ namespace BingoMode
             Custom.Desaturate(Color.blue, 0.35f),
             Custom.Desaturate(Color.green, 0.35f),
             Custom.Desaturate(Color.yellow, 0.35f),
-            Custom.Desaturate(Color.grey, 0.35f),
+            Custom.Desaturate(Color.grey, 0.35f), // Spectator
         };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
@@ -72,6 +76,12 @@ namespace BingoMode
             board = BingoHooks.GlobalBoard;
             size = board.size;
             BingoData.BingoMode = false;
+
+            //tab = new MenuTab();
+            //Container.AddChild(tab._container);
+            //tab._Activate();
+            //tab._Update();
+            //tab._GrafUpdate(0f);
 
             pageTitle = new FSprite("bingotitle");
             pageTitle.SetAnchor(0.5f, 0f);
@@ -100,7 +110,7 @@ namespace BingoMode
             float xx = menu.manager.rainWorld.screenSize.x * 0.79f;
             float yy = 85f;
             startGame = new HoldButton(menu, this, "BEGIN", "STARTBINGO",
-                new Vector2(xx + 75f, yy + 135f), 40f);
+                new Vector2(xx + 75f, yy + 160f), 40f);
             subObjects.Add(startGame);
 
             menuTabWrapper = new MenuTabWrapper(menu, this);
@@ -119,6 +129,22 @@ namespace BingoMode
             plusButton.roundedRect.size = plusButton.size;
             subObjects.Add(plusButton);
 
+            shelterSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ShelterSettingBingo", "_", (ConfigAcceptableBase)null);
+            shelterSetting = new OpTextBox(shelterSettingConf as Configurable<string>, new Vector2(xx + 48, yy + 56), 100f);
+            shelterSetting.alignment = FLabelAlignment.Center;
+            shelterSetting.description = "The shelter players start in. Please type in a valid shelter's room name, or 'random'";
+            shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
+            shelterSettingWrapper = new UIelementWrapper(menuTabWrapper, shelterSetting);
+            shelterSetting.value = "random";
+
+            shelterLabel = new MenuLabel(menu, this, "Shelter: ", new Vector2(xx + 26f, yy + 69), default, false);
+            subObjects.Add(shelterLabel);
+
+            //tab.AddItems(
+            //[
+            //    shelterSetting
+            //]);
+
             // Multigameplayguy
             multiButton = new SimpleButton(menu, this, "Multiplayer", "SWITCH_MULTIPLAYER", expMenu.exitButton.pos + new Vector2(0f, -40f), new Vector2(140f, 30f));
             subObjects.Add(multiButton);
@@ -130,12 +156,6 @@ namespace BingoMode
             divider.scaleY = 2f;
             divider.anchorX = 0f;
             Container.AddChild(divider);
-
-            tab = new MenuTab();
-            Container.AddChild(tab._container);
-            tab._Activate();
-            tab._Update();
-            tab._GrafUpdate(0f);
 
             distanceFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_DistanceFilterBingo", "Near", (ConfigAcceptableBase)null);
             nameFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_NameFilterBingo", "", (ConfigAcceptableBase)null);
@@ -151,7 +171,20 @@ namespace BingoMode
             sliderF = 1f;
         }
 
-        private void NameFilter_OnValueChanged(UIconfig config, string value, string oldValue)
+        private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
+        {
+            Plugin.logger.LogMessage(value);
+            string lastDen = BingoData.BingoDen;
+            if (value.Trim() == string.Empty)
+            {
+                BingoData.BingoDen = "random";
+                return;
+            }
+            BingoData.BingoDen = value;
+            Plugin.logger.LogMessage($"SETTING BINGO DEN FROM {lastDen} TO {BingoData.BingoDen}");
+        }
+
+        private void NameFilter_OnValueUpdate(UIconfig config, string value, string oldValue)
         {
             SteamTest.CurrentFilters.text = value;
             SteamTest.GetJoinableLobbies();
@@ -183,9 +216,10 @@ namespace BingoMode
                 expMenu.exitButton.buttonBehav.greyedOut = true;
                 rightPage.buttonBehav.greyedOut = true;
                 startGame.buttonBehav.greyedOut = !create;
-                randomize.buttonBehav.greyedOut = !create;
-                plusButton.buttonBehav.greyedOut = !create;
-                minusButton.buttonBehav.greyedOut = !create;
+                shelterSetting.greyedOut = !create || fromContinueGame;
+                randomize.buttonBehav.greyedOut = !create || fromContinueGame;
+                plusButton.buttonBehav.greyedOut = !create || fromContinueGame;
+                minusButton.buttonBehav.greyedOut = !create || fromContinueGame;
                 multiButton.menuLabel.text = "Leave Lobby";
                 multiButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
@@ -251,6 +285,8 @@ namespace BingoMode
                 menu.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = ExpeditionData.slugcatPlayer;
                 menu.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
 
+                BingoData.InitializeBingo();
+
                 List<string> bannedRegions = [];
                 foreach (var ch in ExpeditionData.challengeList)
                 {
@@ -269,7 +305,6 @@ namespace BingoMode
                     menu.manager.rainWorld.progression.mapDiscoveryTextures[kvp.Key] = null;
                 }
 
-                BingoData.InitializeBingo();
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
                 ExpeditionData.earnedPassages++;
@@ -350,7 +385,7 @@ namespace BingoMode
             {
                 if (ulong.TryParse(message.Split('-')[1], out ulong lobid))
                 {
-                    Plugin.logger.LogMessage(lobid);
+                    Plugin.logger.LogMessage("Joining" + lobid);
                     var call = SteamMatchmaking.JoinLobby((CSteamID)lobid);
                     SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
                 }
@@ -361,11 +396,13 @@ namespace BingoMode
             if (message == "CHANGE_SETTINGS")
             {
                 menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this, true, true));
+                return;
             }
 
             if (message == "INFO_SETTINGS")
             {
                 menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this, true, false));
+                return;
             }
 
             if (message.StartsWith("KICK-"))
@@ -376,6 +413,7 @@ namespace BingoMode
                 Plugin.logger.LogMessage("test test test: " + kickedPlayer.GetSteamID());
                 InnerWorkings.SendMessage("@", kickedPlayer);
                 if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                return;
             }
 
             if (message.StartsWith("SWTEAM-"))
@@ -399,6 +437,15 @@ namespace BingoMode
                 if (nextTeam > 4) nextTeam = 0;
                 InnerWorkings.SendMessage("%;" + nextTeam, kickedPlayer);
                 if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                return;
+            }
+        }
+
+        public void FindAndJoinHostsLobby()
+        {
+            foreach (var lob in foundLobbies)
+            {
+
             }
         }
 
@@ -494,10 +541,14 @@ namespace BingoMode
             base.RemoveSprites();
             pageTitle.RemoveFromContainer();
             unlocksButton.Hide();
-            tab.RemoveItems(unlocksButton);
+            shelterSetting.Hide();
+            //tab.RemoveItems(unlocksButton, shelterSetting);
             unlocksButton.Unload();
+            shelterSetting.Unload();
             menuTabWrapper.wrappers.Remove(unlocksButton);
+            menuTabWrapper.wrappers.Remove(shelterSetting);
             menuTabWrapper.subObjects.Remove(unlockWrapper);
+            menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
             if (inLobby) RemoveLobbyPage();
             else RemoveSearchPage();
         }
@@ -574,13 +625,13 @@ namespace BingoMode
 
             nameFilter = new OpTextBox(nameFilterConf as Configurable<string>, default, 140f);
             nameFilter.allowSpace = true;
-            nameFilter.OnValueChanged += NameFilter_OnValueChanged;
+            nameFilter.OnValueUpdate += NameFilter_OnValueUpdate;
 
-            tab.AddItems(
-            [
-                distanceFilter,
-                nameFilter
-            ]);
+            //tab.AddItems(
+            //[
+            //    distanceFilter,
+            //    nameFilter
+            //]);
             distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
             nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
         }
@@ -595,7 +646,7 @@ namespace BingoMode
             RemoveSubObject(refreshSearch);
             distanceFilter.Hide();
             nameFilter.Hide();
-            tab.RemoveItems(distanceFilter, nameFilter);
+            //tab.RemoveItems(distanceFilter, nameFilter);
             distanceFilter.Unload();
             nameFilter.Unload();
             menuTabWrapper.wrappers.Remove(distanceFilter);
@@ -726,6 +777,20 @@ namespace BingoMode
 
         public void AddLobbies(List<CSteamID> lobbies)
         {
+            if (fromContinueGame)
+            {
+                foreach (var lobby in lobbies)
+                {
+                    ulong owner = SteamMatchmaking.GetLobbyOwner(lobby).m_SteamID;
+                    if (owner != SteamTest.selfIdentity.GetSteamID64() && owner == BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID)
+                    {
+                        var call = SteamMatchmaking.JoinLobby(lobby);
+                        SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
+                        return;
+                    }
+                }
+                return;
+            }
             foundLobbies = [];
 
             foreach (var lobby in lobbies)
@@ -796,7 +861,7 @@ namespace BingoMode
 
                 if (controls)
                 {
-                    cycleTeam = new SimpleButton(page.menu, page, "Change team", "SWTEAM-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(90f, 16f));
+                    cycleTeam = new SimpleButton(page.menu, page, TeamName(team), "SWTEAM-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(90f, 16f));
                     page.subObjects.Add(cycleTeam);
                     if (!isHost)
                     {
@@ -804,6 +869,19 @@ namespace BingoMode
                         page.subObjects.Add(kick);
                     }
                 }
+            }
+
+            public string TeamName(int teamIndex)
+            {
+                switch (teamIndex)
+                {
+                    case 0: return "Red Team";
+                    case 1: return "Blue Team";
+                    case 2: return "Green Team";
+                    case 3: return "Yellow Team";
+                    case 4: return "Spectator";
+                }
+                return "Change team";
             }
 
             public void Draw(Vector2 origPos)

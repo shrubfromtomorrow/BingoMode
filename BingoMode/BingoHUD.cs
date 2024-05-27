@@ -139,7 +139,7 @@ namespace BingoMode
                     anchorX = 0.5f,
                     anchorY = 0.5f
                 };
-                label = new FLabel(Custom.GetFont(), challenge.ChallengeName())
+                label = new FLabel(Custom.GetFont(), "")
                 {
                     x = pos.x,
                     y = pos.y,
@@ -155,18 +155,19 @@ namespace BingoMode
             {
                 // Phrase biz
                 sprite.alpha = Mathf.Lerp(0f, 0.1f, alpha);
+                label.alpha = alpha;
 
                 if (phrase != null)
                 {
                     phrase.SetAlpha(alpha);
                     phrase.centerPos = pos;// + new Vector2(size / 2f, size / 2f);
                     phrase.Draw();
+                    phrase.scale = 1f;
                 }
             }
 
             public void Update()
             {
-                //label.text = SplitString(challenge.description);//challenge.completed ? "YES" : "NO";
                 if (alpha > 0f && MouseOver && owner.mouseDown)
                 {
                     sprite.color = Color.blue;
@@ -184,9 +185,25 @@ namespace BingoMode
                 else sprite.color = Color.grey;
             }
 
+            public string SplitString(string s)
+            {
+                string modified = "";
+                int limit = 0;
+                foreach (var c in s)
+                {
+                    limit += 6;
+                    if (limit > size * 0.8f)
+                    {
+                        modified += "\n";
+                        limit = 0;
+                    }
+                    modified += c;
+                }
+                return modified;
+            }
+
             public void UpdateText()
             {
-                label.text = "";
                 if (phrase != null)
                 {
                     phrase.ClearAll();
@@ -196,6 +213,7 @@ namespace BingoMode
                 {
                     phrase.AddAll(container);
                 }
+                label.text = phrase == null ? SplitString(challenge.description) : "";
             }
         }
     }

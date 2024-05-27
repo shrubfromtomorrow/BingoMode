@@ -36,6 +36,7 @@ namespace BingoMode
         FLabel[] labels;
         FSprite[] dividers;
         bool inLobby;
+        BingoPage owner;
 
         public CreateLobbyDialog(ProcessManager manager, BingoPage owner, bool inLobby = false, bool host = false) : base(manager)
         {
@@ -43,6 +44,7 @@ namespace BingoMode
             float[] screenOffsets = Custom.GetScreenOffsets();
             leftAnchor = screenOffsets[0];
             Vector2 outOfBounds = new Vector2(10000f, 10000f);
+            this.owner = owner;
 
             pageTitle = new FSprite(inLobby ? "lobbysettings" : "createlobby", true);
             pageTitle.SetAnchor(0.5f, 0.5f);
@@ -195,6 +197,8 @@ namespace BingoMode
                 case "CLOSE":
                     closing = true;
                     targetAlpha = 0f;
+                    if (owner.fromContinueGame) owner.rightPage.Clicked();
+
                     break;
                 case "CREATE":
                     SteamTest.CreateLobby();

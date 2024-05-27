@@ -111,7 +111,6 @@ namespace BingoMode
 
         public override void Clicked()
         {
-            if (owner is BingoPage p && p.fromContinueGame) return;
             Singal(this, singalText);
 
             menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
@@ -119,10 +118,10 @@ namespace BingoMode
 
         public void UpdateText()
         {
-            textLabel.text = "";//challenge.description.WrapText(false, size.x * 0.8f);
             if (phrase != null)
             {
                 phrase.ClearAll();
+                phrase = null;
             }
             phrase = (challenge as BingoChallenge).ConstructPhrase();
             if (phrase != null)
@@ -131,6 +130,7 @@ namespace BingoMode
                 Plugin.logger.LogMessage(size.x);
                 phrase.scale = size.x / 100f;
             }
+            textLabel.text = phrase == null ? challenge.description.WrapText(false, size.x * 0.8f) : "";
         }
     }
 }

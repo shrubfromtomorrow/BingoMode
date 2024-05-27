@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -17,9 +18,14 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("GuidanceNeuron", 1f, new Color(0f, 1f, 0.3f)), new Icon("singlearrow", 1f, Color.white), new Icon(moon.Value ? "GuidanceMoon" : "nomscpebble", 1f, moon.Value ? new Color(1f, 0.8f, 0.3f) : new Color(0.44705883f, 0.9019608f, 0.76862746f))], []);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoGreenNeuronChallenge c || (c.moon != moon);
+            return challenge is not BingoGreenNeuronChallenge c || (c.moon.Value != moon.Value);
         }
 
         public override string ChallengeName()

@@ -23,7 +23,7 @@ namespace BingoMode.Challenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            this.description = ChallengeTools.IGT.Translate("Carry a <crit> for [<current>/<amount>] gates")
+            this.description = ChallengeTools.IGT.Translate("Transport a <crit> through [<current>/<amount>] gates")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
@@ -32,7 +32,11 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("ShortcutGate", 1f, UnityEngine.Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)), new Counter(current, amount.Value)], [2]);
+            return new Phrase([
+                new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)),
+                new Icon("singlearrow", 1f, UnityEngine.Color.white),
+                new Icon("ShortcutGate", 1f, UnityEngine.Color.white),
+                new Counter(current, amount.Value)], [3]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -42,7 +46,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Carrying a Creature Through Gates");
+            return ChallengeTools.IGT.Translate("Transporting a Creature Through Gates");
         }
 
         public override Challenge Generate()
@@ -59,9 +63,11 @@ namespace BingoMode.Challenges
             bool g = false;
             for (int i = 0; i < game.Players.Count; i++)
             {
-                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && player.grasps != null && player.grasps.Any(x => x != null && x.grabbed is Creature c && c.Template.type.value == crit.Value))
+                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null)
                 {
-                    g = true;
+                    /*if (player.grasps != null && player.grasps.Any(x => x != null && x.grabbed is Creature c && c.Template.type.value == crit.Value)) g = true;
+                    else */if (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value) g = true;
+                    else if (player.room.abstractRoom.creatures.Any(x => x.creatureTemplate.type.value == crit.Value)) g = true;
                     break;
                 }
             }

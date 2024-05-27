@@ -17,7 +17,7 @@ namespace BingoMode.Challenges
         public override void UpdateDescription()
         {
             int value = completed ? target.Value : score;
-            description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills this cycle").Replace("<score_target>", target.Value.ToString()).Replace("<current_score>", ValueConverter.ConvertToString<int>(value));
+            description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills in one cycle").Replace("<score_target>", target.Value.ToString()).Replace("<current_score>", ValueConverter.ConvertToString<int>(value));
             base.UpdateDescription();
         }
 

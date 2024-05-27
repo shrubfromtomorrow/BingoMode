@@ -38,7 +38,7 @@ namespace BingoMode.BingoSteamworks
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length < 5)
+                    if (data.Length != 5)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
@@ -76,8 +76,14 @@ namespace BingoMode.BingoSteamworks
 
                 // Begin game
                 case '!':
+                    if (data.Length != 2)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
                     if (SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
+                        BingoData.BingoDen = data[1];
                         page.startGame.buttonBehav.greyedOut = false;
                         page.startGame.Clicked();
                         SteamTest.LeaveLobby();
@@ -87,7 +93,7 @@ namespace BingoMode.BingoSteamworks
 
                 // Change team
                 case '%':
-                    if (data.Length < 2)
+                    if (data.Length != 2)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
@@ -113,7 +119,11 @@ namespace BingoMode.BingoSteamworks
 
                 // Force host burdens
                 case 'b':
-                    if (data.Length < 2) return false;
+                    if (data.Length != 2)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
                     List<string> burjs = [];
                     for (int i = 1; i < data.Length; i++)
                     {
@@ -124,7 +134,11 @@ namespace BingoMode.BingoSteamworks
 
                 // Force host perks
                 case 'p':
-                    if (data.Length < 2) return false;
+                    if (data.Length != 2)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
                     List<string> perj = [];
                     for (int i = 1; i < data.Length; i++)
                     {
