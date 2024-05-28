@@ -49,8 +49,16 @@ namespace BingoMode.BingoSteamworks
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
-                        if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
-                        else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
+                        if (teamCredit != SteamTest.team)
+                        {
+                            if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
+                            else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
+                        }
+                        else
+                        {
+                            BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
+                        }
+                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
                         return true;
                     }
                     else

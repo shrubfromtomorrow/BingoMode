@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
                 {
                     for (int j = 0; j < player.room.updateList.Count; j++)
                     {
-                        if (player.room.updateList[j] is Creature c && c.Template.type.value == crit.Value && c.mainBodyChunk != null && c.mainBodyChunk.pos.y < 1000f)
+                        if (player.room.updateList[j] is Creature c && c.Template.type.value == crit.Value && c.mainBodyChunk != null && c.mainBodyChunk.pos.y < 2266f)
                         {
                             CompleteChallenge();
                         }

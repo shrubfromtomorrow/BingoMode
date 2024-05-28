@@ -1,16 +1,11 @@
-﻿using BingoMode.Challenges;
-using Expedition;
+﻿using BingoMode.BingoSteamworks;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
-using Menu.Remix.MixedUI.ValueTypes;
 using RWCustom;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using Steamworks;
-using System.Runtime;
-using BingoMode.BingoSteamworks;
+using System;
+using UnityEngine;
 
 namespace BingoMode
 {
@@ -28,7 +23,7 @@ namespace BingoMode
         SimpleButton closeButton;
         SimpleButton createButton;
         CheckBox lockout;
-        CheckBox gameMode;
+        //CheckBox gameMode;
         CheckBox friendsOnly;
         CheckBox banCheats;
         CheckBox[] perks;
@@ -37,6 +32,10 @@ namespace BingoMode
         FSprite[] dividers;
         bool inLobby;
         BingoPage owner;
+        MenuTabWrapper menuTabWrapper;
+        ConfigurableBase maxPlayersConf;
+        OpUpdown maxPlayers;
+        UIelementWrapper maxPlayersWrapper;
 
         public CreateLobbyDialog(ProcessManager manager, BingoPage owner, bool inLobby = false, bool host = false) : base(manager)
         {
@@ -71,10 +70,10 @@ namespace BingoMode
             lockout.label.label.alignment = FLabelAlignment.Right;
             lockout.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(lockout);
-            gameMode = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Teams mode: ", "GAMEMODE");
-            gameMode.label.label.alignment = FLabelAlignment.Right;
-            gameMode.buttonBehav.greyedOut = inLobby && !host;
-            pages[0].subObjects.Add(gameMode);
+            //gameMode = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Teams mode: ", "GAMEMODE");
+            //gameMode.label.label.alignment = FLabelAlignment.Right;
+            //gameMode.buttonBehav.greyedOut = inLobby && !host;
+            //pages[0].subObjects.Add(gameMode);
             friendsOnly = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Friends only: ", "FRIENDS");
             friendsOnly.label.label.alignment = FLabelAlignment.Right;
             friendsOnly.buttonBehav.greyedOut = inLobby && !host;
@@ -83,6 +82,14 @@ namespace BingoMode
             banCheats.label.label.alignment = FLabelAlignment.Right;
             banCheats.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(banCheats);
+
+            menuTabWrapper = new MenuTabWrapper(this, pages[0]);
+            pages[0].subObjects.Add(menuTabWrapper);
+            maxPlayersConf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_LobbyMaxPlayers", 4, new ConfigAcceptableRange<int>(1, 16));
+            maxPlayers = new OpUpdown(true, maxPlayersConf, outOfBounds, 50f);
+            maxPlayers.OnValueChanged += MaxPlayers_OnValueChanged;
+            maxPlayersWrapper = new UIelementWrapper(menuTabWrapper, maxPlayers);
+            if (inLobby) SteamMatchmaking.GetLobbyMemberLimit(SteamTest.CurrentLobby);
 
             perks = new CheckBox[3];
             burdens = new CheckBox[3];
@@ -99,12 +106,14 @@ namespace BingoMode
                 burdens[i].buttonBehav.greyedOut = inLobby && !host;
             }
 
-            labels = new FLabel[2];
+            labels = new FLabel[3];
             for (int i = 0; i < 2; i++)
             {
                 labels[i] = new FLabel(Custom.GetFont(), i == 0 ? "Perks:" : "Burdens:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
                 pages[0].Container.AddChild(labels[i]);
             }
+            labels[2] = new FLabel(Custom.GetFont(), "Max Players: ") { anchorX = 1f, anchorY = 0.5f, color = MenuColor(MenuColors.MediumGrey).rgb };
+            pages[0].Container.AddChild(labels[2]);
 
             dividers = new FSprite[2];
             for (int i = 0; i < 2; i++)
@@ -121,6 +130,14 @@ namespace BingoMode
             opening = true;
         }
 
+        private void MaxPlayers_OnValueChanged(UIconfig config, string value, string oldValue)
+        {
+            if (!inLobby) return;
+            int players = maxPlayers.GetValueInt();
+            SteamMatchmaking.SetLobbyMemberLimit(SteamTest.CurrentLobby, players);
+            Plugin.logger.LogMessage("Set lobby member limit to " + players);
+        }
+
         public override void Update()
         {
             base.Update();
@@ -135,10 +152,13 @@ namespace BingoMode
                 pageTitle.RemoveFromContainer();
                 labels[0].RemoveFromContainer();
                 labels[1].RemoveFromContainer();
+                labels[2].RemoveFromContainer();
                 for (int i = 0; i < 2; i++)
                 {
                     dividers[i].RemoveFromContainer();
                 }
+                menuTabWrapper.wrappers.Remove(maxPlayers);
+                menuTabWrapper.subObjects.Remove(maxPlayersWrapper);
                 manager.StopSideProcess(this);
                 closing = false;
             }
@@ -164,9 +184,10 @@ namespace BingoMode
             float xPos = 670f;
             float yTop = 578f;
             lockout.pos = new Vector2(xPos, yTop);
-            gameMode.pos = new Vector2(xPos, yTop - 30f);
-            friendsOnly.pos = new Vector2(xPos, yTop - 60f);
-            banCheats.pos = new Vector2(xPos, yTop - 90f);
+            //gameMode.pos = new Vector2(xPos, yTop - 30f);
+            friendsOnly.pos = new Vector2(xPos, yTop - 30f);
+            banCheats.pos = new Vector2(xPos, yTop - 60f);
+            maxPlayers.pos = new Vector2(xPos, yTop - 95f);
 
             for (int i = 0; i < 3; i++)
             {
@@ -176,6 +197,7 @@ namespace BingoMode
 
             labels[0].SetPosition(pagePos + new Vector2(xPos, yTop - 115f));
             labels[1].SetPosition(pagePos + new Vector2(xPos, yTop - 165f)); 
+            labels[2].SetPosition(pagePos + new Vector2(xPos, yTop - 77f)); 
             
             for (int i = 0; i < 2; i++)
             {
@@ -198,10 +220,10 @@ namespace BingoMode
                     closing = true;
                     targetAlpha = 0f;
                     if (owner.fromContinueGame) owner.rightPage.Clicked();
-
+                    if (inLobby) SteamTest.UpdateOnlineSettings();
                     break;
                 case "CREATE":
-                    SteamTest.CreateLobby();
+                    SteamTest.CreateLobby(maxPlayers.valueInt);
                     closing = true;
                     targetAlpha = 0f;
                     break;
@@ -243,8 +265,8 @@ namespace BingoMode
             {
                 case "LOCKOUT":
                     return BingoData.globalSettings.lockout;
-                case "GAMEMODE":
-                    return BingoData.globalSettings.gameMode;
+                //case "GAMEMODE":
+                //    return BingoData.globalSettings.gameMode;
                 case "FRIENDS":
                     return BingoData.globalSettings.friendsOnly;
                 case "CHEATS":
@@ -293,19 +315,15 @@ namespace BingoMode
                 case "LOCKOUT":
                     BingoData.globalSettings.lockout = c;
                     break;
-                case "GAMEMODE":
-                    BingoData.globalSettings.gameMode = c;
-                    break;
+                //case "GAMEMODE":
+                //    BingoData.globalSettings.gameMode = c;
+                //    break;
                 case "FRIENDS":
                     BingoData.globalSettings.friendsOnly = c;
                     break;
                 case "CHEATS":
                     BingoData.globalSettings.banMods = c;
                     break;
-            }
-            if (inLobby)
-            {
-
             }
         }
     }

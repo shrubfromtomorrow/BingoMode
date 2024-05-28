@@ -8,7 +8,6 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Steamworks;
 
 namespace BingoMode
 {
@@ -470,10 +469,10 @@ namespace BingoMode
                 //{
                 //    c = gruh;
                 //}
-                menu.tab.AddItems(new UIelement[]
-                {
-                    field
-                });
+                //menu.tab.AddItems(new UIelement[]
+                //{
+                //    field
+                //});
                 cWrapper = new UIelementWrapper(menu.wrapper, field);
             }
 
@@ -536,7 +535,7 @@ namespace BingoMode
                 label.RemoveSprites();
                 owner.RemoveSubObject(label);
                 field.Hide();
-                (menu as CustomizerDialog).tab._RemoveItem(field);
+                //(menu as CustomizerDialog).tab._RemoveItem(field);
                 field.Unload();
                 (menu as CustomizerDialog).wrapper.wrappers.Remove(field);
                 (menu as CustomizerDialog).wrapper.subObjects.Remove(cWrapper);

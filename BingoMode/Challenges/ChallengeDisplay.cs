@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using RWCustom;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BingoMode.Challenges
 {
@@ -50,16 +49,12 @@ namespace BingoMode.Challenges
                     positiones[i] += new Vector2(carryOver, 0f);
                     carryOver += horizontalDist;
                     if (resetCarry) carryOver = 0f;
+                    words[i].display.SetPosition(positiones[i]);
                     continue;
                 }
                 positiones[i] += new Vector2(carryOver, 0f);
                 carryOver += horizontalDist;
-            }
-
-            for (int i = 0; i < iconAmount; i++)
-            {
                 words[i].display.SetPosition(positiones[i]);
-                //words[i].display.scale = scale;
             }
         }
 

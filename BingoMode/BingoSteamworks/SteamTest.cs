@@ -43,16 +43,15 @@ namespace BingoMode.BingoSteamworks
             }
 
             BingoData.globalSettings.lockout = false;
-            BingoData.globalSettings.gameMode = false;
             BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.None;
             BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.None;
         }
 
-        public static void CreateLobby()
+        public static void CreateLobby(int maxPlayers)
         {
             //JoinableLobbies.Clear();
             LobbyMembers.Clear();
-            SteamAPICall_t call = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 4);
+            SteamAPICall_t call = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, maxPlayers);
             lobbyCreated.Set(call, OnLobbyCreated);
             BingoData.MultiplayerGame = true;
         }
@@ -91,6 +90,7 @@ namespace BingoMode.BingoSteamworks
 
             SteamMatchmaking.AddRequestLobbyListDistanceFilter((ELobbyDistanceFilter)CurrentFilters.distance);
             if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("name", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
+            SteamMatchmaking.AddRequestLobbyListNumericalFilter("friendsOnly", 0, ELobbyComparison.k_ELobbyComparisonEqual);
             SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
             SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
             lobbyMatchList.Set(call, OnLobbyMatchList);
@@ -136,9 +136,9 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "name", hostName + "'s lobby");
             SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
-            SteamMatchmaking.SetLobbyData(lobbyID, "maxPlayers", BingoData.globalSettings.maxPlayers.ToString());
+            //SteamMatchmaking.SetLobbyData(lobbyID, "maxPlayers", BingoData.globalSettings.maxPlayers.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
-            SteamMatchmaking.SetLobbyData(lobbyID, "gameMode", BingoData.globalSettings.gameMode ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(lobbyID, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());
@@ -198,7 +198,6 @@ namespace BingoMode.BingoSteamworks
                 LeaveLobby();
                 return;
             }
-            BingoData.globalSettings.maxPlayers = maxPayne;
 
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");
             try
@@ -249,7 +248,6 @@ namespace BingoMode.BingoSteamworks
         {
             Plugin.logger.LogMessage("Setting lobby settings");
             BingoData.globalSettings.lockout = SteamMatchmaking.GetLobbyData(CurrentLobby, "lockout") == "1";
-            BingoData.globalSettings.gameMode = SteamMatchmaking.GetLobbyData(CurrentLobby, "gameMode") == "1";
 
             Plugin.logger.LogMessage("- setting perks burdens");
             if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "perks"), out int perjs) || int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens"), out int burjens))
@@ -289,7 +287,7 @@ namespace BingoMode.BingoSteamworks
                     if (SteamMatchmaking.GetLobbyOwner(CurrentLobby) == selfIdentity.GetSteamID())
                     {
                         int tim = team + 1;
-                        if (tim >= 3) tim = 0;
+                        if (tim >= 7) tim = 0;
                         SteamMatchmaking.SetLobbyData(CurrentLobby, "nextTeam", tim.ToString());
                     }
                     text = "entered";
@@ -408,6 +406,14 @@ namespace BingoMode.BingoSteamworks
             {
                 Plugin.logger.LogError(e + "\nFAILED TO UPDATE ONLINE BINGO BOARD");
             }
+        }
+
+        public static void UpdateOnlineSettings()
+        {
+            SteamMatchmaking.SetLobbyData(CurrentLobby, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
+            //SteamMatchmaking.SetLobbyData(CurrentLobby, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(CurrentLobby, "perks", ((int)BingoData.globalSettings.perks).ToString());
+            SteamMatchmaking.SetLobbyData(CurrentLobby, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
         }
 
         public static void BroadcastCompletedChallenge(Challenge ch)

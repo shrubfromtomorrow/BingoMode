@@ -14,26 +14,11 @@ namespace BingoMode.Challenges
         public abstract List<object> Settings();
         public bool RequireSave = true;
         public bool Failed;
-        public bool[] TeamsCompleted = new bool[4];
+        public bool[] TeamsCompleted = new bool[8];
         public ulong completeCredit = 0;
         public virtual Phrase ConstructPhrase() => null;
         public event Action DescriptionUpdated;
-        //Phrase _phrase;
-        //public Phrase phrase
-        //{
-        //    get
-        //    {
-        //        if (_phrase == null)
-        //        {
-        //            _phrase = ConstructPhrase();
-        //        }
-        //        return _phrase;
-        //    }
-        //    set
-        //    {
-        //        _phrase = value;
-        //    }
-        //}
+        public event Action ChallengeCompleted;
 
         public override void UpdateDescription()
         {
@@ -46,12 +31,12 @@ namespace BingoMode.Challenges
             if (completed) return;
             if (hidden) return; // Hidden means locked out here in bingo
 
-            if (SteamTest.LobbyMembers.Count > 0 && completeCredit != 0)
+            if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
             {
                 goto compleple;
             }
 
-            if (RequireSave && !revealed) // I forgot what this does
+            if (RequireSave && !revealed) // I forgot what this does (i remembered)
             {
                 revealed = true;
                 return;
@@ -60,9 +45,10 @@ namespace BingoMode.Challenges
             if (SteamTest.LobbyMembers.Count > 0)
             {
                 SteamTest.BroadcastCompletedChallenge(this);
+                TeamsCompleted[SteamTest.team] = true;
             }
             compleple:
-            completed = true;
+            if (TeamsCompleted[SteamTest.team]) completed = true;
             //int num = 0;
             //bool flag = true;
             //foreach (Challenge challenge in ExpeditionData.challengeList)
@@ -98,6 +84,7 @@ namespace BingoMode.Challenges
             //    ExpeditionData.earnedPassages++;
             //}
             Expedition.Expedition.coreFile.Save(false);
+            ChallengeCompleted?.Invoke();
         }
     }
 }

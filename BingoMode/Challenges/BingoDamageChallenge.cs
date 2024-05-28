@@ -56,7 +56,11 @@ namespace BingoMode.Challenges
             string wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(0, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
 
             string crit;
-            if (UnityEngine.Random.value < 0.3f) crit = "Any Creature";
+            if (UnityEngine.Random.value < 0.3f)
+            {
+                crit = "Any Creature";
+                if (wep == "Any Weapon") wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
+            }
             else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature.value;
             int amound = UnityEngine.Random.Range(2, 7);
 

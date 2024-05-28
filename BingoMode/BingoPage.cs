@@ -61,13 +61,18 @@ namespace BingoMode
         public float slideStep;
         public bool fromContinueGame;
 
+        public static readonly float desaturara = 0.25f;
         public static readonly Color[] TEAM_COLOR =
         {
-            Custom.Desaturate(Color.red, 0.35f),
-            Custom.Desaturate(Color.blue, 0.35f),
-            Custom.Desaturate(Color.green, 0.35f),
-            Custom.Desaturate(Color.yellow, 0.35f),
-            Custom.Desaturate(Color.grey, 0.35f), // Spectator
+            Custom.Desaturate(Color.red, desaturara),
+            Custom.Desaturate(Color.blue, desaturara),
+            Custom.Desaturate(Color.green, desaturara),
+            Custom.Desaturate(Color.yellow, desaturara),
+            Custom.Desaturate(Color.magenta, desaturara), // Pink
+            Custom.Desaturate(Color.cyan, desaturara),
+            Custom.Desaturate(new(1f, 0.45f, 0f), desaturara), // orange
+            Custom.Desaturate(new(0.5f, 0f, 0.5f), desaturara), // purple
+            Custom.Desaturate(Color.grey, desaturara), // Spectator
         };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
@@ -423,7 +428,7 @@ namespace BingoMode
                 {
                     int lastTeame = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, new CSteamID(playerId), "playerTeam"), System.Globalization.NumberStyles.Any);
                     int nextTeame = lastTeame + 1;
-                    if (nextTeame > 4) nextTeame = 0;
+                    if (nextTeame > 8) nextTeame = 0;
 
                     SteamTest.team = nextTeame;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", nextTeame.ToString());
@@ -434,7 +439,7 @@ namespace BingoMode
                 kickedPlayer.SetSteamID64(playerId);
                 int lastTeam = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, new CSteamID(playerId), "playerTeam"), System.Globalization.NumberStyles.Any);
                 int nextTeam = lastTeam + 1;
-                if (nextTeam > 4) nextTeam = 0;
+                if (nextTeam > 8) nextTeam = 0;
                 InnerWorkings.SendMessage("%;" + nextTeam, kickedPlayer);
                 if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
                 return;
@@ -879,7 +884,11 @@ namespace BingoMode
                     case 1: return "Blue Team";
                     case 2: return "Green Team";
                     case 3: return "Yellow Team";
-                    case 4: return "Spectator";
+                    case 4: return "Pink Team";
+                    case 5: return "Cyan Team";
+                    case 6: return "Orange Team";
+                    case 7: return "Purple Team";
+                    case 8: return "Spectator";
                 }
                 return "Change team";
             }
