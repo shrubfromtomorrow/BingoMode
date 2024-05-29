@@ -48,7 +48,7 @@ namespace BingoMode.BingoSteamworks
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
                         if (teamCredit != SteamTest.team)
                         {
-                            if (BingoData.globalSettings.lockout) BingoHooks.GlobalBoard.challengeGrid[x, y].LockoutChallenge();
+                            if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).LockoutChallenge();
                             else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         }
                         else
@@ -56,6 +56,39 @@ namespace BingoMode.BingoSteamworks
                             BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         }
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
+                        return true;
+                    }
+                    else
+                    {
+                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
+
+                // Fail a challenge on the bingo board, based on given int coordinates
+                case '^':
+                    if (data.Length != 5)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
+
+                    if (int.TryParse(data[1], out int xx) && xx != -1 && int.TryParse(data[2], out int yy) && yy != -1 && int.TryParse(data[3], out int teamCredit2) && ulong.TryParse(data[4], out ulong playerCredit2))
+                    {
+                        Plugin.logger.LogMessage($"Completing online challenge at {xx}, {yy}");
+                        //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).TeamsCompleted[teamCredit2] = false;
+                        (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = playerCredit2;
+                        (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).FailChallenge(teamCredit2);
+                        (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = default;
+                        //if (teamCredit2 != SteamTest.team)
+                        //{
+                        //    if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).LockoutChallenge();
+                        //    else BingoHooks.GlobalBoard.challengeGrid[xx, yy].CompleteChallenge();
+                        //}
+                        //else
+                        //{
+                        //    BingoHooks.GlobalBoard.challengeGrid[xx, yy].CompleteChallenge();
+                        //}
+
                         return true;
                     }
                     else

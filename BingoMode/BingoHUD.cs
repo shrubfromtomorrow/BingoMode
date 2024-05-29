@@ -4,6 +4,8 @@ using HUD;
 using RWCustom; 
 using UnityEngine;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Menu.Remix.MixedUI;
 
 namespace BingoMode
 {
@@ -29,6 +31,19 @@ namespace BingoMode
             toggled = false;
 
             GenerateBingoGrid();
+        }
+
+        public override void ClearSprites()
+        {
+            base.ClearSprites();
+
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    grid[i, j].Clear();
+                }
+            }
         }
 
         public override void Update()
@@ -112,15 +127,11 @@ namespace BingoMode
             public TriangleMesh[] teamColors;
             public Vector2[] corners;
             bool showBG;
-
-            public bool MouseOver
-            {
-                get
-                {
-                    return owner.mousePosition.x > pos.x - size / 2f && owner.mousePosition.y > pos.y - size / 2f 
-                        && owner.mousePosition.x < pos.x + size / 2f && owner.mousePosition.y < pos.y + size / 2f;
-                }
-            }
+            FSprite[] boxSprites;
+            FLabel infoLabel;
+            bool boxVisible;
+            public bool lastMouseOver;
+            public bool mouseOver;
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
@@ -135,6 +146,7 @@ namespace BingoMode
                 alpha = 1f;
                 (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
                 (challenge as BingoChallenge).ChallengeCompleted += UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeFailed += UpdateTeamColors;
                 showBG = true;
 
                 sprite = new FSprite("pixel")
@@ -194,8 +206,87 @@ namespace BingoMode
                 }
 
                 container.AddChild(label);
+
+                boxSprites = new FSprite[5];
+
+
+                int width = 400;
+                int height = 75;
+                infoLabel = new FLabel(Custom.GetFont(), challenge.description.WrapText(false, width - 20f))
+                {
+                    anchorX = 0.5f,
+                    anchorY = 0.5f,
+                    alignment = FLabelAlignment.Center
+                };
+                container.AddChild(infoLabel);
+                boxSprites[0] = new FSprite("pixel", true)
+                {
+                    anchorX = 0,
+                    anchorY = 0,
+                    scaleX = width,
+                    scaleY = height,
+                    color = new Color(0.01f, 0.01f, 0.01f, 0.9f)
+                };
+                boxSprites[1] = new FSprite("pixel", true)
+                {
+                    anchorX = 0,
+                    anchorY = 0,
+                    scaleX = width,
+                };
+                boxSprites[2] = new FSprite("pixel", true)
+                {
+                    anchorX = 0,
+                    anchorY = 0,
+                    scaleX = width,
+                };
+                boxSprites[3] = new FSprite("pixel", true)
+                {
+                    anchorX = 0,
+                    anchorY = 0,
+                    scaleY = height,
+                };
+                boxSprites[4] = new FSprite("pixel", true)
+                {
+                    anchorX = 0,
+                    anchorY = 0,
+                    scaleY = height,
+                };
+                for (int i = 0; i < boxSprites.Length; i++)
+                {
+                    container.AddChild(boxSprites[i]);
+                    if (i > 0)
+                    {
+                        boxSprites[i].scaleX += 1f;
+                        boxSprites[i].scaleY += 1f;
+                        boxSprites[i].color = Color.white;
+                        boxSprites[i].shader = hud.rainWorld.Shaders["MenuText"];
+                    }
+                }
+
                 UpdateText();
                 UpdateTeamColors();
+            }
+
+            public void Clear()
+            {
+                (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
+                (challenge as BingoChallenge).ChallengeCompleted -= UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeFailed -= UpdateTeamColors;
+                sprite.RemoveFromContainer();
+                label.RemoveFromContainer();
+                foreach (var g in border)
+                {
+                    g.RemoveFromContainer();
+                }
+                foreach (var g in boxSprites)
+                {
+                    g.RemoveFromContainer();
+                }
+                foreach (var g in teamColors)
+                {
+                    g.RemoveFromContainer();
+                }
+                infoLabel.RemoveFromContainer();
             }
 
             public void UpdateTeamColors()
@@ -250,17 +341,39 @@ namespace BingoMode
                     phrase.Draw();
                     phrase.scale = size / 84f;
                 }
+
+                // Thinj and binj (box)
+                for (int i = 0; i < boxSprites.Length; i++)
+                {
+                    boxSprites[i].isVisible = boxVisible;
+                }
+                infoLabel.isVisible = boxVisible;
+                float yStep = boxSprites[3].scaleY / 2f;
+                boxSprites[0].SetPosition(pos + new Vector2(size / 2f + 10f, -yStep));
+                boxSprites[1].SetPosition(pos + new Vector2(size / 2f + 10f, yStep));
+                boxSprites[2].SetPosition(pos + new Vector2(size / 2f + 10f, -yStep));
+                boxSprites[3].SetPosition(pos + new Vector2(size / 2f + 10f, -yStep));
+                boxSprites[4].SetPosition(pos + new Vector2(size / 2f + 10f + boxSprites[0].scaleX, -yStep));
+                infoLabel.SetPosition(pos + new Vector2(size / 2f + 10f + boxSprites[0].scaleX / 2f, 0));
             }
 
             public void Update()
             {
-                //if (alpha > 0f && MouseOver && owner.mouseDown)
-                //{
-                //    //sprite.color = Color.blue;
-                //}
+                lastMouseOver = mouseOver;
+                mouseOver = owner.mousePosition.x > pos.x - size / 2f && owner.mousePosition.y > pos.y - size / 2f
+                        && owner.mousePosition.x < pos.x + size / 2f && owner.mousePosition.y < pos.y + size / 2f;
+                boxVisible = alpha > 0f && mouseOver;
                 //else if (challenge.hidden) sprite.color = new Color(0.01f, 0.01f, 0.01f);
                 //else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 //else sprite.color = Color.grey;
+                if (lastMouseOver != mouseOver)
+                {
+                    for (int i = 0; i < boxSprites.Length; i++)
+                    {
+                        boxSprites[i].MoveToFront();
+                    }
+                    infoLabel.MoveToFront();
+                }
             }
 
             public string SplitString(string s)
@@ -295,6 +408,7 @@ namespace BingoMode
                     phrase.scale = size / 84f;
                 }
                 label.text = phrase == null ? SplitString(challenge.description) : "";
+                infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
             }
         }
     }

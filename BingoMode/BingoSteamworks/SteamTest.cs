@@ -443,6 +443,32 @@ namespace BingoMode.BingoSteamworks
             }
         }
 
+        public static void BroadcastFailedChallenge(Challenge ch)
+        {
+            Plugin.logger.LogMessage("BROADCASTING CHALLENGE FAILED " + ch);
+            int x = -1;
+            int y = -1;
+            for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
+            {
+                bool b = false;
+                for (int j = 0; j < BingoHooks.GlobalBoard.challengeGrid.GetLength(1); j++)
+                {
+                    if (BingoHooks.GlobalBoard.challengeGrid[i, j] == ch)
+                    {
+                        x = i;
+                        y = j;
+                        b = true;
+                        break;
+                    }
+                }
+                if (b) break;
+            }
+            foreach (var id in LobbyMembers)
+            {
+                InnerWorkings.SendMessage($"^{x};{y};{team};{selfIdentity.GetSteamID64()}", id);
+            }
+        }
+
         public static void BroadcastStartGame()
         {
             if (LobbyMembers.Count > 0)

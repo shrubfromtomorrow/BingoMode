@@ -48,19 +48,17 @@ namespace BingoMode.Challenges
             {
                 item = new(type, "Item type", 0, listName: "banitem"),
                 isFood = edible,
-                completed = true
+                RequireSave = false,
+                ReverseChallenge = true
             };
-            TeamsCompleted[SteamTest.team] = true;
             return ch;
         }
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
-            if (used.value == item.Value)
+            if (used.value == item.Value && !Failed)
             {
-                completed = false;
-                Failed = true;
-                TeamsCompleted[SteamTest.team] = false;
+                FailChallenge(SteamTest.team);
             }
         }
 
@@ -106,7 +104,9 @@ namespace BingoMode.Challenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                TeamsToString()
+                TeamsToString(),
+                Failed ? "1" : "0",
+                "><",
             });
         }
 
@@ -121,6 +121,7 @@ namespace BingoMode.Challenges
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
+                Failed = array[6] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

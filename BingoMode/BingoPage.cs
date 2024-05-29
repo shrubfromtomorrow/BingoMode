@@ -332,7 +332,14 @@ namespace BingoMode
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
-                SteamTest.BroadcastStartGame();
+                if (SteamTest.LobbyMembers.Count > 0 && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
+                for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+                {
+                    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+                    {
+                        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
+                    }
+                }
                 return;
             }
 

@@ -19,6 +19,8 @@ namespace BingoMode.Challenges
         public virtual Phrase ConstructPhrase() => null;
         public event Action DescriptionUpdated;
         public event Action ChallengeCompleted;
+        public event Action ChallengeFailed;
+        public bool ReverseChallenge;
 
         public override void UpdateDescription()
         {
@@ -40,6 +42,25 @@ namespace BingoMode.Challenges
             {
                 TeamsCompleted[i] = data[i] == '1';
             }
+        }
+
+        public void FailChallenge(int team)
+        {
+            Failed = true;
+            completed = false;
+            TeamsCompleted[team] = false;
+            if (SteamTest.LobbyMembers.Count > 0)
+            {
+                SteamTest.BroadcastFailedChallenge(this);
+            }
+            Expedition.Expedition.coreFile.Save(false);
+            ChallengeFailed?.Invoke();
+        }
+
+        public void LockoutChallenge()
+        {
+            if (completed) return;
+            hidden = true;
         }
 
         public override void CompleteChallenge()

@@ -46,21 +46,20 @@ namespace BingoMode.Challenges
             return new BingoAllRegionsExcept
             {
                 region = new(regionn, "Region", 0, listName: "regions"),
-                regionsToEnter = regiones
+                regionsToEnter = regiones,
+                RequireSave = false
             };
         }
 
         public void Entered(string regionName)
         {
-            if (completed && region.Value == regionName)
+            if (completed && region.Value == regionName && !Failed)
             {
-                completed = false;
                 regionsToEnter.Add("failed");
-                Failed = true;
-                TeamsCompleted[SteamTest.team] = false;
+                FailChallenge(SteamTest.team);
                 return;
             }
-            else if (!completed && !revealed && regionsToEnter.Contains(regionName))
+            else if (!Failed && !completed && !revealed && regionsToEnter.Contains(regionName))
             {
                 Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
@@ -105,7 +104,9 @@ namespace BingoMode.Challenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                TeamsToString()
+                TeamsToString(),
+                Failed ? "1" : "0",
+                "><",
             });
         }
 
@@ -120,6 +121,7 @@ namespace BingoMode.Challenges
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
+                Failed = array[6] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -143,11 +143,6 @@ namespace BingoMode.Challenges
             }
         }
 
-        public static void LockoutChallenge(this Challenge self)
-        {
-            self.hidden = true;
-        }
-
         // Runtime detour hooks
         public static Hook tokenColorHook;
 

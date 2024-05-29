@@ -34,20 +34,18 @@ namespace BingoMode.Challenges
             BingoNoRegionChallenge ch = new BingoNoRegionChallenge
             {
                 region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regions"),
-                completed = true,
+                RequireSave = false,
+                ReverseChallenge = true
             };
-            TeamsCompleted[SteamTest.team] = true;
 
             return ch;
         }
 
         public void Entered(string regionName)
         {
-            if (completed && region.Value == regionName)
+            if (completed && region.Value == regionName && !Failed)
             {
-                completed = false;
-                Failed = true;
-                TeamsCompleted[SteamTest.team] = false;
+                FailChallenge(SteamTest.team);
             }
         }
 
@@ -81,7 +79,9 @@ namespace BingoMode.Challenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                TeamsToString()
+                TeamsToString(),
+                Failed ? "1" : "0",
+                "><",
             });
         }
 
@@ -95,6 +95,7 @@ namespace BingoMode.Challenges
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
                 TeamsFromString(array[4]);
+                Failed = array[5] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)
