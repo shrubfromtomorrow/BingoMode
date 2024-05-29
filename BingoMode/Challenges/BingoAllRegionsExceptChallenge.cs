@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,9 +57,10 @@ namespace BingoMode.Challenges
                 completed = false;
                 regionsToEnter.Add("failed");
                 Failed = true;
+                TeamsCompleted[SteamTest.team] = false;
                 return;
             }
-            else if (!completed && regionsToEnter.Contains(regionName))
+            else if (!completed && !revealed && regionsToEnter.Contains(regionName))
             {
                 Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
@@ -101,7 +103,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -115,6 +119,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -74,6 +74,7 @@ namespace BingoMode.Challenges
 
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
+            if (completed || revealed) return;
             Plugin.logger.LogMessage("hit " + weaponn.value + " " + weapon.Value);
             bool glug = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;
@@ -137,7 +138,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -153,6 +156,7 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
                 UpdateDescription();
             }
             catch (Exception ex)

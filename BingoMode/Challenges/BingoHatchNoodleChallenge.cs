@@ -52,7 +52,7 @@ namespace BingoMode.Challenges
 
         public void Hatch()
         {
-            if (!completed)
+            if (!completed && !revealed)
             {
                 current++;
                 UpdateDescription();
@@ -98,7 +98,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -113,6 +115,7 @@ namespace BingoMode.Challenges
                 completed = (array[3] == "1");
                 hidden = (array[4] == "1");
                 revealed = (array[5] == "1");
+                TeamsFromString(array[6]);
                 UpdateDescription();
             }
             catch (Exception ex)

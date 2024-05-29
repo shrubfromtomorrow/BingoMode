@@ -21,32 +21,31 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (!this.completed)
+            if (completed || revealed) return;
+
+            for (int i = 0; i < this.game.Players.Count; i++)
             {
-                for (int i = 0; i < this.game.Players.Count; i++)
+                if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == this.room.Value && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
                 {
-                    if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == this.room.Value && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
-                    {
-                        this.CompleteChallenge();
-                    }
+                    this.CompleteChallenge();
                 }
-                if (this.game.world != null && this.game.world.activeRooms != null)
+            }
+            if (this.game.world != null && this.game.world.activeRooms != null)
+            {
+                for (int j = 0; j < this.game.world.activeRooms.Count; j++)
                 {
-                    for (int j = 0; j < this.game.world.activeRooms.Count; j++)
+                    if (this.game.world.activeRooms[j].abstractRoom.name == this.room.Value)
                     {
-                        if (this.game.world.activeRooms[j].abstractRoom.name == this.room.Value)
+                        for (int k = 0; k < this.game.world.activeRooms[j].updateList.Count; k++)
                         {
-                            for (int k = 0; k < this.game.world.activeRooms[j].updateList.Count; k++)
+                            if (this.game.world.activeRooms[j].updateList[k] is BingoVistaChallenge.BingoVistaPoint)
                             {
-                                if (this.game.world.activeRooms[j].updateList[k] is BingoVistaChallenge.BingoVistaPoint)
-                                {
-                                    return;
-                                }
+                                return;
                             }
-                            ExpLog.Log("SPAWN BVISTA");
-                            this.game.world.activeRooms[j].AddObject(new BingoVistaChallenge.BingoVistaPoint(this.game.world.activeRooms[j], this, this.location));
-                            return;
                         }
+                        ExpLog.Log("SPAWN BVISTA");
+                        this.game.world.activeRooms[j].AddObject(new BingoVistaChallenge.BingoVistaPoint(this.game.world.activeRooms[j], this, this.location));
+                        return;
                     }
                 }
             }
@@ -145,7 +144,9 @@ namespace BingoMode.Challenges
                 "><",
                 this.hidden ? "1" : "0",
                 "><",
-                this.revealed ? "1" : "0"
+                this.revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -162,6 +163,7 @@ namespace BingoMode.Challenges
                 this.completed = (array[4] == "1");
                 this.hidden = (array[5] == "1");
                 this.revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
                 this.UpdateDescription();
             }
             catch (Exception ex)
@@ -303,7 +305,7 @@ namespace BingoMode.Challenges
                     this.collected = true;
                     return;
                 }
-                if (this.vista.completed && this.collected)
+                if ((vista.completed || vista.revealed) && this.collected)
                 {
                     base.RemoveFromRoom();
                     this.Destroy();

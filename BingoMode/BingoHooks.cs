@@ -16,7 +16,6 @@ namespace BingoMode
 {
     using BingoSteamworks;
     using Challenges;
-    using System.Security.Cryptography;
 
     public class BingoHooks
     {
@@ -497,6 +496,7 @@ namespace BingoMode
             self.pages.Add(new Page(self, null, "BINGO", 4));
             BingoData.globalMenu = self;
             BingoData.MultiplayerGame = false;
+            SteamTest.team = 0;
         }
 
         public static void ExpeditionMenu_InitMenuPages(On.Menu.ExpeditionMenu.orig_InitMenuPages orig, ExpeditionMenu self)
@@ -522,6 +522,7 @@ namespace BingoMode
             if (self.pagesMoving) return;
             if (message == "NEWBINGO")
             {
+                SteamTest.team = 0;
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     self.UpdatePage(4);

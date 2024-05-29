@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -30,11 +31,14 @@ namespace BingoMode.Challenges
         {
             string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
 
-            return new BingoNoRegionChallenge
+            BingoNoRegionChallenge ch = new BingoNoRegionChallenge
             {
                 region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regions"),
                 completed = true,
             };
+            TeamsCompleted[SteamTest.team] = true;
+
+            return ch;
         }
 
         public void Entered(string regionName)
@@ -43,6 +47,7 @@ namespace BingoMode.Challenges
             {
                 completed = false;
                 Failed = true;
+                TeamsCompleted[SteamTest.team] = false;
             }
         }
 
@@ -74,7 +79,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -87,6 +94,7 @@ namespace BingoMode.Challenges
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
+                TeamsFromString(array[4]);
                 UpdateDescription();
             }
             catch (Exception ex)

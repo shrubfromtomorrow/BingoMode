@@ -46,6 +46,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
+            if (completed || revealed) return;
             if (this.game != null && this.game.rainWorld.progression.currentSaveState != null)
             {
                 if (this.game.rainWorld.progression.currentSaveState.miscWorldSaveData.SLOracleState.totNeuronsGiven > this.delivered)
@@ -104,7 +105,9 @@ namespace BingoMode.Challenges
                 "><",
                 this.hidden ? "1" : "0",
                 "><",
-                this.revealed ? "1" : "0"
+                this.revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -118,6 +121,7 @@ namespace BingoMode.Challenges
                 this.completed = (array[2] == "1");
                 this.hidden = (array[3] == "1");
                 this.revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 this.UpdateDescription();
             }
             catch (Exception ex)

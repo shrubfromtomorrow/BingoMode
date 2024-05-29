@@ -121,7 +121,7 @@ namespace BingoMode.Challenges
 
         public void DeathPit(Creature c, Player p)
         {
-            if (!deathPit.Value || c == null || game == null || !CritInLocation(c)) return;
+            if (!deathPit.Value || c == null || game == null || !CritInLocation(c) || revealed || completed) return;
             if (starve.Value && !p.Malnourished) return;
             string type = c.abstractCreature.creatureTemplate.type.value;
             bool flag = crit == null || type == crit.Value;
@@ -230,7 +230,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -262,6 +264,7 @@ namespace BingoMode.Challenges
                 completed = (array[9] == "1");
                 hidden = (array[10] == "1");
                 revealed = (array[11] == "1");
+                TeamsFromString(array[12]);
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -279,7 +282,7 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature c, int playerNumber)
         {
             Plugin.logger.LogMessage("killed " + this);
-            if (deathPit.Value || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c)) return;
+            if (deathPit.Value || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c) || revealed) return;
             if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
             CreatureType type = c.abstractCreature.creatureTemplate.type;
             bool flag = crit == null || type.value == crit.Value;

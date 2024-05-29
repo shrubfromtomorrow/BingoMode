@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
 
         public void Pop()
         {
-            if (!completed)
+            if (!completed && !revealed)
             {
                 current++;
                 UpdateDescription();
@@ -87,7 +87,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -101,8 +103,8 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
-                Plugin.logger.LogMessage(description);
             }
             catch (Exception ex)
             {

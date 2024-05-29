@@ -23,6 +23,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
+            if (completed || revealed) return;
             if (this.iterator == -1)
             {
                 this.iterator = ((ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0);
@@ -97,7 +98,9 @@ namespace BingoMode.Challenges
                 "><",
                 this.hidden ? "1" : "0",
                 "><",
-                this.revealed ? "1" : "0"
+                this.revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -110,6 +113,7 @@ namespace BingoMode.Challenges
                 this.completed = (array[1] == "1");
                 this.hidden = (array[2] == "1");
                 this.revealed = (array[3] == "1");
+                TeamsFromString(array[4]);
                 this.UpdateDescription();
             }
             catch (Exception ex)

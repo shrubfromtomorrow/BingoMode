@@ -28,6 +28,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
+            if (completed || revealed) return;
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && (!starve.Value || player.Malnourished))
@@ -61,7 +62,8 @@ namespace BingoMode.Challenges
             return new BingoEchoChallenge
             {
                 ghost = new(list[Random.Range(0, list.Count)], "Region", 0, listName: "echoes"),
-                starve = new(Random.value < 0.25f, "While Starving", 1)
+                starve = new(Random.value < 0.25f, "While Starving", 1),
+                RequireSave = false
             };
         }
 
@@ -94,7 +96,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             ]);
         }
 
@@ -108,6 +112,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (System.Exception ex)

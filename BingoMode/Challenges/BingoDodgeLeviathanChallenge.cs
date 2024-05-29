@@ -34,7 +34,7 @@ namespace BingoMode.Challenges
 
         public void Dodged()
         {
-            if (!completed) CompleteChallenge();
+            if (!completed && !revealed) CompleteChallenge();
         }
 
         public override Challenge Generate()
@@ -106,7 +106,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -118,6 +120,7 @@ namespace BingoMode.Challenges
                 completed = (array[0] == "1");
                 hidden = (array[1] == "1");
                 revealed = (array[2] == "1");
+                TeamsFromString(array[3]);
                 UpdateDescription();
             }
             catch (Exception ex)

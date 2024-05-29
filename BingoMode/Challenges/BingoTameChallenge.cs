@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
 
         public void Fren(CreatureTemplate.Type friend)
         {
-            if (!completed && friend.value == crit.Value)
+            if (!completed && !revealed && friend.value == crit.Value)
             {
                 CompleteChallenge();
             }
@@ -76,7 +76,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -89,6 +91,7 @@ namespace BingoMode.Challenges
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
+                TeamsFromString(array[4]);
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -101,7 +101,7 @@ namespace BingoMode.Challenges
                 }
             }
 
-            if (g && !completed)
+            if (g && !completed && !revealed)
             {
                 CompleteChallenge();
             }
@@ -148,7 +148,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -174,6 +176,7 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
                 UpdateDescription();
             }
             catch (System.Exception ex)

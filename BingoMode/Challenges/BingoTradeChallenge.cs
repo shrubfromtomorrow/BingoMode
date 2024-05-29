@@ -60,7 +60,7 @@ namespace BingoMode.Challenges
                 UpdateDescription();
                 if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
 
-                if (!completed && current >= amount.Value)
+                if (!completed && !revealed && current >= amount.Value)
                 {
                     CompleteChallenge();
                 }
@@ -102,7 +102,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -117,6 +119,7 @@ namespace BingoMode.Challenges
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
                 bannedIDs = [];
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

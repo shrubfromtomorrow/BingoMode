@@ -14,7 +14,7 @@ namespace BingoMode.BingoSteamworks
     {
         public static List<SteamNetworkingIdentity> LobbyMembers = new ();
         public static List<SteamNetworkingIdentity> TeamMembers = new ();
-        public static int team = -1;
+        public static int team = 0;
         public static CSteamID CurrentLobby;
         //public static List<CSteamID> JoinableLobbies = new ();
         public static LobbyFilters CurrentFilters;
@@ -139,6 +139,7 @@ namespace BingoMode.BingoSteamworks
             //SteamMatchmaking.SetLobbyData(lobbyID, "maxPlayers", BingoData.globalSettings.maxPlayers.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
             SteamMatchmaking.SetLobbyData(lobbyID, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(lobbyID, "banCheats", BingoData.globalSettings.banMods ? "1" : "0");
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());

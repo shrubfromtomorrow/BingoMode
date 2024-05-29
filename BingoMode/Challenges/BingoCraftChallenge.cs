@@ -39,7 +39,7 @@ namespace BingoMode.Challenges
 
         public void Crafted(ItemType item)
         {
-            if (!completed && item.value == craftee.Value)
+            if (!completed && !revealed && item.value == craftee.Value)
             {
                 CompleteChallenge();
             }
@@ -72,7 +72,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -85,6 +87,7 @@ namespace BingoMode.Challenges
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
+                TeamsFromString(array[4]);
                 UpdateDescription();
             }
             catch (Exception ex)

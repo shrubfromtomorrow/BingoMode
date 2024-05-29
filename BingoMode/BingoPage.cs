@@ -11,6 +11,7 @@ using Steamworks;
 namespace BingoMode
 {
     using BingoSteamworks;
+    using System.Linq;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -73,6 +74,15 @@ namespace BingoMode
             Custom.Desaturate(new(1f, 0.45f, 0f), desaturara), // orange
             Custom.Desaturate(new(0.5f, 0f, 0.5f), desaturara), // purple
             Custom.Desaturate(Color.grey, desaturara), // Spectator
+        };
+
+        public static readonly string[] BANNED_MOD_IDS =
+        {
+            "devtools",
+            "slime-cubed.devconsole",
+            "fyre.BeastMaster",
+            "warp",
+            "maxi-mol.mousedrag"
         };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
@@ -391,7 +401,22 @@ namespace BingoMode
                 if (ulong.TryParse(message.Split('-')[1], out ulong lobid))
                 {
                     Plugin.logger.LogMessage("Joining" + lobid);
-                    var call = SteamMatchmaking.JoinLobby((CSteamID)lobid);
+                    CSteamID lobbid = new CSteamID(lobid);
+                    if (SteamMatchmaking.GetLobbyData(lobbid, "banCheats") == "1")
+                    {
+                        List<string> totallyevilmods = [];
+                        foreach (var mod in ModManager.ActiveMods)
+                        {
+                            if (BANNED_MOD_IDS.Contains(mod.id)) totallyevilmods.Add(mod.id);
+                        }
+
+                        if (totallyevilmods.Count > 0)
+                        {
+                            menu.manager.ShowDialog(new InfoDialog(menu.manager, "Please disable the following cheat mods if you wish to join this lobby:\n-" + string.Join("\n-", totallyevilmods)));
+                            return;
+                        }
+                    } 
+                    var call = SteamMatchmaking.JoinLobby(lobbid);
                     SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
                 }
                 else Plugin.logger.LogError("FAILED TO PARSE LOBBY ULONG FROM " + message);
@@ -806,12 +831,12 @@ namespace BingoMode
                     int maxPlayers = int.Parse(SteamMatchmaking.GetLobbyData(lobby, "maxPlayers"), System.Globalization.NumberStyles.Any);
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
                     bool lockout = SteamMatchmaking.GetLobbyData(lobby, "lockout") == "1";
-                    bool gameMode = SteamMatchmaking.GetLobbyData(lobby, "gameMode") == "1";
+                    bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "gameMode") == "1";
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks"), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens"), System.Globalization.NumberStyles.Any));
 
-                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Game mode - {gameMode}, Perks - {perks}, Burdens - {burdens}");
-                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, gameMode, perks, burdens));
+                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
+                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, perks, burdens));
                 }
                 catch (System.Exception e)
                 {
@@ -929,7 +954,7 @@ namespace BingoMode
             public int maxPlayers;
             public int currentPlayers;
             public bool lockout;
-            public bool gameMode;
+            public bool banCheats;
             public AllowUnlocks perks;
             public AllowUnlocks burdens;
             public FLabel nameLabel;
@@ -939,14 +964,14 @@ namespace BingoMode
             BingoPage page;
             public InfoPanel panel;
 
-            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool gameMode, AllowUnlocks perks, AllowUnlocks burdens)
+            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool banCheats, AllowUnlocks perks, AllowUnlocks burdens)
             {
                 this.lobbyID = lobbyID;
                 this.name = name;
                 this.maxPlayers = maxPlayers;
                 this.currentPlayers = currentPlayers;
                 this.lockout = lockout;
-                this.gameMode = gameMode;
+                this.banCheats = banCheats;
                 this.perks = perks;
                 this.burdens = burdens;
                 this.page = page;
@@ -1052,10 +1077,9 @@ namespace BingoMode
                     }
 
                     labels[0].text = "Lockout: " + (info.lockout ? "Yes" : "No");
-                    labels[1].text = "Game Mode: " + (info.gameMode ? "Teams" : "Versus");
                     labels[2].text = "Perks: " + (info.perks == AllowUnlocks.Any ? "Allowed" : info.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
                     labels[3].text = "Burdens: " + (info.burdens == AllowUnlocks.Any ? "Allowed" : info.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
-                    labels[4].text = "Banned cheat mods: TO-DO";//(info. ? "YES" : "NO");
+                    labels[4].text = "Banned cheat mods: " + (info.banCheats ? "YES" : "NO");
                 }
 
                 public void Draw(Vector2 pos)

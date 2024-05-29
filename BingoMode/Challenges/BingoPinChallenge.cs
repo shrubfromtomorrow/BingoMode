@@ -57,7 +57,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || game.Players == null) return;
+            if (completed || revealed || game.Players == null) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 if (this.game.Players[i] != null && this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null)
@@ -145,7 +145,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             ]);
         }
     
@@ -165,6 +167,7 @@ namespace BingoMode.Challenges
                 revealed = (array[7] == "1");
                 pinList = [];
                 spearList = [];
+                TeamsFromString(array[8]);
                 UpdateDescription();
             }
             catch (System.Exception ex)

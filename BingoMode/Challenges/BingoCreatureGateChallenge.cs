@@ -72,7 +72,7 @@ namespace BingoMode.Challenges
                 }
             }
 
-            if (g && !completed && !gates.Contains(roomName))
+            if (g && !completed && !revealed && !gates.Contains(roomName))
             {
                 gates.Add(roomName);
                 current++;
@@ -124,7 +124,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -140,6 +142,7 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
                 UpdateDescription();
             }
             catch (Exception ex)

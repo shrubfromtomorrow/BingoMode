@@ -26,9 +26,25 @@ namespace BingoMode.Challenges
             DescriptionUpdated?.Invoke();
         }
 
+        public string TeamsToString()
+        {
+            string data = "";
+            foreach (bool t in TeamsCompleted) data += t ? "1" : 0;
+            return data;
+        }
+
+        public void TeamsFromString(string data)
+        {
+            if (TeamsCompleted.Length != data.Length) return;
+            for (int i = 0; i < data.Length; i++)
+            {
+                TeamsCompleted[i] = data[i] == '1';
+            }
+        }
+
         public override void CompleteChallenge()
         {
-            if (completed) return;
+            if (completed || TeamsCompleted[SteamTest.team]) return;
             if (hidden) return; // Hidden means locked out here in bingo
 
             if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
@@ -39,15 +55,16 @@ namespace BingoMode.Challenges
             if (RequireSave && !revealed) // I forgot what this does (i remembered)
             {
                 revealed = true;
+                Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
                 return;
             }
             
             if (SteamTest.LobbyMembers.Count > 0)
             {
                 SteamTest.BroadcastCompletedChallenge(this);
-                TeamsCompleted[SteamTest.team] = true;
             }
-            compleple:
+            TeamsCompleted[SteamTest.team] = true;
+        compleple:
             if (TeamsCompleted[SteamTest.team]) completed = true;
             //int num = 0;
             //bool flag = true;

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using RWCustom;
 using Steamworks;
 using BingoMode.Challenges;
 
@@ -123,6 +120,7 @@ namespace BingoMode.BingoSteamworks
                 case '@':
                     if (SteamTest.CurrentLobby == default) return false;
                     SteamTest.LeaveLobby();
+                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
                     return true;
 
                 // Force host burdens

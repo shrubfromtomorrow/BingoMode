@@ -135,6 +135,7 @@
     <Compile Include="Challenges\ChallengeDisplay.cs" />
     <Compile Include="CreateLobbyDialog.cs" />
     <Compile Include="CustomizerDialog.cs" />
+    <Compile Include="InfoDialog.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -44,7 +44,7 @@ namespace BingoMode.Challenges
 
         public void Boom(string room)
         {
-            if (!completed && roomName.Value == room.ToLowerInvariant())
+            if (!completed && !revealed && roomName.Value == room.ToLowerInvariant())
             {
                 Plugin.logger.LogMessage("bombed");
                 if (!pass.Value)
@@ -100,7 +100,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             ]);
         }
 
@@ -114,6 +116,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

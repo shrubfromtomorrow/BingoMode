@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using BingoMode.BingoSteamworks;
 
 namespace BingoMode.Challenges
 {
@@ -43,12 +44,14 @@ namespace BingoMode.Challenges
                 type = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.FoodTypes.Length - (ModManager.MSC ? 5 : 1))];
             } 
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
-            return new BingoDontUseItemChallenge
+            BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge
             {
                 item = new(type, "Item type", 0, listName: "banitem"),
                 isFood = edible,
                 completed = true
             };
+            TeamsCompleted[SteamTest.team] = true;
+            return ch;
         }
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
@@ -57,6 +60,7 @@ namespace BingoMode.Challenges
             {
                 completed = false;
                 Failed = true;
+                TeamsCompleted[SteamTest.team] = false;
             }
         }
 
@@ -100,7 +104,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -114,6 +120,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

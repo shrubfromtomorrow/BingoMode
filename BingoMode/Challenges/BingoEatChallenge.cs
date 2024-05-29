@@ -94,7 +94,7 @@ namespace BingoMode.Challenges
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
             if (thisEdibleIsShit is PhysicalObject gasd) Plugin.logger.LogMessage($"Eated: {gasd.abstractPhysicalObject.type}. Our type: {foodType.Value}");
-            if (!completed && thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
+            if (!completed && !revealed && thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
             {
                 currentEated++;
@@ -128,7 +128,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
     
@@ -144,6 +146,7 @@ namespace BingoMode.Challenges
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
                 UpdateDescription();
             }
             catch (Exception ex)

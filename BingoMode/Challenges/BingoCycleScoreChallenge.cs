@@ -74,7 +74,7 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
             Plugin.logger.LogMessage("creaturekil score " + this);
-            if (this.completed || this.game == null || crit == null)
+            if (this.completed || revealed || this.game == null || crit == null)
             {
                 return;
             }
@@ -128,7 +128,9 @@ namespace BingoMode.Challenges
                 "><",
                 this.hidden ? "1" : "0",
                 "><",
-                this.revealed ? "1" : "0"
+                this.revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -141,11 +143,8 @@ namespace BingoMode.Challenges
                 this.completed = (array[1] == "1");
                 this.hidden = (array[2] == "1");
                 this.revealed = (array[3] == "1");
-                if (!this.completed)
-                {
-                    this.score = 0;
-                }
                 this.score = 0;
+                TeamsFromString(array[4]);
                 this.UpdateDescription();
             }
             catch (Exception ex)

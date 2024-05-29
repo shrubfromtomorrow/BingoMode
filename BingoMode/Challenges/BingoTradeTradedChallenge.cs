@@ -52,7 +52,7 @@ namespace BingoMode.Challenges
         public void Traded(EntityID item, EntityID scav)
         {
             Plugin.logger.LogMessage("Traded " + item);
-            if (!completed && traderItems.ContainsKey(item) && traderItems[item] != scav)
+            if (!completed && !revealed && traderItems.ContainsKey(item) && traderItems[item] != scav)
             {
                 Plugin.logger.LogMessage("Suck ces");
                 traderItems.Remove(item);
@@ -116,7 +116,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -137,6 +139,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

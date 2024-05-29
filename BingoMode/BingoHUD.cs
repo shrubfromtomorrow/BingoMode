@@ -108,7 +108,6 @@ namespace BingoMode
             public int y;
             public Phrase phrase;
             public FContainer container;
-            public FSprite[] teamCompletes;
             public FSprite[] border;
             public TriangleMesh[] teamColors;
             public Vector2[] corners;
@@ -194,16 +193,6 @@ namespace BingoMode
                     container.AddChild(teamColors[i]);
                 }
 
-                //teamCompletes = new FSprite[8];
-                //for (int i = 0; i < teamCompletes.Length; i++)
-                //{
-                //    teamCompletes[i] = new FSprite("Kill_Slugcat")
-                //    {
-                //        color = BingoPage.TEAM_COLOR[i],
-                //        scale = 0.8f * scaleFac
-                //    };
-                //    container.AddChild(teamCompletes[i]);
-                //}
                 container.AddChild(label);
                 UpdateText();
                 UpdateTeamColors();
@@ -211,21 +200,20 @@ namespace BingoMode
 
             public void UpdateTeamColors()
             {
-                bool[] virtualTeams = new bool[8];
-                bool g = false;
-                for (int i = 0; i < virtualTeams.Length; i++)
-                {
-                    if (Random.value < 0.1f) { virtualTeams[i] = true; g = true; }
-                }
-                if (g) showBG = false;
-
+                Plugin.logger.LogMessage($"Updating team colors for " + challenge);
                 List<TriangleMesh> visible = [];
+                bool g = false;
                 for (int i = 0; i < teamColors.Length; i++)
                 {
-                    //teamColors[i].isVisible = virtualTeams[i];//(challenge as BingoChallenge).TeamsCompleted[i];
                     teamColors[i].isVisible = false;
-                    if (virtualTeams[i]) visible.Add(teamColors[i]);
+                    if ((challenge as BingoChallenge).TeamsCompleted[i])
+                    {
+                        Plugin.logger.LogMessage("Making it visible!");
+                        visible.Add(teamColors[i]);
+                        g = true;
+                    }
                 }
+                if (g) showBG = false;
 
                 float dist = size / visible.Count;
                 float halfStep = dist * 0.3f;
@@ -243,19 +231,12 @@ namespace BingoMode
                 }
             }
 
-            public void Draw() // Add fading later
+            public void Draw()
             {
                 // Phrase biz
                 sprite.alpha = showBG ? Mathf.Lerp(0f, 0.66f, alpha) : 0f;
                 foreach (var g in border) g.alpha = alpha;
                 label.alpha = alpha;
-
-                //for (int i = 0; i < teamCompletes.Length; i++)
-                //{
-                //    Vector2 teamPos = pos + new Vector2(-31.5f + 10.5f * i, -31.5f);
-                //    teamCompletes[i].SetPosition(teamPos);
-                //    teamCompletes[i].alpha = alpha;
-                //}
 
                 for (int i = 0; i < teamColors.Length; i++)
                 {
@@ -273,14 +254,10 @@ namespace BingoMode
 
             public void Update()
             {
-                if (alpha > 0f && MouseOver && owner.mouseDown)
-                {
-                    //sprite.color = Color.blue;
-                    if (owner.MousePressed)
-                    {
-                        challenge.CompleteChallenge();
-                    }
-                }
+                //if (alpha > 0f && MouseOver && owner.mouseDown)
+                //{
+                //    //sprite.color = Color.blue;
+                //}
                 //else if (challenge.hidden) sprite.color = new Color(0.01f, 0.01f, 0.01f);
                 //else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 //else sprite.color = Color.grey;

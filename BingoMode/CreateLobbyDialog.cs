@@ -85,11 +85,11 @@ namespace BingoMode
 
             menuTabWrapper = new MenuTabWrapper(this, pages[0]);
             pages[0].subObjects.Add(menuTabWrapper);
-            maxPlayersConf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_LobbyMaxPlayers", 4, new ConfigAcceptableRange<int>(1, 16));
+            maxPlayersConf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_LobbyMaxPlayers", 4, new ConfigAcceptableRange<int>(1, 32));
             maxPlayers = new OpUpdown(true, maxPlayersConf, outOfBounds, 50f);
             maxPlayers.OnValueChanged += MaxPlayers_OnValueChanged;
             maxPlayersWrapper = new UIelementWrapper(menuTabWrapper, maxPlayers);
-            if (inLobby) SteamMatchmaking.GetLobbyMemberLimit(SteamTest.CurrentLobby);
+            if (inLobby) maxPlayers.valueInt = SteamMatchmaking.GetLobbyMemberLimit(SteamTest.CurrentLobby);
 
             perks = new CheckBox[3];
             burdens = new CheckBox[3];

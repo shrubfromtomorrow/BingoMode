@@ -77,7 +77,7 @@ namespace BingoMode.Challenges
 
         public void Stoled(AbstractPhysicalObject item, bool tollCheck)
         {
-            if (!completed && item.type.value == subject.Value && tollCheck == toll.Value && !checkedIDs.Contains(item.ID))
+            if (!completed && !revealed && item.type.value == subject.Value && tollCheck == toll.Value && !checkedIDs.Contains(item.ID))
             {
                 current++;
                 UpdateDescription();
@@ -108,7 +108,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -125,6 +127,7 @@ namespace BingoMode.Challenges
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
                 checkedIDs = [];
+                TeamsFromString(array[7]);
                 UpdateDescription();
             }
             catch (Exception ex)

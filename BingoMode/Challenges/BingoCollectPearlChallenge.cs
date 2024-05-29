@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
@@ -34,9 +35,9 @@ namespace BingoMode.Challenges
         {
             if (specific.Value)
             {
-                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(0, 1)], [1]);
+                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(TeamsCompleted[SteamTest.team] ? 1 : 0, 1)], [1]);
             }
-            return new Phrase([new Icon("Symbol_Pearl", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(current, amount.Value)], [1]);
+            return new Phrase([new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(current, amount.Value)], [1]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -51,10 +52,11 @@ namespace BingoMode.Challenges
 
         public void PickedUp(PearlType type)
         {
-            if (completed) return;
+            if (completed || revealed) return;
 
             if (specific.Value)
             {
+                UpdateDescription();
                 if (type.value == pearl.Value) CompleteChallenge();
             }
             else
@@ -150,7 +152,9 @@ namespace BingoMode.Challenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                string.Join("cLtD", collected)
+                string.Join("cLtD", collected),
+                "><",
+                TeamsToString()
             });
         }
 
@@ -169,6 +173,7 @@ namespace BingoMode.Challenges
                 revealed = (array[6] == "1");
                 string[] arr = Regex.Split(array[7], "cLtD");
                 collected = [.. arr];
+                TeamsFromString(array[8]);
 
                 UpdateDescription();
             }

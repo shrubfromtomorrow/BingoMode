@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
             return new BingoPearlHoardChallenge
             {
                 common = new(flag, "Common Pearls", 0),
-                amount = new((int)Mathf.Lerp(2f, 5f, ExpeditionData.challengeDifficulty), "Amount", 1),
+                amount = new((int)Mathf.Lerp(2f, 5f, UnityEngine.Random.value), "Amount", 1),
                 region = new(text, "In Region", 2, listName: "regions")
             };
         }
@@ -74,6 +74,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
+            if (completed || revealed) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 int num = 0;
@@ -122,7 +123,9 @@ namespace BingoMode.Challenges
                 "><",
                 this.hidden ? "1" : "0",
                 "><",
-                this.revealed ? "1" : "0"
+                this.revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -137,6 +140,7 @@ namespace BingoMode.Challenges
                 completed = (array[3] == "1");
                 hidden = (array[4] == "1");
                 revealed = (array[5] == "1");
+                TeamsFromString(array[6]);
                 UpdateDescription();
             }
             catch (Exception ex)

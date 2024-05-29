@@ -83,7 +83,7 @@ namespace BingoMode.Challenges
 
         public void CheckAchievementProgress(WinState winState)
         {
-            if (this.completed || this.game == null)
+            if (this.completed || revealed || this.game == null)
             {
                 return;
             }
@@ -109,7 +109,9 @@ namespace BingoMode.Challenges
                 "><",
                 hidden ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                "><",
+                TeamsToString()
             });
         }
 
@@ -122,6 +124,7 @@ namespace BingoMode.Challenges
                 completed = (array[1] == "1");
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
+                TeamsFromString(array[4]);
                 UpdateDescription();
             }
             catch (System.Exception ex)
