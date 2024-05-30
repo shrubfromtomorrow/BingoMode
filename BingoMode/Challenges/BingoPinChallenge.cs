@@ -27,7 +27,7 @@ namespace BingoMode.Challenges
                 .Replace("<current_pin>", current.ToString())
                 .Replace("<pin_amount>", target.Value.ToString())
                 .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : "creatures")
-                .Replace("<region>", region.Value != "" ? region.Value == "multi" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
+                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
     
@@ -44,11 +44,11 @@ namespace BingoMode.Challenges
             regions.Remove("ss");
             float radom = Random.value;
             if (radom < 0.33f) r = regions[Random.Range(0, regions.Count)];
-            else if (radom < 0.66f) r = "multi";
+            else if (radom < 0.66f) r = "Any Region";
     
             return new BingoPinChallenge
             {
-                target = new(Mathf.FloorToInt(Random.Range(4, 8) / (r == "multi" ? 2.5f : 1f)), "Amount", 0),
+                target = new(Mathf.FloorToInt(Random.Range(4, 8) / (r == "Any Region" ? 2.5f : 1f)), "Amount", 0),
                 crit = new(c, "Creature Type", 1, listName: "creatures"),
                 region = new(r, "Region", 2, listName: "regions"),
             };
@@ -84,7 +84,7 @@ namespace BingoMode.Challenges
                 {
                     this.pinList.Add(c);
                     this.current++;
-                    if (region.Value == "multi") pinRegions.Add(rr);
+                    if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
                     if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
                     this.spearList.Remove(this.spearList[k]);

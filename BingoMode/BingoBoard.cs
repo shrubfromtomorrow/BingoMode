@@ -102,7 +102,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Vertical win");
+                    if (!bias) Plugin.logger.LogMessage("Vertical win");
                     break;
                 }
                 else currentWinLine.Clear();
@@ -123,7 +123,7 @@ namespace BingoMode
                     won = line;
                     if (won)
                     {
-                        Plugin.logger.LogMessage("Horizontal win");
+                        if (!bias) Plugin.logger.LogMessage("Horizontal win");
                         break;
                     }
                     else currentWinLine.Clear();
@@ -143,7 +143,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Diagonal 1 win");
+                    if (!bias) Plugin.logger.LogMessage("Diagonal 1 win");
                 }
                 else currentWinLine.Clear();
             }
@@ -161,7 +161,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Diagnoal 2 win");
+                    if (!bias) Plugin.logger.LogMessage("Diagnoal 2 win");
                 }
                 else currentWinLine.Clear();
             }

@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Menu.Remix.MixedUI;
+using System.Linq;
 
 namespace BingoMode
 {
@@ -208,8 +209,6 @@ namespace BingoMode
                 container.AddChild(label);
 
                 boxSprites = new FSprite[5];
-
-
                 int width = 400;
                 int height = 75;
                 infoLabel = new FLabel(Custom.GetFont(), challenge.description.WrapText(false, width - 20f))
@@ -366,13 +365,18 @@ namespace BingoMode
                 //else if (challenge.hidden) sprite.color = new Color(0.01f, 0.01f, 0.01f);
                 //else if (MouseOver || challenge.completed) sprite.color = Color.red;
                 //else sprite.color = Color.grey;
-                if (lastMouseOver != mouseOver)
+                if (mouseOver && lastMouseOver != mouseOver)
                 {
                     for (int i = 0; i < boxSprites.Length; i++)
                     {
                         boxSprites[i].MoveToFront();
                     }
                     infoLabel.MoveToFront();
+                }
+
+                if (mouseOver && owner.mouseDown && !owner.lastMouseDown)
+                {
+                    challenge.CompleteChallenge();
                 }
             }
 
@@ -409,6 +413,15 @@ namespace BingoMode
                 }
                 label.text = phrase == null ? SplitString(challenge.description) : "";
                 infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
+                if ((challenge as BingoChallenge).TeamsCompleted.Any(x => x == true))
+                {
+                    infoLabel.text += "\nCompleted by: ";
+                    for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
+                    {
+                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
+                    }
+                    infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
+                }
             }
         }
     }

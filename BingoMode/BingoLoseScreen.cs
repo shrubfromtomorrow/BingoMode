@@ -43,7 +43,7 @@ namespace BingoMode
             grid = new BingoGrid(this, pages[0], new(leftOffset + 300f, manager.rainWorld.screenSize.y / 2f), 500f);
             pages[0].subObjects.Add(grid);
 
-            continueButton = new SimpleButton(this, pages[0], Translate("CONTINUE"), "CONTINUE", new Vector2(rightOffset - 150f, 40f), new Vector2(100f, 30f));
+            continueButton = new SimpleButton(this, pages[0], "This is the fail screen lol", "CONTINUE", new Vector2(rightOffset - 150f, 40f), new Vector2(100f, 30f));
             pages[0].subObjects.Add(continueButton);
 
             BingoData.FinishBingo();
@@ -51,7 +51,7 @@ namespace BingoMode
 
         public override void Singal(MenuObject sender, string message)
         {
-            if (message == "you failed lol")
+            if (message == "CONTINUE")
             {
                 manager.RequestMainProcessSwitch(ExpeditionEnums.ProcessID.ExpeditionMenu);
             }

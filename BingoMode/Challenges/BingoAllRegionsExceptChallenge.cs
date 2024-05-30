@@ -105,6 +105,7 @@ namespace BingoMode.Challenges
                 revealed ? "1" : "0",
                 "><",
                 TeamsToString(),
+                "><",
                 Failed ? "1" : "0",
                 "><",
             });

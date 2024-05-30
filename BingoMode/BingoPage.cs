@@ -871,6 +871,23 @@ namespace BingoMode
             return 0f;
         }
 
+        public static string TeamName(int teamIndex)
+        {
+            switch (teamIndex)
+            {
+                case 0: return "Red";
+                case 1: return "Blue";
+                case 2: return "Green";
+                case 3: return "Yellow";
+                case 4: return "Pink";
+                case 5: return "Cyan";
+                case 6: return "Orange";
+                case 7: return "Purple";
+                case 8: return "Spectator";
+            }
+            return "Change";
+        }
+
         public class PlayerInfo
         {
             public CSteamID playerID;
@@ -898,7 +915,7 @@ namespace BingoMode
 
                 if (controls)
                 {
-                    cycleTeam = new SimpleButton(page.menu, page, TeamName(team), "SWTEAM-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(90f, 16f));
+                    cycleTeam = new SimpleButton(page.menu, page, BingoPage.TeamName(team) + (team == 8 ? "" : " Team"), "SWTEAM-" + player.ToString(), new Vector2(-10000f, -10000f), new Vector2(90f, 16f));
                     page.subObjects.Add(cycleTeam);
                     if (!isHost)
                     {
@@ -906,23 +923,6 @@ namespace BingoMode
                         page.subObjects.Add(kick);
                     }
                 }
-            }
-
-            public string TeamName(int teamIndex)
-            {
-                switch (teamIndex)
-                {
-                    case 0: return "Red Team";
-                    case 1: return "Blue Team";
-                    case 2: return "Green Team";
-                    case 3: return "Yellow Team";
-                    case 4: return "Pink Team";
-                    case 5: return "Cyan Team";
-                    case 6: return "Orange Team";
-                    case 7: return "Purple Team";
-                    case 8: return "Spectator";
-                }
-                return "Change team";
             }
 
             public void Draw(Vector2 origPos)

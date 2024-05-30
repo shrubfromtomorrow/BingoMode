@@ -1010,5 +1010,18 @@ namespace BingoMode.Challenges
                 }
             }
         }
+
+        public static void Player_ObjectEaten2(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+            orig.Invoke(self, edible);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood && edible is PhysicalObject p)
+                {
+                    g.Used(p.abstractPhysicalObject.type);
+                }
+            }
+        }
     }
 }

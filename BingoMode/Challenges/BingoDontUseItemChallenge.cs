@@ -105,6 +105,7 @@ namespace BingoMode.Challenges
                 revealed ? "1" : "0",
                 "><",
                 TeamsToString(),
+                "><",
                 Failed ? "1" : "0",
                 "><",
             });
@@ -135,12 +136,14 @@ namespace BingoMode.Challenges
         {
             On.Player.ThrowObject += Player_ThrowObject;
             On.Player.GrabUpdate += Player_GrabUpdate;
+            On.Player.ObjectEaten += Player_ObjectEaten2;
         }
 
         public override void RemoveHooks()
         {
             On.Player.ThrowObject -= Player_ThrowObject;
             On.Player.GrabUpdate -= Player_GrabUpdate;
+            On.Player.ObjectEaten -= Player_ObjectEaten2;
         }
 
         public override List<object> Settings() => [item];

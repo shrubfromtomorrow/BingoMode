@@ -275,7 +275,6 @@ namespace BingoMode
                 ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
             }
             owner.challenge.UpdateDescription();
-            owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
         }
 

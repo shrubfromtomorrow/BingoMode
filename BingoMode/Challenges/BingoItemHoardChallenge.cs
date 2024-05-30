@@ -46,7 +46,7 @@ namespace BingoMode.Challenges
             AbstractPhysicalObject.AbstractObjectType abstractObjectType = ChallengeTools.ObjectTypes[UnityEngine.Random.Range(0, ChallengeTools.ObjectTypes.Count - 1)];
             return new BingoItemHoardChallenge
             {
-                amount = new((int)Mathf.Lerp(2f, 8f, ExpeditionData.challengeDifficulty), "Amount", 1),
+                amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 1),
                 target = new(abstractObjectType.value, "Item", 0, listName: "expobject")
             };
         }
