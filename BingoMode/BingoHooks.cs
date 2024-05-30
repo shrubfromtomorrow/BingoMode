@@ -235,6 +235,23 @@ namespace BingoMode
 
             // Remove challenge preview list
             On.Menu.CharacterSelectPage.UpdateChallengePreview += CharacterSelectPage_UpdateChallengePreview;
+
+            // Make everyone quit if the host quits
+            On.ProcessManager.RequestMainProcessSwitch_ProcessID_float += ProcessManager_RequestMainProcessSwitch_ProcessID_float;
+        }
+
+        private static void ProcessManager_RequestMainProcessSwitch_ProcessID_float(On.ProcessManager.orig_RequestMainProcessSwitch_ProcessID_float orig, ProcessManager self, ProcessManager.ProcessID ID, float fadeOutSeconds)
+        {
+            orig.Invoke(self, ID, fadeOutSeconds);
+
+            if (BingoData.BingoMode && SteamTest.LobbyMembers.Count > 0 && ID == ProcessManager.ProcessID.MainMenu &&
+                SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID())
+            {
+                foreach (var player in SteamTest.LobbyMembers)
+                {
+                    InnerWorkings.SendMessage("e", player);
+                }
+            }
         }
 
         private static void CharacterSelectPage_AbandonButton_OnPressDone(On.Menu.CharacterSelectPage.orig_AbandonButton_OnPressDone orig, CharacterSelectPage self, Menu.Remix.MixedUI.UIfocusable trigger)
@@ -450,7 +467,7 @@ namespace BingoMode
                 {
                     if (BingoData.BingoMode) 
                     {
-                        ExpeditionGame.expeditionComplete = GlobalBoard.CheckWin();
+                        ExpeditionGame.expeditionComplete = false;//GlobalBoard.CheckWin();
                     }
                 });
             }
@@ -638,21 +655,24 @@ namespace BingoMode
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
                 SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
-                if (saveGameData != null)
+                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
+                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
+                if (!isMultiplayer && saveGameData == null)
                 {
-                    bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
-                    bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
-                    self.slugcatDescription.text = "";
-                    if (!newBingoButton.TryGetValue(self, out _))
-                    {
-                        newBingoButton.Add(self, new HoldButton(self.menu, self, isHost ? "CREATE\nLOBBY" : isMultiplayer ? "REJOIN\nLOBBY" : "CONTINUE\nBINGO", isHost ? "CREATELOB" : isMultiplayer ? "TRYREJOIN" : "LOADBINGO", new Vector2(680f, 210f), 30f));
-                    }
-                    newBingoButton.TryGetValue(self, out var bb);
-                    self.subObjects.Add(bb);
-                    self.abandonButton.Show();
-                    return;
+                    BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                    goto invok;
                 }
+                self.slugcatDescription.text = "";
+                if (!newBingoButton.TryGetValue(self, out _))
+                {
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, isHost ? "CREATE\nLOBBY" : isMultiplayer ? "REJOIN\nLOBBY" : "CONTINUE\nBINGO", isHost ? "CREATELOB" : isMultiplayer ? "TRYREJOIN" : "LOADBINGO", new Vector2(680f, 210f), 30f));
+                }
+                newBingoButton.TryGetValue(self, out var bb);
+                self.subObjects.Add(bb);
+                self.abandonButton.Show();
+                return;
             }
+            invok:
             orig.Invoke(self);
 
             self.confirmExpedition.pos.x += 90;

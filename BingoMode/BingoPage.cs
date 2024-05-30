@@ -61,6 +61,7 @@ namespace BingoMode
         public float lastLobbySlideIn;
         public float slideStep;
         public bool fromContinueGame;
+        public bool spectatorMode;
 
         public static readonly float desaturara = 0.25f;
         public static readonly Color[] TEAM_COLOR =
@@ -276,9 +277,51 @@ namespace BingoMode
 
             if (message == "STARTBINGO")
             {
-                if (SteamTest.team == 4)  // Spectator
+                if (SteamTest.team == 8) // Spectator
                 {
+                    spectatorMode = true;
 
+                    randomize.RemoveSprites();
+                    RemoveSubObject(randomize);
+                    plusButton.RemoveSprites();
+                    RemoveSubObject(plusButton);
+                    minusButton.RemoveSprites();
+                    RemoveSubObject(minusButton);
+                    shelterLabel.RemoveSprites();
+                    RemoveSubObject(shelterLabel);
+                    rightPage.RemoveSprites();
+                    RemoveSubObject(rightPage);
+                    startGame.RemoveSprites();
+                    RemoveSubObject(startGame);
+
+                    unlocksButton.Hide();
+                    shelterSetting.Hide();
+                    unlocksButton.Unload();
+                    shelterSetting.Unload();
+                    menuTabWrapper.wrappers.Remove(unlocksButton);
+                    menuTabWrapper.wrappers.Remove(shelterSetting);
+                    menuTabWrapper.subObjects.Remove(unlockWrapper);
+                    menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
+
+                    grid.Switch(true);
+
+                    if (slideStep == 0f) slideStep = 1f;
+                    else slideStep = -slideStep;
+                    float ff = slideStep == 1f ? 1f : 0f;
+                    slider.subtleSliderNob.outerCircle.alpha = ff;
+                    foreach (var line in slider.lineSprites)
+                    {
+                        line.alpha = ff;
+                    }
+
+                    menu.PlaySound(SoundID.MENU_Start_New_Game);
+
+                    if (BingoData.MultiplayerGame)
+                    {
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID());
+                    }
+                    else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
+                    if (SteamTest.LobbyMembers.Count > 0 && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
 
                     return;
                 }
@@ -372,6 +415,11 @@ namespace BingoMode
             if (message == "LEAVE_LOBBY")
             {
                 SteamTest.LeaveLobby();
+                if (spectatorMode)
+                {
+                    expMenu.exitButton.buttonBehav.greyedOut = false;
+                    expMenu.exitButton.Clicked();
+                }
                 return;
             }
 
@@ -475,14 +523,6 @@ namespace BingoMode
                 InnerWorkings.SendMessage("%;" + nextTeam, kickedPlayer);
                 if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
                 return;
-            }
-        }
-
-        public void FindAndJoinHostsLobby()
-        {
-            foreach (var lob in foundLobbies)
-            {
-
             }
         }
 

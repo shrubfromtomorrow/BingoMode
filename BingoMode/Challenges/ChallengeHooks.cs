@@ -450,8 +450,6 @@ namespace BingoMode.Challenges
 
         private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
-            orig.Invoke(self, game, survived, newMalnourished);
-
             if (BingoData.BingoMode)
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
@@ -464,21 +462,14 @@ namespace BingoMode.Challenges
                         }
                         ExpeditionData.challengeList[j].revealed = false;
                     }
-                    if (ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
-                    {
-                        c.bombed = false;
-                    }
                 }
                 ownerOfUAD.Clear();
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();
                 BingoData.heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
-
-                if (!BingoHooks.GlobalBoard.CheckWin(true))
-                {
-                    game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
-                }
             }
+
+            orig.Invoke(self, game, survived, newMalnourished);
         }
 
         public static void ScavengerBomb_Explode(On.ScavengerBomb.orig_Explode orig, ScavengerBomb self, BodyChunk hitChunk)

@@ -70,7 +70,11 @@ namespace BingoMode
                 Player p = hud.owner as Player;
 
                 // Display only if map pressed
-                if (p.input[0].mp && !p.input[1].mp) toggled = !toggled;
+                if (p.input[0].mp && !p.input[1].mp) 
+                {
+                    toggled = !toggled;
+                    Cursor.visible = Cursor.visible || toggled;
+                }
             }
         }
 

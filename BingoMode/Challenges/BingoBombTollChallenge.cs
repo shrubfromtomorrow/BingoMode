@@ -116,6 +116,7 @@ namespace BingoMode.Challenges
                 completed = (array[2] == "1");
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
+                bombed = false;
                 TeamsFromString(array[5]);
                 UpdateDescription();
             }

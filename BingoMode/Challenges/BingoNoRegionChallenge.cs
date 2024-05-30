@@ -13,7 +13,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Do not enter " + region.Value);
+            this.description = ChallengeTools.IGT.Translate("Do not enter " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));
             base.UpdateDescription();
         }
 

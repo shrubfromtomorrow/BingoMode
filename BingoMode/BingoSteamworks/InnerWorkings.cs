@@ -185,6 +185,32 @@ namespace BingoMode.BingoSteamworks
                     }
                     SteamTest.FetchUnlocks(perj, false);
                     return true;
+
+                // Exit to menu
+                case 'e':
+                    if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame game)
+                    {
+                        if (game.manager.musicPlayer != null)
+                        {
+                            game.manager.musicPlayer.DeathEvent();
+                        }
+                        game.ExitGame(false, true);
+                        game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
+                    }
+                    break;
+
+                // End game ! !!! ! ! ! !!
+                case 'x':
+                    if (data.Length < 2)
+                    //if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame unlimitedGames) // but no games :(
+                    //{
+                    //    if (unlimitedGames.manager.musicPlayer != null)
+                    //    {
+                    //        unlimitedGames.manager.musicPlayer.DeathEvent();
+                    //    }
+                    //}
+                    Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
+                    break;
             }
 
             return false;

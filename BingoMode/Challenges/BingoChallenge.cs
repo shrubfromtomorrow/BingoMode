@@ -4,6 +4,7 @@ using Expedition;
 using System.Collections.Generic;
 using Steamworks;
 using BingoMode.BingoSteamworks;
+using System.Linq;
 
 namespace BingoMode.Challenges
 {
@@ -14,12 +15,13 @@ namespace BingoMode.Challenges
         public abstract List<object> Settings();
         public bool RequireSave = true;
         public bool Failed;
-        public bool[] TeamsCompleted = new bool[8];
+        public bool[] TeamsCompleted = new bool[9];
         public ulong completeCredit = 0;
         public virtual Phrase ConstructPhrase() => null;
         public event Action DescriptionUpdated;
         public event Action ChallengeCompleted;
         public event Action ChallengeFailed;
+        public event Action ChallengeAlmostComplete;
         public bool ReverseChallenge;
 
         public override void UpdateDescription()
@@ -77,6 +79,7 @@ namespace BingoMode.Challenges
             {
                 revealed = true;
                 Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                ChallengeAlmostComplete?.Invoke();
                 return;
             }
             
@@ -100,9 +103,9 @@ namespace BingoMode.Challenges
             //        num++;
             //    }
             //}
+            UpdateDescription();
             if (this.game != null && this.game.cameras != null && this.game.cameras[0].hud != null)
             {
-                this.UpdateDescription();
                 for (int i = 0; i < this.game.cameras[0].hud.parts.Count; i++)
                 {
                     //if (this.game.cameras[0].hud.parts[i] is ExpeditionHUD)
@@ -123,6 +126,42 @@ namespace BingoMode.Challenges
             //}
             Expedition.Expedition.coreFile.Save(false);
             ChallengeCompleted?.Invoke();
+
+            int teamsLost = 0;
+            for (int t = 0; t < 8; t++)
+            {
+                if (!BingoHooks.GlobalBoard.CheckWin(SteamTest.team, true)) teamsLost++;
+            }
+            bool allChallengesDone = true;
+            for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+            {
+                if (!allChallengesDone) break;
+                for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+                {
+                    if (!(BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted.Any(x => x == true))
+                    {
+                        allChallengesDone = false;
+                        break;
+                    }
+                }
+            }
+            if (teamsLost == 8 && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
+            {
+                game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
+                game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                return;
+            }
+
+            for (int t = 0; t < 8; t++)
+            {
+                if (BingoHooks.GlobalBoard.CheckWin(t, false))
+                {
+                    game.manager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
+                    game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                }
+            }
         }
     }
 }

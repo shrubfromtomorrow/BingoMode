@@ -85,7 +85,7 @@ namespace BingoMode
             }
         }
 
-        public bool CheckWin(bool bias = false)
+        public bool CheckWin(int t, bool checkLose = false) // Checks whether a team won or cant win
         {
             bool won = false;
 
@@ -96,13 +96,13 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[SteamTest.team] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!bias) Plugin.logger.LogMessage("Vertical win");
+                    if (!checkLose) Plugin.logger.LogMessage("Vertical win");
                     break;
                 }
                 else currentWinLine.Clear();
@@ -117,13 +117,13 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[SteamTest.team] && !ch.hidden;
+                        line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
                     if (won)
                     {
-                        if (!bias) Plugin.logger.LogMessage("Horizontal win");
+                        if (!checkLose) Plugin.logger.LogMessage("Horizontal win");
                         break;
                     }
                     else currentWinLine.Clear();
@@ -137,13 +137,13 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[SteamTest.team] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!bias) Plugin.logger.LogMessage("Diagonal 1 win");
+                    if (!checkLose) Plugin.logger.LogMessage("Diagonal 1 win");
                 }
                 else currentWinLine.Clear();
             }
@@ -155,13 +155,13 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    line &= bias ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[SteamTest.team] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : ch.completed && (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!bias) Plugin.logger.LogMessage("Diagnoal 2 win");
+                    if (!checkLose) Plugin.logger.LogMessage("Diagnoal 2 win");
                 }
                 else currentWinLine.Clear();
             }
