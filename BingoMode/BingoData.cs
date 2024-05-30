@@ -35,6 +35,7 @@ namespace BingoMode
         public static ExpeditionMenu globalMenu;
         public static LobbySettings globalSettings = new LobbySettings();
         public static string BingoDen = "random";
+        public static int TeamsInBingo = 1;
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 

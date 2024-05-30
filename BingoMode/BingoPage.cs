@@ -92,6 +92,7 @@ namespace BingoMode
             board = BingoHooks.GlobalBoard;
             size = board.size;
             BingoData.BingoMode = false;
+            BingoData.TeamsInBingo = 1;
 
             //tab = new MenuTab();
             //Container.AddChild(tab._container);
@@ -316,6 +317,20 @@ namespace BingoMode
 
                     menu.PlaySound(SoundID.MENU_Start_New_Game);
 
+                    List<string> bannedRegionss = [];
+                    foreach (var ch in ExpeditionData.challengeList)
+                    {
+                        if (ch is BingoNoRegionChallenge r) bannedRegionss.Add(r.region.Value);
+                        if (ch is BingoAllRegionsExcept g) bannedRegionss.Add(g.region.Value);
+                    }
+                resette:
+                    ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    BingoData.BingoDen = ExpeditionData.startingDen;
+                    foreach (var banned in bannedRegionss)
+                    {
+                        if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto resette;
+                    }
+
                     if (BingoData.MultiplayerGame)
                     {
                         BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID());
@@ -325,6 +340,16 @@ namespace BingoMode
 
                     return;
                 }
+
+                int totalTeams = 1;
+                foreach (var playere in SteamTest.LobbyMembers)
+                {
+                    if (SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.GetSteamID(), "team") != SteamTest.team.ToString())
+                    {
+                        totalTeams++;
+                    }
+                }
+                BingoData.TeamsInBingo = totalTeams;
 
                 if (ModManager.JollyCoop && ModManager.CoopAvailable)
                 {
@@ -353,6 +378,7 @@ namespace BingoMode
                 }
             reset:
                 ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                BingoData.BingoDen = ExpeditionData.startingDen;
                 foreach (var banned in bannedRegions) 
                 {
                     if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto reset;
@@ -375,12 +401,17 @@ namespace BingoMode
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
-                if (SteamTest.LobbyMembers.Count > 0 && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
+                if (SteamTest.LobbyMembers.Count > 0 && SteamTest.CurrentLobby != default && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
+                SteamTest.LeaveLobby();
                 for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
                 {
                     for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
                     {
-                        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
+                        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) 
+                        {
+                            Plugin.logger.LogMessage("Completing reverse challenge as team " + SteamTest.team);
+                            BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
+                        }
                     }
                 }
                 return;
@@ -414,6 +445,10 @@ namespace BingoMode
 
             if (message == "LEAVE_LOBBY")
             {
+                foreach (var player in SteamTest.LobbyMembers)
+                {
+                    InnerWorkings.SendMessage("g;" + player.GetSteamID64(), player);
+                }
                 SteamTest.LeaveLobby();
                 if (spectatorMode)
                 {
@@ -512,7 +547,7 @@ namespace BingoMode
 
                     SteamTest.team = nextTeame;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", nextTeame.ToString());
-                    if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                    ResetPlayerLobby();
                     return;
                 }
                 SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
@@ -520,8 +555,8 @@ namespace BingoMode
                 int lastTeam = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, new CSteamID(playerId), "playerTeam"), System.Globalization.NumberStyles.Any);
                 int nextTeam = lastTeam + 1;
                 if (nextTeam > 8) nextTeam = 0;
-                InnerWorkings.SendMessage("%;" + nextTeam, kickedPlayer);
-                if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                InnerWorkings.SendMessage("%" + nextTeam, kickedPlayer);
+                ResetPlayerLobby();
                 return;
             }
         }
@@ -875,15 +910,16 @@ namespace BingoMode
                 try
                 {
                     string name = SteamMatchmaking.GetLobbyData(lobby, "name");
-                    int maxPlayers = int.Parse(SteamMatchmaking.GetLobbyData(lobby, "maxPlayers"), System.Globalization.NumberStyles.Any);
+                    //int maxPlayers = int.Parse(SteamMatchmaking.GetLobbyData(lobby, "maxPlayers"), System.Globalization.NumberStyles.Any);
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
                     bool lockout = SteamMatchmaking.GetLobbyData(lobby, "lockout") == "1";
                     bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "gameMode") == "1";
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks"), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens"), System.Globalization.NumberStyles.Any));
-
+                    int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
                     Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
                     foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, perks, burdens));
+                    Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
                 }
                 catch (System.Exception e)
                 {
@@ -944,7 +980,8 @@ namespace BingoMode
                 this.page = page;
                 team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam"), System.Globalization.NumberStyles.Any);
                 bool isHost = player == SteamTest.selfIdentity.GetSteamID();
-                nickname = isHost ? SteamFriends.GetPersonaName() : SteamFriends.GetPlayerNickname(player);
+                nickname = isHost ? SteamFriends.GetPersonaName() : SteamFriends.GetFriendPersonaName(player);
+                if (nickname == null) nickname = "Cant get player's nickname";
                 nameLabel = new FLabel(Custom.GetFont(), nickname)
                 {
                     alignment = FLabelAlignment.Left,
@@ -970,9 +1007,12 @@ namespace BingoMode
                 nameLabel.SetPosition(origPos);
                 float a = Mathf.Clamp01(maxAlpha);
                 nameLabel.alpha = a;
-                cycleTeam.Container.alpha = a;
-                cycleTeam.pos = origPos + new Vector2(250f, -8f);
-                cycleTeam.lastPos = cycleTeam.pos;
+                if (cycleTeam != null)
+                {
+                    cycleTeam.Container.alpha = a;
+                    cycleTeam.pos = origPos + new Vector2(250f, -8f);
+                    cycleTeam.lastPos = cycleTeam.pos;
+                }
                 if (kick != null)
                 {
                     kick.Container.alpha = a;
@@ -984,8 +1024,11 @@ namespace BingoMode
             public void Remove()
             {
                 nameLabel.RemoveFromContainer();
-                cycleTeam.RemoveSprites();
-                page.RemoveSubObject(cycleTeam);
+                if (cycleTeam != null)
+                {
+                    cycleTeam.RemoveSprites();
+                    page.RemoveSubObject(cycleTeam);
+                }
                 if (kick != null)
                 {
                     kick.RemoveSprites();

@@ -23,7 +23,7 @@ namespace BingoMode
 
             float yTop = 578f;
 
-            closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), "CLOSE", new Vector2(683f - num / 2f, yTop - 305f), new Vector2(num, 35f));
+            closeButton = new SimpleButton(this, pages[0], Translate("CLOSE"), message == "The host quit the game." ? "QUITGAEM" : "CLOSE", new Vector2(683f - num / 2f, yTop - 305f), new Vector2(num, 35f));
             pages[0].subObjects.Add(closeButton);
             infoText = new FLabel(Custom.GetFont(), message)
             {
@@ -42,6 +42,10 @@ namespace BingoMode
             switch (message)
             {
                 case "CLOSE":
+                    manager.StopSideProcess(this);
+                    break;
+                case "QUITGAEM":
+                    Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
                     manager.StopSideProcess(this);
                     break;
             }

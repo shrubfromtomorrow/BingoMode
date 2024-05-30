@@ -51,9 +51,9 @@ namespace BingoMode
             //    }
             //}
 
-            if (!BingoData.MultiplayerGame) return;
+            if (!BingoData.MultiplayerGame && !BingoData.BingoMode) return;
             // How the fuck does this work
-            IntPtr[] messges = new IntPtr[16];
+            IntPtr[] messges = new IntPtr[32];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
             if (messages > 0)
             {

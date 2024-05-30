@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return (!ModManager.MSC || !(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Saint) || (!(ID.Value == "Traveller") && !(ID.Value == "Hunter") && !(ID.Value == "Scholar"))) && (!ModManager.MSC || !(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Artificer) || !(ID.Value == "Chieftain"));
+            return true;
         }
 
         public override Challenge Generate()

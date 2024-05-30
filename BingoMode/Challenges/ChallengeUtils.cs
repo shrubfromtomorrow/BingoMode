@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using MoreSlugcats;
 using System.Linq;
 using UnityEngine;
+using System;
 
 namespace BingoMode.Challenges
 {
@@ -67,7 +68,24 @@ namespace BingoMode.Challenges
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
                 case "expobject": return ["FirecrackerPlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
-                case "vista": return [.. ChallengeTools.VistaLocations.Keys];
+                case "vista": // hate
+                    List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
+                    foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
+                    {
+                        if (SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(keyValuePair.Key))
+                        {
+                            foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
+                            {
+                                list.Add(new ValueTuple<string, string>(keyValuePair.Key, keyValuePair2.Key));
+                            }
+                        }
+                    }
+                    List<string> strings = [];
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        strings.Add(list[i].Item2);
+                    }
+                    return strings.ToArray();
                 case "subregions": return ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint ? [.. SaintSubregions] : [.. AllSubregions];
             }
             return ["Whoops something went wrong"];

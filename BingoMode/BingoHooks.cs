@@ -620,6 +620,7 @@ namespace BingoMode
 
         public static void LoadBingoNoStart()
         {
+            if (BingoData.BingoSaves == null || !BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) return;
             int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
             int chIndex = 0;
@@ -655,13 +656,13 @@ namespace BingoMode
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
                 SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
-                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
-                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
-                if (!isMultiplayer && saveGameData == null)
+                if (saveGameData == null && SteamTest.team != 8)
                 {
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                     goto invok;
                 }
+                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
+                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
                 self.slugcatDescription.text = "";
                 if (!newBingoButton.TryGetValue(self, out _))
                 {
@@ -679,7 +680,7 @@ namespace BingoMode
 
             if (!newBingoButton.TryGetValue(self, out _))
             {
-                newBingoButton.Add(self, new HoldButton(self.menu, self, "NEW\nBINGO", "NEWBINGO", new Vector2(590f, 180f), 30f));
+                newBingoButton.Add(self, new HoldButton(self.menu, self, "PLAY\nBINGO", "NEWBINGO", new Vector2(590f, 180f), 30f));
             }
             newBingoButton.TryGetValue(self, out var button);
             self.subObjects.Add(button);

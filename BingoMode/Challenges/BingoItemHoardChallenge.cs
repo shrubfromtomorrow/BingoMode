@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return !ModManager.MSC || !(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Artificer) || !(target.Value == "ScavengerBomb");
+            return true;
         }
 
         public override Challenge Generate()

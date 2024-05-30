@@ -272,9 +272,11 @@ namespace BingoMode
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
                 ccc.region = ccc.room.Value.Substring(0, 2);
+                Plugin.logger.LogMessage("Vista bs: " + ccc.region + " " + ccc.room.Value);
                 ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
             }
             owner.challenge.UpdateDescription();
+            owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
         }
 

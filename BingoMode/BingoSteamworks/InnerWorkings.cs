@@ -28,20 +28,25 @@ namespace BingoMode.BingoSteamworks
         public static bool MessageReceived(string message)
         {
             char type = message[0];
-            //message = message.Substring(1);
+            message = message.Substring(1);
             Plugin.logger.LogMessage("MESSAGE TYPE IS " + type + " " + (type == '!'));
             string[] data = message.Split(';');
             switch (type)
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length != 5)
+                    if (data.Length != 4)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
 
-                    if (int.TryParse(data[1], out int x) && x != -1 && int.TryParse(data[2], out int y) && y != -1 && int.TryParse(data[3], out int teamCredit) && ulong.TryParse(data[4], out ulong playerCredit))
+                    int x = int.Parse(data[0], System.Globalization.NumberStyles.Any);
+                    int y = int.Parse(data[1], System.Globalization.NumberStyles.Any);
+                    int teamCredit = int.Parse(data[2], System.Globalization.NumberStyles.Any);
+                    ulong playerCredit = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
+                    Plugin.logger.LogMessage("Player credit: " + playerCredit);
+                    if (x != -1 && y != -1)
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
@@ -60,21 +65,25 @@ namespace BingoMode.BingoSteamworks
                     }
                     else
                     {
-                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
+                        Plugin.logger.LogError("COULDNT: " + message);
                         return false;
                     }
 
                 // Fail a challenge on the bingo board, based on given int coordinates
                 case '^':
-                    if (data.Length != 5)
+                    if (data.Length != 4)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         return false;
                     }
 
-                    if (int.TryParse(data[1], out int xx) && xx != -1 && int.TryParse(data[2], out int yy) && yy != -1 && int.TryParse(data[3], out int teamCredit2) && ulong.TryParse(data[4], out ulong playerCredit2))
+                    int xx = int.Parse(data[0], System.Globalization.NumberStyles.Any);
+                    int yy = int.Parse(data[1], System.Globalization.NumberStyles.Any);
+                    int teamCredit2 = int.Parse(data[2], System.Globalization.NumberStyles.Any);
+                    ulong playerCredit2 = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
+                    if (xx != -1 && yy != -1)
                     {
-                        Plugin.logger.LogMessage($"Completing online challenge at {xx}, {yy}");
+                        Plugin.logger.LogMessage($"Failing online challenge at {xx}, {yy}");
                         //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).TeamsCompleted[teamCredit2] = false;
                         (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = playerCredit2;
                         (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).FailChallenge(teamCredit2);
@@ -114,46 +123,33 @@ namespace BingoMode.BingoSteamworks
 
                 // Begin game
                 case '!':
-                    if (data.Length != 2)
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
-                    }
-                    if (SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
-                    {
-                        BingoData.BingoDen = data[1];
+                        BingoData.BingoDen = data[0];
                         page.startGame.buttonBehav.greyedOut = false;
-                        page.startGame.Clicked();
-                        SteamTest.LeaveLobby();
+                        page.startGame.Singal(page.startGame, page.startGame.signalText);
                         return true;
                     }
+                    Plugin.logger.LogError("No menu no page no bitches: " + message);
                     return false;
 
                 // Change team
                 case '%':
-                    if (data.Length != 2)
-                    {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
-                    }
+                    int t = int.Parse(data[0], System.Globalization.NumberStyles.Any);
 
-                    if (int.TryParse(data[1], out int t))
-                    {
-                        SteamTest.team = t;
-                        SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
-                        return true;
-                    }
-                    else
-                    {
-                        Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message + " DATA: " + data[1]);
-                        return false;
-                    }
+                    SteamTest.team = t;
+                    SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
+                    return true;
 
                 // Kick behavior
                 case '@':
                     if (SteamTest.CurrentLobby == default) return false;
-                    SteamTest.LeaveLobby();
-                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
+
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page6) && page6.inLobby)
+                    {
+                        page6.Singal(page6.multiButton, "LEAVE_LOBBY");
+                        Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
+                    }
                     return true;
 
                 // Force host burdens
@@ -201,7 +197,6 @@ namespace BingoMode.BingoSteamworks
 
                 // End game ! !!! ! ! ! !!
                 case 'x':
-                    if (data.Length < 2)
                     //if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame unlimitedGames) // but no games :(
                     //{
                     //    if (unlimitedGames.manager.musicPlayer != null)
@@ -209,7 +204,30 @@ namespace BingoMode.BingoSteamworks
                     //        unlimitedGames.manager.musicPlayer.DeathEvent();
                     //    }
                     //}
-                    Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
+                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
+                    break;
+
+                // End game ! !!! ! ! ! !!
+                case 'g':
+                    if (data.Length != 2)
+                    {
+                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                        return false;
+                    }
+                    SteamTest.LobbyMembers.RemoveAll(x => x.GetSteamID64() == ulong.Parse(data[1], System.Globalization.NumberStyles.Any));
+
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
+                    {
+                        page2.ResetPlayerLobby();
+                    }
+                    break;
+
+                // End game ! !!! ! ! ! !!
+                case 'q':
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    {
+                        page3.ResetPlayerLobby();
+                    }
                     break;
             }
 

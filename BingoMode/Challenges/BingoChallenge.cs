@@ -22,6 +22,7 @@ namespace BingoMode.Challenges
         public event Action ChallengeCompleted;
         public event Action ChallengeFailed;
         public event Action ChallengeAlmostComplete;
+        public event Action ChallengeLockedOut;
         public bool ReverseChallenge;
 
         public override void UpdateDescription()
@@ -63,15 +64,17 @@ namespace BingoMode.Challenges
         {
             if (completed) return;
             hidden = true;
+            ChallengeLockedOut?.Invoke();
+            CheckWinLose();
         }
 
         public override void CompleteChallenge()
         {
-            if (completed || TeamsCompleted[SteamTest.team]) return;
             if (hidden) return; // Hidden means locked out here in bingo
 
             if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
             {
+                Plugin.logger.LogMessage("complete credit isnt null " + completeCredit);
                 goto compleple;
             }
 
@@ -82,7 +85,12 @@ namespace BingoMode.Challenges
                 ChallengeAlmostComplete?.Invoke();
                 return;
             }
-            
+
+            //Plugin.logger.LogMessage($"Current lobby member count in the thing: {SteamTest.LobbyMembers.Count}");
+            //foreach (var gg in SteamTest.LobbyMembers)
+            //{
+            //    Plugin.logger.LogMessage($"- {gg.GetSteamID64()}");
+            //}
             if (SteamTest.LobbyMembers.Count > 0)
             {
                 SteamTest.BroadcastCompletedChallenge(this);
@@ -126,7 +134,11 @@ namespace BingoMode.Challenges
             //}
             Expedition.Expedition.coreFile.Save(false);
             ChallengeCompleted?.Invoke();
+            CheckWinLose();
+        }
 
+        public void CheckWinLose()
+        {
             int teamsLost = 0;
             for (int t = 0; t < 8; t++)
             {
@@ -145,11 +157,11 @@ namespace BingoMode.Challenges
                     }
                 }
             }
-            if (teamsLost == 8 && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
+            if (teamsLost == BingoData.TeamsInBingo && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
             {
                 game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
                 game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                 return;
             }
 
@@ -159,7 +171,8 @@ namespace BingoMode.Challenges
                 {
                     game.manager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
                     game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                    BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                    if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                    return;
                 }
             }
         }

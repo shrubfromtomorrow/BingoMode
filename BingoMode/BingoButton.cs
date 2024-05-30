@@ -287,6 +287,7 @@ namespace BingoMode
         public override void Clicked()
         {
             Singal(this, singalText);
+            //challenge.CompleteChallenge();
             menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
         }
 

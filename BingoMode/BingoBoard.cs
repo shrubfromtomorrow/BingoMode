@@ -283,7 +283,7 @@ namespace BingoMode
                         string[] array11 = Regex.Split(challenges[next], "~");
                         string type = array11[0];
                         string text2 = array11[1];
-                        Challenge challenge = (Challenge)Activator.CreateInstance(ChallengeOrganizer.availableChallengeTypes.Find((Challenge c) => c.GetType().Name == type).GetType());
+                        Challenge challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
                         challenge.FromString(text2);
                         ExpLog.Log(challenge.description);
                         if (!ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer))

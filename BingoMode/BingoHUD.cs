@@ -137,6 +137,7 @@ namespace BingoMode
             bool boxVisible;
             public bool lastMouseOver;
             public bool mouseOver;
+            public float flashProgress;
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
@@ -268,6 +269,11 @@ namespace BingoMode
 
                 UpdateText();
                 UpdateTeamColors();
+            }
+
+            public void ChallengeCompleted()
+            {
+
             }
 
             public void Clear()

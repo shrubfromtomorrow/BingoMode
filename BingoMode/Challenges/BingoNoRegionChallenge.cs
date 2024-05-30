@@ -83,6 +83,10 @@ namespace BingoMode.Challenges
                 "><",
                 Failed ? "1" : "0",
                 "><",
+                ReverseChallenge ? "1" : "0",
+                "><",
+                RequireSave ? "1" : "0",
+                "><",
             });
         }
 
@@ -97,6 +101,8 @@ namespace BingoMode.Challenges
                 revealed = (array[3] == "1");
                 TeamsFromString(array[4]);
                 Failed = array[5] == "1";
+                ReverseChallenge = array[6] == "1";
+                RequireSave = array[7] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)
