@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ namespace BingoMode.Challenges
 
         public void Grabbed(Creature c)
         {
-            if (!completed && c.Template.type.value == crit.Value)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && c.Template.type.value == crit.Value)
             {
                 string rr = c.room.world.region.name;
                 if ((rr == from.Value || from.Value == "Any Region") && !origins.Contains(c.abstractCreature.ID))

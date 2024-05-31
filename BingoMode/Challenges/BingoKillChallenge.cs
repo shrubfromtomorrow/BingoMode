@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -282,7 +283,7 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature c, int playerNumber)
         {
             Plugin.logger.LogMessage("killed " + this);
-            if (deathPit.Value || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c) || revealed) return;
+            if (deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c) || revealed) return;
             if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
             CreatureType type = c.abstractCreature.creatureTemplate.type;
             bool flag = crit == null || type.value == crit.Value;

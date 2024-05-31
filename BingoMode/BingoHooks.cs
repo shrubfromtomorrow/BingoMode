@@ -371,35 +371,22 @@ namespace BingoMode
         {
             orig.Invoke(self, sender, message);
 
-            if (message == "CLOSE" && bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
+            if (message == "CLOSE")
             {
-                pag.unlocksButton.greyedOut = false;
-                pag.unlocksButton.Reset();
-            }
-            if (!BingoData.MultiplayerGame || SteamTest.LobbyMembers.Count == 0) return;
-            if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited && message.StartsWith("unl-"))
-            {
-                string perkList = "";
-                foreach (var unl in ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")))
+                if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
                 {
-                    perkList += ";" + unl;
+                    pag.unlocksButton.greyedOut = false;
+                    pag.unlocksButton.Reset();
                 }
-                foreach (var player in SteamTest.LobbyMembers)
-                {
-                    InnerWorkings.SendMessage("p" + perkList, player);
-                }
-            }
 
-            if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.Inherited && message.StartsWith("bur-"))
-            {
-                string burList = "";
-                foreach (var bur in ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")))
+                if (!BingoData.MultiplayerGame || SteamTest.LobbyMembers.Count == 0 || SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) != SteamTest.selfIdentity.GetSteamID()) return;
+                if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited)
                 {
-                    burList += ";" + bur;
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));
                 }
-                foreach (var player in SteamTest.LobbyMembers)
+                if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.Inherited)
                 {
-                    InnerWorkings.SendMessage("b" + burList, player);
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "burdenList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")).ToList()));
                 }
             }
         }
@@ -656,13 +643,14 @@ namespace BingoMode
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
                 SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
-                if (saveGameData == null && SteamTest.team != 8)
+
+                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
+                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost; 
+                if (saveGameData == null)
                 {
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                     goto invok;
                 }
-                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
-                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
                 self.slugcatDescription.text = "";
                 if (!newBingoButton.TryGetValue(self, out _))
                 {

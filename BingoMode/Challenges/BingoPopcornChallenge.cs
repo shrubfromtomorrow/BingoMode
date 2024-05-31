@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
@@ -43,7 +44,7 @@ namespace BingoMode.Challenges
 
         public void Pop()
         {
-            if (!completed && !revealed)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
                 current++;
                 UpdateDescription();

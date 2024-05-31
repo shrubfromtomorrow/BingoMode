@@ -56,7 +56,7 @@ namespace BingoMode.Challenges
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
-            if (used.value == item.Value && !Failed)
+            if (used.value == item.Value && !Failed && completed)
             {
                 FailChallenge(SteamTest.team);
             }

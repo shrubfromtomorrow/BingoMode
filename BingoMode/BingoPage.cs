@@ -242,6 +242,7 @@ namespace BingoMode
                 grid.Switch(!create);
                 RemoveSearchPage();
                 CreateLobbyPage();
+                GrafUpdate(menu.myTimeStacker);
                 return;
             }
 
@@ -257,6 +258,7 @@ namespace BingoMode
 
             RemoveLobbyPage();
             CreateSearchPage();
+            GrafUpdate(menu.myTimeStacker);
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -278,6 +280,7 @@ namespace BingoMode
 
             if (message == "STARTBINGO")
             {
+                if (menu.manager.dialog != null) menu.manager.StopSideProcess(menu.manager.dialog);
                 if (SteamTest.team == 8) // Spectator
                 {
                     spectatorMode = true;
@@ -447,7 +450,7 @@ namespace BingoMode
             {
                 foreach (var player in SteamTest.LobbyMembers)
                 {
-                    InnerWorkings.SendMessage("g;" + player.GetSteamID64(), player);
+                    InnerWorkings.SendMessage("g" + SteamTest.selfIdentity.GetSteamID64(), player);
                 }
                 SteamTest.LeaveLobby();
                 if (spectatorMode)
@@ -530,9 +533,8 @@ namespace BingoMode
                 ulong playerId = ulong.Parse(message.Split('-')[1], System.Globalization.NumberStyles.Any);
                 SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
                 kickedPlayer.SetSteamID64(playerId);
-                Plugin.logger.LogMessage("test test test: " + kickedPlayer.GetSteamID());
                 InnerWorkings.SendMessage("@", kickedPlayer);
-                if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
+                //if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
                 return;
             }
 
@@ -623,9 +625,11 @@ namespace BingoMode
 
             lobbyName.pos.x = divider.x + 190f;
             lobbyName.pos.y = divider.y + 25.25f;
+            lobbyName.lastPos = lobbyName.pos;
 
             lobbySettingsInfo.pos.x = multiMenuBg.pos.x + 338f;
             lobbySettingsInfo.pos.y = divider.y + 5.25f;
+            lobbySettingsInfo.lastPos = lobbySettingsInfo.pos;
 
             if (lobbyPlayers != null && lobbyPlayers.Count > 0) DrawPlayerInfo(timeStacker);
         }
@@ -668,10 +672,11 @@ namespace BingoMode
         public void CreateLobbyPage()
         {
             lobbyName = new MenuLabel(expMenu, this, SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name"), default, default, true);
+            lobbyName.pos.x = divider.x + 190f;
+            lobbyName.pos.y = divider.y + 25.25f;
+            lobbyName.lastPos = lobbyName.pos;
             subObjects.Add(lobbyName);
-            Plugin.logger.LogMessage("ASHOL " + SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) + " - " + SteamTest.selfIdentity.GetSteamID());
             bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
-            Plugin.logger.LogFatal(isHost);
             lobbySettingsInfo = new SymbolButton(expMenu, this, isHost ? "settingscog" : "Menu_InfoI", isHost ? "CHANGE_SETTINGS" : "INFO_SETTINGS", default);
             lobbySettingsInfo.size = new Vector2(35f, 35f);
             lobbySettingsInfo.roundedRect.size = lobbySettingsInfo.size;
@@ -738,6 +743,23 @@ namespace BingoMode
             nameFilter = new OpTextBox(nameFilterConf as Configurable<string>, default, 140f);
             nameFilter.allowSpace = true;
             nameFilter.OnValueUpdate += NameFilter_OnValueUpdate;
+
+            createLobby.pos.x = multiMenuBg.pos.x + 338f;
+            createLobby.pos.y = divider.y + 5.25f;
+
+            friendsNoFriends.pos.x = createLobby.pos.x - 40f;
+            friendsNoFriends.pos.y = createLobby.pos.y;
+
+            refreshSearch.pos.x = friendsNoFriends.pos.x - 40f;
+            refreshSearch.pos.y = createLobby.pos.y;
+
+            distanceFilter.PosX = refreshSearch.pos.x - 105f;
+            distanceFilter.PosY = createLobby.pos.y + 5f;
+            distanceFilter.lastScreenPos = distanceFilter.ScreenPos;
+
+            nameFilter.PosX = distanceFilter.PosX - 145f;
+            nameFilter.PosY = createLobby.pos.y + 5f;
+            nameFilter.lastScreenPos = nameFilter.ScreenPos;
 
             //tab.AddItems(
             //[
@@ -907,6 +929,15 @@ namespace BingoMode
 
             foreach (var lobby in lobbies)
             {
+                Plugin.logger.LogMessage($"sus among us lobby - {lobby}");
+                int l = SteamMatchmaking.GetLobbyDataCount(lobby);
+                for (int i = 0; i < l; i++)
+                {
+                    if (SteamMatchmaking.GetLobbyDataByIndex(lobby, i, out string key, 255, out string value, 8192))
+                    {
+                        Plugin.logger.LogMessage($"Data {i} - {key} - {value}");
+                    }
+                }
                 try
                 {
                     string name = SteamMatchmaking.GetLobbyData(lobby, "name");
@@ -914,12 +945,14 @@ namespace BingoMode
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
                     bool lockout = SteamMatchmaking.GetLobbyData(lobby, "lockout") == "1";
                     bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "gameMode") == "1";
-                    AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks"), System.Globalization.NumberStyles.Any));
-                    AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens"), System.Globalization.NumberStyles.Any));
+                    Plugin.logger.LogMessage($"Perks: {SteamMatchmaking.GetLobbyData(lobby, "perks").Trim()}");
+                    Plugin.logger.LogMessage($"Burdens: {SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim()}");
+                    AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
+                    AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
                     Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
                     foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, perks, burdens));
-                    Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
+                    //Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
                 }
                 catch (System.Exception e)
                 {

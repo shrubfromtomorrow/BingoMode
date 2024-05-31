@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
@@ -74,7 +75,7 @@ namespace BingoMode.Challenges
 
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
-            if (completed || revealed) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             Plugin.logger.LogMessage("hit " + weaponn.value + " " + weapon.Value);
             bool glug = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;

@@ -900,7 +900,7 @@ namespace BingoMode.Challenges
             {
                 foreach (Challenge ch in ExpeditionData.challengeList)
                 {
-                    if (ch is BingoUnlockChallenge b && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
+                    if (ch is BingoUnlockChallenge b && !b.completed && !b.TeamsCompleted[SteamTest.team] && !b.revealed && !b.hidden && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
                         ch.CompleteChallenge();
                         if (BingoData.challengeTokens.Contains(d.tokenString)) BingoData.challengeTokens.Remove(d.tokenString + (d.isRed ? "-safari" : ""));

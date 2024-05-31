@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace BingoMode.Challenges
 
         public void Fren(CreatureTemplate.Type friend)
         {
-            if (!completed && !revealed && friend.value == crit.Value)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && friend.value == crit.Value)
             {
                 CompleteChallenge();
             }

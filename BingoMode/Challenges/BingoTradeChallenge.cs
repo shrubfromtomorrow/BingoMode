@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
@@ -52,6 +53,7 @@ namespace BingoMode.Challenges
 
         public void Traded(int pnts, EntityID ID)
         {
+            if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden) return;
             Plugin.logger.LogMessage("Traded " + pnts);
             if (!bannedIDs.Contains(ID))
             {
@@ -60,7 +62,7 @@ namespace BingoMode.Challenges
                 UpdateDescription();
                 if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
 
-                if (!completed && !revealed && current >= amount.Value)
+                if (current >= amount.Value)
                 {
                     CompleteChallenge();
                 }

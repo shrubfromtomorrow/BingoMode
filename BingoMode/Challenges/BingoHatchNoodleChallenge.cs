@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace BingoMode.Challenges
 
         public void Hatch()
         {
-            if (!completed && !revealed)
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
                 current++;
                 UpdateDescription();

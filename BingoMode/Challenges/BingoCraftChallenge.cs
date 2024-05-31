@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace BingoMode.Challenges
 
         public void Crafted(ItemType item)
         {
-            if (!completed && !revealed && item.value == craftee.Value)
+            if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && item.value == craftee.Value)
             {
                 CompleteChallenge();
             }

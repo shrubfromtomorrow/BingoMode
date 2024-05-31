@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -34,7 +35,7 @@ namespace BingoMode.Challenges
 
         public void Dodged()
         {
-            if (!completed && !revealed) CompleteChallenge();
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden) CompleteChallenge();
         }
 
         public override Challenge Generate()
@@ -47,7 +48,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed) return;
+            if (completed || hidden || revealed || TeamsCompleted[SteamTest.team]) return;
             wasInArea = Mathf.Max(0, wasInArea - 1);
             for (int i = 0; i < game.Players.Count; i++)
             {

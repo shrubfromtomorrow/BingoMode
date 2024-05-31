@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace BingoMode
 {
+    using BingoSteamworks;
     public class BingoHUD : HudPart
     {
         public BingoBoard board;
@@ -152,7 +153,7 @@ namespace BingoMode
                 alpha = 1f;
                 (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
                 (challenge as BingoChallenge).ChallengeCompleted += UpdateTeamColors;
-                (challenge as BingoChallenge).ChallengeFailed += UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
                 showBG = true;
 
                 sprite = new FSprite("pixel")
@@ -271,6 +272,11 @@ namespace BingoMode
                 UpdateTeamColors();
             }
 
+            public void OnChallengeFailed(int tea)
+            {
+                UpdateTeamColors();
+            }
+
             public void ChallengeCompleted()
             {
 
@@ -280,7 +286,7 @@ namespace BingoMode
             {
                 (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
                 (challenge as BingoChallenge).ChallengeCompleted -= UpdateTeamColors;
-                (challenge as BingoChallenge).ChallengeFailed -= UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
                 sprite.RemoveFromContainer();
                 label.RemoveFromContainer();
                 foreach (var g in border)
@@ -300,7 +306,7 @@ namespace BingoMode
 
             public void UpdateTeamColors()
             {
-                Plugin.logger.LogMessage($"Updating team colors for " + challenge);
+                //Plugin.logger.LogMessage($"Updating team colors for " + challenge);
                 List<TriangleMesh> visible = [];
                 bool g = false;
                 for (int i = 0; i < teamColors.Length; i++)
@@ -308,7 +314,7 @@ namespace BingoMode
                     teamColors[i].isVisible = false;
                     if ((challenge as BingoChallenge).TeamsCompleted[i])
                     {
-                        Plugin.logger.LogMessage("Making it visible!");
+                        //Plugin.logger.LogMessage("Making it visible!");
                         visible.Add(teamColors[i]);
                         g = true;
                     }
@@ -387,6 +393,26 @@ namespace BingoMode
                 if (mouseOver && owner.mouseDown && !owner.lastMouseDown)
                 {
                     challenge.CompleteChallenge();
+
+                    //int x = -1;
+                    //int y = -1;
+                    //for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
+                    //{
+                    //    bool b = false;
+                    //    for (int j = 0; j < BingoHooks.GlobalBoard.challengeGrid.GetLength(1); j++)
+                    //    {
+                    //        if (BingoHooks.GlobalBoard.challengeGrid[i, j] == challenge)
+                    //        {
+                    //            x = i;
+                    //            y = j;
+                    //            b = true;
+                    //            break;
+                    //        }
+                    //    }
+                    //    if (b) break;
+                    //}
+                    //
+                    //InnerWorkings.MessageReceived($"#{x};{y};{SteamTest.selfIdentity.GetSteamID64()};{1}");
                 }
             }
 
@@ -418,8 +444,8 @@ namespace BingoMode
                 {
                     phrase.AddAll(container);
                     phrase.centerPos = pos;
-                    phrase.Draw();
                     phrase.scale = size / 84f;
+                    phrase.Draw();
                 }
                 label.text = phrase == null ? SplitString(challenge.description) : "";
                 infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);

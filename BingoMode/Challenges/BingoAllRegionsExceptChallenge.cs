@@ -59,7 +59,7 @@ namespace BingoMode.Challenges
                 FailChallenge(SteamTest.team);
                 return;
             }
-            else if (!Failed && !completed && !revealed && regionsToEnter.Contains(regionName))
+            else if (!Failed && !completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && regionsToEnter.Contains(regionName))
             {
                 Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);

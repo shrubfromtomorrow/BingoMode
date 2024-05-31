@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace BingoMode.Challenges
 
         public void Boom(string room)
         {
-            if (!completed && !revealed && roomName.Value == room.ToLowerInvariant())
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden && roomName.Value == room.ToLowerInvariant())
             {
                 Plugin.logger.LogMessage("bombed");
                 if (!pass.Value)
@@ -58,7 +59,7 @@ namespace BingoMode.Challenges
 
         public void Pass(string room)
         {
-            if (!completed && bombed && roomName.Value == room.ToLowerInvariant())
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && bombed && roomName.Value == room.ToLowerInvariant())
             {
                 bombed = false;
                 CompleteChallenge();

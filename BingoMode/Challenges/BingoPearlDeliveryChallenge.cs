@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (this.iterator == -1)
             {
                 this.iterator = ((ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0);

@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -43,7 +44,7 @@ namespace BingoMode.Challenges
 
         public void Delivered()
         {
-            if (!completed && !revealed)
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
                 CompleteChallenge();
             }

@@ -127,16 +127,21 @@ namespace BingoMode
 
             (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
             (challenge as BingoChallenge).ChallengeCompleted += UpdateTeamColors;
-            (challenge as BingoChallenge).ChallengeFailed += UpdateTeamColors;
+            (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
 
             UpdateText();
             UpdateTeamColors();
             buttonBehav.greyedOut = menu is not ExpeditionMenu;
         }
 
+        public void OnChallengeFailed(int tea)
+        {
+            UpdateTeamColors();
+        }
+
         public void UpdateTeamColors()
         {
-            Plugin.logger.LogMessage($"Updating team colors for " + challenge);
+            //Plugin.logger.LogMessage($"Updating team colors for " + challenge);
             visible = [];
             bool g = false;
             for (int i = 0; i < teamColors.Length; i++)
@@ -144,7 +149,7 @@ namespace BingoMode
                 teamColors[i].isVisible = false;
                 if ((challenge as BingoChallenge).TeamsCompleted[i])
                 {
-                    Plugin.logger.LogMessage("Making it visible!");
+                    //Plugin.logger.LogMessage("Making it visible!");
                     visible.Add(teamColors[i]);
                     g = true;
                 }
@@ -281,7 +286,7 @@ namespace BingoMode
             }
             (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
             (challenge as BingoChallenge).ChallengeCompleted -= UpdateTeamColors;
-            (challenge as BingoChallenge).ChallengeFailed -= UpdateTeamColors;
+            (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
         }
 
         public override void Clicked()
@@ -304,6 +309,7 @@ namespace BingoMode
                 phrase.AddAll(Container);
                 Plugin.logger.LogMessage(size.x);
                 phrase.scale = size.x / 100f;
+                phrase.Draw();
             }
             textLabel.text = phrase == null ? challenge.description.WrapText(false, size.x * 0.8f) : "";
             infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);

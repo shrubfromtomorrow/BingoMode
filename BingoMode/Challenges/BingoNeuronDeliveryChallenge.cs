@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
@@ -46,7 +47,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (this.game != null && this.game.rainWorld.progression.currentSaveState != null)
             {
                 if (this.game.rainWorld.progression.currentSaveState.miscWorldSaveData.SLOracleState.totNeuronsGiven > this.delivered)

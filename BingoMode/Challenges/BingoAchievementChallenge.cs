@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace BingoMode.Challenges
 {
+    using BingoSteamworks;
     using static ChallengeHooks;
     // Taken from vanilla and modified
     public class BingoAchievementChallenge : BingoChallenge
@@ -83,7 +84,7 @@ namespace BingoMode.Challenges
 
         public void CheckAchievementProgress(WinState winState)
         {
-            if (this.completed || revealed || this.game == null)
+            if (completed || TeamsCompleted[SteamTest.team] || revealed || this.game == null)
             {
                 return;
             }

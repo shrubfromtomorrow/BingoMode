@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
@@ -94,7 +95,7 @@ namespace BingoMode.Challenges
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
             if (thisEdibleIsShit is PhysicalObject gasd) Plugin.logger.LogMessage($"Eated: {gasd.abstractPhysicalObject.type}. Our type: {foodType.Value}");
-            if (!completed && !revealed && thisEdibleIsShit != null && thisEdibleIsShit is PhysicalObject p &&
+            if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
             {
                 currentEated++;

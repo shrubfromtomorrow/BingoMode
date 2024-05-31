@@ -52,8 +52,6 @@ namespace BingoMode.Challenges
 
         public void PickedUp(PearlType type)
         {
-            if (completed || revealed) return;
-
             if (specific.Value)
             {
                 UpdateDescription();
@@ -73,6 +71,7 @@ namespace BingoMode.Challenges
         {
             base.Update();
 
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null 

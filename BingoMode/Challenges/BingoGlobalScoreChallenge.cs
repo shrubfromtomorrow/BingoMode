@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
@@ -74,7 +75,7 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
             Plugin.logger.LogMessage("creaturekil global score " + this);
-            if (this.completed || revealed || this.game == null || crit == null)
+            if (this.completed || revealed || TeamsCompleted[SteamTest.team] || hidden || this.game == null || crit == null)
             {
                 return;
             }

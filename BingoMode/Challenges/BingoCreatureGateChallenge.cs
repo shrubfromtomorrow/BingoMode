@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace BingoMode.Challenges
                 }
             }
 
-            if (g && !completed && !revealed && !gates.Contains(roomName))
+            if (g && !completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && !gates.Contains(roomName))
             {
                 gates.Add(roomName);
                 current++;

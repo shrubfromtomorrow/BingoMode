@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using RWCustom;
 using Steamworks;
 using BingoMode.Challenges;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoSteamworks
 {
@@ -25,7 +26,7 @@ namespace BingoMode.BingoSteamworks
         // Data format: "xdata1;data2;..dataN"
         // x - type of data we want to interpret
         // the rest - the actual data we want, separated with semicolons if needed
-        public static bool MessageReceived(string message)
+        public static void MessageReceived(string message)
         {
             char type = message[0];
             message = message.Substring(1);
@@ -38,7 +39,7 @@ namespace BingoMode.BingoSteamworks
                     if (data.Length != 4)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
+                        break;
                     }
 
                     int x = int.Parse(data[0], System.Globalization.NumberStyles.Any);
@@ -61,12 +62,12 @@ namespace BingoMode.BingoSteamworks
                             BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
                         }
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
-                        return true;
+                        break;
                     }
                     else
                     {
                         Plugin.logger.LogError("COULDNT: " + message);
-                        return false;
+                        break;
                     }
 
                 // Fail a challenge on the bingo board, based on given int coordinates
@@ -74,7 +75,7 @@ namespace BingoMode.BingoSteamworks
                     if (data.Length != 4)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
+                        break;
                     }
 
                     int xx = int.Parse(data[0], System.Globalization.NumberStyles.Any);
@@ -98,12 +99,12 @@ namespace BingoMode.BingoSteamworks
                         //    BingoHooks.GlobalBoard.challengeGrid[xx, yy].CompleteChallenge();
                         //}
 
-                        return true;
+                        break;
                     }
                     else
                     {
                         Plugin.logger.LogError("COULDNT PARSE INTEGERS OF REQUESTED MESSAGE: " + message);
-                        return false;
+                        break;
                     }
 
                 // Update board
@@ -128,10 +129,10 @@ namespace BingoMode.BingoSteamworks
                         BingoData.BingoDen = data[0];
                         page.startGame.buttonBehav.greyedOut = false;
                         page.startGame.Singal(page.startGame, page.startGame.signalText);
-                        return true;
+                        break;
                     }
                     Plugin.logger.LogError("No menu no page no bitches: " + message);
-                    return false;
+                    break;
 
                 // Change team
                 case '%':
@@ -139,48 +140,31 @@ namespace BingoMode.BingoSteamworks
 
                     SteamTest.team = t;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
-                    return true;
+                    break;
 
                 // Kick behavior
                 case '@':
-                    if (SteamTest.CurrentLobby == default) return false;
+                    if (SteamTest.CurrentLobby == default) break;
 
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page6) && page6.inLobby)
                     {
+                        page6.multiButton.buttonBehav.greyedOut = false;
                         page6.Singal(page6.multiButton, "LEAVE_LOBBY");
                         Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
                     }
-                    return true;
+                    break;
 
-                // Force host burdens
-                case 'b':
-                    if (data.Length != 2)
-                    {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
-                    }
-                    List<string> burjs = [];
-                    for (int i = 1; i < data.Length; i++)
-                    {
-                        burjs.Add(data[1]);
-                    }
-                    SteamTest.FetchUnlocks(burjs, true);
-                    return true;
-
-                // Force host perks
-                case 'p':
-                    if (data.Length != 2)
-                    {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
-                    }
-                    List<string> perj = [];
-                    for (int i = 1; i < data.Length; i++)
-                    {
-                        perj.Add(data[1]);
-                    }
-                    SteamTest.FetchUnlocks(perj, false);
-                    return true;
+                //// Force host burdens
+                //case 'b':
+                //    string[] burjs = Regex.Split(data[0], "><");
+                //    SteamTest.FetchUnlocks(burjs, true);
+                //    return true;
+                //
+                //// Force host perks
+                //case 'p':
+                //    string[] perjs = Regex.Split(data[0], "><");
+                //    SteamTest.FetchUnlocks(perjs, false);
+                //    return true;
 
                 // Exit to menu
                 case 'e':
@@ -207,22 +191,24 @@ namespace BingoMode.BingoSteamworks
                     Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
                     break;
 
-                // End game ! !!! ! ! ! !!
+                // Announce exited lobby
                 case 'g':
-                    if (data.Length != 2)
+                    foreach (var player in SteamTest.LobbyMembers)
                     {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        return false;
+                        if (player.GetSteamID64() == ulong.Parse(data[0], System.Globalization.NumberStyles.Any))
+                        {
+                            SteamTest.LobbyMembers.Remove(player);
+                        }
                     }
-                    SteamTest.LobbyMembers.RemoveAll(x => x.GetSteamID64() == ulong.Parse(data[1], System.Globalization.NumberStyles.Any));
-
+                    //SteamTest.LobbyMembers.RemoveAll(x => x.GetSteamID64() == ulong.Parse(data[0], System.Globalization.NumberStyles.Any));
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
                     {
+                        Plugin.logger.LogMessage("resetting player loblob");
                         page2.ResetPlayerLobby();
                     }
                     break;
 
-                // End game ! !!! ! ! ! !!
+                // Resetting player lobbies 
                 case 'q':
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
                     {
@@ -230,8 +216,6 @@ namespace BingoMode.BingoSteamworks
                     }
                     break;
             }
-
-            return false;
         }
     }
 }

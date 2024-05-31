@@ -20,7 +20,7 @@ namespace BingoMode.Challenges
         public virtual Phrase ConstructPhrase() => null;
         public event Action DescriptionUpdated;
         public event Action ChallengeCompleted;
-        public event Action ChallengeFailed;
+        public event Action<int> ChallengeFailed;
         public event Action ChallengeAlmostComplete;
         public event Action ChallengeLockedOut;
         public bool ReverseChallenge;
@@ -49,15 +49,18 @@ namespace BingoMode.Challenges
 
         public void FailChallenge(int team)
         {
-            Failed = true;
-            completed = false;
+            if (team == SteamTest.team)
+            {
+                Failed = true;
+                completed = false;
+            }
             TeamsCompleted[team] = false;
-            if (SteamTest.LobbyMembers.Count > 0)
+            if (SteamTest.LobbyMembers.Count > 0 && completeCredit == default)
             {
                 SteamTest.BroadcastFailedChallenge(this);
             }
             Expedition.Expedition.coreFile.Save(false);
-            ChallengeFailed?.Invoke();
+            ChallengeFailed?.Invoke(team);
         }
 
         public void LockoutChallenge()
@@ -169,6 +172,7 @@ namespace BingoMode.Challenges
             {
                 if (BingoHooks.GlobalBoard.CheckWin(t, false))
                 {
+                    Plugin.logger.LogMessage($"Team {t} won!");
                     game.manager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
                     game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                     if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);

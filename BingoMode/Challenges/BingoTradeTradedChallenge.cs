@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using BingoMode.BingoSteamworks;
 
 namespace BingoMode.Challenges
 {
@@ -52,7 +53,7 @@ namespace BingoMode.Challenges
         public void Traded(EntityID item, EntityID scav)
         {
             Plugin.logger.LogMessage("Traded " + item);
-            if (!completed && !revealed && traderItems.ContainsKey(item) && traderItems[item] != scav)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && traderItems.ContainsKey(item) && traderItems[item] != scav)
             {
                 Plugin.logger.LogMessage("Suck ces");
                 traderItems.Remove(item);

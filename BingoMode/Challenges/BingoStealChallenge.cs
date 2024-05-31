@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace BingoMode.Challenges
 
         public void Stoled(AbstractPhysicalObject item, bool tollCheck)
         {
-            if (!completed && !revealed && item.type.value == subject.Value && tollCheck == toll.Value && !checkedIDs.Contains(item.ID))
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden && item.type.value == subject.Value && tollCheck == toll.Value && !checkedIDs.Contains(item.ID))
             {
                 current++;
                 UpdateDescription();
