@@ -20,6 +20,8 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override bool RequireSave() => false;
+
         public override Phrase ConstructPhrase()
         {
             return new Phrase([new Icon("smallEmptyCircle", 1f, Color.white), new Icon(ID.Value + "A", 1f, Color.white), new Icon("smallEmptyCircle", 1f, Color.white)], []);

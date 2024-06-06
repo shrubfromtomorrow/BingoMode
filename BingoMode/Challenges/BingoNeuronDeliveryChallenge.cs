@@ -54,7 +54,7 @@ namespace BingoMode.Challenges
                 {
                     this.delivered = this.game.rainWorld.progression.currentSaveState.miscWorldSaveData.SLOracleState.totNeuronsGiven;
                     this.UpdateDescription();
-                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 }
                 if (!this.completed && this.delivered >= this.neurons.Value)
                 {

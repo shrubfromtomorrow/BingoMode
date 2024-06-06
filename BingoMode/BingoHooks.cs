@@ -91,12 +91,31 @@ namespace BingoMode
                             string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
                             for (int i = 0; i < array.Length; i++)
                             {
-                                string[] array2 = array[i].Split('#'); 
+                                string[] array2 = array[i].Split('#');
+                                int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                                 if (array2.Length > 2)
                                 {
-                                    BingoData.BingoSaves[new(array2[0])] = new(int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture), ulong.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture), array2[3] == "1");
+                                    int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                                    SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
+                                    hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
+                                    bool isHost = array2[4] == "1";
+
+                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array[5]}");
+
+                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array[5]);
+
+                                    if (array[5] != "")
+                                    {
+                                        SteamFinal.ConnectedPlayers = [];
+                                        foreach (var player in Regex.Split(array[5], "bPlR"))
+                                        {
+                                            SteamNetworkingIdentity playerIdentity = new();
+                                            playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
+                                            SteamFinal.ConnectedPlayers.Add(playerIdentity);
+                                        }
+                                    }
                                 }
-                                else BingoData.BingoSaves[new(array2[0])] = new(int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture));
+                                else BingoData.BingoSaves[new(array2[0])] = new(size);
                             }
                         }
                     }
@@ -327,10 +346,19 @@ namespace BingoMode
                     string text = "";
                     for (int i = 0; i < BingoData.BingoSaves.Count; i++)
                     {
-                        text += BingoData.BingoSaves.ElementAt(i).Key + "#" + BingoData.BingoSaves.ElementAt(i).Value.size.ToString();
-                        if (BingoData.BingoSaves.ElementAt(i).Value.hostID != default)
+                        BingoData.BingoSaveData saveData = BingoData.BingoSaves.ElementAt(i).Value;
+                        text += BingoData.BingoSaves.ElementAt(i).Key + "#" + saveData.size.ToString();
+                        if (SteamFinal.IsSaveMultiplayer(saveData))
                         {
-                            text += "#" + BingoData.BingoSaves.ElementAt(i).Value.hostID + "#" + (BingoData.BingoSaves.ElementAt(i).Value.isHost ? "1" : "0");
+                            text +=
+                            "#" +
+                            saveData.team + 
+                            "#" +
+                            saveData.hostID + 
+                            "#" + 
+                            (saveData.isHost ? "1" : "0") +
+                            "#" +
+                            saveData.connectedPlayers;
                         }
                         if (i < BingoData.BingoSaves.Count - 1)
                         {
@@ -577,7 +605,11 @@ namespace BingoMode
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     page.fromContinueGame = true;
-                    SteamTest.GetJoinableLobbies();
+
+                    SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
+                    SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
+                    SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
+                    SteamTest.lobbyMatchList.Set(call, SteamTest.OnLobbyMatchListFromContinue);
                 }
             }
             if (message == "CREATELOB")
@@ -644,8 +676,9 @@ namespace BingoMode
             {
                 SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
 
-                bool isMultiplayer = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID != default;
-                bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost; 
+                bool isMultiplayer = SteamFinal.IsSaveMultiplayer(BingoData.BingoSaves[ExpeditionData.slugcatPlayer]);
+                //bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost; 
+                bool isSpectator = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team == 8; //TODO
                 if (saveGameData == null)
                 {
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
@@ -654,7 +687,7 @@ namespace BingoMode
                 self.slugcatDescription.text = "";
                 if (!newBingoButton.TryGetValue(self, out _))
                 {
-                    newBingoButton.Add(self, new HoldButton(self.menu, self, isHost ? "CREATE\nLOBBY" : isMultiplayer ? "REJOIN\nLOBBY" : "CONTINUE\nBINGO", isHost ? "CREATELOB" : isMultiplayer ? "TRYREJOIN" : "LOADBINGO", new Vector2(680f, 210f), 30f));
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, isMultiplayer ? "CONTINUE\nMULTIPLAYER" : "CONTINUE\nBINGO", "LOADBINGO", new Vector2(680f, 210f), 30f));
                 }
                 newBingoButton.TryGetValue(self, out var bb);
                 self.subObjects.Add(bb);

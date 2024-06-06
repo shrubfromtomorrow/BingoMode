@@ -60,7 +60,7 @@ namespace BingoMode.Challenges
                 current += pnts;
                 bannedIDs.Add(ID);
                 UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
 
                 if (current >= amount.Value)
                 {

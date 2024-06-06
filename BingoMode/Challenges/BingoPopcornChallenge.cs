@@ -48,7 +48,7 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= (int)amound.Value) CompleteChallenge();
             }
         }

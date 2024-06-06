@@ -100,7 +100,7 @@ namespace BingoMode.Challenges
             {
                 currentEated++;
                 UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (currentEated >= amountRequired.Value) CompleteChallenge();
             }
         }

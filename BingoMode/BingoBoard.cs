@@ -313,5 +313,19 @@ namespace BingoMode
             if (x < challengeGrid.GetLength(0) && y < challengeGrid.GetLength(1)) return challengeGrid[x, y];
             return null;
         }
+
+        public string GetBingoState()
+        {
+            string state = "";
+            for (int i = 0; i < challengeGrid.GetLength(0); i++)
+            {
+                for (int j = 0; j < challengeGrid.GetLength(1); j++)
+                {
+                    state +=
+                        (challengeGrid[i, j] as BingoChallenge).TeamsToString() + "<>";
+                }
+            }
+            return state;
+        }
     }
 }

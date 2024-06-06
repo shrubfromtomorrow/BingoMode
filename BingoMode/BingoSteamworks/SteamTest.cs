@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Expedition;
 using Steamworks;
 using UnityEngine;
@@ -30,6 +28,23 @@ namespace BingoMode.BingoSteamworks
         public static CallResult<LobbyMatchList_t> lobbyMatchList = new();
         public static CallResult<LobbyCreated_t> lobbyCreated = new();
         public static CallResult<LobbyEnter_t> lobbyEntered = new();
+
+        public static Dictionary<int, string> messagesToConfirm = [];
+        public static int _nextMessage = 0;
+        public static int NextMessage
+        {
+            get
+            {
+                for (int i = 0; i <= _nextMessage; i++)
+                {
+                    if (!messagesToConfirm.ContainsKey(i)) { _nextMessage = i; break; };
+                }
+                int m = _nextMessage;
+                _nextMessage++;
+                return m;
+            }
+        }
+        public static int repeatMessageCounter = 0;
 
         public static void Apply()
         {
@@ -121,6 +136,7 @@ namespace BingoMode.BingoSteamworks
             }
             Plugin.logger.LogMessage("Left lobby " + CurrentLobby);
             CurrentLobby = default;
+            LobbyMembers = [];
             BingoData.MultiplayerGame = false;
         }
 
@@ -344,6 +360,7 @@ namespace BingoMode.BingoSteamworks
                     //    page2.ResetPlayerLobby();
                     //}
                     text = "left " + callback.m_rgfChatMemberStateChange;
+                    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
 
                     break;
                 //case 0x0004:
@@ -417,6 +434,40 @@ namespace BingoMode.BingoSteamworks
                     Plugin.logger.LogMessage($"Relationship to owner: {SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend}");
                     if (SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend) continue;
                 }
+                JoinableLobbies.Add(lobbyID);
+                //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);
+                //var call = SteamMatchmaking.JoinLobby(lobbyID);
+                //lobbyEntered.Set(call, OnLobbyEntered);
+            }
+            if (JoinableLobbies.Count > 0)
+            {
+                Plugin.logger.LogMessage("All available lobbies:");
+                foreach (var lob in JoinableLobbies)
+                {
+                    Plugin.logger.LogMessage(lob);
+                }
+            }
+
+            if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+            {
+                page.AddLobbies(JoinableLobbies);
+            }
+        }
+
+        public static void OnLobbyMatchListFromContinue(LobbyMatchList_t result, bool bIOFailure)
+        {
+            Plugin.logger.LogMessage("Lobby search from conitnue game. Searching for host's game");
+            if (bIOFailure) { Plugin.logger.LogError("OnLobbyMatchList bIOfailure"); return; }
+            if (result.m_nLobbiesMatching < 1)
+            {
+                Plugin.logger.LogError("FOUND ZERO LOBBIES!!!");
+                return;
+            }
+            List<CSteamID> JoinableLobbies = new();
+            for (int i = 0; i < result.m_nLobbiesMatching; i++)
+            {
+                var lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
+                if (SteamMatchmaking.GetLobbyData(lobbyID, "mode") != "BingoMode") continue;
                 JoinableLobbies.Add(lobbyID);
                 //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);
@@ -521,13 +572,10 @@ namespace BingoMode.BingoSteamworks
 
         public static void BroadcastStartGame()
         {
-            if (LobbyMembers.Count > 0)
+            Plugin.logger.LogMessage("BROADCASTING GAME STARTING TO LOBBY " + CurrentLobby);
+            foreach (var id in LobbyMembers)
             {
-                Plugin.logger.LogMessage("BROADCASTING GAME STARTING TO LOBBY " + CurrentLobby);
-                foreach (var id in LobbyMembers)
-                {
-                    InnerWorkings.SendMessage("!" + BingoData.BingoDen, id);
-                }
+                InnerWorkings.SendMessage("!" + BingoData.BingoDen, id);
             }
         }
 

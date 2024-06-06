@@ -10,6 +10,7 @@ namespace BingoMode.Challenges
         public Vector2 centerPos;
         public float scale;
         public int[] newLines;
+        public bool applyScale;
 
         public Phrase(List<Word> words, int[] newLines)
         {
@@ -55,6 +56,7 @@ namespace BingoMode.Challenges
                 positiones[i] += new Vector2(carryOver, 0f);
                 carryOver += horizontalDist;
                 words[i].display.SetPosition(positiones[i]);
+                if (applyScale) words[i].display.scale = scale;
             }
         }
 

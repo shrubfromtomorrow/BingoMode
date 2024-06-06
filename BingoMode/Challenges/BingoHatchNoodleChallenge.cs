@@ -23,6 +23,8 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override bool RequireSave() => false;
+
         public override Phrase ConstructPhrase()
         {
             Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol"))], [atOnce.Value ? 2 : 1]);
@@ -47,7 +49,7 @@ namespace BingoMode.Challenges
             return new BingoHatchNoodleChallenge
             {
                 atOnce = new(onc, "At Once", 0),
-                amount = new(UnityEngine.Random.Range(2, onc ? 3 : 6), "Amount", 1)
+                amount = new(UnityEngine.Random.Range(2, onc ? 3 : 6), "Amount", 1),
             };
         }
 
@@ -57,7 +59,7 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
             }
         }

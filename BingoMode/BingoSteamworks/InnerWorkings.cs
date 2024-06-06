@@ -23,6 +23,11 @@ namespace BingoMode.BingoSteamworks
             Marshal.FreeHGlobal(ptr);
         }
 
+        public static void ConfirmMessage(int m, SteamNetworkingIdentity receiver)
+        {
+            SendMessage("c" + m, receiver);
+        }
+
         // Data format: "xdata1;data2;..dataN"
         // x - type of data we want to interpret
         // the rest - the actual data we want, separated with semicolons if needed
@@ -140,6 +145,16 @@ namespace BingoMode.BingoSteamworks
 
                     SteamTest.team = t;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
+
+                    foreach (var player in SteamTest.LobbyMembers)
+                    {
+                        SendMessage("q", player);
+                    }
+
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
+                    {
+                        page33.ResetPlayerLobby();
+                    }
                     break;
 
                 // Kick behavior
@@ -210,10 +225,10 @@ namespace BingoMode.BingoSteamworks
 
                 // Resetting player lobbies 
                 case 'q':
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
-                    {
-                        page3.ResetPlayerLobby();
-                    }
+                    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    //{
+                    //    page3.ResetPlayerLobby();
+                    //}
                     break;
             }
         }

@@ -2,7 +2,6 @@
 using Expedition;
 using MoreSlugcats;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -64,9 +63,10 @@ namespace BingoMode.Challenges
             {
                 ghost = new(list[Random.Range(0, list.Count)], "Region", 0, listName: "echoes"),
                 starve = new(Random.value < 0.25f, "While Starving", 1),
-                RequireSave = false
             };
         }
+
+        public override bool RequireSave() => false;
 
         public override bool CombatRequired()
         {

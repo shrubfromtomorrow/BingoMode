@@ -95,7 +95,7 @@ namespace BingoMode.Challenges
                 }));
             }
             UpdateDescription();
-            if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+            if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
             if (score >= target.Value)
             {
                 score = target.Value;

@@ -47,9 +47,10 @@ namespace BingoMode.Challenges
             {
                 region = new(regionn, "Region", 0, listName: "regions"),
                 regionsToEnter = regiones,
-                RequireSave = false
             };
         }
+
+        public override bool RequireSave() => false;
 
         public void Entered(string regionName)
         {
@@ -69,7 +70,7 @@ namespace BingoMode.Challenges
                     CompleteChallenge();
                 }
                 UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
             }
         }
 
@@ -107,9 +108,6 @@ namespace BingoMode.Challenges
                 TeamsToString(),
                 "><",
                 Failed ? "1" : "0",
-                "><",
-                RequireSave ? "1" : "0",
-                "><",
             });
         }
 
@@ -125,7 +123,6 @@ namespace BingoMode.Challenges
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
                 Failed = array[6] == "1";
-                RequireSave = array[7] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -71,7 +71,7 @@ namespace BingoMode.Challenges
                 {
                     origins.Add(c.abstractCreature.ID);
                     Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
-                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 }
             }
         }

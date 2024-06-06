@@ -16,6 +16,7 @@ namespace BingoMode
     using BingoSteamworks;
     using Challenges;
     using MoreSlugcats;
+    using Steamworks;
     using System.IO;
     using System.Text.RegularExpressions;
 
@@ -42,19 +43,23 @@ namespace BingoMode
         public struct BingoSaveData
         {
             public int size;
-            public ulong hostID;
+            public SteamNetworkingIdentity hostID;
             public bool isHost;
+            public string connectedPlayers;
+            public int team;
 
             public BingoSaveData(int size)
             {
                 this.size = size;
             }
 
-            public BingoSaveData(int size, ulong hostID, bool isHost)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string connectedPlayers)
             {
                 this.size = size;
+                this.team = team;
                 this.hostID = hostID;
                 this.isHost = isHost;
+                this.connectedPlayers = connectedPlayers;
             }
         }
 

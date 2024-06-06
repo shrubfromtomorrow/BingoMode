@@ -192,7 +192,7 @@ namespace BingoMode.Challenges
             if (self is BingoChallenge c)
             {
                 if (self.hidden) return; // Hidden means locked out here in bingo
-                if (c.RequireSave && !self.revealed) // I forgot what this does
+                if (c.RequireSave() && !self.revealed) // I forgot what this does
                 {
                     self.revealed = true;
                     return;
@@ -454,7 +454,7 @@ namespace BingoMode.Challenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave)
+                    if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave())
                     {
                         if (survived && ExpeditionData.challengeList[j].revealed)
                         {

@@ -296,7 +296,7 @@ namespace BingoMode.Challenges
                 this.current++;
                 ExpLog.Log("Player " + (playerNumber + 1).ToString() + " killed " + type.value);
                 this.UpdateDescription();
-                if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (this.current >= this.amount.Value)
                 {
                     this.CompleteChallenge();

@@ -87,7 +87,7 @@ namespace BingoMode.Challenges
                     this.current++;
                     if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
-                    if (!RequireSave) Expedition.Expedition.coreFile.Save(false);
+                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                     this.spearList.Remove(this.spearList[k]);
                     return;
                 }

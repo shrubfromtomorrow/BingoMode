@@ -48,11 +48,12 @@ namespace BingoMode.Challenges
             {
                 item = new(type, "Item type", 0, listName: "banitem"),
                 isFood = edible,
-                RequireSave = false,
-                ReverseChallenge = true
             };
             return ch;
         }
+
+        public override bool RequireSave() => false;
+        public override bool ReverseChallenge() => true;
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
@@ -107,11 +108,6 @@ namespace BingoMode.Challenges
                 TeamsToString(),
                 "><",
                 Failed ? "1" : "0",
-                "><",
-                ReverseChallenge ? "1" : "0",
-                "><",
-                RequireSave ? "1" : "0",
-                "><",
             });
         }
 
@@ -127,8 +123,6 @@ namespace BingoMode.Challenges
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
                 Failed = array[6] == "1";
-                ReverseChallenge = array[7] == "1";
-                RequireSave = array[8] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

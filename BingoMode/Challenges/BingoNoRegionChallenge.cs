@@ -33,13 +33,14 @@ namespace BingoMode.Challenges
 
             BingoNoRegionChallenge ch = new BingoNoRegionChallenge
             {
-                region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regions"),
-                RequireSave = false,
-                ReverseChallenge = true
+                region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regions")
             };
 
             return ch;
         }
+
+        public override bool RequireSave() => false;
+        public override bool ReverseChallenge () => true;
 
         public void Entered(string regionName)
         {
@@ -81,12 +82,7 @@ namespace BingoMode.Challenges
                 "><",
                 TeamsToString(),
                 "><",
-                Failed ? "1" : "0",
-                "><",
-                ReverseChallenge ? "1" : "0",
-                "><",
-                RequireSave ? "1" : "0",
-                "><",
+                Failed ? "1" : "0"
             });
         }
 
@@ -101,8 +97,6 @@ namespace BingoMode.Challenges
                 revealed = (array[3] == "1");
                 TeamsFromString(array[4]);
                 Failed = array[5] == "1";
-                ReverseChallenge = array[6] == "1";
-                RequireSave = array[7] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -281,6 +281,7 @@ namespace BingoMode
             if (message == "STARTBINGO")
             {
                 if (menu.manager.dialog != null) menu.manager.StopSideProcess(menu.manager.dialog);
+                /*
                 if (SteamTest.team == 8) // Spectator
                 {
                     spectatorMode = true;
@@ -336,13 +337,19 @@ namespace BingoMode
 
                     if (BingoData.MultiplayerGame)
                     {
-                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID());
+                        SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
+                        hostIdentity.SetSteamID(SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby));
+                        string connectedPlayers = "";
+
+
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, hostIdentity.GetSteamID() == SteamTest.selfIdentity.GetSteamID(), );
                     }
                     else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
                     if (SteamTest.LobbyMembers.Count > 0 && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
 
                     return;
                 }
+                */
 
                 int totalTeams = 1;
                 foreach (var playere in SteamTest.LobbyMembers)
@@ -395,28 +402,50 @@ namespace BingoMode
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
                 ExpeditionData.earnedPassages++;
+                bool isHost = false;
+
                 if (BingoData.MultiplayerGame)
                 {
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID());
+                    string connectedPlayers = "";
+
+                    SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
+                    hostIdentity.SetSteamID(SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby));
+                    isHost = hostIdentity.GetSteamID() == SteamTest.selfIdentity.GetSteamID();
+
+                    if (isHost && SteamTest.LobbyMembers.Count > 0)
+                    {
+                        foreach (var player in SteamTest.LobbyMembers)
+                        {
+                            connectedPlayers += player.GetSteamID64() + "bPlR";
+                        }
+                        connectedPlayers.Remove(connectedPlayers.Length - 4);
+                        Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
+                    }
+
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers);
                 }
                 else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
-                if (SteamTest.LobbyMembers.Count > 0 && SteamTest.CurrentLobby != default && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
-                SteamTest.LeaveLobby();
-                for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+                if (BingoData.MultiplayerGame)
                 {
-                    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
-                    {
-                        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) 
-                        {
-                            Plugin.logger.LogMessage("Completing reverse challenge as team " + SteamTest.team);
-                            BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
-                        }
-                    }
+                    if (SteamTest.LobbyMembers.Count > 0 && isHost) SteamTest.BroadcastStartGame();
+                    SteamTest.LeaveLobby();
                 }
+                // TODO
+                //for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+                //{
+                //    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+                //    {
+                //        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) 
+                //        {
+                //            Plugin.logger.LogMessage("Completing reverse challenge as team " + SteamTest.team);
+                //            BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
+                //        }
+                //    }
+                //}
                 return;
             }
 
@@ -550,6 +579,10 @@ namespace BingoMode
                     SteamTest.team = nextTeame;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", nextTeame.ToString());
                     ResetPlayerLobby();
+                    foreach (var player in SteamTest.LobbyMembers)
+                    {
+                        InnerWorkings.SendMessage("q", player);
+                    }
                     return;
                 }
                 SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
@@ -558,7 +591,6 @@ namespace BingoMode
                 int nextTeam = lastTeam + 1;
                 if (nextTeam > 8) nextTeam = 0;
                 InnerWorkings.SendMessage("%" + nextTeam, kickedPlayer);
-                ResetPlayerLobby();
                 return;
             }
         }
@@ -916,7 +948,7 @@ namespace BingoMode
                 foreach (var lobby in lobbies)
                 {
                     ulong owner = SteamMatchmaking.GetLobbyOwner(lobby).m_SteamID;
-                    if (owner != SteamTest.selfIdentity.GetSteamID64() && owner == BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID)
+                    if (owner != SteamTest.selfIdentity.GetSteamID64() && owner == BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64())
                     {
                         var call = SteamMatchmaking.JoinLobby(lobby);
                         SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
@@ -929,7 +961,7 @@ namespace BingoMode
 
             foreach (var lobby in lobbies)
             {
-                Plugin.logger.LogMessage($"sus among us lobby - {lobby}");
+                Plugin.logger.LogMessage($"Examining lobby - {lobby}");
                 int l = SteamMatchmaking.GetLobbyDataCount(lobby);
                 for (int i = 0; i < l; i++)
                 {
@@ -1138,6 +1170,7 @@ namespace BingoMode
             {
                 nameLabel.RemoveFromContainer();
                 playerLabel.RemoveFromContainer();
+                clicky.RemoveSprites();
                 page.RemoveSubObject(clicky);
                 panel.Remove();
             }

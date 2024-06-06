@@ -1,7 +1,4 @@
 ﻿using BepInEx;
-using Steamworks;
-using System;
-using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
 
@@ -15,7 +12,7 @@ namespace BingoMode
     using BingoSteamworks;
     using Challenges;
 
-    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.3")]
+    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.9")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool AppliedAlreadyDontDoItAgainPlease;
@@ -52,26 +49,20 @@ namespace BingoMode
             //}
 
             if (!BingoData.MultiplayerGame && !BingoData.BingoMode) return;
-            // How the fuck does this work
-            IntPtr[] messges = new IntPtr[32];
-            int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
-            if (messages > 0)
-            {
-                for (int i = 0; i < messages; i++)
-                {
-                    SteamNetworkingMessage_t netMessage = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messges[i]);
+            //
+            //if (SteamTest.messagesToConfirm != null && SteamTest.messagesToConfirm.Keys != null && SteamTest.messagesToConfirm.Keys.Count > 0)
+            //{
+            //    if (SteamTest.repeatMessageCounter++ > 2000)
+            //    {
+            //        foreach (var kvp in SteamTest.messagesToConfirm)
+            //        {
+            //
+            //        }
+            //    }
+            //}
+            //else SteamTest.repeatMessageCounter = 0;
 
-                    logger.LogMessage("RECEIVED MESSAG???");
-
-                    byte[] data = new byte[netMessage.m_cbSize];
-                    Marshal.Copy(netMessage.m_pData, data, 0, data.Length);
-                    char[] chars = new char[data.Length / sizeof(char)];
-                    Buffer.BlockCopy(data, 0, chars, 0, data.Length);
-                    string message = new string(chars, 0, chars.Length);
-                    logger.LogMessage(message);
-                    InnerWorkings.MessageReceived(message);
-                }
-            }
+            SteamFinal.ReceiveMessagesUpdate();
         }
 
         public void OnDisable()

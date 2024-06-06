@@ -13,7 +13,7 @@ namespace BingoMode.Challenges
         public abstract void AddHooks();
         public abstract void RemoveHooks();
         public abstract List<object> Settings();
-        public bool RequireSave = true;
+        //public bool RequireSave = true;
         public bool Failed;
         public bool[] TeamsCompleted = new bool[9];
         public ulong completeCredit = 0;
@@ -23,7 +23,9 @@ namespace BingoMode.Challenges
         public event Action<int> ChallengeFailed;
         public event Action ChallengeAlmostComplete;
         public event Action ChallengeLockedOut;
-        public bool ReverseChallenge;
+
+        public virtual bool ReverseChallenge() => false;
+        public virtual bool RequireSave() => true;
 
         public override void UpdateDescription()
         {
@@ -81,7 +83,7 @@ namespace BingoMode.Challenges
                 goto compleple;
             }
 
-            if (RequireSave && !revealed) // I forgot what this does (i remembered)
+            if (RequireSave() && !revealed) // I forgot what this does (i remembered)
             {
                 revealed = true;
                 Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");

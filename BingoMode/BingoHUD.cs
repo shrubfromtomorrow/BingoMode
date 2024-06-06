@@ -130,6 +130,7 @@ namespace BingoMode
             public Phrase phrase;
             public FContainer container;
             public FSprite[] border;
+            public FSprite lockoutLock;
             public TriangleMesh[] teamColors;
             public Vector2[] corners;
             bool showBG;
@@ -138,7 +139,12 @@ namespace BingoMode
             bool boxVisible;
             public bool lastMouseOver;
             public bool mouseOver;
-            public float flashProgress;
+            public bool almostWon;
+            public float scale;
+            public List<TriangleMesh> visible;
+            public bool scaleDown;
+            public float downScaled;
+            public const float scaleTo = 0.75f;
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
@@ -152,9 +158,12 @@ namespace BingoMode
                 this.container = container;
                 alpha = 1f;
                 (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
-                (challenge as BingoChallenge).ChallengeCompleted += UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeCompleted += ChallengeCompleted;
                 (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
+                (challenge as BingoChallenge).ChallengeLockedOut += BingoInfo_ChallengeLockedOut;
+                (challenge as BingoChallenge).ChallengeAlmostComplete += BingoInfo_ChallengeAlmostComplete;
                 showBG = true;
+                scale = 1f;
 
                 sprite = new FSprite("pixel")
                 {
@@ -272,6 +281,15 @@ namespace BingoMode
                 UpdateTeamColors();
             }
 
+            private void BingoInfo_ChallengeAlmostComplete()
+            {
+                almostWon = true;
+            }
+
+            private void BingoInfo_ChallengeLockedOut()
+            {
+            }
+
             public void OnChallengeFailed(int tea)
             {
                 UpdateTeamColors();
@@ -279,14 +297,16 @@ namespace BingoMode
 
             public void ChallengeCompleted()
             {
-
+                UpdateTeamColors();
             }
 
             public void Clear()
             {
                 (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
-                (challenge as BingoChallenge).ChallengeCompleted -= UpdateTeamColors;
+                (challenge as BingoChallenge).ChallengeCompleted -= ChallengeCompleted;
                 (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
+                (challenge as BingoChallenge).ChallengeLockedOut -= BingoInfo_ChallengeLockedOut;
+                (challenge as BingoChallenge).ChallengeAlmostComplete -= BingoInfo_ChallengeAlmostComplete;
                 sprite.RemoveFromContainer();
                 label.RemoveFromContainer();
                 foreach (var g in border)
@@ -307,7 +327,7 @@ namespace BingoMode
             public void UpdateTeamColors()
             {
                 //Plugin.logger.LogMessage($"Updating team colors for " + challenge);
-                List<TriangleMesh> visible = [];
+                visible = [];
                 bool g = false;
                 for (int i = 0; i < teamColors.Length; i++)
                 {
@@ -320,21 +340,6 @@ namespace BingoMode
                     }
                 }
                 if (g) showBG = false;
-
-                float dist = size / visible.Count;
-                float halfStep = dist * 0.3f;
-                for (int i = 0; i < visible.Count; i++)
-                {
-                    visible[i].isVisible = true;
-
-                    int isFirst = i == 0 ? 0 : 1;
-                    int isLast = i == visible.Count - 1 ? 0 : 1;
-                    visible[i].MoveVertice(0, corners[0] + new Vector2(dist * i - halfStep * isFirst, 0f));
-                    visible[i].MoveVertice(1, corners[1] + new Vector2(dist * i + halfStep * isFirst, 0f));
-
-                    visible[i].MoveVertice(2, corners[0] + new Vector2(dist * (i + 1) - halfStep * isLast, 0f));
-                    visible[i].MoveVertice(3, corners[1] + new Vector2(dist * (i + 1) + halfStep * isLast, 0f));
-                }
             }
 
             public void Draw()
@@ -354,7 +359,40 @@ namespace BingoMode
                     phrase.SetAlpha(alpha);
                     phrase.centerPos = pos;
                     phrase.Draw();
-                    phrase.scale = size / 84f;
+                    phrase.scale = size / 84f * scale;
+                    phrase.applyScale = almostWon;
+                }
+
+                // Border
+                for (int i = 0; i < border.Length; i++)
+                {
+                    border[i].scaleX = (i < 2) ? size * scale : 2f;
+                    border[i].scaleY = (i < 2) ? 2f : size * scale;
+                }
+                sprite.scale = scale;
+                corners[0] = pos + new Vector2(-size * scale / 2f, -size * scale / 2f);
+                corners[1] = pos + new Vector2(-size * scale / 2f, size * scale / 2f);
+                corners[2] = pos + new Vector2(size * scale / 2f, -size * scale / 2f);
+                corners[3] = pos + new Vector2(size * scale / 2f, size * scale / 2f);
+                border[0].SetPosition(corners[0]);
+                border[1].SetPosition(corners[1]);
+                border[2].SetPosition(corners[0]);
+                border[3].SetPosition(corners[2]);
+
+                // Colors
+                float dist = size / visible.Count * scale;
+                float halfStep = dist * 0.3f;
+                for (int i = 0; i < visible.Count; i++)
+                {
+                    visible[i].isVisible = true;
+
+                    int isFirst = i == 0 ? 0 : 1;
+                    int isLast = i == visible.Count - 1 ? 0 : 1;
+                    visible[i].MoveVertice(0, corners[0] + new Vector2(dist * i - halfStep * isFirst, 0f));
+                    visible[i].MoveVertice(1, corners[1] + new Vector2(dist * i + halfStep * isFirst, 0f));
+
+                    visible[i].MoveVertice(2, corners[0] + new Vector2(dist * (i + 1) - halfStep * isLast, 0f));
+                    visible[i].MoveVertice(3, corners[1] + new Vector2(dist * (i + 1) + halfStep * isLast, 0f));
                 }
 
                 // Thinj and binj (box)
@@ -393,26 +431,11 @@ namespace BingoMode
                 if (mouseOver && owner.mouseDown && !owner.lastMouseDown)
                 {
                     challenge.CompleteChallenge();
+                }
 
-                    //int x = -1;
-                    //int y = -1;
-                    //for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
-                    //{
-                    //    bool b = false;
-                    //    for (int j = 0; j < BingoHooks.GlobalBoard.challengeGrid.GetLength(1); j++)
-                    //    {
-                    //        if (BingoHooks.GlobalBoard.challengeGrid[i, j] == challenge)
-                    //        {
-                    //            x = i;
-                    //            y = j;
-                    //            b = true;
-                    //            break;
-                    //        }
-                    //    }
-                    //    if (b) break;
-                    //}
-                    //
-                    //InnerWorkings.MessageReceived($"#{x};{y};{SteamTest.selfIdentity.GetSteamID64()};{1}");
+                if (almostWon)
+                {
+
                 }
             }
 
