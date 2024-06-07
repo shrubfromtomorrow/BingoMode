@@ -14,9 +14,61 @@ namespace BingoMode.BingoSteamworks
     public class SteamFinal
     {
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
+        public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];
+        public static int HostUpkeep;
+
+        public const int PlayerUpkeepTime = 7200;
+        public const int MaxPlayerUpKeepTime = 4800;
+        public const int MaxHostUpKeepTime = 6000;
+        public static int SendUpKeepCounter = PlayerUpkeepTime;
+
+        //public enum UpKeepState
+        //{
+        //    Idle,
+        //    Sent,
+        //    Received
+        //}
 
         public static void ReceiveMessagesUpdate()
         {
+            SendUpKeepCounter--;
+            if (SendUpKeepCounter <= 0)
+            {
+                List<ulong> ToRemove = [];
+                foreach (var kvp in ReceivedPlayerUpKeep)
+                {
+                    if (ReceivedPlayerUpKeep[kvp.Key])
+                    {
+                        RequestPlayerUpKeep(kvp.Key);
+                        continue;
+                    }
+
+                    // Player didnt send their upkeep, so theyre considered dead to the host
+                    ConnectedPlayers.RemoveAll(x => x.GetSteamID64() == kvp.Key);
+                    ToRemove.Add(kvp.Key);
+                    //switch (PlayerUpKeeps[kvp.Key])
+                    //{
+                    //    case UpKeepState.Idle:
+                    //        RequestPlayerUpKeep(kvp.Key);
+                    //        break;
+                    //    case UpKeepState.Sent:
+                    //    case UpKeepState.Received:
+                    //        RequestPlayerUpKeep(kvp.Key);
+                    //        break;
+                    //}
+                }
+
+                if (ToRemove.Count > 0)
+                {
+                    foreach (var r in ToRemove)
+                    {
+                        ReceivedPlayerUpKeep.Remove(r);
+                    }
+                }
+
+                SendUpKeepCounter = PlayerUpkeepTime;
+            }
+
             // How the fuck does this work
             IntPtr[] messges = new IntPtr[16];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);
@@ -24,6 +76,8 @@ namespace BingoMode.BingoSteamworks
             {
                 for (int i = 0; i < messages; i++)
                 {
+                    if (!BingoData.MultiplayerGame && !BingoData.BingoMode) continue;
+
                     SteamNetworkingMessage_t netMessage = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messges[i]);
 
                     Plugin.logger.LogMessage("RECEIVED MESSAG???");
@@ -38,6 +92,19 @@ namespace BingoMode.BingoSteamworks
                 }
             }
         }
+
+        public static void RequestPlayerUpKeep(ulong playerID)
+        {
+            SteamNetworkingIdentity playerIdentity = new();
+            playerIdentity.SetSteamID64(playerID);
+            InnerWorkings.SendMessage("U", playerIdentity);
+            ReceivedPlayerUpKeep[playerID] = false;
+        }
+
+        //public static void UpdatePlayerUpKeep(ulong playerID)
+        //{
+        //    PlayerUpkeeps[playerID] = PlayerUpkeepTime;
+        //}
 
         public static bool IsSaveMultiplayer(BingoData.BingoSaveData saveData)
         {
@@ -85,6 +152,12 @@ namespace BingoMode.BingoSteamworks
             InnerWorkings.SendMessage($"#{x};{y};{SteamTest.team};{SteamTest.selfIdentity.GetSteamID64()}", GetHost());
         }
 
-
+        public static void BroadcastCurrentBoardState()
+        {
+            foreach (var player in ConnectedPlayers)
+            {
+                InnerWorkings.SendMessage("B" + BingoHooks.GlobalBoard.GetBingoState(), player);
+            }
+        }
     }
 }

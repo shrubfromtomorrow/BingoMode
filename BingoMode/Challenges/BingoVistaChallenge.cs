@@ -19,6 +19,8 @@ namespace BingoMode.Challenges
         public string region;
         public Vector2 location;
 
+        public override bool RequireSave() => false;
+
         public override void Update()
         {
             base.Update();

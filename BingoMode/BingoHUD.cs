@@ -293,11 +293,13 @@ namespace BingoMode
             public void OnChallengeFailed(int tea)
             {
                 UpdateTeamColors();
+                UpdateText();
             }
 
-            public void ChallengeCompleted()
+            public void ChallengeCompleted(int tea)
             {
                 UpdateTeamColors();
+                UpdateText();
             }
 
             public void Clear()

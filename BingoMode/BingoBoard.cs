@@ -72,7 +72,7 @@ namespace BingoMode
                 c.UpdateDescription();
             }
             ExpeditionMenu self = BingoData.globalMenu;
-            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.grid != null)
+            if (self != null && BingoHooks.bingoPage.TryGetValue(self, out var page) && page.grid != null)
             {
                 if (page.grid != null)
                 {
@@ -273,11 +273,11 @@ namespace BingoMode
             int next = 0;
             foreach (var gu in challenges) Plugin.logger.LogWarning(gu);
             challengeGrid = new Challenge[size, size];
+            Plugin.logger.LogMessage("All challenges count: " + challenges.Length);
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
-                    Plugin.logger.LogMessage("S - " + challenges.Length);
                     try
                     {
                         string[] array11 = Regex.Split(challenges[next], "~");
@@ -321,11 +321,51 @@ namespace BingoMode
             {
                 for (int j = 0; j < challengeGrid.GetLength(1); j++)
                 {
-                    state +=
-                        (challengeGrid[i, j] as BingoChallenge).TeamsToString() + "<>";
+                    state += (challengeGrid[i, j] as BingoChallenge).TeamsToString() + "<>";
                 }
             }
+            if (state != "") state.Remove(state.Length - 2);
+            Plugin.logger.LogMessage("Bingo state to string:\n" + state);
             return state;
+        }
+
+        public void InterpretBingoState(string state)
+        {
+            Plugin.logger.LogMessage("Bingo state from string:\n" + state);
+            if (challengeGrid == null) { Plugin.logger.LogError("CHALLENGE GRID IS NULL!! Returning"); return; }
+
+            string[] challenges = Regex.Split(state, "<>");
+            Plugin.logger.LogMessage("All challenges count: " + challenges.Length);
+
+            int next = 0;
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    string lastTeamsString = (challengeGrid[i, j] as BingoChallenge).TeamsToString();
+                    string currentTeamsString = challenges[next];
+
+                    if (lastTeamsString != currentTeamsString)
+                    {
+                        for (int k = 0; k < lastTeamsString.Length; k++)
+                        {
+                            if (lastTeamsString[k] != currentTeamsString[k])
+                            {
+                                if (currentTeamsString[k] == '1')
+                                {
+                                    if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) (challengeGrid[i, j] as BingoChallenge).OnChallengeLockedOut();
+                                    else (challengeGrid[i, j] as BingoChallenge).OnChallengeCompleted(k);
+                                }
+                                else
+                                {
+                                    (challengeGrid[i, j] as BingoChallenge).OnChallengeFailed(k);
+                                }
+                            }
+                        }
+                    }
+                    next++;
+                }
+            }
         }
     }
 }

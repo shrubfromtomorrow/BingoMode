@@ -47,8 +47,6 @@ namespace BingoMode
             //        InnerWorkings.MessageReceived(message);
             //    }
             //}
-
-            if (!BingoData.MultiplayerGame && !BingoData.BingoMode) return;
             //
             //if (SteamTest.messagesToConfirm != null && SteamTest.messagesToConfirm.Keys != null && SteamTest.messagesToConfirm.Keys.Count > 0)
             //{

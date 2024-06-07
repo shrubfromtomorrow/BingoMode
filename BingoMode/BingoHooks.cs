@@ -99,20 +99,22 @@ namespace BingoMode
                                     SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
                                     hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
                                     bool isHost = array2[4] == "1";
+                                    bool lockout = array2[6] == "1";
 
                                     Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array[5]}");
 
-                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array[5]);
+                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array[5], lockout);
 
                                     if (array[5] != "")
                                     {
-                                        SteamFinal.ConnectedPlayers = [];
-                                        foreach (var player in Regex.Split(array[5], "bPlR"))
-                                        {
-                                            SteamNetworkingIdentity playerIdentity = new();
-                                            playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
-                                            SteamFinal.ConnectedPlayers.Add(playerIdentity);
-                                        }
+                                        SteamFinal.ConnectedPlayers = SteamFinal.PlayersFromString(array[5]);
+
+                                        //foreach (var player in Regex.Split(array[5], "bPlR"))
+                                        //{
+                                        //    SteamNetworkingIdentity playerIdentity = new();
+                                        //    playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
+                                        //    SteamFinal.ConnectedPlayers.Add(playerIdentity);
+                                        //}
                                     }
                                 }
                                 else BingoData.BingoSaves[new(array2[0])] = new(size);
@@ -358,7 +360,9 @@ namespace BingoMode
                             "#" + 
                             (saveData.isHost ? "1" : "0") +
                             "#" +
-                            saveData.connectedPlayers;
+                            saveData.connectedPlayers +
+                            "#" +
+                            (saveData.lockout ? "1" : "0");
                         }
                         if (i < BingoData.BingoSaves.Count - 1)
                         {

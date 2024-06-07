@@ -41,32 +41,35 @@ namespace BingoMode.BingoSteamworks
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length != 4)
-                    {
-                        Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
-                        break;
-                    }
+                    //if (data.Length != 4)
+                    //{
+                    //    Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
+                    //    break;
+                    //}
 
                     int x = int.Parse(data[0], System.Globalization.NumberStyles.Any);
                     int y = int.Parse(data[1], System.Globalization.NumberStyles.Any);
                     int teamCredit = int.Parse(data[2], System.Globalization.NumberStyles.Any);
                     ulong playerCredit = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
-                    Plugin.logger.LogMessage("Player credit: " + playerCredit);
+
                     if (x != -1 && y != -1)
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
                         (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
-                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
-                        if (teamCredit != SteamTest.team)
-                        {
-                            if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).LockoutChallenge();
-                            else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
-                        }
-                        else
-                        {
-                            BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
-                        }
-                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
+
+                        SteamFinal.BroadcastCurrentBoardState();
+
+                        //(BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
+                        //if (teamCredit != SteamTest.team)
+                        //{
+                        //    if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).LockoutChallenge();
+                        //    else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
+                        //}
+                        //else
+                        //{
+                        //    BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
+                        //}
+                        //(BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
                         break;
                     }
                     else
@@ -128,16 +131,16 @@ namespace BingoMode.BingoSteamworks
                 //    return false;
 
                 // Begin game
-                case '!':
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
-                    {
-                        BingoData.BingoDen = data[0];
-                        page.startGame.buttonBehav.greyedOut = false;
-                        page.startGame.Singal(page.startGame, page.startGame.signalText);
-                        break;
-                    }
-                    Plugin.logger.LogError("No menu no page no bitches: " + message);
-                    break;
+                //case '!':
+                //    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+                //    //{
+                //    //    BingoData.BingoDen = data[0];
+                //    //    page.startGame.buttonBehav.greyedOut = false;
+                //    //    page.startGame.Singal(page.startGame, page.startGame.signalText);
+                //    //    break;
+                //    //}
+                //    Plugin.logger.LogError("DEPRECATED: " + message);
+                //    break;
 
                 // Change team
                 case '%':
@@ -146,10 +149,10 @@ namespace BingoMode.BingoSteamworks
                     SteamTest.team = t;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
 
-                    foreach (var player in SteamTest.LobbyMembers)
-                    {
-                        SendMessage("q", player);
-                    }
+                    //foreach (var player in SteamTest.LobbyMembers)
+                    //{
+                    //    SendMessage("q", player);
+                    //}
 
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
                     {
@@ -229,6 +232,14 @@ namespace BingoMode.BingoSteamworks
                     //{
                     //    page3.ResetPlayerLobby();
                     //}
+                    break;
+
+                case 'B':
+                    BingoHooks.GlobalBoard.InterpretBingoState(message);
+                    break;
+
+                default:
+                    Plugin.logger.LogError("INVALID MESSAGE: " + message);
                     break;
             }
         }

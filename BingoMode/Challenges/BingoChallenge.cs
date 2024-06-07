@@ -19,7 +19,7 @@ namespace BingoMode.Challenges
         public ulong completeCredit = 0;
         public virtual Phrase ConstructPhrase() => null;
         public event Action DescriptionUpdated;
-        public event Action ChallengeCompleted;
+        public event Action<int> ChallengeCompleted;
         public event Action<int> ChallengeFailed;
         public event Action ChallengeAlmostComplete;
         public event Action ChallengeLockedOut;
@@ -65,7 +65,7 @@ namespace BingoMode.Challenges
             ChallengeFailed?.Invoke(team);
         }
 
-        public void LockoutChallenge()
+        public void OnChallengeLockedOut()
         {
             if (completed) return;
             hidden = true;
@@ -75,7 +75,68 @@ namespace BingoMode.Challenges
 
         public override void CompleteChallenge()
         {
+            // Singleplayer
+            if (SteamFinal.GetHost().GetSteamID64() == default)
+            {
+                if (RequireSave() && !revealed)
+                {
+                    revealed = true;
+                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    ChallengeAlmostComplete?.Invoke();
+                    return;
+                }
+
+                OnChallengeCompleted(SteamTest.team);
+
+                //if (ExpeditionGame.activeUnlocks.Contains("unl-passage"))
+                //{
+                //    ExpeditionData.earnedPassages++;
+                //}
+
+                CheckWinLose();
+                return;
+            }
+
+            // Multiplayer
+
             if (hidden) return; // Hidden means locked out here in bingo
+
+            // If is host
+            if (SteamFinal.GetHost().GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+            {
+                if (RequireSave() && !revealed)
+                {
+                    revealed = true;
+                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    ChallengeAlmostComplete?.Invoke();
+                    return;
+                }
+
+                OnChallengeCompleted(SteamTest.team);
+
+                //if (ExpeditionGame.activeUnlocks.Contains("unl-passage"))
+                //{
+                //    ExpeditionData.earnedPassages++;
+                //}
+
+                SteamFinal.BroadcastCurrentBoardState();
+                CheckWinLose();
+
+                return;
+            }
+            else // If regular player
+            {
+                if (RequireSave() && !revealed)
+                {
+                    revealed = true;
+                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    ChallengeAlmostComplete?.Invoke();
+                    return;
+                }
+
+                SteamFinal.ChallengeStateChangeToHost(this, false);
+                return;
+            }
 
             if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
             {
@@ -103,43 +164,33 @@ namespace BingoMode.Challenges
             TeamsCompleted[SteamTest.team] = true;
         compleple:
             if (TeamsCompleted[SteamTest.team]) completed = true;
-            //int num = 0;
-            //bool flag = true;
-            //foreach (Challenge challenge in ExpeditionData.challengeList)
-            //{
-            //    if (!challenge.hidden && !challenge.completed)
-            //    {
-            //        flag = false;
-            //    }
-            //    else if (challenge.hidden && !challenge.revealed)
-            //    {
-            //        num++;
-            //    }
-            //}
             UpdateDescription();
-            if (this.game != null && this.game.cameras != null && this.game.cameras[0].hud != null)
-            {
-                for (int i = 0; i < this.game.cameras[0].hud.parts.Count; i++)
-                {
-                    //if (this.game.cameras[0].hud.parts[i] is ExpeditionHUD)
-                    //{
-                    //    (this.game.cameras[0].hud.parts[i] as ExpeditionHUD).completeMode = true;
-                    //    (this.game.cameras[0].hud.parts[i] as ExpeditionHUD).challengesToComplete++;
-                    //    if (flag)
-                    //    {
-                    //        (this.game.cameras[0].hud.parts[i] as ExpeditionHUD).challengesToReveal = num;
-                    //        (this.game.cameras[0].hud.parts[i] as ExpeditionHUD).revealMode = true;
-                    //    }
-                    //}
-                }
-            }
+
             //if (ExpeditionGame.activeUnlocks.Contains("unl-passage"))
             //{
             //    ExpeditionData.earnedPassages++;
             //}
+
+            // Expedition.Expedition.coreFile.Save(false); // Idk when the saving should happen
+
+            //ChallengeCompleted?.Invoke(SteamTest.team);
+            //CheckWinLose();
+        }
+
+        public void OnChallengeCompleted(int team)
+        {
+            Plugin.logger.LogMessage($"Completing challenge for {BingoPage.TeamName(team)}: {this}");
+            TeamsCompleted[team] = true;
+            if (TeamsCompleted[SteamTest.team]) completed = true;
+            UpdateDescription();
+            ChallengeCompleted?.Invoke(team);
             Expedition.Expedition.coreFile.Save(false);
-            ChallengeCompleted?.Invoke();
             CheckWinLose();
+        }
+
+        public void OnChallengeFailed(int team) // failing challenges to do
+        {
+            ChallengeFailed?.Invoke(team);
         }
 
         public void CheckWinLose()

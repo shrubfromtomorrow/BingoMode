@@ -422,7 +422,7 @@ namespace BingoMode
                         Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
                     }
 
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout);
                 }
                 else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
                 Expedition.Expedition.coreFile.Save(false);
@@ -431,10 +431,11 @@ namespace BingoMode
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
                 if (BingoData.MultiplayerGame)
                 {
-                    if (SteamTest.LobbyMembers.Count > 0 && isHost) SteamTest.BroadcastStartGame();
+                    if (SteamTest.LobbyMembers.Count > 0 && isHost) SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "startGame", BingoData.BingoDen);
                     SteamTest.LeaveLobby();
                 }
-                // TODO
+
+                // This will be decided by the host when sending the first bingo state
                 //for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
                 //{
                 //    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)

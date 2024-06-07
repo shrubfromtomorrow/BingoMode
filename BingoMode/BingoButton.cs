@@ -126,7 +126,7 @@ namespace BingoMode
             }
 
             (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
-            (challenge as BingoChallenge).ChallengeCompleted += UpdateTeamColors;
+            (challenge as BingoChallenge).ChallengeCompleted += OnChallengeCompleted;
             (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
 
             UpdateText();
@@ -135,6 +135,11 @@ namespace BingoMode
         }
 
         public void OnChallengeFailed(int tea)
+        {
+            UpdateTeamColors();
+        }
+
+        public void OnChallengeCompleted(int tea)
         {
             UpdateTeamColors();
         }
@@ -285,7 +290,7 @@ namespace BingoMode
                 g.RemoveFromContainer();
             }
             (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
-            (challenge as BingoChallenge).ChallengeCompleted -= UpdateTeamColors;
+            (challenge as BingoChallenge).ChallengeCompleted -= OnChallengeCompleted;
             (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
         }
 

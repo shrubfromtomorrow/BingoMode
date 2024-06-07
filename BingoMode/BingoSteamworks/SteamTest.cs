@@ -339,6 +339,8 @@ namespace BingoMode.BingoSteamworks
             switch (callback.m_rgfChatMemberStateChange)
             {
                 case 0x0001:
+                    text = "entered";
+
                     SteamNetworkingIdentity newMember = new SteamNetworkingIdentity();
                     newMember.SetSteamID((CSteamID)callback.m_ulSteamIDUserChanged);
                     LobbyMembers.Add(newMember);
@@ -348,19 +350,23 @@ namespace BingoMode.BingoSteamworks
                         if (tim >= 7) tim = 0;
                         SteamMatchmaking.SetLobbyData(CurrentLobby, "nextTeam", tim.ToString());
                     }
-                    text = "entered";
+
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
+                    {
+                        page2.ResetPlayerLobby();
+                    }
 
                     break;
                 case 0x0002:
                 case 0x0004:
                 case 0x0008:
                 case 0x0010:
-                    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
-                    //{
-                    //    page2.ResetPlayerLobby();
-                    //}
                     text = "left " + callback.m_rgfChatMemberStateChange;
                     LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    {
+                        page3.ResetPlayerLobby();
+                    }
 
                     break;
                 //case 0x0004:
@@ -387,10 +393,21 @@ namespace BingoMode.BingoSteamworks
 
         public static void OnLobbyDataUpdate(LobbyDataUpdate_t callback)
         {
-            if (callback.m_bSuccess == 0 || selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
-
-            if (callback.m_ulSteamIDLobby == callback.m_ulSteamIDMember)
+            if (callback.m_bSuccess == 0) return;
+            if (callback.m_ulSteamIDLobby == callback.m_ulSteamIDMember && selfIdentity.GetSteamID() != SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby))
             {
+                string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
+                if (den != "")
+                {
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+                    {
+                        BingoData.BingoDen = den;
+                        page.startGame.buttonBehav.greyedOut = false;
+                        page.startGame.Singal(page.startGame, page.startGame.signalText);
+                    }
+                    return;
+                }
+
                 string challenjes = SteamMatchmaking.GetLobbyData(CurrentLobby, "challenges");
                 try
                 {
@@ -407,9 +424,9 @@ namespace BingoMode.BingoSteamworks
             }
             else
             {
-                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.inLobby)
+                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
                 {
-                    page.ResetPlayerLobby();
+                    page2.ResetPlayerLobby();
                 }
             }
         }
@@ -570,14 +587,14 @@ namespace BingoMode.BingoSteamworks
             }
         }
 
-        public static void BroadcastStartGame()
-        {
-            Plugin.logger.LogMessage("BROADCASTING GAME STARTING TO LOBBY " + CurrentLobby);
-            foreach (var id in LobbyMembers)
-            {
-                InnerWorkings.SendMessage("!" + BingoData.BingoDen, id);
-            }
-        }
+        //public static void BroadcastStartGame()
+        //{
+        //    Plugin.logger.LogMessage("BROADCASTING GAME STARTING TO LOBBY " + CurrentLobby);
+        //    foreach (var id in LobbyMembers)
+        //    {
+        //        InnerWorkings.SendMessage("!" + BingoData.BingoDen, id);
+        //    }
+        //}
 
         public static void SetMemberTeam(CSteamID persone, int newTeam)
         {
