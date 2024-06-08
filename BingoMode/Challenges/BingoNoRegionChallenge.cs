@@ -3,6 +3,7 @@ using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -15,6 +16,11 @@ namespace BingoMode.Challenges
         {
             this.description = ChallengeTools.IGT.Translate("Do not enter " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value)], []);
         }
 
         public override bool Duplicable(Challenge challenge)

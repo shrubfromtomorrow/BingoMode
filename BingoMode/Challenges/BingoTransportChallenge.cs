@@ -31,6 +31,22 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new Phrase([new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))], [1]);
+            if (from.Value != "Any Region")
+            {
+                phrase.words.Add(new Verse(from.Value));
+            }
+            phrase.words.Add(new Icon("singlearrow", 1f, Color.white));
+            if (to.Value != "Any Region")
+            {
+                phrase.words.Add(new Verse(to.Value));
+            }
+
+            return phrase;
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoTransportChallenge c || (crit != c.crit && (from != c.from || to != c.to));

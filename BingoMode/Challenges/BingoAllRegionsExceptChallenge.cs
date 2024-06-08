@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -17,6 +18,11 @@ namespace BingoMode.Challenges
         {
             this.description = ChallengeTools.IGT.Translate("Enter all regions except " + region.Value);
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon("TravellerA", 1f, Color.white), new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value)], []);
         }
 
         public override bool Duplicable(Challenge challenge)

@@ -26,6 +26,43 @@ namespace BingoMode.Challenges
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
 
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new Phrase([], []);
+
+            int newLine = 1;
+            List<int> newLines = [];
+            if (weapon.Value != "Any Weapon" || deathPit.Value)
+            {
+                phrase.words.Add(new Icon(deathPit.Value ? "deathpiticon" : ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, deathPit.Value ? Color.white : ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)));
+                newLine++;
+            }
+            phrase.words.Add(new Icon("Multiplayer_Bones", 1f, Color.white));
+            if (crit.Value != "Any Creature")
+            {
+                phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
+                newLine++;
+            }
+            newLines.Add(newLine);
+            if (sub.Value != "Any Subregion" || region.Value != "Any Region")
+            {
+                phrase.words.Add(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
+                newLine++;
+                newLines.Add(newLine);
+            }
+            phrase.words.Add(new Counter(current, amount.Value));
+            if (starve.Value)
+            {
+                phrase.words.Add(new Icon("Multiplayer_Death", 1f, Color.white));
+            }
+            if (oneCycle.Value)
+            {
+                phrase.words.Add(new Icon("cycle_limit", 1f, Color.white));
+            }
+            phrase.newLines = newLines.ToArray();
+            return phrase;
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

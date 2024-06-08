@@ -20,8 +20,8 @@ namespace BingoMode.Challenges
 
         public void Draw()
         {
-            float horizontalDist = 25f * scale;
-            float verticalDist = 25f * scale;
+            float horizontalDist = 27.5f * scale;
+            float verticalDist = 27.5f * scale;
             int iconAmount = words.Count;
             Vector2[] positiones = new Vector2[iconAmount];
             int distToNewLine = newLines.Length == 0 ? (iconAmount - 1) : (newLines[0] - 1);

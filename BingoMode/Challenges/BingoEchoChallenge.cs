@@ -22,7 +22,7 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("echo_icon", 1f, Color.white)], []);
+            return new Phrase([new Icon("echo_icon", 1f, Color.white), new Verse(ghost.Value)], []);
         }
 
         public override void Update()

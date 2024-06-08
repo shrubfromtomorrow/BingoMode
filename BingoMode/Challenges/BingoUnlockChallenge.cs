@@ -1,8 +1,8 @@
 ﻿using Expedition;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -15,6 +15,50 @@ namespace BingoMode.Challenges
         {
             description = "Get the " + ChallengeTools.IGT.Translate(unlock.Value) + " unlock";
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            UnlockIconData data = IconDataForUnlock(unlock.Value);
+            return new Phrase([new Icon("arenaunlock", 1f, data.iconColor), (data.unlockIconName == "" ? new Verse(unlock.Value) : new Icon(data.unlockIconName, 1f, data.unlockIconColor))], [1]);
+        }
+
+        public struct UnlockIconData
+        {
+            public Color iconColor;
+            public string unlockIconName;
+            public Color unlockIconColor;
+        }
+
+        public static UnlockIconData IconDataForUnlock(string unlockName)
+        {
+            UnlockIconData data = new UnlockIconData();
+            if (AbstractPhysicalObject.AbstractObjectType.values.entries.Contains(unlockName) || CreatureTemplate.Type.values.entries.Contains(unlockName))
+            {
+                data.unlockIconName = ChallengeUtils.ItemOrCreatureIconName(unlockName);
+                data.unlockIconColor = ChallengeUtils.ItemOrCreatureIconColor(unlockName);
+                data.iconColor = RainWorld.AntiGold.rgb;
+            }
+            else if (SlugcatStats.Name.values.entries.Contains(unlockName))
+            {
+                data.unlockIconName = "Kill_Slugcat";
+                data.unlockIconColor = PlayerGraphics.SlugcatColor(new SlugcatStats.Name(unlockName, false));
+                data.iconColor = CollectToken.GreenColor.rgb;
+            }
+            else if (unlockName.EndsWith("-safari"))
+            {
+                data.unlockIconName = "";
+                data.unlockIconColor = Color.white;
+                data.iconColor = CollectToken.RedColor.rgb;
+            }
+            else
+            {
+                data.unlockIconName = "";
+                data.unlockIconColor = Color.white;
+                data.iconColor = new Color(1f, 0.6f, 0.05f);
+            }
+
+            return data;
         }
 
         public override bool Duplicable(Challenge challenge)

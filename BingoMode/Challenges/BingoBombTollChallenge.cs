@@ -4,6 +4,7 @@ using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -20,6 +21,17 @@ namespace BingoMode.Challenges
             description = ChallengeTools.IGT.Translate("Throw a grenade at the <toll> scavenger toll" + (pass.Value ? " and pass it" : ""))
                 .Replace("<toll>", Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) + (roomName.Value == "gw_c05" ? " surface" : roomName.Value == "gw_c11" ? " underground" : ""));
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new Phrase([new Icon("Symbol_StunBomb", 1f, new Color(0.9019608f, 0.05490196f, 0.05490196f)), new Icon("scavtoll", 0.7f, Color.white)], [pass.Value ? 3 : 2]);
+            if (pass.Value)
+            {
+                phrase.words.Add(new Icon("singlearrow", 1f, Color.white));
+            }
+            phrase.words.Add(new Verse(roomName.Value));
+            return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)

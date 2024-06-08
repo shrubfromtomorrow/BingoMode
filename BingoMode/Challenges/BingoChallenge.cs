@@ -137,7 +137,7 @@ namespace BingoMode.Challenges
                 SteamFinal.ChallengeStateChangeToHost(this, false);
                 return;
             }
-
+            /*
             if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
             {
                 Plugin.logger.LogMessage("complete credit isnt null " + completeCredit);
@@ -175,6 +175,7 @@ namespace BingoMode.Challenges
 
             //ChallengeCompleted?.Invoke(SteamTest.team);
             //CheckWinLose();
+            */
         }
 
         public void OnChallengeCompleted(int team)

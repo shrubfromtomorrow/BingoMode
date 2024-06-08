@@ -1,10 +1,9 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
+﻿using BingoMode.Challenges;
+using Expedition;
 using RWCustom;
 using Steamworks;
-using BingoMode.Challenges;
-using System.Text.RegularExpressions;
+using System;
+using System.Runtime.InteropServices;
 
 namespace BingoMode.BingoSteamworks
 {
@@ -55,7 +54,7 @@ namespace BingoMode.BingoSteamworks
                     if (x != -1 && y != -1)
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
-                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[teamCredit] = true;
+                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeCompleted(teamCredit);
 
                         SteamFinal.BroadcastCurrentBoardState();
 
@@ -115,44 +114,12 @@ namespace BingoMode.BingoSteamworks
                         break;
                     }
 
-                // Update board
-                //case '*':
-                //    string challenjes = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "challenges");
-                //    try
-                //    {
-                //        BingoHooks.GlobalBoard.FromString(challenjes);
-                //        return true;
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
-                //        SteamTest.LeaveLobby();
-                //    }
-                //    return false;
-
-                // Begin game
-                //case '!':
-                //    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
-                //    //{
-                //    //    BingoData.BingoDen = data[0];
-                //    //    page.startGame.buttonBehav.greyedOut = false;
-                //    //    page.startGame.Singal(page.startGame, page.startGame.signalText);
-                //    //    break;
-                //    //}
-                //    Plugin.logger.LogError("DEPRECATED: " + message);
-                //    break;
-
                 // Change team
                 case '%':
                     int t = int.Parse(data[0], System.Globalization.NumberStyles.Any);
 
                     SteamTest.team = t;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
-
-                    //foreach (var player in SteamTest.LobbyMembers)
-                    //{
-                    //    SendMessage("q", player);
-                    //}
 
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
                     {
@@ -172,18 +139,6 @@ namespace BingoMode.BingoSteamworks
                     }
                     break;
 
-                //// Force host burdens
-                //case 'b':
-                //    string[] burjs = Regex.Split(data[0], "><");
-                //    SteamTest.FetchUnlocks(burjs, true);
-                //    return true;
-                //
-                //// Force host perks
-                //case 'p':
-                //    string[] perjs = Regex.Split(data[0], "><");
-                //    SteamTest.FetchUnlocks(perjs, false);
-                //    return true;
-
                 // Exit to menu
                 case 'e':
                     if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame game)
@@ -199,43 +154,27 @@ namespace BingoMode.BingoSteamworks
 
                 // End game ! !!! ! ! ! !!
                 case 'x':
-                    //if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame unlimitedGames) // but no games :(
-                    //{
-                    //    if (unlimitedGames.manager.musicPlayer != null)
-                    //    {
-                    //        unlimitedGames.manager.musicPlayer.DeathEvent();
-                    //    }
-                    //}
                     Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
                     break;
 
-                // Announce exited lobby
-                case 'g':
-                    foreach (var player in SteamTest.LobbyMembers)
-                    {
-                        if (player.GetSteamID64() == ulong.Parse(data[0], System.Globalization.NumberStyles.Any))
-                        {
-                            SteamTest.LobbyMembers.Remove(player);
-                        }
-                    }
-                    //SteamTest.LobbyMembers.RemoveAll(x => x.GetSteamID64() == ulong.Parse(data[0], System.Globalization.NumberStyles.Any));
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
-                    {
-                        Plugin.logger.LogMessage("resetting player loblob");
-                        page2.ResetPlayerLobby();
-                    }
-                    break;
-
-                // Resetting player lobbies 
-                case 'q':
-                    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
-                    //{
-                    //    page3.ResetPlayerLobby();
-                    //}
-                    break;
-
+                // Receive new bingo state
                 case 'B':
                     BingoHooks.GlobalBoard.InterpretBingoState(message);
+                    break;
+
+                // Receive upkeep request
+                case 'U':
+                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
+                    {
+                        SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
+                        SteamFinal.ReceivedHostUpKeep = true;
+                    }
+                    break;
+
+                // Confirm upkeep
+                case 'C':
+                    ulong playerID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
+                    if (SteamFinal.ReceivedPlayerUpKeep.ContainsKey(playerID)) SteamFinal.ReceivedPlayerUpKeep[playerID] = true;
                     break;
 
                 default:
