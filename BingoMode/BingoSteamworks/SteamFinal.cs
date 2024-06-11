@@ -11,79 +11,105 @@ namespace BingoMode.BingoSteamworks
 {
     public class SteamFinal
     {
-        public const int PlayerUpkeepTime = 7200;
-        public const int MaxHostUpKeepTime = 10000;
+        public const int PlayerUpkeepTime = 1300;
+        public const int MaxHostUpKeepTime = 2600;
 
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
         public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];
         public static int SendUpKeepCounter = PlayerUpkeepTime;
         public static int HostUpkeep = MaxHostUpKeepTime;
         public static bool ReceivedHostUpKeep;
+        public static bool TryToReconnect;
 
-        public static void ReceiveMessagesUpdate()
+        public static void ReceiveMessagesUpdate(RainWorld rw)
         {
-            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default && 
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
+            if (BingoData.BingoMode)
             {
-                HostUpkeep--;
-                if (HostUpkeep <= 0)
+                if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                 {
-                    if (ReceivedHostUpKeep)
+                    HostUpkeep--;
+                    if (HostUpkeep <= 0)
                     {
-                        Plugin.logger.LogMessage("Received host upkeep in time :))");
-                        HostUpkeep = MaxHostUpKeepTime;
-                        ReceivedHostUpKeep = false;
-                    }
-                    else
-                    {
-                        Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
-                        // Didnt receve host upkeep, so host is probably disconnected
-                        Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
-                    }
-                }
-            }
-
-            SendUpKeepCounter--;
-            if (SendUpKeepCounter == PlayerUpkeepTime / 2) // Halfway check to make sure
-            {
-                foreach (var kvp in ReceivedPlayerUpKeep)
-                {
-                    if (!ReceivedPlayerUpKeep[kvp.Key])
-                    {
-                        Plugin.logger.LogMessage("Didnt receive upkeep yet, halfway check for " + kvp.Key);
-                        RequestPlayerUpKeep(kvp.Key);
-                    }
-                }
-            }
-            if (SendUpKeepCounter <= 0)
-            {
-                List<ulong> ToRemove = [];
-                foreach (var kvp in ReceivedPlayerUpKeep)
-                {
-                    if (ReceivedPlayerUpKeep[kvp.Key])
-                    {
-                        Plugin.logger.LogMessage($"Received upkeep from {kvp.Key} in time!");
-                        RequestPlayerUpKeep(kvp.Key);
-                        continue;
-                    }
-
-                    Plugin.logger.LogMessage($"Didnt receive upkeep from {kvp.Key} in time! Considering them disconnected");
-                    // Player didnt send their upkeep, so theyre considered dead to the host
-                    ConnectedPlayers.RemoveAll(x => x.GetSteamID64() == kvp.Key);
-                    ToRemove.Add(kvp.Key);
-                }
-
-                if (ToRemove.Count > 0)
-                {
-                    foreach (var r in ToRemove)
-                    {
-                        Plugin.logger.LogMessage($"Removing {r} from upkeep list");
-                        ReceivedPlayerUpKeep.Remove(r);
+                        if (ReceivedHostUpKeep)
+                        {
+                            if (TryToReconnect)
+                            {
+                                Plugin.logger.LogMessage("Reconnected to host!");
+                                TryToReconnect = false;
+                                HostUpkeep = MaxHostUpKeepTime;
+                                ReceivedHostUpKeep = false;
+                                if (rw.processManager.currentMainLoop is RainWorldGame game)
+                                {
+                                    game.paused = false;
+                                }
+                            }
+                            else
+                            {
+                                Plugin.logger.LogMessage("Received host upkeep in time :))");
+                                HostUpkeep = MaxHostUpKeepTime;
+                                ReceivedHostUpKeep = false;
+                            }
+                        }
+                        else
+                        {
+                            if (TryToReconnect)
+                            {
+                                Plugin.logger.LogMessage("Trying to reconnect to host!");
+                                InnerWorkings.SendMessage("H" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
+                                HostUpkeep = MaxHostUpKeepTime / 2;
+                            }
+                            Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
+                            // Didnt receve host upkeep, so host is probably disconnected
+                            Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
+                        }
                     }
                 }
 
-                SendUpKeepCounter = PlayerUpkeepTime;
+                SendUpKeepCounter--;
+                if (SendUpKeepCounter == PlayerUpkeepTime / 2) // Halfway check to make sure
+                {
+                    foreach (var kvp in ReceivedPlayerUpKeep)
+                    {
+                        if (!ReceivedPlayerUpKeep[kvp.Key])
+                        {
+                            Plugin.logger.LogMessage("Didnt receive upkeep yet, halfway check for " + kvp.Key);
+                            RequestPlayerUpKeep(kvp.Key);
+                        }
+                    }
+                }
+                if (SendUpKeepCounter <= 0)
+                {
+                    List<ulong> ToRemove = [];
+                    foreach (var kvp in ReceivedPlayerUpKeep)
+                    {
+                        if (ReceivedPlayerUpKeep[kvp.Key])
+                        {
+                            Plugin.logger.LogMessage($"Received upkeep from {kvp.Key} in time!");
+                            RequestPlayerUpKeep(kvp.Key);
+                            continue;
+                        }
+
+                        Plugin.logger.LogMessage($"Didnt receive upkeep from {kvp.Key} in time! Considering them disconnected");
+                        // Player didnt send their upkeep, so theyre considered dead to the host
+                        ConnectedPlayers.RemoveAll(x => x.GetSteamID64() == kvp.Key);
+                        ToRemove.Add(kvp.Key);
+                    }
+
+                    if (ToRemove.Count > 0)
+                    {
+                        foreach (var r in ToRemove)
+                        {
+                            Plugin.logger.LogMessage($"Removing {r} from upkeep list");
+                            ReceivedPlayerUpKeep.Remove(r);
+                        }
+                    }
+
+                    SendUpKeepCounter = PlayerUpkeepTime;
+
+                    BroadcastCurrentBoardState();
+                }
             }
 
             // How the fuck does this work

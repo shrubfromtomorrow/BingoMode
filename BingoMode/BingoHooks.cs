@@ -259,6 +259,40 @@ namespace BingoMode
 
             // Make everyone quit if the host quits
             On.ProcessManager.RequestMainProcessSwitch_ProcessID_float += ProcessManager_RequestMainProcessSwitch_ProcessID_float;
+
+            // Request host upkeep when going back to the game
+            On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures;
+        }
+
+        private static void ShelterDoor_UpdatePathfindingCreatures(On.ShelterDoor.orig_UpdatePathfindingCreatures orig, ShelterDoor self)
+        {
+            orig.Invoke(self);
+
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
+            {
+                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+                {
+                    if (SlugcatSelectMenu.MineForSaveData(self.room.game.manager, ExpeditionData.slugcatPlayer) == null) // First cycle
+                    {
+                        Plugin.logger.LogMessage("No save data found, means its the first cycle!! Or the host starved the first cycle for some reason! Dont do that.");
+                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        {
+                            if (challenge is BingoChallenge b && b.ReverseChallenge())
+                            {
+                                foreach (int team in BingoData.TeamsInBingo)
+                                {
+                                    b.TeamsCompleted[team] = true;
+                                }
+                            }
+                        }
+                        SteamFinal.BroadcastCurrentBoardState();
+                    }
+                }
+                else
+                {
+                    self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
+                }
+            }
         }
 
         private static void ProcessManager_RequestMainProcessSwitch_ProcessID_float(On.ProcessManager.orig_RequestMainProcessSwitch_ProcessID_float orig, ProcessManager self, ProcessManager.ProcessID ID, float fadeOutSeconds)
@@ -656,6 +690,7 @@ namespace BingoMode
                     chIndex++;
                 }
             }
+            SteamTest.team = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team;
         }
 
         public static void ExpeditionMenu_UpdatePage(On.Menu.ExpeditionMenu.orig_UpdatePage orig, ExpeditionMenu self, int pageIndex)

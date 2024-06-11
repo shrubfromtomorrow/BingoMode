@@ -60,7 +60,7 @@ namespace BingoMode
             //}
             //else SteamTest.repeatMessageCounter = 0;
 
-            SteamFinal.ReceiveMessagesUpdate();
+            SteamFinal.ReceiveMessagesUpdate(self);
         }
 
         public void OnDisable()

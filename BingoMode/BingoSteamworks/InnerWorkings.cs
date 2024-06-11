@@ -3,6 +3,7 @@ using Expedition;
 using RWCustom;
 using Steamworks;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace BingoMode.BingoSteamworks
@@ -164,7 +165,7 @@ namespace BingoMode.BingoSteamworks
 
                 // Receive upkeep request
                 case 'U':
-                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
+                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                     {
                         SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
                         SteamFinal.ReceivedHostUpKeep = true;
@@ -173,8 +174,41 @@ namespace BingoMode.BingoSteamworks
 
                 // Confirm upkeep
                 case 'C':
-                    ulong playerID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
+                    if (SteamFinal.TryToReconnect)
+                    {
+                        if (data.Length == 2)
+                        {
+                            Plugin.logger.LogMessage("Reconnected to host " + data[0] + "!");
+                            SteamFinal.ReceivedHostUpKeep = true;
+                            Plugin.logger.LogMessage($"Got new bingo board state!");
+                            BingoHooks.GlobalBoard.InterpretBingoState(data[1]);
+                        } 
+                        else
+                        {
+                            Plugin.logger.LogError("INVALID LENGTH OF DATA IN C" + message);
+                        }
+                        break;
+                    }
+                    string g = message;
+                    if (data.Length == 2) g = data[0];
+                    ulong playerID = ulong.Parse(g, System.Globalization.NumberStyles.Any);
                     if (SteamFinal.ReceivedPlayerUpKeep.ContainsKey(playerID)) SteamFinal.ReceivedPlayerUpKeep[playerID] = true;
+                    break;
+
+                // Host upkeep request
+                case 'H':
+                    ulong requesterID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
+                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+                    {
+                        SteamNetworkingIdentity requesterIdentity = new SteamNetworkingIdentity();
+                        requesterIdentity.SetSteamID64(requesterID);
+                        SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState(), requesterIdentity);
+                        if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID))
+                        {
+                            Plugin.logger.LogMessage($"Adding player {requesterID} back to the game!");
+                            SteamFinal.ConnectedPlayers.Add(requesterIdentity);
+                        }
+                    }
                     break;
 
                 default:

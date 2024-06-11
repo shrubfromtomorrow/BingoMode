@@ -92,7 +92,7 @@ namespace BingoMode
             board = BingoHooks.GlobalBoard;
             size = board.size;
             BingoData.BingoMode = false;
-            BingoData.TeamsInBingo = 1;
+            BingoData.TeamsInBingo = [0];
 
             //tab = new MenuTab();
             //Container.AddChild(tab._container);
@@ -351,15 +351,12 @@ namespace BingoMode
                 }
                 */
 
-                int totalTeams = 1;
+                BingoData.TeamsInBingo = [];
                 foreach (var playere in SteamTest.LobbyMembers)
                 {
-                    if (SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.GetSteamID(), "team") != SteamTest.team.ToString())
-                    {
-                        totalTeams++;
-                    }
+                    int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.GetSteamID(), "team"));
+                    if (!BingoData.TeamsInBingo.Contains(team)) BingoData.TeamsInBingo.Add(team);
                 }
-                BingoData.TeamsInBingo = totalTeams;
 
                 if (ModManager.JollyCoop && ModManager.CoopAvailable)
                 {
@@ -414,13 +411,19 @@ namespace BingoMode
 
                     if (isHost && SteamTest.LobbyMembers.Count > 0)
                     {
+                        SteamFinal.ConnectedPlayers.Clear();
+                        SteamFinal.ReceivedPlayerUpKeep = [];
                         foreach (var player in SteamTest.LobbyMembers)
                         {
                             connectedPlayers += player.GetSteamID64() + "bPlR";
+                            SteamFinal.ConnectedPlayers.Add(player);
+                            SteamFinal.ReceivedPlayerUpKeep[player.GetSteamID64()] = true;
+                            SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
                         }
                         connectedPlayers.Remove(connectedPlayers.Length - 4);
                         Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
                     }
+                    else if (!isHost) { SteamFinal.ReceivedHostUpKeep = true; SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime; }
 
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout);
                 }

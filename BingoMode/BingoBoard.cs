@@ -358,7 +358,11 @@ namespace BingoMode
                                 }
                                 else
                                 {
-                                    (challengeGrid[i, j] as BingoChallenge).OnChallengeFailed(k);
+                                    // Failed check
+
+                                    challengeGrid[i, j].completed = false;
+                                    (challengeGrid[i, j] as BingoChallenge).TeamsCompleted[SteamTest.team] = false;
+                                    //(challengeGrid[i, j] as BingoChallenge).OnChallengeFailed(k);
                                 }
                             }
                         }

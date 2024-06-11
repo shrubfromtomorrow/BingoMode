@@ -29,23 +29,6 @@ namespace BingoMode.BingoSteamworks
         public static CallResult<LobbyCreated_t> lobbyCreated = new();
         public static CallResult<LobbyEnter_t> lobbyEntered = new();
 
-        public static Dictionary<int, string> messagesToConfirm = [];
-        public static int _nextMessage = 0;
-        public static int NextMessage
-        {
-            get
-            {
-                for (int i = 0; i <= _nextMessage; i++)
-                {
-                    if (!messagesToConfirm.ContainsKey(i)) { _nextMessage = i; break; };
-                }
-                int m = _nextMessage;
-                _nextMessage++;
-                return m;
-            }
-        }
-        public static int repeatMessageCounter = 0;
-
         public static void Apply()
         {
             CurrentFilters = new LobbyFilters("", 1, false);
