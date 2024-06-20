@@ -430,7 +430,7 @@ namespace BingoMode
                 else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
-                menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
+                menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game, 0.1f);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
                 if (BingoData.MultiplayerGame)
                 {

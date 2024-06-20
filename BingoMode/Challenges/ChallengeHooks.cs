@@ -492,6 +492,7 @@ namespace BingoMode.Challenges
         {
             if (self.State.eggSpawn && placeRoom.abstractRoom.shelter && placeRoom.world.rainCycle.timer < 40)
             {
+                Plugin.logger.LogMessage("Hatch test 1");
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is BingoHatchNoodleChallenge c)

@@ -203,7 +203,7 @@ namespace BingoMode.BingoSteamworks
                         SteamNetworkingIdentity requesterIdentity = new SteamNetworkingIdentity();
                         requesterIdentity.SetSteamID64(requesterID);
                         SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState(), requesterIdentity);
-                        if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID))
+                        if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID) && SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList).Any(x => x.GetSteamID64() == requesterID))
                         {
                             Plugin.logger.LogMessage($"Adding player {requesterID} back to the game!");
                             SteamFinal.ConnectedPlayers.Add(requesterIdentity);

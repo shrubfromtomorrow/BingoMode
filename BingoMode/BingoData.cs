@@ -45,7 +45,7 @@ namespace BingoMode
             public int size;
             public SteamNetworkingIdentity hostID;
             public bool isHost;
-            public string connectedPlayers;
+            public string playerWhiteList;
             public int team;
             public bool lockout;
 
@@ -54,13 +54,13 @@ namespace BingoMode
                 this.size = size;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string connectedPlayers, bool lockout)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout)
             {
                 this.size = size;
                 this.team = team;
                 this.hostID = hostID;
                 this.isHost = isHost;
-                this.connectedPlayers = connectedPlayers;
+                this.playerWhiteList = playerWhiteList;
                 this.lockout = lockout;
             }
         }

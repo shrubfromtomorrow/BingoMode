@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Expedition;
+using RWCustom;
 using Steamworks;
 using UnityEngine;
 
@@ -346,6 +347,8 @@ namespace BingoMode.BingoSteamworks
                 case 0x0010:
                     text = "left " + callback.m_rgfChatMemberStateChange;
                     LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
+
+                    if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
                     {
                         page3.ResetPlayerLobby();

@@ -214,7 +214,7 @@ namespace BingoMode.Challenges
                     }
                 }
             }
-            if (teamsLost == BingoData.TeamsInBingo && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
+            if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
             {
                 game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
                 game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);

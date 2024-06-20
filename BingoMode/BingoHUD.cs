@@ -11,6 +11,8 @@ using System.Linq;
 namespace BingoMode
 {
     using BingoSteamworks;
+    using Menu;
+
     public class BingoHUD : HudPart
     {
         public BingoBoard board;
@@ -23,6 +25,8 @@ namespace BingoMode
         public bool toggled;
         public float alpha;
         public float lastAlpha;
+        public bool mapOpen;
+        public bool lastMapOpen;
 
         public bool MousePressed => mouseDown && !lastMouseDown;
 
@@ -31,7 +35,6 @@ namespace BingoMode
             pos = new Vector2(20.2f, 725.2f);
             board = BingoHooks.GlobalBoard;
             toggled = false;
-
             GenerateBingoGrid();
         }
 
@@ -65,16 +68,27 @@ namespace BingoMode
                     grid[i, j].Update();
                 }
             }
-
-            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player) // Use later when fading the hud
+            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player)
             {
                 Player p = hud.owner as Player;
 
-                // Display only if map pressed
                 if (p.input[0].mp && !p.input[1].mp) 
                 {
                     toggled = !toggled;
-                    Cursor.visible = Cursor.visible || toggled;
+                    Cursor.visible = toggled;
+                }
+                return;
+            }
+            if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen || hud.owner.GetOwnerType() == HUD.HUD.OwnerType.DeathScreen)
+            {
+                lastMapOpen = mapOpen;
+                mapOpen = hud.owner.MapInput.mp;
+                SleepAndDeathScreen sleepScreen = hud.owner as SleepAndDeathScreen;
+
+                if (mapOpen && !lastMapOpen) 
+                {
+                    Plugin.logger.LogError("toggling");
+                    toggled = !toggled;
                 }
             }
         }
@@ -91,7 +105,7 @@ namespace BingoMode
                     float topLeft = -size * board.size / 2f;
                     Vector2 center = new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
                     grid[i, j] = new BingoInfo(hud, this,
-                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.fContainers[1], board.challengeGrid[i, j], i, j);
+                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.owner is SleepAndDeathScreen s ? s.container : hud.fContainers[1], board.challengeGrid[i, j], i, j);
                 }
             }
         }
@@ -168,8 +182,8 @@ namespace BingoMode
                 sprite = new FSprite("pixel")
                 {
                     scale = size,
-                    color = new Color(0f, 0f, 0f),
-                    alpha = 0.75f,
+                    color = new Color(0.01f, 0.01f, 0.01f),
+                    alpha = 0.7f,
                     x = pos.x, 
                     y = pos.y,
                     anchorX = 0.5f,
@@ -341,13 +355,13 @@ namespace BingoMode
                         g = true;
                     }
                 }
-                if (g) showBG = false;
+                showBG = !g;
             }
 
             public void Draw()
             {
                 // Phrase biz
-                sprite.alpha = showBG ? Mathf.Lerp(0f, 0.66f, alpha) : 0f;
+                sprite.alpha = showBG ? Mathf.Lerp(0f, 0.85f, alpha) : 0f;
                 foreach (var g in border) g.alpha = alpha;
                 label.alpha = alpha;
 
@@ -371,7 +385,7 @@ namespace BingoMode
                     border[i].scaleX = (i < 2) ? size * scale : 2f;
                     border[i].scaleY = (i < 2) ? 2f : size * scale;
                 }
-                sprite.scale = scale;
+                sprite.scale = scale * size;
                 corners[0] = pos + new Vector2(-size * scale / 2f, -size * scale / 2f);
                 corners[1] = pos + new Vector2(-size * scale / 2f, size * scale / 2f);
                 corners[2] = pos + new Vector2(size * scale / 2f, -size * scale / 2f);

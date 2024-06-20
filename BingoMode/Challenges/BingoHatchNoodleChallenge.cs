@@ -17,7 +17,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " in one cycle" : ""))
+            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodleflies from eggs" + (atOnce.Value ? " in one cycle" : ""))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
@@ -27,7 +27,7 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol"))], [atOnce.Value ? 2 : 1]);
+            Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))], [atOnce.Value ? 3 : 2]);
             if (atOnce.Value) p.words.Add(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
             p.words.Add(new Counter(current, amount.Value));
             return p;
@@ -49,17 +49,19 @@ namespace BingoMode.Challenges
             return new BingoHatchNoodleChallenge
             {
                 atOnce = new(onc, "At Once", 0),
-                amount = new(UnityEngine.Random.Range(2, onc ? 3 : 6), "Amount", 1),
+                amount = new(UnityEngine.Random.Range(1, onc ? 3 : 5) * 2, "Amount", 1),
             };
         }
 
         public void Hatch()
         {
+            Plugin.logger.LogMessage("Trying to hatch this mf");
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
+                Plugin.logger.LogMessage("Hatching this mf");
                 current++;
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
+                if (!RequireSave() && !atOnce.Value) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
             }
         }
@@ -91,7 +93,7 @@ namespace BingoMode.Challenges
             {
                 "BingoHatchNoodleChallenge",
                 "~",
-                atOnce.Value ? "0" : current.ToString(),
+                atOnce.Value && !completed ? "0" : current.ToString(),
                 "><",
                 amount.ToString(),
                 "><",

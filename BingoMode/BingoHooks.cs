@@ -105,17 +105,17 @@ namespace BingoMode
 
                                     BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array[5], lockout);
 
-                                    if (array[5] != "")
-                                    {
-                                        SteamFinal.ConnectedPlayers = SteamFinal.PlayersFromString(array[5]);
-
-                                        //foreach (var player in Regex.Split(array[5], "bPlR"))
-                                        //{
-                                        //    SteamNetworkingIdentity playerIdentity = new();
-                                        //    playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
-                                        //    SteamFinal.ConnectedPlayers.Add(playerIdentity);
-                                        //}
-                                    }
+                                    //if (array[5] != "")
+                                    //{
+                                    //    SteamFinal.ConnectedPlayers = SteamFinal.PlayersFromString(array[5]);
+                                    //
+                                    //    //foreach (var player in Regex.Split(array[5], "bPlR"))
+                                    //    //{
+                                    //    //    SteamNetworkingIdentity playerIdentity = new();
+                                    //    //    playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
+                                    //    //    SteamFinal.ConnectedPlayers.Add(playerIdentity);
+                                    //    //}
+                                    //}
                                 }
                                 else BingoData.BingoSaves[new(array2[0])] = new(size);
                             }
@@ -227,6 +227,7 @@ namespace BingoMode
 
             // Add Bingo HUD and Stop the base Expedition HUD from appearing
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+            On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
             //IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
 
             // Ficks
@@ -394,7 +395,7 @@ namespace BingoMode
                             "#" + 
                             (saveData.isHost ? "1" : "0") +
                             "#" +
-                            saveData.connectedPlayers +
+                            saveData.playerWhiteList +
                             "#" +
                             (saveData.lockout ? "1" : "0");
                         }
@@ -548,15 +549,22 @@ namespace BingoMode
         public static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
             bool exp = ModManager.Expedition;
-            if (BingoData.BingoMode)
+            if (BingoData.BingoMode && GlobalBoard != null && GlobalBoard.challengeGrid != null)
             {
                 ModManager.Expedition = false;
                 self.AddPart(new BingoHUD(self));
             }
-            if (self.rainWorld == null) Plugin.logger.LogMessage("rw null");
-            if (self.rainWorld.options == null) Plugin.logger.LogMessage("op null");
             orig.Invoke(self, cam);
             ModManager.Expedition = exp;
+        }
+
+        private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
+        {
+            orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
+            if (BingoData.BingoMode && GlobalBoard != null && GlobalBoard.challengeGrid != null)
+            {
+                self.AddPart(new BingoHUD(self));
+            }
         }
 
         public static void ExpeditionMenu_ctor(On.Menu.ExpeditionMenu.orig_ctor orig, ExpeditionMenu self, ProcessManager manager)
