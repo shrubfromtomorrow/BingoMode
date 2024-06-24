@@ -153,6 +153,7 @@ namespace BingoMode.BingoSteamworks
             Plugin.logger.LogMessage("SETTING IT TO BINJO??? " + SteamMatchmaking.GetLobbyData(lobbyID, "mode"));
             SteamMatchmaking.SetLobbyData(lobbyID, "name", hostName + "'s lobby");
             SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
+            SteamMatchmaking.SetLobbyData(lobbyID, "hostID", selfIdentity.GetSteamID64().ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
             //SteamMatchmaking.SetLobbyData(lobbyID, "maxPlayers", BingoData.globalSettings.maxPlayers.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
@@ -242,8 +243,7 @@ namespace BingoMode.BingoSteamworks
             {
                 SteamNetworkingIdentity member = new SteamNetworkingIdentity();
                 member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(lobbyID, i));
-                InnerWorkings.SendMessage($"Hello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
-                InnerWorkings.SendMessage($"q", member);
+                InnerWorkings.SendMessage($"Jello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
             }
 
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
@@ -319,12 +319,13 @@ namespace BingoMode.BingoSteamworks
 
         public static void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
         {
+            Plugin.logger.LogMessage($"Lobby chat update " + callback.m_rgfChatMemberStateChange);
             string text = "";
             switch (callback.m_rgfChatMemberStateChange)
             {
                 case 0x0001:
                     text = "entered";
-
+                    Plugin.logger.LogMessage($"1User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
                     SteamNetworkingIdentity newMember = new SteamNetworkingIdentity();
                     newMember.SetSteamID((CSteamID)callback.m_ulSteamIDUserChanged);
                     LobbyMembers.Add(newMember);
@@ -335,6 +336,7 @@ namespace BingoMode.BingoSteamworks
                         SteamMatchmaking.SetLobbyData(CurrentLobby, "nextTeam", tim.ToString());
                     }
 
+                    if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
                     {
                         page2.ResetPlayerLobby();
@@ -345,11 +347,14 @@ namespace BingoMode.BingoSteamworks
                 case 0x0004:
                 case 0x0008:
                 case 0x0010:
-                    text = "left " + callback.m_rgfChatMemberStateChange;
+                    Plugin.logger.LogMessage($"HERE");
+                    text = "left";
+                    Plugin.logger.LogMessage($"2User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
                     LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    if (SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame") != "") break;
+                    if (LobbyMembers.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
                     {
                         page3.ResetPlayerLobby();
                     }
@@ -385,8 +390,10 @@ namespace BingoMode.BingoSteamworks
                 string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
                 if (den != "")
                 {
+                    Plugin.logger.LogMessage("TRYING TO START GAME BECAUSE HOST STARTED");
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
+                        Plugin.logger.LogMessage("ACTUALLY STARTING GAME BECAUSE HOST STARTED");
                         BingoData.BingoDen = den;
                         page.startGame.buttonBehav.greyedOut = false;
                         page.startGame.Singal(page.startGame, page.startGame.signalText);

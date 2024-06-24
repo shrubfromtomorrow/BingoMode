@@ -47,7 +47,7 @@ namespace BingoMode
         {
             base.Update();
 
-            if (infoText.text == "Trying to reconnect to the host." && manager.currentMainLoop is RainWorldGame game)
+            if ((infoText.text == "Trying to reconnect to the host." || infoText.text == "The host quit the game.") && manager.currentMainLoop is RainWorldGame game)
             {
                 game.paused = true;
             }
@@ -64,7 +64,7 @@ namespace BingoMode
                 case "QUITGAEM":
                     Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
                     manager.StopSideProcess(this);
-
+                    SteamFinal.TryToReconnect = false;
                     break;
                 case "STOPRECONNECT":
                     SteamFinal.TryToReconnect = false;

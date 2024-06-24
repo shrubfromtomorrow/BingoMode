@@ -1,6 +1,12 @@
 ﻿using BepInEx;
+using BepInEx.Logging;
 using System.Security;
 using System.Security.Permissions;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
+using System;
+using System.Reflection;
+using Mono.Cecil.Cil;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -16,14 +22,20 @@ namespace BingoMode
     public class Plugin : BaseUnityPlugin
     {
         public static bool AppliedAlreadyDontDoItAgainPlease;
-        internal static BepInEx.Logging.ManualLogSource logger;
+        internal static ManualLogSource logger;
 
         public void OnEnable()
         {
+            new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
             On.RainWorld.Update += RainWorld_Update;
+        }
+
+        public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)
+        {
+            return "[" + DateTime.Now.Hour + ":" + (DateTime.Now.Minute < 10 ? "0" : "") + DateTime.Now.Minute + ":" + (DateTime.Now.Second < 10 ? "0" : "") + DateTime.Now.Second + "]" + orig.Invoke(self);
         }
 
         // Receiving data from yuh (networking)

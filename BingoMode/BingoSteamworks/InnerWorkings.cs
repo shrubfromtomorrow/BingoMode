@@ -23,11 +23,6 @@ namespace BingoMode.BingoSteamworks
             Marshal.FreeHGlobal(ptr);
         }
 
-        public static void ConfirmMessage(int m, SteamNetworkingIdentity receiver)
-        {
-            SendMessage("c" + m, receiver);
-        }
-
         // Data format: "xdata1;data2;..dataN"
         // x - type of data we want to interpret
         // the rest - the actual data we want, separated with semicolons if needed
@@ -120,7 +115,7 @@ namespace BingoMode.BingoSteamworks
                     int t = int.Parse(data[0], System.Globalization.NumberStyles.Any);
 
                     SteamTest.team = t;
-                    SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", t.ToString());
+                    SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", data[0]);
 
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
                     {
@@ -148,7 +143,7 @@ namespace BingoMode.BingoSteamworks
                         {
                             game.manager.musicPlayer.DeathEvent();
                         }
-                        game.ExitGame(false, true);
+                        game.ExitGame(false, false);
                         game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
                     }
                     break;
@@ -211,8 +206,13 @@ namespace BingoMode.BingoSteamworks
                     }
                     break;
 
+                // Leave lobby
+                case 'L':
+                    SteamTest.LeaveLobby();
+                    break;
+
                 default:
-                    Plugin.logger.LogError("INVALID MESSAGE: " + message);
+                    Plugin.logger.LogWarning("INVALID MESSAGE: " + message);
                     break;
             }
         }

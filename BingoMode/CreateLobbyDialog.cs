@@ -89,6 +89,7 @@ namespace BingoMode
             maxPlayers = new OpUpdown(true, maxPlayersConf, outOfBounds, 50f);
             maxPlayers.OnValueChanged += MaxPlayers_OnValueChanged;
             maxPlayersWrapper = new UIelementWrapper(menuTabWrapper, maxPlayers);
+            maxPlayers.greyedOut = inLobby && !host;
             if (inLobby) maxPlayers.valueInt = SteamMatchmaking.GetLobbyMemberLimit(SteamTest.CurrentLobby);
 
             perks = new CheckBox[3];

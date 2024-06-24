@@ -321,10 +321,10 @@ namespace BingoMode
             {
                 for (int j = 0; j < challengeGrid.GetLength(1); j++)
                 {
-                    state += (challengeGrid[i, j] as BingoChallenge).TeamsToString() + "<>";
+                    state += "<>" + (challengeGrid[i, j] as BingoChallenge).TeamsToString();
                 }
             }
-            if (state != "") state.Remove(state.Length - 2);
+            if (state != "") state = state.Substring(2);
             Plugin.logger.LogMessage("Bingo state to string:\n" + state);
             return state;
         }
@@ -353,7 +353,7 @@ namespace BingoMode
                             {
                                 if (currentTeamsString[k] == '1')
                                 {
-                                    if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) (challengeGrid[i, j] as BingoChallenge).OnChallengeLockedOut();
+                                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) (challengeGrid[i, j] as BingoChallenge).OnChallengeLockedOut();
                                     else (challengeGrid[i, j] as BingoChallenge).OnChallengeCompleted(k);
                                 }
                                 else

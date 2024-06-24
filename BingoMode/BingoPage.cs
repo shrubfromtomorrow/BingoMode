@@ -354,9 +354,10 @@ namespace BingoMode
                 BingoData.TeamsInBingo = [];
                 foreach (var playere in SteamTest.LobbyMembers)
                 {
-                    int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.GetSteamID(), "team"));
+                    int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.GetSteamID(), "playerTeam"));
                     if (!BingoData.TeamsInBingo.Contains(team)) BingoData.TeamsInBingo.Add(team);
                 }
+                Plugin.logger.LogMessage("teams in bingo: " + BingoData.TeamsInBingo.Count);
 
                 if (ModManager.JollyCoop && ModManager.CoopAvailable)
                 {
@@ -384,8 +385,11 @@ namespace BingoMode
                     if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
                 }
             reset:
-                ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
-                BingoData.BingoDen = ExpeditionData.startingDen;
+                if (BingoData.BingoDen == "random")
+                {
+                    ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    BingoData.BingoDen = ExpeditionData.startingDen;
+                }
                 foreach (var banned in bannedRegions) 
                 {
                     if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto reset;
@@ -415,15 +419,20 @@ namespace BingoMode
                         SteamFinal.ReceivedPlayerUpKeep = [];
                         foreach (var player in SteamTest.LobbyMembers)
                         {
-                            connectedPlayers += player.GetSteamID64() + "bPlR";
+                            connectedPlayers += "bPlR" + player.GetSteamID64();
                             SteamFinal.ConnectedPlayers.Add(player);
-                            SteamFinal.ReceivedPlayerUpKeep[player.GetSteamID64()] = true;
+                            SteamFinal.ReceivedPlayerUpKeep[player.GetSteamID64()] = false;
                             SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
                         }
-                        connectedPlayers.Remove(connectedPlayers.Length - 4);
+                        connectedPlayers = connectedPlayers.Substring(4);
                         Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
                     }
-                    else if (!isHost) { SteamFinal.ReceivedHostUpKeep = true; SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime; }
+                    else if (!isHost) 
+                    { 
+                        SteamFinal.ReceivedHostUpKeep = true; 
+                        SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
+                        InnerWorkings.SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
+                    }
 
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout);
                 }
@@ -435,7 +444,7 @@ namespace BingoMode
                 if (BingoData.MultiplayerGame)
                 {
                     if (SteamTest.LobbyMembers.Count > 0 && isHost) SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "startGame", BingoData.BingoDen);
-                    SteamTest.LeaveLobby();
+                    SteamMatchmaking.SetLobbyJoinable(SteamTest.CurrentLobby, false);
                 }
 
                 // This will be decided by the host when sending the first bingo state
@@ -1047,7 +1056,9 @@ namespace BingoMode
             public PlayerInfo(BingoPage page, CSteamID player, bool controls)
             {
                 this.page = page;
-                team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam"), System.Globalization.NumberStyles.Any);
+                Plugin.logger.LogMessage("thing: " + SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam"));
+                if (SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam") == "") team = 0;
+                else team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player, "playerTeam"), System.Globalization.NumberStyles.Any);
                 bool isHost = player == SteamTest.selfIdentity.GetSteamID();
                 nickname = isHost ? SteamFriends.GetPersonaName() : SteamFriends.GetFriendPersonaName(player);
                 if (nickname == null) nickname = "Cant get player's nickname";

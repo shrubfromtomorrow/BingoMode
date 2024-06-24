@@ -11,8 +11,8 @@ namespace BingoMode.BingoSteamworks
 {
     public class SteamFinal
     {
-        public const int PlayerUpkeepTime = 1300;
-        public const int MaxHostUpKeepTime = 2600;
+        public const int PlayerUpkeepTime = 2600;
+        public const int MaxHostUpKeepTime = 5200;
 
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
         public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];
@@ -44,6 +44,10 @@ namespace BingoMode.BingoSteamworks
                                 {
                                     game.paused = false;
                                 }
+                                if (rw.processManager.IsRunningAnyDialog)
+                                {
+                                    rw.processManager.StopSideProcess(rw.processManager.dialog);
+                                }
                             }
                             else
                             {
@@ -52,7 +56,7 @@ namespace BingoMode.BingoSteamworks
                                 ReceivedHostUpKeep = false;
                             }
                         }
-                        else
+                        else if (!Custom.rainWorld.processManager.IsRunningAnyDialog)
                         {
                             if (TryToReconnect)
                             {
@@ -70,24 +74,42 @@ namespace BingoMode.BingoSteamworks
                 SendUpKeepCounter--;
                 if (SendUpKeepCounter == PlayerUpkeepTime / 2) // Halfway check to make sure
                 {
+                    List<ulong> ToFalse = [];
                     foreach (var kvp in ReceivedPlayerUpKeep)
                     {
                         if (!ReceivedPlayerUpKeep[kvp.Key])
                         {
                             Plugin.logger.LogMessage("Didnt receive upkeep yet, halfway check for " + kvp.Key);
                             RequestPlayerUpKeep(kvp.Key);
+                            ToFalse.Add(kvp.Key);
+                        }
+                    }
+
+                    if (ToFalse.Count > 0)
+                    {
+                        foreach (var r in ToFalse)
+                        {
+                            Plugin.logger.LogMessage($"Settin {r} to false");
+                            ReceivedPlayerUpKeep[r] = false;
                         }
                     }
                 }
                 if (SendUpKeepCounter <= 0)
                 {
+                    Plugin.logger.LogMessage($"hi");
+                    SendUpKeepCounter = PlayerUpkeepTime;
                     List<ulong> ToRemove = [];
+                    List<ulong> ToFalse = [];
+                    int allReceived = 0;
                     foreach (var kvp in ReceivedPlayerUpKeep)
                     {
+                        Plugin.logger.LogMessage($"upkp {kvp.Key} + {kvp.Value}");
                         if (ReceivedPlayerUpKeep[kvp.Key])
                         {
                             Plugin.logger.LogMessage($"Received upkeep from {kvp.Key} in time!");
                             RequestPlayerUpKeep(kvp.Key);
+                            ToFalse.Add(kvp.Key);
+                            allReceived++;
                             continue;
                         }
 
@@ -96,17 +118,32 @@ namespace BingoMode.BingoSteamworks
                         ConnectedPlayers.RemoveAll(x => x.GetSteamID64() == kvp.Key);
                         ToRemove.Add(kvp.Key);
                     }
+                    if (SteamTest.CurrentLobby != default && allReceived == ReceivedPlayerUpKeep.Keys.Count)
+                    {
+                        SteamTest.LeaveLobby();
+                        foreach (var player in ConnectedPlayers) InnerWorkings.SendMessage("L", player);
+                    }
 
+                    gobabk:
                     if (ToRemove.Count > 0)
                     {
                         foreach (var r in ToRemove)
                         {
                             Plugin.logger.LogMessage($"Removing {r} from upkeep list");
                             ReceivedPlayerUpKeep.Remove(r);
+                            ToRemove.Remove(r);
+                            goto gobabk;
                         }
                     }
 
-                    SendUpKeepCounter = PlayerUpkeepTime;
+                    if (ToFalse.Count > 0)
+                    {
+                        foreach (var r in ToFalse)
+                        {
+                            Plugin.logger.LogMessage($"Settin {r} to false");
+                            ReceivedPlayerUpKeep[r] = false;
+                        }
+                    }
 
                     BroadcastCurrentBoardState();
                 }
@@ -142,7 +179,6 @@ namespace BingoMode.BingoSteamworks
             SteamNetworkingIdentity playerIdentity = new();
             playerIdentity.SetSteamID64(playerID);
             InnerWorkings.SendMessage("U", playerIdentity);
-            ReceivedPlayerUpKeep[playerID] = false;
         }
 
         public static bool IsSaveMultiplayer(BingoData.BingoSaveData saveData)

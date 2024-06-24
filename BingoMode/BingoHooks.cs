@@ -101,9 +101,9 @@ namespace BingoMode
                                     bool isHost = array2[4] == "1";
                                     bool lockout = array2[6] == "1";
 
-                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array[5]}");
+                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}");
 
-                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array[5], lockout);
+                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array2[5], lockout);
 
                                     //if (array[5] != "")
                                     //{
@@ -269,12 +269,17 @@ namespace BingoMode
         {
             orig.Invoke(self);
 
+            Plugin.logger.LogMessage("0");
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
             {
+                Plugin.logger.LogMessage("1");
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                 {
-                    if (SlugcatSelectMenu.MineForSaveData(self.room.game.manager, ExpeditionData.slugcatPlayer) == null) // First cycle
+                    Plugin.logger.LogMessage("2");
+                    if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
+                        (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
+                        Plugin.logger.LogMessage("3");
                         Plugin.logger.LogMessage("No save data found, means its the first cycle!! Or the host starved the first cycle for some reason! Dont do that.");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
@@ -282,14 +287,14 @@ namespace BingoMode
                             {
                                 foreach (int team in BingoData.TeamsInBingo)
                                 {
-                                    b.TeamsCompleted[team] = true;
+                                    b.OnChallengeCompleted(team);
                                 }
                             }
                         }
                         SteamFinal.BroadcastCurrentBoardState();
                     }
                 }
-                else
+                else if (!SteamFinal.ReceivedHostUpKeep)
                 {
                     self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
                 }
@@ -300,10 +305,10 @@ namespace BingoMode
         {
             orig.Invoke(self, ID, fadeOutSeconds);
 
-            if (BingoData.BingoMode && SteamTest.LobbyMembers.Count > 0 && ID == ProcessManager.ProcessID.MainMenu &&
-                SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID())
+            if (BingoData.BingoMode && SteamFinal.ConnectedPlayers.Count > 0 && ID == ProcessManager.ProcessID.MainMenu &&
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
             {
-                foreach (var player in SteamTest.LobbyMembers)
+                foreach (var player in SteamFinal.ConnectedPlayers)
                 {
                     InnerWorkings.SendMessage("e", player);
                 }
@@ -391,7 +396,7 @@ namespace BingoMode
                             "#" +
                             saveData.team + 
                             "#" +
-                            saveData.hostID + 
+                            saveData.hostID.GetSteamID64() + 
                             "#" + 
                             (saveData.isHost ? "1" : "0") +
                             "#" +
@@ -719,15 +724,16 @@ namespace BingoMode
         // Creating butone
         public static void CharacterSelectPage_UpdateStats(On.Menu.CharacterSelectPage.orig_UpdateStats orig, CharacterSelectPage self)
         {
+            SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
+
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(self.menu.manager, ExpeditionData.slugcatPlayer);
-
                 bool isMultiplayer = SteamFinal.IsSaveMultiplayer(BingoData.BingoSaves[ExpeditionData.slugcatPlayer]);
                 //bool isHost = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost; 
                 bool isSpectator = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team == 8; //TODO
                 if (saveGameData == null)
                 {
+                    Plugin.logger.LogMessage("save game data null for " + ExpeditionData.slugcatPlayer);
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                     goto invok;
                 }
@@ -739,11 +745,13 @@ namespace BingoMode
                 newBingoButton.TryGetValue(self, out var bb);
                 self.subObjects.Add(bb);
                 self.abandonButton.Show();
+                self.abandonButton.PosX -= 200f;
                 return;
             }
-            invok:
+        invok:
             orig.Invoke(self);
 
+            if (saveGameData != null) return;
             self.confirmExpedition.pos.x += 90;
 
             if (!newBingoButton.TryGetValue(self, out _))
