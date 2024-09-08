@@ -103,7 +103,7 @@ namespace BingoMode
 
                                     Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}");
 
-                                    BingoData.BingoSaves[new(array2[0])] = new(size, team, hostIdentity, isHost, array2[5], lockout);
+                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout);
 
                                     //if (array[5] != "")
                                     //{
@@ -223,7 +223,7 @@ namespace BingoMode
 
             // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
-            IL.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
+            IL.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcessIL;
 
             // Add Bingo HUD and Stop the base Expedition HUD from appearing
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
@@ -269,6 +269,7 @@ namespace BingoMode
         {
             orig.Invoke(self);
 
+            if (!BingoData.BingoMode) return;
             Plugin.logger.LogMessage("0");
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
             {
@@ -305,13 +306,26 @@ namespace BingoMode
         {
             orig.Invoke(self, ID, fadeOutSeconds);
 
-            if (BingoData.BingoMode && SteamFinal.ConnectedPlayers.Count > 0 && ID == ProcessManager.ProcessID.MainMenu &&
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+            if (ID == ProcessManager.ProcessID.MainMenu)
             {
-                foreach (var player in SteamFinal.ConnectedPlayers)
+                if (BingoData.BingoMode && SteamFinal.ConnectedPlayers.Count > 0 &&
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                 {
-                    InnerWorkings.SendMessage("e", player);
+                    foreach (var player in SteamFinal.ConnectedPlayers)
+                    {
+                        InnerWorkings.SendMessage("e", player);
+                    }
                 }
+
+                BingoData.BingoDen = "random";
+                BingoData.BingoMode = false;
+                BingoData.MultiplayerGame = false;
+                SteamFinal.ConnectedPlayers.Clear();
+                SteamFinal.ReceivedPlayerUpKeep.Clear();
+                SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
+                SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
+                SteamFinal.ReceivedHostUpKeep = false;
+                SteamFinal.TryToReconnect = false;
             }
         }
 
@@ -469,7 +483,7 @@ namespace BingoMode
             orig.Invoke(self);
         }
 
-        public static void ProcessManager_PostSwitchMainProcess(ILContext il)
+        public static void ProcessManager_PostSwitchMainProcessIL(ILContext il)
         {
             ILCursor c = new(il);
 
@@ -493,7 +507,7 @@ namespace BingoMode
                     }
                 });
             }
-            else Plugin.logger.LogError(nameof(ProcessManager_PostSwitchMainProcess) + " Threw :(( " + il);
+            else Plugin.logger.LogError(nameof(ProcessManager_PostSwitchMainProcessIL) + " Threw :(( " + il);
         }
 
         public static void WinState_CycleCompleted(ILContext il)
@@ -580,6 +594,13 @@ namespace BingoMode
             BingoData.globalMenu = self;
             BingoData.MultiplayerGame = false;
             SteamTest.team = 0;
+            BingoData.BingoDen = "random";
+            SteamFinal.ConnectedPlayers.Clear();
+            SteamFinal.ReceivedPlayerUpKeep.Clear();
+            SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
+            SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
+            SteamFinal.ReceivedHostUpKeep = false;
+            SteamFinal.TryToReconnect = false;
         }
 
         public static void ExpeditionMenu_InitMenuPages(On.Menu.ExpeditionMenu.orig_InitMenuPages orig, ExpeditionMenu self)
@@ -690,7 +711,9 @@ namespace BingoMode
 
         public static void LoadBingoNoStart()
         {
+            Plugin.logger.LogFatal("tryinj to load");
             if (BingoData.BingoSaves == null || !BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) return;
+            Plugin.logger.LogFatal("loajing " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
             int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
             int chIndex = 0;

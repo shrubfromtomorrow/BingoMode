@@ -3,6 +3,7 @@ using BingoMode.Challenges;
 using Expedition;
 using Menu;
 using RWCustom;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -82,6 +83,10 @@ namespace BingoMode
                 }
                 page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                 page.subObjects.Add(page.grid);
+                if (SteamTest.CurrentLobby != null && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID != SteamTest.selfIdentity.GetSteamID64())
+                {
+                    page.grid.Switch(true);
+                }
             }
         }
 
@@ -267,7 +272,8 @@ namespace BingoMode
         public void FromString(string text)
         {
             Plugin.logger.LogMessage("Bingo board from string:\n" + text);
-            ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
+            if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
+            Plugin.logger.LogMessage("test tested yes");
             string[] challenges = Regex.Split(text, "bChG");
             size = Mathf.FloorToInt(Mathf.Sqrt(challenges.Length));
             int next = 0;

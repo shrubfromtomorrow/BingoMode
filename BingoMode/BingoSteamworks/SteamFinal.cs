@@ -13,11 +13,13 @@ namespace BingoMode.BingoSteamworks
     {
         public const int PlayerUpkeepTime = 2600;
         public const int MaxHostUpKeepTime = 5200;
+        public const int TryToReconnectTime = 100;
 
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
         public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];
         public static int SendUpKeepCounter = PlayerUpkeepTime;
         public static int HostUpkeep = MaxHostUpKeepTime;
+        public static int ReconnectTimer = TryToReconnectTime;
         public static bool ReceivedHostUpKeep;
         public static bool TryToReconnect;
 
@@ -29,12 +31,12 @@ namespace BingoMode.BingoSteamworks
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                 {
-                    HostUpkeep--;
-                    if (HostUpkeep <= 0)
+                    if (TryToReconnect)
                     {
-                        if (ReceivedHostUpKeep)
+                        ReconnectTimer--;
+                        if (ReconnectTimer <= 0)
                         {
-                            if (TryToReconnect)
+                            if (ReceivedHostUpKeep)
                             {
                                 Plugin.logger.LogMessage("Reconnected to host!");
                                 TryToReconnect = false;
@@ -51,22 +53,30 @@ namespace BingoMode.BingoSteamworks
                             }
                             else
                             {
-                                Plugin.logger.LogMessage("Received host upkeep in time :))");
-                                HostUpkeep = MaxHostUpKeepTime;
-                                ReceivedHostUpKeep = false;
-                            }
-                        }
-                        else if (!Custom.rainWorld.processManager.IsRunningAnyDialog)
-                        {
-                            if (TryToReconnect)
-                            {
                                 Plugin.logger.LogMessage("Trying to reconnect to host!");
                                 InnerWorkings.SendMessage("H" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
-                                HostUpkeep = MaxHostUpKeepTime / 2;
+                                ReconnectTimer = TryToReconnectTime;
                             }
-                            Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
-                            // Didnt receve host upkeep, so host is probably disconnected
-                            Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
+                        }
+                    }
+                    else
+                    {
+                        HostUpkeep--;
+                        if (HostUpkeep <= 0)
+                        {
+                            if (ReceivedHostUpKeep)
+                            {
+                                Plugin.logger.LogMessage("Received host upkeep in time :))");
+                                ReceivedHostUpKeep = false;
+                            }
+                            else
+                            {
+                                Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
+                                // Didnt receve host upkeep, so host is probably disconnected
+                                if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
+                                rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Cannot reconnect to host."));
+                            }
+                            HostUpkeep = MaxHostUpKeepTime;
                         }
                     }
                 }
@@ -200,6 +210,7 @@ namespace BingoMode.BingoSteamworks
             {
                 SteamNetworkingIdentity playerIdentity = new();
                 playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
+                players.Add(playerIdentity);
             }
             return players;
         }

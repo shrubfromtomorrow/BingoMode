@@ -162,6 +162,7 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());
+            Plugin.logger.LogWarning("SETTINGS TEAM TO " + team.ToString() + " AS HOST");
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "burdenList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")).ToList()));
@@ -214,6 +215,7 @@ namespace BingoMode.BingoSteamworks
             //    LeaveLobby();
             //    return;
             //}
+            Plugin.logger.LogMessage("HOST TEAM IS " + SteamMatchmaking.GetLobbyMemberData(lobbyID, SteamMatchmaking.GetLobbyOwner(lobbyID), "playerTeam"));
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             Plugin.logger.LogMessage("Set team number to " + team);
             //if (!int.TryParse(SteamMatchmaking.GetLobbyData(CurrentLobby, "maxPlayers"), out int maxPayne))
@@ -243,6 +245,7 @@ namespace BingoMode.BingoSteamworks
             {
                 SteamNetworkingIdentity member = new SteamNetworkingIdentity();
                 member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(lobbyID, i));
+                if (!LobbyMembers.Contains(member) && member.GetSteamID64() != selfIdentity.GetSteamID64()) { LobbyMembers.Add(member); }
                 InnerWorkings.SendMessage($"Jello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
             }
 
@@ -390,13 +393,12 @@ namespace BingoMode.BingoSteamworks
                 string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
                 if (den != "")
                 {
-                    Plugin.logger.LogMessage("TRYING TO START GAME BECAUSE HOST STARTED");
+                    Plugin.logger.LogMessage("TRYING TO START GAME BECAUSE HOST STARTED - " + den);
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
                         Plugin.logger.LogMessage("ACTUALLY STARTING GAME BECAUSE HOST STARTED");
                         BingoData.BingoDen = den;
-                        page.startGame.buttonBehav.greyedOut = false;
-                        page.startGame.Singal(page.startGame, page.startGame.signalText);
+                        page.Singal(null, "STARTBINGO");
                     }
                     return;
                 }

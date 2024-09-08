@@ -25,7 +25,7 @@ namespace BingoMode
 
             float yTop = 578f;
 
-            closeButton = new SimpleButton(this, pages[0], message == "Trying to reconnect to the host." ? Translate("CANCEL") : Translate("CLOSE"), message == "Trying to reconnect to the host." ? "STOPRECONNECT" : message == "The host quit the game." ? "QUITGAEM" : "CLOSE", new Vector2(683f - num / 2f, yTop - 305f), new Vector2(num, 35f));
+            closeButton = new SimpleButton(this, pages[0], message == "Trying to reconnect to the host." ? Translate("CANCEL") : Translate("CLOSE"), message == "Trying to reconnect to the host." ? "STOPRECONNECT" : message == "Cannot reconnect to host." ? "QUITGAEM" : "CLOSE", new Vector2(683f - num / 2f, yTop - 305f), new Vector2(num, 35f));
             pages[0].subObjects.Add(closeButton);
             infoText = new FLabel(Custom.GetFont(), message)
             {
@@ -39,7 +39,7 @@ namespace BingoMode
             if (message == "Trying to reconnect to the host.")
             {
                 SteamFinal.TryToReconnect = true;
-                SteamFinal.HostUpkeep = 1;
+                SteamFinal.HostUpkeep = 0;
             }
         }
 
@@ -47,7 +47,7 @@ namespace BingoMode
         {
             base.Update();
 
-            if ((infoText.text == "Trying to reconnect to the host." || infoText.text == "The host quit the game.") && manager.currentMainLoop is RainWorldGame game)
+            if ((infoText.text == "Trying to reconnect to the host." || infoText.text == "Cannot reconnect to host.") && manager.currentMainLoop is RainWorldGame game)
             {
                 game.paused = true;
             }

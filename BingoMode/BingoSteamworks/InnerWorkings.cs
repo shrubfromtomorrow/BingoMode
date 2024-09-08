@@ -150,7 +150,7 @@ namespace BingoMode.BingoSteamworks
 
                 // End game ! !!! ! ! ! !!
                 case 'x':
-                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "The host quit the game."));
+                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "Cannot reconnect to host."));
                     break;
 
                 // Receive new bingo state
@@ -171,10 +171,11 @@ namespace BingoMode.BingoSteamworks
                 case 'C':
                     if (SteamFinal.TryToReconnect)
                     {
-                        if (data.Length == 2)
+                        if (data.Length == 2 && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64().ToString() == data[0])
                         {
                             Plugin.logger.LogMessage("Reconnected to host " + data[0] + "!");
                             SteamFinal.ReceivedHostUpKeep = true;
+                            SteamFinal.HostUpkeep = 0;
                             Plugin.logger.LogMessage($"Got new bingo board state!");
                             BingoHooks.GlobalBoard.InterpretBingoState(data[1]);
                         } 
@@ -188,6 +189,13 @@ namespace BingoMode.BingoSteamworks
                     if (data.Length == 2) g = data[0];
                     ulong playerID = ulong.Parse(g, System.Globalization.NumberStyles.Any);
                     if (SteamFinal.ReceivedPlayerUpKeep.ContainsKey(playerID)) SteamFinal.ReceivedPlayerUpKeep[playerID] = true;
+
+                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64().ToString() == data[0] &&
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
+                    {
+                        SteamFinal.ReceivedHostUpKeep = true;
+                    }
                     break;
 
                 // Host upkeep request
@@ -198,11 +206,22 @@ namespace BingoMode.BingoSteamworks
                         SteamNetworkingIdentity requesterIdentity = new SteamNetworkingIdentity();
                         requesterIdentity.SetSteamID64(requesterID);
                         SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState(), requesterIdentity);
-                        if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID) && SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList).Any(x => x.GetSteamID64() == requesterID))
+                        var playerwhitelist = SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
+                        Plugin.logger.LogMessage("The guy who contacted me: " + requesterID);
+                        foreach (var gruh in playerwhitelist)
+                        {
+                            Plugin.logger.LogMessage("Player white list: " + gruh.GetSteamID64());
+                        }
+                        foreach (var gruh in SteamFinal.ConnectedPlayers)
+                        {
+                            Plugin.logger.LogMessage("Connected player: " + gruh.GetSteamID64());
+                        }
+                        if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID) && playerwhitelist.Any(x => x.GetSteamID64() == requesterID))
                         {
                             Plugin.logger.LogMessage($"Adding player {requesterID} back to the game!");
                             SteamFinal.ConnectedPlayers.Add(requesterIdentity);
                         }
+                        SteamFinal.ReceivedPlayerUpKeep[requesterID] = true;
                     }
                     break;
 
