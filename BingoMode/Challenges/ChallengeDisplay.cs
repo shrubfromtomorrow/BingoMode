@@ -51,6 +51,7 @@ namespace BingoMode.Challenges
                     carryOver += horizontalDist;
                     if (resetCarry) carryOver = 0f;
                     words[i].display.SetPosition(positiones[i]);
+                    if (applyScale) words[i].display.scale = scale;
                     continue;
                 }
                 positiones[i] += new Vector2(carryOver, 0f);
@@ -82,6 +83,11 @@ namespace BingoMode.Challenges
             {
                 word.display.alpha = alpha;
             }
+        }
+
+        public static Phrase LockPhrase()
+        {
+            return new Phrase([new Icon("bingolock", 1f, new Color(0.01f, 0.01f, 0.01f))], []);
         }
     }
 

@@ -109,10 +109,15 @@ namespace BingoMode.Challenges
                     {
                         if (cc is Creature crib && crib.Template.type.value == crit.Value && origins.Contains(crib.abstractCreature.ID))
                         {
-                            Plugin.logger.LogMessage("WIN");
                             g = true;
+                            Plugin.logger.LogMessage("WIN");
                             break;
                         }
+                    }
+                    if (!g && player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value && origins.Contains(stomacreature.ID))
+                    {
+                        g = true;
+                        Plugin.logger.LogMessage("STOMACH WIN");
                     }
                     if (g) break;
                 }

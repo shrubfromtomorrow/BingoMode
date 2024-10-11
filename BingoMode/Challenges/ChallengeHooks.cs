@@ -452,17 +452,6 @@ namespace BingoMode.Challenges
         {
             if (BingoData.BingoMode)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave())
-                    {
-                        if (survived && ExpeditionData.challengeList[j].revealed)
-                        {
-                            ExpeditionData.challengeList[j].CompleteChallenge();
-                        }
-                        ExpeditionData.challengeList[j].revealed = false;
-                    }
-                }
                 ownerOfUAD.Clear();
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();

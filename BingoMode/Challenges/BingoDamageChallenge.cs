@@ -87,24 +87,9 @@ namespace BingoMode.Challenges
                 UpdateDescription();
                 if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
         }
-
-        //public override void Update()
-        //{
-        //    base.Update();
-        //    ss:
-        //    foreach (var kvp in BingoData.blacklist)
-        //    {
-        //        s:
-        //        foreach (var item in kvp.Value)
-        //        {
-        //            if (item == null) { kvp.Value.Remove(item); goto s; }
-        //        }
-        //
-        //        if (kvp.Value.Count == 0) { BingoData.blacklist.Remove(kvp.Key); goto ss; }
-        //    }
-        //}
 
         public override int Points()
         {

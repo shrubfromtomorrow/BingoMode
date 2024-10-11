@@ -31,6 +31,7 @@ namespace BingoMode
         public Vector2[] corners;
         public bool showBG;
         public List<TriangleMesh> visible;
+        public bool resetPhrase;
 
         public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
         {
@@ -125,7 +126,7 @@ namespace BingoMode
                 }
             }
 
-            (challenge as BingoChallenge).DescriptionUpdated += UpdateText;
+            (challenge as BingoChallenge).ValueChanged += UpdateText;
             (challenge as BingoChallenge).ChallengeCompleted += OnChallengeCompleted;
             (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
 
@@ -215,6 +216,34 @@ namespace BingoMode
         public override void GrafUpdate(float timeStacker)
         {
             base.GrafUpdate(timeStacker);
+            if (resetPhrase)
+            {
+                if (phrase != null)
+                {
+                    phrase.ClearAll();
+                    phrase = null;
+                }
+                phrase = (challenge as BingoChallenge).ConstructPhrase();
+                if (phrase != null)
+                {
+                    phrase.AddAll(Container);
+                    phrase.scale = size.x / 100f;
+                    phrase.Draw();
+                }
+                textLabel.text = phrase == null ? challenge.description.WrapText(false, size.x * 0.8f) : "";
+                infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
+                if ((challenge as BingoChallenge).TeamsCompleted.Any(x => x == true))
+                {
+                    infoLabel.text += "\nCompleted by: ";
+                    for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
+                    {
+                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
+                    }
+                    infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
+                }
+                resetPhrase = false;
+            }
+
             textLabel.label.color = InterpColor(timeStacker, labelColor);
             Color color = Color.Lerp(Menu.Menu.MenuRGB(Menu.Menu.MenuColors.Black), Menu.Menu.MenuRGB(Menu.Menu.MenuColors.White), Mathf.Lerp(buttonBehav.lastFlash, buttonBehav.flash, timeStacker));
             for (int i = 0; i < 9; i++)
@@ -289,7 +318,7 @@ namespace BingoMode
             {
                 g.RemoveFromContainer();
             }
-            (challenge as BingoChallenge).DescriptionUpdated -= UpdateText;
+            (challenge as BingoChallenge).ValueChanged -= UpdateText;
             (challenge as BingoChallenge).ChallengeCompleted -= OnChallengeCompleted;
             (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
         }
@@ -303,30 +332,7 @@ namespace BingoMode
 
         public void UpdateText()
         {
-            if (phrase != null)
-            {
-                phrase.ClearAll();
-                phrase = null;
-            }
-            phrase = (challenge as BingoChallenge).ConstructPhrase();
-            if (phrase != null)
-            {
-                phrase.AddAll(Container);
-                Plugin.logger.LogMessage(size.x);
-                phrase.scale = size.x / 100f;
-                phrase.Draw();
-            }
-            textLabel.text = phrase == null ? challenge.description.WrapText(false, size.x * 0.8f) : "";
-            infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
-            if ((challenge as BingoChallenge).TeamsCompleted.Any(x => x == true))
-            {
-                infoLabel.text += "\nCompleted by: ";
-                for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
-                {
-                    if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
-                }
-                infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
-            }
+            resetPhrase = true;
         }
     }
 }

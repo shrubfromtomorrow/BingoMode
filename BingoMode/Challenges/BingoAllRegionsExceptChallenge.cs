@@ -16,7 +16,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter all regions except " + region.Value);
+            this.description = ChallengeTools.IGT.Translate("Enter all regions except " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));
             base.UpdateDescription();
         }
 
@@ -75,6 +75,7 @@ namespace BingoMode.Challenges
                 {
                     CompleteChallenge();
                 }
+                else ChangeValue();
                 UpdateDescription();
                 if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
             }

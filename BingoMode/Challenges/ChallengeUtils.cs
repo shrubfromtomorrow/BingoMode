@@ -55,7 +55,7 @@ namespace BingoMode.Challenges
                 case "tolls": return BombableOutposts;
                 case "food": return FoodTypes;
                 case "weapons": return Weapons;
-                case "theft": return StealableStolable;
+                case "theft": return [.. StealableStolable, "DataPearl"];
                 case "ban": return Bannable;
                 case "friend": return Befriendable;
                 case "pearls": return CollectablePearls;

@@ -23,6 +23,13 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)),
+                new Icon("deathpiticon", 1f, UnityEngine.Color.white),
+                new Verse("SB_D06")], [2]);
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoDepthsChallenge;

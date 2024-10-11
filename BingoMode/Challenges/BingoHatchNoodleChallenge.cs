@@ -63,6 +63,7 @@ namespace BingoMode.Challenges
                 UpdateDescription();
                 if (!RequireSave() && !atOnce.Value) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
         }
 

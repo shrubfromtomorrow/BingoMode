@@ -15,7 +15,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Craft a <item>")
+            this.description = ChallengeTools.IGT.Translate($"Craft [{(completed ? "1" : "0")}/1] <item>")
                 .Replace("<item>", ChallengeTools.ItemName(new(craftee.Value)).TrimEnd('s'));
             base.UpdateDescription();
         }

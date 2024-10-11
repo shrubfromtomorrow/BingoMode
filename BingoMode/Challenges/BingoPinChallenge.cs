@@ -44,8 +44,8 @@ namespace BingoMode.Challenges
             List<string> regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
             regions.Remove("ss");
             float radom = Random.value;
-            if (radom < 0.33f) r = regions[Random.Range(0, regions.Count)];
-            else if (radom < 0.66f) r = "Any Region";
+            if (radom < 0.66f) r = regions[Random.Range(0, regions.Count)];
+            else r = "Any Region";
     
             return new BingoPinChallenge
             {
@@ -54,7 +54,26 @@ namespace BingoMode.Challenges
                 region = new(r, "Region", 2, listName: "regions"),
             };
         }
-    
+
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new Phrase([new Icon("pin_creature", 1f, Color.white)], []);
+            int n = 1;
+            if (crit.Value != "Any Creature")
+            {
+                phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
+                n++;
+            }
+            if (region.Value != "Any Region")
+            {
+                phrase.words.Add(new Verse(region.Value));
+                n++;
+            }
+            phrase.words.Add(new Counter(current, target.Value));
+            phrase.newLines = [n];
+            return phrase;
+        }
+
         public override void Update()
         {
             base.Update();
@@ -88,6 +107,7 @@ namespace BingoMode.Challenges
                     if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
                     if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
+                    if (current != target.Value) ChangeValue();
                     this.spearList.Remove(this.spearList[k]);
                     return;
                 }

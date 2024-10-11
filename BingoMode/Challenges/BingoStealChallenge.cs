@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.Challenges
 {
@@ -28,7 +29,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoStealChallenge || ((challenge as BingoStealChallenge).subject != subject && (challenge as BingoStealChallenge).toll != toll);
+            return challenge is not BingoStealChallenge c || (c.subject.Value != subject.Value || c.toll.Value != toll.Value);
         }
 
         public override string ChallengeName()
@@ -53,6 +54,15 @@ namespace BingoMode.Challenges
                 subject = new(itme, "Item", 1, listName: "theft"),
                 amount = new(UnityEngine.Random.Range(1, itme == "ScavengerBomb" ? 3 : 5), "Amount", 2)
             };
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase([
+                new Icon("steal_item", 1f, Color.white),
+                new Icon(ChallengeUtils.ItemOrCreatureIconName(subject.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(subject.Value)),
+                new Icon(toll.Value ? "scavtoll" : "Kill_Scavenger", toll.Value ? 0.8f : 1f, toll.Value ? Color.white : ChallengeUtils.ItemOrCreatureIconColor("Scavenger")),
+                new Counter(current, amount.Value)], [3]);
         }
 
         public override int Points()
@@ -87,6 +97,7 @@ namespace BingoMode.Challenges
                 {
                     CompleteChallenge();
                 }
+                else ChangeValue();
                 checkedIDs.Add(item.ID);
             }
         }

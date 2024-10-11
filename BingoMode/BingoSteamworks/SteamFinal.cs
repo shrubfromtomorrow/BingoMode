@@ -25,62 +25,61 @@ namespace BingoMode.BingoSteamworks
 
         public static void ReceiveMessagesUpdate(RainWorld rw)
         {
-            if (BingoData.BingoMode)
+            if (!BingoData.BingoMode || !BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) || BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default) goto gabagoogye;
+
+            if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
             {
-                if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
+                if (TryToReconnect)
                 {
-                    if (TryToReconnect)
+                    ReconnectTimer--;
+                    if (ReconnectTimer <= 0)
                     {
-                        ReconnectTimer--;
-                        if (ReconnectTimer <= 0)
+                        if (ReceivedHostUpKeep)
                         {
-                            if (ReceivedHostUpKeep)
+                            Plugin.logger.LogMessage("Reconnected to host!");
+                            TryToReconnect = false;
+                            HostUpkeep = MaxHostUpKeepTime;
+                            ReceivedHostUpKeep = false;
+                            if (rw.processManager.currentMainLoop is RainWorldGame game)
                             {
-                                Plugin.logger.LogMessage("Reconnected to host!");
-                                TryToReconnect = false;
-                                HostUpkeep = MaxHostUpKeepTime;
-                                ReceivedHostUpKeep = false;
-                                if (rw.processManager.currentMainLoop is RainWorldGame game)
-                                {
-                                    game.paused = false;
-                                }
-                                if (rw.processManager.IsRunningAnyDialog)
-                                {
-                                    rw.processManager.StopSideProcess(rw.processManager.dialog);
-                                }
+                                game.paused = false;
                             }
-                            else
+                            if (rw.processManager.IsRunningAnyDialog)
                             {
-                                Plugin.logger.LogMessage("Trying to reconnect to host!");
-                                InnerWorkings.SendMessage("H" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
-                                ReconnectTimer = TryToReconnectTime;
+                                rw.processManager.StopSideProcess(rw.processManager.dialog);
                             }
                         }
-                    }
-                    else
-                    {
-                        HostUpkeep--;
-                        if (HostUpkeep <= 0)
+                        else
                         {
-                            if (ReceivedHostUpKeep)
-                            {
-                                Plugin.logger.LogMessage("Received host upkeep in time :))");
-                                ReceivedHostUpKeep = false;
-                            }
-                            else
-                            {
-                                Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
-                                // Didnt receve host upkeep, so host is probably disconnected
-                                if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
-                                rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Cannot reconnect to host."));
-                            }
-                            HostUpkeep = MaxHostUpKeepTime;
+                            Plugin.logger.LogMessage("Trying to reconnect to host!");
+                            InnerWorkings.SendMessage("H" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
+                            ReconnectTimer = TryToReconnectTime;
                         }
                     }
                 }
-
+                else
+                {
+                    HostUpkeep--;
+                    if (HostUpkeep <= 0)
+                    {
+                        if (ReceivedHostUpKeep)
+                        {
+                            Plugin.logger.LogMessage("Received host upkeep in time :))");
+                            ReceivedHostUpKeep = false;
+                        }
+                        else
+                        {
+                            Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
+                            // Didnt receve host upkeep, so host is probably disconnected
+                            if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
+                            rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Cannot reconnect to host."));
+                        }
+                        HostUpkeep = MaxHostUpKeepTime;
+                    }
+                }
+            }
+            else
+            {
                 SendUpKeepCounter--;
                 if (SendUpKeepCounter == PlayerUpkeepTime / 2) // Halfway check to make sure
                 {
@@ -134,7 +133,7 @@ namespace BingoMode.BingoSteamworks
                         foreach (var player in ConnectedPlayers) InnerWorkings.SendMessage("L", player);
                     }
 
-                    gobabk:
+                gobabk:
                     if (ToRemove.Count > 0)
                     {
                         foreach (var r in ToRemove)
@@ -159,6 +158,7 @@ namespace BingoMode.BingoSteamworks
                 }
             }
 
+        gabagoogye:
             // How the fuck does this work
             IntPtr[] messges = new IntPtr[16];
             int messages = SteamNetworkingMessages.ReceiveMessagesOnChannel(0, messges, messges.Length);

@@ -16,6 +16,7 @@ namespace BingoMode
 {
     using BingoSteamworks;
     using Challenges;
+    using RWCustom;
 
     public class BingoHooks
     {
@@ -268,19 +269,29 @@ namespace BingoMode
         private static void ShelterDoor_UpdatePathfindingCreatures(On.ShelterDoor.orig_UpdatePathfindingCreatures orig, ShelterDoor self)
         {
             orig.Invoke(self);
-
             if (!BingoData.BingoMode) return;
-            Plugin.logger.LogMessage("0");
-            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default)
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                Plugin.logger.LogMessage("1");
-                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default)
                 {
-                    Plugin.logger.LogMessage("2");
                     if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
                         (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
-                        Plugin.logger.LogMessage("3");
+                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        {
+                            if (challenge is BingoChallenge b && b.ReverseChallenge())
+                            {
+                                b.OnChallengeCompleted(SteamTest.team);
+                            }
+                        }
+                    }
+                    return;
+                }
+                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+                {
+                    if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
+                        (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
+                    {
                         Plugin.logger.LogMessage("No save data found, means its the first cycle!! Or the host starved the first cycle for some reason! Dont do that.");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
@@ -768,7 +779,7 @@ namespace BingoMode
                 newBingoButton.TryGetValue(self, out var bb);
                 self.subObjects.Add(bb);
                 self.abandonButton.Show();
-                self.abandonButton.PosX -= 200f;
+                self.abandonButton.PosX = bb.pos.x - 55f;
                 return;
             }
         invok:

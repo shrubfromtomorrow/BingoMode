@@ -66,6 +66,7 @@ namespace BingoMode.Challenges
                 {
                     CompleteChallenge();
                 }
+                else ChangeValue();
             }
         }
 

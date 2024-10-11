@@ -66,10 +66,9 @@ namespace BingoMode.Challenges
             {
                 if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null)
                 {
-                    /*if (player.grasps != null && player.grasps.Any(x => x != null && x.grabbed is Creature c && c.Template.type.value == crit.Value)) g = true;
-                    else */if (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value) g = true;
-                    else if (player.room.abstractRoom.creatures.Any(x => x.creatureTemplate.type.value == crit.Value)) g = true;
-                    break;
+                    g = (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value) ||
+                        player.room.abstractRoom.creatures.Any(x => x.creatureTemplate.type.value == crit.Value);
+                    if (g) break;
                 }
             }
 
@@ -81,6 +80,7 @@ namespace BingoMode.Challenges
                 if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
 
                 if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
         }
 

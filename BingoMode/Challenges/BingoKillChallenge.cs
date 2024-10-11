@@ -338,6 +338,7 @@ namespace BingoMode.Challenges
                 {
                     this.CompleteChallenge();
                 }
+                else ChangeValue();
             }
         }
 

@@ -74,8 +74,7 @@ namespace BingoMode.Challenges
 
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
-            Plugin.logger.LogMessage("creaturekil score " + this);
-            if (this.completed || revealed || TeamsCompleted[SteamTest.team] || hidden || this.game == null || crit == null)
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || game == null || crit == null)
             {
                 return;
             }
@@ -83,23 +82,17 @@ namespace BingoMode.Challenges
             if (type != null && ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type) != null)
             {
                 int points = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type).points;
-                this.score += points;
-                ExpLog.Log(string.Concat(new string[]
+                score += points;
+                Plugin.logger.LogFatal(points);
+                if (points == 0) return;
+                UpdateDescription();
+                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
+                if (score >= target.Value)
                 {
-                    "Player ",
-                    (playerNumber + 1).ToString(),
-                    " killed ",
-                    type.value,
-                    " | +",
-                    points.ToString()
-                }));
-            }
-            this.UpdateDescription();
-            if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
-            if (this.score >= this.target.Value)
-            {
-                this.score = this.target.Value;
-                this.CompleteChallenge();
+                    score = target.Value;
+                    CompleteChallenge();
+                }
+                else ChangeValue();
             }
         }
 

@@ -83,7 +83,7 @@ namespace BingoMode
                 }
                 page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                 page.subObjects.Add(page.grid);
-                if (SteamTest.CurrentLobby != null && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID != SteamTest.selfIdentity.GetSteamID64())
+                if (SteamTest.CurrentLobby != default && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby).m_SteamID != SteamTest.selfIdentity.GetSteamID64())
                 {
                     page.grid.Switch(true);
                 }

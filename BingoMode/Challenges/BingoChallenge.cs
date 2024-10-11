@@ -18,20 +18,14 @@ namespace BingoMode.Challenges
         public bool[] TeamsCompleted = new bool[9];
         public ulong completeCredit = 0;
         public virtual Phrase ConstructPhrase() => null;
-        public event Action DescriptionUpdated;
+        public event Action ValueChanged;
         public event Action<int> ChallengeCompleted;
         public event Action<int> ChallengeFailed;
-        public event Action ChallengeAlmostComplete;
+        public event Action<int> ChallengeAlmostComplete;
         public event Action ChallengeLockedOut;
 
         public virtual bool ReverseChallenge() => false;
         public virtual bool RequireSave() => true;
-
-        public override void UpdateDescription()
-        {
-            base.UpdateDescription();
-            DescriptionUpdated?.Invoke();
-        }
 
         public string TeamsToString()
         {
@@ -82,7 +76,7 @@ namespace BingoMode.Challenges
                 {
                     revealed = true;
                     Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
-                    ChallengeAlmostComplete?.Invoke();
+                    ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
@@ -108,7 +102,7 @@ namespace BingoMode.Challenges
                 {
                     revealed = true;
                     Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
-                    ChallengeAlmostComplete?.Invoke();
+                    ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
@@ -130,7 +124,7 @@ namespace BingoMode.Challenges
                 {
                     revealed = true;
                     Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
-                    ChallengeAlmostComplete?.Invoke();
+                    ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
@@ -233,6 +227,11 @@ namespace BingoMode.Challenges
                     return;
                 }
             }
+        }
+
+        public void ChangeValue()
+        {
+            ValueChanged?.Invoke();
         }
     }
 }

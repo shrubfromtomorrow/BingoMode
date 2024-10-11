@@ -22,12 +22,13 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
+            region = pearl.Value.Substring(0, 2);
             this.description = specific.Value ? ChallengeTools.IGT.Translate("Collect the <pearl> pearl from <region>")
                 .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer)))
                 .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl.Value)))
                 : ChallengeTools.IGT.Translate("Collect [<current>/<amount>] colored pearls")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
+                .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
@@ -35,7 +36,7 @@ namespace BingoMode.Challenges
         {
             if (specific.Value)
             {
-                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(TeamsCompleted[SteamTest.team] ? 1 : 0, 1)], [1]);
+                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(current, 1)], [1]);
             }
             return new Phrase([new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(current, amount.Value)], [1]);
         }
@@ -52,10 +53,13 @@ namespace BingoMode.Challenges
 
         public void PickedUp(PearlType type)
         {
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
+                if (type.value != pearl.Value) return;
+                current = 1;
                 UpdateDescription();
-                if (type.value == pearl.Value) CompleteChallenge();
+                CompleteChallenge();
             }
             else
             {
@@ -64,6 +68,7 @@ namespace BingoMode.Challenges
                 UpdateDescription(); 
                 if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
         }
 
@@ -83,6 +88,7 @@ namespace BingoMode.Challenges
                         if (game.Players[i].realizedCreature.grasps[g] != null && game.Players[i].realizedCreature.grasps[g].grabbed is DataPearl p && ((!specific.Value && DataPearl.PearlIsNotMisc(p.AbstractPearl.dataPearlType) && !collected.Contains(p.AbstractPearl.dataPearlType.value)) || specific.Value))
                         {
                             PickedUp(p.AbstractPearl.dataPearlType);
+                            return;
                         }
                     }
                 }
@@ -92,16 +98,12 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool specifi = UnityEngine.Random.value < 0.5f;
-            string p = "nopearl";
+            string p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
             BingoCollectPearlChallenge chal = new()
             {
                 specific = new SettingBox<bool>(specifi, "Specific Pearl", 0),
                 collected = []
             };
-            if (specifi)
-            {
-                p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
-            }
             chal.pearl = new(p, "Pearl", 1, listName: "pearls");
             chal.region = p.Substring(0, 2);
             chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
@@ -139,7 +141,7 @@ namespace BingoMode.Challenges
                 "~",
                 specific.ToString(),
                 "><",
-                specific.Value ? pearl.ToString() : "nopearl",
+                pearl.ToString(),
                 "><",
                 current.ToString(),
                 "><",
@@ -163,7 +165,7 @@ namespace BingoMode.Challenges
             {
                 string[] array = Regex.Split(args, "><");
                 specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                pearl = specific.Value ? SettingBoxFromString(array[1]) as SettingBox<string> : null;
+                pearl = SettingBoxFromString(array[1]) as SettingBox<string>;
                 region = pearl == null ? "noregion" : pearl.Value.Substring(0, 2);
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[3]) as SettingBox<int>;
