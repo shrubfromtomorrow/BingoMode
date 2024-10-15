@@ -2,11 +2,10 @@
 using BepInEx.Logging;
 using System.Security;
 using System.Security.Permissions;
-using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Reflection;
-using Mono.Cecil.Cil;
+using MonoMod.Cil;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -30,20 +29,28 @@ namespace BingoMode
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
-            On.RainWorld.Update += RainWorld_Update;
+            IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
+        }
+
+        private void MainLoopProcess_RawUpdate(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchCallOrCallvirt<MainLoopProcess>("Update")
+                ))
+            {
+                c.EmitDelegate(() =>
+                {
+                    SteamFinal.ReceiveMessagesUpdate();
+                });
+            }
+            else logger.LogError("MainLoopProcess_RawUpdate IL fail " + il);
         }
 
         public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)
         {
             return "[" + DateTime.Now.Hour + ":" + (DateTime.Now.Minute < 10 ? "0" : "") + DateTime.Now.Minute + ":" + (DateTime.Now.Second < 10 ? "0" : "") + DateTime.Now.Second + "]" + orig.Invoke(self);
-        }
-
-        // Receiving data from yuh (networking)
-        public void RainWorld_Update(On.RainWorld.orig_Update orig, RainWorld self)
-        {
-            orig.Invoke(self);
-
-            SteamFinal.ReceiveMessagesUpdate(self);
         }
 
         public void OnDisable()

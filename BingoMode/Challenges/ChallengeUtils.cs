@@ -86,7 +86,7 @@ namespace BingoMode.Challenges
                         strings.Add(list[i].Item2);
                     }
                     return strings.ToArray();
-                case "subregions": return ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint ? [.. SaintSubregions] : [.. AllSubregions];
+                case "subregions": return ["Any Subregion", ..(ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint ? SaintSubregions : AllSubregions)];
             }
             return ["Whoops something went wrong"];
         }

@@ -186,27 +186,27 @@ namespace BingoMode.Challenges
             else Plugin.logger.LogError("Uh oh, Challenge_CompleteChallengeIL il fucked up " + il);
         }
 
-        public static void Challenge_CompleteChallenge(On.Expedition.Challenge.orig_CompleteChallenge orig, Challenge self)
-        {
-            if (self.completed) return;
-            if (self is BingoChallenge c)
-            {
-                if (self.hidden) return; // Hidden means locked out here in bingo
-                if (c.RequireSave() && !self.revealed) // I forgot what this does
-                {
-                    self.revealed = true;
-                    return;
-                }
-
-                if (SteamTest.LobbyMembers.Count > 0)
-                {
-                    SteamTest.BroadcastCompletedChallenge(self);
-                }
-            }
-
-            orig.Invoke(self);
-            if (BingoData.BingoMode) Expedition.Expedition.coreFile.Save(false);
-        }
+        //public static void Challenge_CompleteChallenge(On.Expedition.Challenge.orig_CompleteChallenge orig, Challenge self)
+        //{
+        //    if (self.completed) return;
+        //    if (self is BingoChallenge c)
+        //    {
+        //        if (self.hidden) return; // Hidden means locked out here in bingo
+        //        if (c.RequireSave() && !self.revealed) // I forgot what this does
+        //        {
+        //            self.revealed = true;
+        //            return;
+        //        }
+        //
+        //        if (SteamTest.LobbyMembers.Count > 0)
+        //        {
+        //            SteamTest.BroadcastCompletedChallenge(self);
+        //        }
+        //    }
+        //
+        //    orig.Invoke(self);
+        //    if (BingoData.BingoMode) Expedition.Expedition.coreFile.Save(false);
+        //}
 
         public static void WinState_CycleCompleted(ILContext il)
         {
@@ -448,10 +448,22 @@ namespace BingoMode.Challenges
             }
         }
 
+        public static List<Challenge> revealInMemory = [];
         private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
             if (BingoData.BingoMode)
             {
+                revealInMemory = [];
+
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (survived && ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
+                    {
+                        revealInMemory.Add(g);
+                        g.revealed = false;
+                    }
+                }
+
                 ownerOfUAD.Clear();
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();
@@ -893,7 +905,6 @@ namespace BingoMode.Challenges
                     if (ch is BingoUnlockChallenge b && !b.completed && !b.TeamsCompleted[SteamTest.team] && !b.revealed && !b.hidden && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
                     {
                         ch.CompleteChallenge();
-                        if (BingoData.challengeTokens.Contains(d.tokenString)) BingoData.challengeTokens.Remove(d.tokenString + (d.isRed ? "-safari" : ""));
                     }
                 }
 
@@ -983,11 +994,6 @@ namespace BingoMode.Challenges
                 if (ExpeditionData.challengeList[j] is BingoEatChallenge c)
                 {
                     c.FoodEated(edible);
-                    Plugin.logger.LogMessage("Eated fo " + edible);
-                }
-                else if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood && edible is PhysicalObject p)
-                {
-                    g.Used(p.abstractPhysicalObject.type);
                 }
             }
         }
@@ -998,9 +1004,9 @@ namespace BingoMode.Challenges
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood && edible is PhysicalObject p)
+                if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood)
                 {
-                    g.Used(p.abstractPhysicalObject.type);
+                    g.Eated(edible);
                 }
             }
         }

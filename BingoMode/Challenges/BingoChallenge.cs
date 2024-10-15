@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Steamworks;
 using BingoMode.BingoSteamworks;
 using System.Linq;
+using RWCustom;
 
 namespace BingoMode.Challenges
 {
@@ -43,30 +44,6 @@ namespace BingoMode.Challenges
             }
         }
 
-        public void FailChallenge(int team)
-        {
-            if (team == SteamTest.team)
-            {
-                Failed = true;
-                completed = false;
-            }
-            TeamsCompleted[team] = false;
-            if (SteamTest.LobbyMembers.Count > 0 && completeCredit == default)
-            {
-                SteamTest.BroadcastFailedChallenge(this);
-            }
-            Expedition.Expedition.coreFile.Save(false);
-            ChallengeFailed?.Invoke(team);
-        }
-
-        public void OnChallengeLockedOut()
-        {
-            if (completed) return;
-            hidden = true;
-            ChallengeLockedOut?.Invoke();
-            CheckWinLose();
-        }
-
         public override void CompleteChallenge()
         {
             // Singleplayer
@@ -87,7 +64,7 @@ namespace BingoMode.Challenges
                 //    ExpeditionData.earnedPassages++;
                 //}
 
-                CheckWinLose();
+                //CheckWinLose();
                 return;
             }
 
@@ -114,7 +91,7 @@ namespace BingoMode.Challenges
                 //}
 
                 SteamFinal.BroadcastCurrentBoardState();
-                CheckWinLose();
+                //CheckWinLose();
 
                 return;
             }
@@ -179,16 +156,56 @@ namespace BingoMode.Challenges
             if (TeamsCompleted[SteamTest.team]) completed = true;
             UpdateDescription();
             ChallengeCompleted?.Invoke(team);
+            if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
             Expedition.Expedition.coreFile.Save(false);
-            CheckWinLose();
+            //CheckWinLose();
         }
 
-        public void OnChallengeFailed(int team) // failing challenges to do
+        public void FailChallenge(int team)
         {
+            if (SteamFinal.GetHost().GetSteamID64() == default)
+            {
+                OnChallengeFailed(SteamTest.team);
+                return;
+            }
+
+            // If is host
+            if (SteamFinal.GetHost().GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+            {
+                OnChallengeFailed(SteamTest.team);
+
+                SteamFinal.BroadcastCurrentBoardState();
+                return;
+            }
+            else // If regular player
+            {
+                SteamFinal.ChallengeStateChangeToHost(this, true);
+                return;
+            }
+        }
+
+        public void OnChallengeFailed(int team)
+        {
+            Plugin.logger.LogMessage($"Failing challenge for {completeCredit}: {this}");
+            if (team == SteamTest.team)
+            {
+                Failed = true;
+                completed = false;
+            }
+            TeamsCompleted[team] = false;
+            Expedition.Expedition.coreFile.Save(false);
             ChallengeFailed?.Invoke(team);
         }
 
-        public void CheckWinLose()
+        public void OnChallengeLockedOut()
+        {
+            if (completed) return;
+            hidden = true;
+            ChallengeLockedOut?.Invoke();
+            //CheckWinLose();
+        }
+
+        public static void CheckWinLose()
         {
             int teamsLost = 0;
             for (int t = 0; t < 8; t++)
@@ -210,9 +227,8 @@ namespace BingoMode.Challenges
             }
             if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
             {
-                game.manager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
-                game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
+                Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                 return;
             }
 
@@ -221,9 +237,8 @@ namespace BingoMode.Challenges
                 if (BingoHooks.GlobalBoard.CheckWin(t, false))
                 {
                     Plugin.logger.LogMessage($"Team {t} won!");
-                    game.manager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
-                    game.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                    if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+                    Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
+                    Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                     return;
                 }
             }

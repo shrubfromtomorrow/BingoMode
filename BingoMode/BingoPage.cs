@@ -378,6 +378,7 @@ namespace BingoMode
                 Plugin.logger.LogMessage("2");
 
                 BingoData.InitializeBingo();
+                BingoData.RedoTokens();
                 Plugin.logger.LogMessage("3");
 
                 List<string> bannedRegions = [];
@@ -420,7 +421,10 @@ namespace BingoMode
                 ExpeditionData.earnedPassages++;
                 Plugin.logger.LogMessage("9");
                 bool isHost = false;
-
+                SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
+                SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
+                SteamFinal.ReconnectTimer = SteamFinal.TryToReconnectTime;
+                SteamFinal.UpkeepCounter = SteamFinal.MaxUpkeepCounter;
                 if (BingoData.MultiplayerGame)
                 {
                     Plugin.logger.LogMessage("10");
@@ -478,7 +482,6 @@ namespace BingoMode
                         SteamMatchmaking.SetLobbyJoinable(SteamTest.CurrentLobby, false);
                     }
                 }
-
                 Plugin.logger.LogMessage("20");
 
                 // This will be decided by the host when sending the first bingo state
@@ -800,6 +803,7 @@ namespace BingoMode
                 };
                 Container.AddChild(lobbyDividers[i]);
             }
+            DrawPlayerInfo(menu.myTimeStacker);
         }
 
         public void CreateSearchPage()
@@ -996,20 +1000,20 @@ namespace BingoMode
 
         public void AddLobbies(List<CSteamID> lobbies)
         {
-            if (fromContinueGame)
-            {
-                foreach (var lobby in lobbies)
-                {
-                    ulong owner = SteamMatchmaking.GetLobbyOwner(lobby).m_SteamID;
-                    if (owner != SteamTest.selfIdentity.GetSteamID64() && owner == BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64())
-                    {
-                        var call = SteamMatchmaking.JoinLobby(lobby);
-                        SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
-                        return;
-                    }
-                }
-                return;
-            }
+            //if (fromContinueGame)
+            //{
+            //    foreach (var lobby in lobbies)
+            //    {
+            //        ulong owner = SteamMatchmaking.GetLobbyOwner(lobby).m_SteamID;
+            //        if (owner != SteamTest.selfIdentity.GetSteamID64() && owner == BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64())
+            //        {
+            //            var call = SteamMatchmaking.JoinLobby(lobby);
+            //            SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
+            //            return;
+            //        }
+            //    }
+            //    return;
+            //}
             foundLobbies = [];
 
             foreach (var lobby in lobbies)

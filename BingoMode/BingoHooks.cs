@@ -277,13 +277,15 @@ namespace BingoMode
                     if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
                         (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
+                        Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
-                            if (challenge is BingoChallenge b && b.ReverseChallenge())
+                            if (!challenge.completed && challenge is BingoChallenge b && !b.Failed && b.ReverseChallenge())
                             {
                                 b.OnChallengeCompleted(SteamTest.team);
                             }
                         }
+                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                     }
                     return;
                 }
@@ -292,10 +294,10 @@ namespace BingoMode
                     if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
                         (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
-                        Plugin.logger.LogMessage("No save data found, means its the first cycle!! Or the host starved the first cycle for some reason! Dont do that.");
+                        Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
-                            if (challenge is BingoChallenge b && b.ReverseChallenge())
+                            if (!challenge.completed && challenge is BingoChallenge b && !b.Failed && b.ReverseChallenge())
                             {
                                 foreach (int team in BingoData.TeamsInBingo)
                                 {
@@ -303,6 +305,7 @@ namespace BingoMode
                                 }
                             }
                         }
+                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                         SteamFinal.BroadcastCurrentBoardState();
                     }
                 }
@@ -658,6 +661,7 @@ namespace BingoMode
             {
                 BingoData.InitializeBingo();
                 LoadBingoNoStart();
+                BingoData.RedoTokens();
 
                 if (ModManager.CoopAvailable)
                 {

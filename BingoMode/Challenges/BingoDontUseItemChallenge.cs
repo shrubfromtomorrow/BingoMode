@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BingoMode.BingoSteamworks;
+using System.Linq;
 
 namespace BingoMode.Challenges
 {
@@ -13,10 +14,12 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> item;
         public bool isFood;
+        public bool isCreature;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>").Replace("<item>", ChallengeTools.ItemName(new(item.Value)));
+            this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>")
+                .Replace("<item>", isFood && isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureTemplate.Type(item.Value).Index]) : ChallengeTools.ItemName(new(item.Value)));
             base.UpdateDescription();
         }
 
@@ -39,15 +42,20 @@ namespace BingoMode.Challenges
         {
             bool edible = UnityEngine.Random.value < 0.5f;
             string type;
+            bool c = false;
             if (edible)
             {
-                type = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(0, ChallengeUtils.FoodTypes.Length - (ModManager.MSC ? 5 : 1))];
+                List<string> foob = [.. ChallengeUtils.FoodTypes];
+                if (!ModManager.MSC) foob.RemoveRange(6, 4);
+                type = foob[UnityEngine.Random.Range(0, foob.Count)];
+                c = ChallengeUtils.FoodTypes.IndexOf(type) > 9;
             } 
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
             BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge
             {
                 item = new(type, "Item type", 0, listName: "banitem"),
                 isFood = edible,
+                isCreature = c
             };
             return ch;
         }
@@ -58,6 +66,15 @@ namespace BingoMode.Challenges
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
             if (used.value == item.Value && !Failed && completed)
+            {
+                FailChallenge(SteamTest.team);
+            }
+        }
+
+        public void Eated(IPlayerEdible used)
+        {
+            if (Failed || !completed) return;
+            if (used is PhysicalObject p && (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == item.Value) : (p.abstractPhysicalObject.type.value == item.Value)))
             {
                 FailChallenge(SteamTest.team);
             }
@@ -108,6 +125,8 @@ namespace BingoMode.Challenges
                 TeamsToString(),
                 "><",
                 Failed ? "1" : "0",
+                "><",
+                isCreature ? "1" : "0",
             });
         }
 
@@ -123,6 +142,7 @@ namespace BingoMode.Challenges
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
                 Failed = array[6] == "1";
+                isCreature = array[7] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

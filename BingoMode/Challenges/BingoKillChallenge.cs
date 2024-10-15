@@ -187,13 +187,13 @@ namespace BingoMode.Challenges
             {
                 return rom.name == location;
             }
-            else*/ if (location == sub.Value)
+            else*/ if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
             {
-                return rom.subregionName == location || rom.altSubregionName == location;
+                return rom.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || rom.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();
             }
-            else if (location == region.Value)
+            else if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
             {
-                return rom.world.region.name == location;
+                return rom.world.region.name.ToLowerInvariant() == location.ToLowerInvariant();
             }
             else return true;
         }
@@ -344,9 +344,10 @@ namespace BingoMode.Challenges
 
         public bool CreatureHitByDesired(Creature c)
         {
+            if (weapon.Value == "Any Weapon") return true;
             if (BingoData.hitTimeline.TryGetValue(c.abstractCreature.ID, out var list))
             {
-                if (weapon.Value == "Any Weapon" || (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value))) return true;
+                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value)) return true;
             }
             return false;
         }

@@ -21,7 +21,8 @@ namespace BingoMode
         public BingoWinScreen(ProcessManager manager) : base(manager, BingoEnums.BingoWinScreen)
         {
             manager.musicPlayer?.MenuRequestsSong("RW_65 - Garden", 100f, 50f);
-            
+
+            if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
             pages = new List<Page>
             {
                 new Page(this, null, "Main", 0)

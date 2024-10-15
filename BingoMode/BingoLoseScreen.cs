@@ -22,6 +22,7 @@ namespace BingoMode
         {
             manager.musicPlayer?.MenuRequestsSong("RW_65 - Garden", 100f, 50f); // it should play https://www.youtube.com/watch?v=tC0rsn9zCSw
 
+            if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
             pages = new List<Page>
             {
                 new Page(this, null, "Main", 0)

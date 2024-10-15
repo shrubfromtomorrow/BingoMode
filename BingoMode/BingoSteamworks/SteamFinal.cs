@@ -13,20 +13,24 @@ namespace BingoMode.BingoSteamworks
     {
         public const int PlayerUpkeepTime = 2600;
         public const int MaxHostUpKeepTime = 5200;
-        public const int TryToReconnectTime = 100;
+        public const int TryToReconnectTime = 50;
+        public const int MaxUpkeepCounter = 100;
 
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
         public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];
         public static int SendUpKeepCounter = PlayerUpkeepTime;
         public static int HostUpkeep = MaxHostUpKeepTime;
         public static int ReconnectTimer = TryToReconnectTime;
+        public static int UpkeepCounter = MaxUpkeepCounter;
         public static bool ReceivedHostUpKeep;
         public static bool TryToReconnect;
 
-        public static void ReceiveMessagesUpdate(RainWorld rw)
+        public static void ReceiveMessagesUpdate()
         {
             if (!BingoData.BingoMode || !BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) || BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default) goto gabagoogye;
 
+            RainWorld rw = Custom.rainWorld;
+            if (rw == null) return;
             if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
             {
                 if (TryToReconnect)
@@ -81,28 +85,6 @@ namespace BingoMode.BingoSteamworks
             else
             {
                 SendUpKeepCounter--;
-                if (SendUpKeepCounter == PlayerUpkeepTime / 2) // Halfway check to make sure
-                {
-                    List<ulong> ToFalse = [];
-                    foreach (var kvp in ReceivedPlayerUpKeep)
-                    {
-                        if (!ReceivedPlayerUpKeep[kvp.Key])
-                        {
-                            Plugin.logger.LogMessage("Didnt receive upkeep yet, halfway check for " + kvp.Key);
-                            RequestPlayerUpKeep(kvp.Key);
-                            ToFalse.Add(kvp.Key);
-                        }
-                    }
-
-                    if (ToFalse.Count > 0)
-                    {
-                        foreach (var r in ToFalse)
-                        {
-                            Plugin.logger.LogMessage($"Settin {r} to false");
-                            ReceivedPlayerUpKeep[r] = false;
-                        }
-                    }
-                }
                 if (SendUpKeepCounter <= 0)
                 {
                     Plugin.logger.LogMessage($"hi");
@@ -155,6 +137,33 @@ namespace BingoMode.BingoSteamworks
                     }
 
                     BroadcastCurrentBoardState();
+                }
+                else
+                {
+                    UpkeepCounter--;
+                    if (UpkeepCounter <= 0)
+                    {
+                        //List<ulong> ToFalse = [];
+                        foreach (var kvp in ReceivedPlayerUpKeep)
+                        {
+                            if (!ReceivedPlayerUpKeep[kvp.Key])
+                            {
+                                Plugin.logger.LogMessage("Didnt receive upkeep yet, midway check for " + kvp.Key);
+                                RequestPlayerUpKeep(kvp.Key);
+                                //ToFalse.Add(kvp.Key);
+                            }
+                        }
+
+                        //if (ToFalse.Count > 0)
+                        //{
+                        //    foreach (var r in ToFalse)
+                        //    {
+                        //        Plugin.logger.LogMessage($"Settin {r} to false");
+                        //        ReceivedPlayerUpKeep[r] = false;
+                        //    }
+                        //}
+                        UpkeepCounter = MaxUpkeepCounter;
+                    }
                 }
             }
 
@@ -235,7 +244,7 @@ namespace BingoMode.BingoSteamworks
                 }
                 if (b) break;
             }
-            InnerWorkings.SendMessage($"#{x};{y};{SteamTest.team};{SteamTest.selfIdentity.GetSteamID64()}", GetHost());
+            InnerWorkings.SendMessage($"{(failed ? "^" : "#")}{x};{y};{SteamTest.team};{SteamTest.selfIdentity.GetSteamID64()}", GetHost());
         }
 
         public static void BroadcastCurrentBoardState()

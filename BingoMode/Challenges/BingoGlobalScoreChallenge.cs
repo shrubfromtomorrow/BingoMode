@@ -74,17 +74,21 @@ namespace BingoMode.Challenges
 
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
-            if (this.completed || revealed || TeamsCompleted[SteamTest.team] || hidden || this.game == null || crit == null)
+            Plugin.logger.LogInfo($"(2)Player {playerNumber} killed {crit.abstractCreature}");
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || game == null || crit == null)
             {
                 return;
             }
+            int lastPoints = score;
             CreatureTemplate.Type type = crit.abstractCreature.creatureTemplate.type;
             if (type != null && ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type) != null)
             {
                 int points = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type).points;
                 score += points;
-                Plugin.logger.LogFatal(points);
-                if (points == 0) return;
+                Plugin.logger.LogFatal("Points for kill: " + points);
+            }
+            if (score != lastPoints)
+            {
                 UpdateDescription();
                 if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (score >= target.Value)

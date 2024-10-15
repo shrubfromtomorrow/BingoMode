@@ -78,19 +78,22 @@ namespace BingoMode
             appliedChallenges = [];
             HookAll(ExpeditionData.challengeList, false);
             HookAll(ExpeditionData.challengeList, true);
+            heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
+            blacklist = [];
+            hitTimeline = [];
+        }
 
+        public static void RedoTokens()
+        {
             challengeTokens.Clear();
             foreach (Challenge challenge in ExpeditionData.challengeList)
             {
-                if (challenge is BingoUnlockChallenge c && !challengeTokens.Contains(c.unlock.Value))
+                if (challenge is BingoUnlockChallenge c && !c.TeamsCompleted[SteamTest.team] && !challengeTokens.Contains(c.unlock.Value))
                 {
                     challengeTokens.Add(c.unlock.Value);
                     Plugin.logger.LogMessage("Addunlock " + c.unlock.Value);
                 }
             }
-            heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
-            blacklist = [];
-            hitTimeline = [];
         }
 
         public static void FinishBingo()

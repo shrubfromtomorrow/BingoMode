@@ -55,8 +55,10 @@ namespace BingoMode.Challenges
             }
             else
             {
-                randomFood = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(0, 9 -
-                            (ModManager.MSC ? (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet ? 0 : 1) : 4))];
+                List<string> foob = [.. ChallengeUtils.FoodTypes];
+                if (!ModManager.MSC) foob.RemoveRange(6, 4);
+                else if (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) foob.Remove("GlowWeed");
+                randomFood = foob[UnityEngine.Random.Range(0, foob.Count)];
             }
 
             return new BingoEatChallenge()

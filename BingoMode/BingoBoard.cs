@@ -93,6 +93,7 @@ namespace BingoMode
         public bool CheckWin(int t, bool checkLose = false) // Checks whether a team won or cant win
         {
             bool won = false;
+            currentWinLine = [];
 
             // Vertical lines
             for (int i = 0; i < size; i++)
@@ -215,8 +216,10 @@ namespace BingoMode
         public void RecreateFromList()
         {
             Plugin.logger.LogMessage("Recreating from list " + (recreateList != null ? recreateList.Count : "SHITS NULL"));
-            if (recreateList != null && recreateList.Count == size * size)
+            Plugin.logger.LogMessage("Size of rec: " + size);
+            if (recreateList != null && Mathf.RoundToInt(Mathf.Sqrt(recreateList.Count)) == size)
             {
+                Plugin.logger.LogMessage("Went through");
                 int next = 0;
                 for (int i = 0; i < size; i++)
                 {
@@ -234,7 +237,7 @@ namespace BingoMode
                     }
                 }
                 Plugin.logger.LogMessage("Recreated list from thinj yipe");
-                Plugin.logger.LogMessage("Current recreated challenge list");
+                Plugin.logger.LogMessage("Current recreated challenge list:");
                 foreach (var gruh in ExpeditionData.challengeList)
                 {
                     Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
@@ -275,7 +278,7 @@ namespace BingoMode
             if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
             Plugin.logger.LogMessage("test tested yes");
             string[] challenges = Regex.Split(text, "bChG");
-            size = Mathf.FloorToInt(Mathf.Sqrt(challenges.Length));
+            size = Mathf.RoundToInt(Mathf.Sqrt(challenges.Length));
             int next = 0;
             foreach (var gu in challenges) Plugin.logger.LogWarning(gu);
             challengeGrid = new Challenge[size, size];
@@ -348,7 +351,13 @@ namespace BingoMode
             {
                 for (int j = 0; j < size; j++)
                 {
-                    string lastTeamsString = (challengeGrid[i, j] as BingoChallenge).TeamsToString();
+                    if (challengeGrid[i, j] == null)
+                    {
+                        Plugin.logger.LogWarning("is null");
+                        continue;
+                    }
+                    BingoChallenge ch = challengeGrid[i, j] as BingoChallenge;
+                    string lastTeamsString = ch.TeamsToString();
                     string currentTeamsString = challenges[next];
 
                     if (lastTeamsString != currentTeamsString)
@@ -359,16 +368,12 @@ namespace BingoMode
                             {
                                 if (currentTeamsString[k] == '1')
                                 {
-                                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) (challengeGrid[i, j] as BingoChallenge).OnChallengeLockedOut();
-                                    else (challengeGrid[i, j] as BingoChallenge).OnChallengeCompleted(k);
+                                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) ch.OnChallengeLockedOut();
+                                    else ch.OnChallengeCompleted(k);
                                 }
                                 else
                                 {
-                                    // Failed check
-
-                                    challengeGrid[i, j].completed = false;
-                                    (challengeGrid[i, j] as BingoChallenge).TeamsCompleted[SteamTest.team] = false;
-                                    //(challengeGrid[i, j] as BingoChallenge).OnChallengeFailed(k);
+                                    ch.OnChallengeFailed(k);
                                 }
                             }
                         }

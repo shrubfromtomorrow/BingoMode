@@ -268,6 +268,7 @@ namespace BingoMode
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
                 cc.isFood = l.IndexOf(cc.item.Value) < (l.Length - 6);
+                if (cc.isFood) cc.isCreature = ChallengeUtils.FoodTypes.IndexOf(cc.item.Value) > 9;
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
