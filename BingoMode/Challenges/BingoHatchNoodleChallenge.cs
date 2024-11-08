@@ -17,19 +17,19 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodleflies from eggs" + (atOnce.Value ? " in one cycle" : ""))
+            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " in one cycle" : ""))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
-        public override bool RequireSave() => false;
+       // public override bool RequireSave() => false;
 
         public override Phrase ConstructPhrase()
         {
             Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))], [atOnce.Value ? 3 : 2]);
             if (atOnce.Value) p.words.Add(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
-            p.words.Add(new Counter(current, amount.Value));
+            p.words.Add(new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value));
             return p;
         }
 
@@ -40,7 +40,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Noodlefly Hatching");
+            return ChallengeTools.IGT.Translate("Hatching noodlefly eggs");
         }
 
         public override Challenge Generate()
@@ -55,10 +55,8 @@ namespace BingoMode.Challenges
 
         public void Hatch()
         {
-            Plugin.logger.LogMessage("Trying to hatch this mf");
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
-                Plugin.logger.LogMessage("Hatching this mf");
                 current++;
                 UpdateDescription();
                 if (!RequireSave() && !atOnce.Value) Expedition.Expedition.coreFile.Save(false);
@@ -90,11 +88,12 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
+            if (atOnce.Value) current = 0;
             return string.Concat(new string[]
             {
                 "BingoHatchNoodleChallenge",
                 "~",
-                atOnce.Value && !completed ? "0" : current.ToString(),
+                current.ToString(),
                 "><",
                 amount.ToString(),
                 "><",
@@ -115,9 +114,9 @@ namespace BingoMode.Challenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 atOnce = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                current = (atOnce.Value && !completed) ? 0 : int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[3] == "1");
                 hidden = (array[4] == "1");
                 revealed = (array[5] == "1");
@@ -133,12 +132,12 @@ namespace BingoMode.Challenges
 
         public override void AddHooks()
         {
-            On.SmallNeedleWorm.PlaceInRoom += SmallNeedleWorm_PlaceInRoom;
+            On.ShelterDoor.Close += ShelterDoor_Close;
         }
 
         public override void RemoveHooks()
         {
-            On.SmallNeedleWorm.PlaceInRoom -= SmallNeedleWorm_PlaceInRoom;
+            On.ShelterDoor.Close -= ShelterDoor_Close;
         }
 
         public override List<object> Settings() => [atOnce, amount];

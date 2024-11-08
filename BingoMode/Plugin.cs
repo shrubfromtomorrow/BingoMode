@@ -29,23 +29,6 @@ namespace BingoMode
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
-            IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
-        }
-
-        private void MainLoopProcess_RawUpdate(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
-                x => x.MatchCallOrCallvirt<MainLoopProcess>("Update")
-                ))
-            {
-                c.EmitDelegate(() =>
-                {
-                    SteamFinal.ReceiveMessagesUpdate();
-                });
-            }
-            else logger.LogError("MainLoopProcess_RawUpdate IL fail " + il);
         }
 
         public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)
@@ -75,7 +58,16 @@ namespace BingoMode
                 BingoHooks.Apply();
                 ChallengeHooks.Apply();
                 ChallengeUtils.Apply();
+
+                // Timeline fix
+                On.MainLoopProcess.Update += MainLoopProcess_Update;
             }
+        }
+
+        private static void MainLoopProcess_Update(On.MainLoopProcess.orig_Update orig, MainLoopProcess self)
+        {
+            orig.Invoke(self);
+            SteamFinal.ReceiveMessagesUpdate();
         }
     }
 }

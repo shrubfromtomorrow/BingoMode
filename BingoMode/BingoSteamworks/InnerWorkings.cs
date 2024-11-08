@@ -12,6 +12,7 @@ namespace BingoMode.BingoSteamworks
     {
         public static void SendMessage(string data, SteamNetworkingIdentity receiver, bool reliable = true)
         {
+            if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID()) return;
             IntPtr ptr = Marshal.StringToHGlobalAuto(data);
             Plugin.logger.LogMessage("TEST: " + Marshal.PtrToStringAuto(ptr) + " " + (uint)(data.Length * sizeof(char)));
 

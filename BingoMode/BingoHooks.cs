@@ -194,13 +194,6 @@ namespace BingoMode
             else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 4 threw!!! " + il);
         }
 
-       //public static void ExpeditionData_ClearActiveChallengeList(On.Expedition.ExpeditionData.orig_ClearActiveChallengeList orig)
-       //{
-       //    orig.Invoke();
-       //
-       //    try { BingoData.HookAll(ExpeditionData.challengeList, false); } catch { }
-       //}
-
         public static void ChallengeOrganizer_SetupChallengeTypes(On.Expedition.ChallengeOrganizer.orig_SetupChallengeTypes orig)
         {
             BingoData.availableBingoChallenges ??= [];
@@ -264,6 +257,27 @@ namespace BingoMode
 
             // Request host upkeep when going back to the game
             On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures;
+
+            // No red karma 1
+            IL.Menu.KarmaLadder.KarmaSymbol.Update += KarmaSymbol_UpdateIL;
+        }
+
+        private static void KarmaSymbol_UpdateIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld<ModManager>("Expedition")
+                ))
+            {
+                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                {
+                    if (BingoData.BingoMode) orig = false;
+
+                    return orig;
+                });
+            } 
+            else Plugin.logger.LogError("KarmaSymbol_UpdateIL FAILURE " + il);
         }
 
         private static void ShelterDoor_UpdatePathfindingCreatures(On.ShelterDoor.orig_UpdatePathfindingCreatures orig, ShelterDoor self)
@@ -274,8 +288,8 @@ namespace BingoMode
             {
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default)
                 {
-                    if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
-                        (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
+                    if (!Custom.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
+                        (Custom.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
                         Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
@@ -285,14 +299,15 @@ namespace BingoMode
                                 b.OnChallengeCompleted(SteamTest.team);
                             }
                         }
+                        Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
                         Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                     }
                     return;
                 }
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                 {
-                    if (!self.room.game.manager.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
-                        (self.room.game.manager.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
+                    if (!Custom.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
+                        (Custom.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
                     {
                         Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
@@ -305,7 +320,6 @@ namespace BingoMode
                                 }
                             }
                         }
-                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                         SteamFinal.BroadcastCurrentBoardState();
                     }
                 }
@@ -313,6 +327,8 @@ namespace BingoMode
                 {
                     self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
                 }
+                Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
             }
         }
 
@@ -726,9 +742,8 @@ namespace BingoMode
 
         public static void LoadBingoNoStart()
         {
-            Plugin.logger.LogFatal("tryinj to load");
             if (BingoData.BingoSaves == null || !BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) return;
-            Plugin.logger.LogFatal("loajing " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
+            Plugin.logger.LogMessage("Loading bingo no start. Player white list: " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
             int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
             int chIndex = 0;

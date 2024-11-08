@@ -95,14 +95,14 @@ namespace BingoMode.Challenges
     {
         public FNode display;
 
-        public Word(float rotation)
+        public Word()
         {
         }
     }
 
     public class Counter : Word
     {
-        public Counter(int current, int max) : base(0f)
+        public Counter(int current, int max) : base()
         {
             display = new FLabel(Custom.GetFont(), $"[{current}/{max}]");
         }
@@ -110,7 +110,7 @@ namespace BingoMode.Challenges
 
     public class Verse : Word
     {
-        public Verse(string text) : base(0f)
+        public Verse(string text) : base()
         {
             display = new FLabel(Custom.GetFont(), text);
         }
@@ -118,7 +118,7 @@ namespace BingoMode.Challenges
 
     public class Icon : Word
     {
-        public Icon(string element, float scale, Color color, float rotation = 0f) : base(rotation)
+        public Icon(string element, float scale, Color color, float rotation = 0f) : base()
         {
             display = new FSprite(element)
             {

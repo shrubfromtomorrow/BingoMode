@@ -63,7 +63,7 @@ namespace BingoMode
         public bool fromContinueGame;
         public bool spectatorMode;
 
-        public static readonly float desaturara = 0.25f;
+        public static readonly float desaturara = 0.1f;
         public static readonly Color[] TEAM_COLOR =
         {
             Custom.Desaturate(Color.red, desaturara),
@@ -850,11 +850,6 @@ namespace BingoMode
             nameFilter.PosY = createLobby.pos.y + 5f;
             nameFilter.lastScreenPos = nameFilter.ScreenPos;
 
-            //tab.AddItems(
-            //[
-            //    distanceFilter,
-            //    nameFilter
-            //]);
             distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
             nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
         }
@@ -914,6 +909,7 @@ namespace BingoMode
                 {
                     lobbyDividers[i].RemoveFromContainer();
                 }
+                lobbyDividers = [];
             }
         }
 

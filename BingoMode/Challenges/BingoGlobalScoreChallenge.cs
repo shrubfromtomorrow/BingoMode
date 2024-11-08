@@ -34,7 +34,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Overall Score");
+            return ChallengeTools.IGT.Translate("Scoring global points");
         }
 
         public override Challenge Generate()

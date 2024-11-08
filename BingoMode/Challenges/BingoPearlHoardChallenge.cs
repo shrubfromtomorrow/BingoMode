@@ -36,7 +36,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Pearl Hoarding");
+            return ChallengeTools.IGT.Translate("Hoarding pearls");
         }
 
         public override Challenge Generate()

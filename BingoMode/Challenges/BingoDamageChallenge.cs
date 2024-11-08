@@ -48,7 +48,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Hitting Creatures");
+            return ChallengeTools.IGT.Translate("Hitting creatures");
         }
 
         public override Challenge Generate()

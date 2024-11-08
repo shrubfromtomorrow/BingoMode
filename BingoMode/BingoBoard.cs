@@ -368,7 +368,10 @@ namespace BingoMode
                             {
                                 if (currentTeamsString[k] == '1')
                                 {
-                                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout) ch.OnChallengeLockedOut();
+                                    if (!ch.ReverseChallenge() && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
+                                    {
+                                        ch.OnChallengeLockedOut(k);
+                                    }
                                     else ch.OnChallengeCompleted(k);
                                 }
                                 else

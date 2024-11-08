@@ -23,7 +23,7 @@ namespace BingoMode.Challenges
         public event Action<int> ChallengeCompleted;
         public event Action<int> ChallengeFailed;
         public event Action<int> ChallengeAlmostComplete;
-        public event Action ChallengeLockedOut;
+        public event Action<int> ChallengeLockedOut;
 
         public virtual bool ReverseChallenge() => false;
         public virtual bool RequireSave() => true;
@@ -152,13 +152,17 @@ namespace BingoMode.Challenges
         public void OnChallengeCompleted(int team)
         {
             Plugin.logger.LogMessage($"Completing challenge for {BingoPage.TeamName(team)}: {this}");
+            bool lastCompleted = TeamsCompleted[team];
+
             TeamsCompleted[team] = true;
             if (TeamsCompleted[SteamTest.team]) completed = true;
+
             UpdateDescription();
-            ChallengeCompleted?.Invoke(team);
+
+            if (!lastCompleted) ChallengeCompleted?.Invoke(team);
             if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
+            
             Expedition.Expedition.coreFile.Save(false);
-            //CheckWinLose();
         }
 
         public void FailChallenge(int team)
@@ -186,6 +190,7 @@ namespace BingoMode.Challenges
 
         public void OnChallengeFailed(int team)
         {
+            bool lastFailed = Failed;
             Plugin.logger.LogMessage($"Failing challenge for {completeCredit}: {this}");
             if (team == SteamTest.team)
             {
@@ -194,14 +199,16 @@ namespace BingoMode.Challenges
             }
             TeamsCompleted[team] = false;
             Expedition.Expedition.coreFile.Save(false);
-            ChallengeFailed?.Invoke(team);
+            if (!lastFailed) ChallengeFailed?.Invoke(team);
         }
 
-        public void OnChallengeLockedOut()
+        public void OnChallengeLockedOut(int team)
         {
-            if (completed) return;
+            bool lastHidden = hidden;
+            if (team == SteamTest.team || TeamsCompleted[SteamTest.team] || hidden) return;
             hidden = true;
-            ChallengeLockedOut?.Invoke();
+            TeamsCompleted[team] = true;
+            if (!lastHidden) ChallengeLockedOut?.Invoke(team);
             //CheckWinLose();
         }
 

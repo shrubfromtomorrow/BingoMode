@@ -40,7 +40,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Cycle Score");
+            return ChallengeTools.IGT.Translate("Scoring cycle points");
         }
 
         public override Challenge Generate()
@@ -103,6 +103,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
+            if (revealed || completed) return;
             if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.score != 0)
@@ -142,7 +143,11 @@ namespace BingoMode.Challenges
                 this.completed = (array[1] == "1");
                 this.hidden = (array[2] == "1");
                 this.revealed = (array[3] == "1");
-                this.score = 0;
+                if (revealed || completed)
+                {
+                    score = target.Value;
+                }
+                else score = 0;
                 TeamsFromString(array[4]);
                 this.UpdateDescription();
             }

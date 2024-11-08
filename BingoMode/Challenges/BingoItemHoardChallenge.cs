@@ -34,7 +34,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Item Collecting");
+            return ChallengeTools.IGT.Translate("Collecting items");
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)

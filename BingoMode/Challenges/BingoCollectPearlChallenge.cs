@@ -1,9 +1,11 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
@@ -48,7 +50,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Pearl Collecting");
+            return ChallengeTools.IGT.Translate("Collecting pearls");
         }
 
         public void PickedUp(PearlType type)
@@ -98,7 +100,14 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             bool specifi = UnityEngine.Random.value < 0.5f;
-            string p = ChallengeUtils.CollectablePearls[UnityEngine.Random.Range(0, ChallengeUtils.CollectablePearls.Length - (ModManager.MSC ? 0 : 4))];
+            List<string> fromList = ChallengeUtils.CollectablePearls.ToList();
+            if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear)
+            {
+                fromList.Remove("SL_chimney");
+                fromList.Remove("SL_bridge");
+                fromList.Remove("SL_moon");
+            }
+            string p = fromList[UnityEngine.Random.Range(0, fromList.Count - (ModManager.MSC ? 0 : 4))];
             BingoCollectPearlChallenge chal = new()
             {
                 specific = new SettingBox<bool>(specifi, "Specific Pearl", 0),

@@ -20,7 +20,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount.Value == 1 ? "item" : "items") + " from Scavenger Merchants to others")
+            this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount.Value == 1 ? "item" : "items") + " from Scavenger Merchants to other Scavenger Merchants")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Trading Already Traded Items");
+            return ChallengeTools.IGT.Translate("Trading already traded items");
         }
 
         public override Challenge Generate()

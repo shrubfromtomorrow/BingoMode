@@ -29,7 +29,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Befriending");
+            return ChallengeTools.IGT.Translate("Befriending a creature");
         }
 
         public override Challenge Generate()

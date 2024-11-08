@@ -9,6 +9,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -163,9 +164,38 @@ namespace BingoMode.Challenges
             IL.SporeCloud.Update += SporeCloud_Update;
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
-            IL.FlareBomb.Update += FlareBomb_Update;
+            //IL.FlareBomb.Update += FlareBomb_Update;
             //On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
             //IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
+        }
+
+        public static void ShelterDoor_Close(On.ShelterDoor.orig_Close orig, ShelterDoor self)
+        {
+            orig.Invoke(self);
+
+            if (self.Broken || self.closedFac != 0f) return;
+            int eggs = 0;
+
+            foreach (var entity in self.room.abstractRoom.entities)
+            {
+                if (entity is AbstractPhysicalObject p && p.type == ItemType.NeedleEgg)
+                {
+                    eggs++;
+                }
+            }
+
+            Plugin.logger.LogWarning("eggs: " + eggs);
+            if (eggs == 0) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoHatchNoodleChallenge c)
+                {
+                    for (int e = 0; e < eggs; e++)
+                    {
+                        c.Hatch();
+                    }
+                }
+            }
         }
 
         public static void Challenge_CompleteChallengeIL(ILContext il)
@@ -487,22 +517,6 @@ namespace BingoMode.Challenges
                     }
                 }
             }
-        }
-
-        public static void SmallNeedleWorm_PlaceInRoom(On.SmallNeedleWorm.orig_PlaceInRoom orig, SmallNeedleWorm self, Room placeRoom)
-        {
-            if (self.State.eggSpawn && placeRoom.abstractRoom.shelter && placeRoom.world.rainCycle.timer < 40)
-            {
-                Plugin.logger.LogMessage("Hatch test 1");
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoHatchNoodleChallenge c)
-                    {
-                        c.Hatch();
-                    }
-                }
-            }
-            orig.Invoke(self, placeRoom);
         }
 
         public static ItemType Player_CraftingResults(On.Player.orig_CraftingResults orig, Player self)

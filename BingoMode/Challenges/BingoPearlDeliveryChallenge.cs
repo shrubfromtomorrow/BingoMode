@@ -70,7 +70,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Pearl Delivery");
+            return ChallengeTools.IGT.Translate("Delivering colored pearls");
         }
 
         public override int Points()

@@ -39,10 +39,10 @@ namespace BingoMode.Challenges
                 data.unlockIconColor = ChallengeUtils.ItemOrCreatureIconColor(unlockName);
                 data.iconColor = RainWorld.AntiGold.rgb;
             }
-            else if (SlugcatStats.Name.values.entries.Contains(unlockName))
+            else if (SlugcatStats.Name.values.entries.Contains(unlockName) || unlockName == "Spearmaster")
             {
                 data.unlockIconName = "Kill_Slugcat";
-                data.unlockIconColor = PlayerGraphics.SlugcatColor(new SlugcatStats.Name(unlockName, false));
+                data.unlockIconColor = PlayerGraphics.SlugcatColor(new SlugcatStats.Name(unlockName == "Spearmaster" ? "Spear" : unlockName, false));
                 data.iconColor = CollectToken.GreenColor.rgb;
             }
             else if (unlockName.EndsWith("-safari"))
@@ -68,7 +68,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Getting Arena Unlocks");
+            return ChallengeTools.IGT.Translate("Getting arena unlocks");
         }
 
         public override Challenge Generate()

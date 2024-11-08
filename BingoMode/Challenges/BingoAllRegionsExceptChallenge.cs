@@ -32,7 +32,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Entering all Regions Except X");
+            return ChallengeTools.IGT.Translate("Entering all regions except one");
         }
 
         public override void Reset()

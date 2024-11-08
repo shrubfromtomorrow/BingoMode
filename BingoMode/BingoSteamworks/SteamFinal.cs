@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Expedition;
 using Steamworks;
 using RWCustom;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BingoMode.BingoSteamworks
 {
@@ -14,7 +15,7 @@ namespace BingoMode.BingoSteamworks
         public const int PlayerUpkeepTime = 2600;
         public const int MaxHostUpKeepTime = 5200;
         public const int TryToReconnectTime = 50;
-        public const int MaxUpkeepCounter = 100;
+        public const int MaxUpkeepCounter = 200;
 
         public static List<SteamNetworkingIdentity> ConnectedPlayers = [];
         public static Dictionary<ulong, bool> ReceivedPlayerUpKeep = [];

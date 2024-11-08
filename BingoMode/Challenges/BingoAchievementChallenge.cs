@@ -29,7 +29,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Passage");
+            return ChallengeTools.IGT.Translate("Obtaining passages");
         }
 
         public override bool Duplicable(Challenge challenge)

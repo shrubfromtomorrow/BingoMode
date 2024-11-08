@@ -30,7 +30,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Leviathan Dodging");
+            return ChallengeTools.IGT.Translate("Dodging a leviathan");
         }
 
         public void Dodged()

@@ -47,7 +47,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Transporting a Creature Through Gates");
+            return ChallengeTools.IGT.Translate("Transporting a creature through gates");
         }
 
         public override Challenge Generate()

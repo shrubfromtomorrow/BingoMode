@@ -139,7 +139,7 @@ namespace BingoMode.Challenges
                     r.AddRange(["HI", "GW", "CC", "LF"]);
                     break;
                 case "JetFish":
-                    r.Add("SL"); //if (slug == SlugcatStats.Name.Red) r.Add("sb");
+                    r.Add((slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer || slug == MoreSlugcatsEnums.SlugcatStatsName.Spear) ? "LM" : "SL");
                     break;
                 case "Yeek":
                     r.Add("OE"); if (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint || slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.AddRange(["SB", "LF"]);
@@ -347,7 +347,7 @@ namespace BingoMode.Challenges
             "Spear",
             "Rock",
             "ScavengerBomb",
-            "FlareBomb",
+            //"FlareBomb",
             "JellyFish",
             "PuffBall",
             "LillyPuck"

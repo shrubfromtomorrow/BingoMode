@@ -100,7 +100,7 @@ namespace BingoMode.Challenges
                     break;
                 }
                 string rr = spearList[k].room.world.region.name;
-                if ((region.Value == "" || rr == region.Value) && !pinRegions.Contains(rr) && this.spearList[k].stuckInObject != null && this.spearList[k].stuckInObject is Creature c && (crit.Value == "Any Creature" || c.Template.type.value == crit.Value) && this.spearList[k].stuckInWall != null && !this.pinList.Contains(c))
+                if ((region.Value == "Any Region" || rr == region.Value) && !pinRegions.Contains(rr) && this.spearList[k].stuckInObject != null && this.spearList[k].stuckInObject is Creature c && (crit.Value == "Any Creature" || c.Template.type.value == crit.Value) && this.spearList[k].stuckInWall != null && !this.pinList.Contains(c))
                 {
                     this.pinList.Add(c);
                     this.current++;
@@ -143,7 +143,7 @@ namespace BingoMode.Challenges
     
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Creature Pinning");
+            return ChallengeTools.IGT.Translate("Pinning creatures to walls");
         }
     
         public override string ToString()

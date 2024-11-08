@@ -200,7 +200,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Creature Killing");
+            return ChallengeTools.IGT.Translate("Killing creatures");
         }
 
         public override int Points()
@@ -320,10 +320,12 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature c, int playerNumber)
         {
             Plugin.logger.LogMessage("killed " + this);
-            if (deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || !CritInLocation(c) || !CreatureHitByDesired(c) || revealed) return;
+            if (deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
+            if (!CreatureHitByDesired(c)) return;
+            if (!CritInLocation(c)) return;
             if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;
             CreatureType type = c.abstractCreature.creatureTemplate.type;
-            bool flag = crit == null || type.value == crit.Value;
+            bool flag = crit.Value == "Any Creature" || type.value == crit.Value;
             if (!flag && crit.Value == "DaddyLongLegs" && type == CreatureType.BrotherLongLegs && (c as DaddyLongLegs).colorClass)
             {
                 flag = true;

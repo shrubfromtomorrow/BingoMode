@@ -61,7 +61,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Vista Visiting");
+            return ChallengeTools.IGT.Translate("Visiting vistas");
         }
 
         public override void UpdateDescription()
