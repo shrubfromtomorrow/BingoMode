@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Expedition;
 using Steamworks;
 using RWCustom;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BingoMode.BingoSteamworks
 {
@@ -25,6 +24,7 @@ namespace BingoMode.BingoSteamworks
         public static int UpkeepCounter = MaxUpkeepCounter;
         public static bool ReceivedHostUpKeep;
         public static bool TryToReconnect;
+        //public static Dictionary<ulong, bool> PlayerForSureQuit = [];
 
         public static void ReceiveMessagesUpdate()
         {
@@ -44,7 +44,7 @@ namespace BingoMode.BingoSteamworks
                             Plugin.logger.LogMessage("Reconnected to host!");
                             TryToReconnect = false;
                             HostUpkeep = MaxHostUpKeepTime;
-                            ReceivedHostUpKeep = false;
+                            ReceivedHostUpKeep = true;
                             if (rw.processManager.currentMainLoop is RainWorldGame game)
                             {
                                 game.paused = false;
@@ -67,6 +67,7 @@ namespace BingoMode.BingoSteamworks
                     HostUpkeep--;
                     if (HostUpkeep <= 0)
                     {
+                        HostUpkeep = MaxHostUpKeepTime;
                         if (ReceivedHostUpKeep)
                         {
                             Plugin.logger.LogMessage("Received host upkeep in time :))");
@@ -77,9 +78,8 @@ namespace BingoMode.BingoSteamworks
                             Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
                             // Didnt receve host upkeep, so host is probably disconnected
                             if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
-                            rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Cannot reconnect to host."));
+                            rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Lost connection to host."));
                         }
-                        HostUpkeep = MaxHostUpKeepTime;
                     }
                 }
             }

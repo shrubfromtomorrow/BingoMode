@@ -6,6 +6,7 @@ using MonoMod.RuntimeDetour;
 using System;
 using System.Reflection;
 using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -17,7 +18,7 @@ namespace BingoMode
     using BingoSteamworks;
     using Challenges;
 
-    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.9")]
+    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.5")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool AppliedAlreadyDontDoItAgainPlease;
@@ -60,14 +61,27 @@ namespace BingoMode
                 ChallengeUtils.Apply();
 
                 // Timeline fix
-                On.MainLoopProcess.Update += MainLoopProcess_Update;
+                IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
             }
         }
 
-        private static void MainLoopProcess_Update(On.MainLoopProcess.orig_Update orig, MainLoopProcess self)
+        public static void MainLoopProcess_RawUpdate(ILContext il)
         {
-            orig.Invoke(self);
-            SteamFinal.ReceiveMessagesUpdate();
+            ILCursor c = new(il);
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchCallOrCallvirt<MainLoopProcess>("Update")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<MainLoopProcess>>((process) =>
+                {
+                    if (process is RainWorldGame or Menu.Menu)
+                    {
+                        SteamFinal.ReceiveMessagesUpdate();
+                    }
+                });
+            }
+            else logger.LogError("MainLoopProcess_RawUpdate IL fail " + il);
         }
     }
 }

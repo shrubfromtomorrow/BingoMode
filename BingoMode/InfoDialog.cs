@@ -39,7 +39,7 @@ namespace BingoMode
             if (message == "Trying to reconnect to the host.")
             {
                 SteamFinal.TryToReconnect = true;
-                SteamFinal.HostUpkeep = 0;
+                SteamFinal.ReconnectTimer = 0;
             }
         }
 

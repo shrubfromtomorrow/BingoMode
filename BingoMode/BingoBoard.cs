@@ -28,7 +28,7 @@ namespace BingoMode
 
         public void GenerateBoard(int size, bool changeSize = false)
         {
-            Plugin.logger.LogMessage("Generating bored");
+            Plugin.logger.LogMessage("Generating board");
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
@@ -56,11 +56,6 @@ namespace BingoMode
                     }
                     challengeGrid[i, j] = RandomBingoChallenge();
                 }
-            }
-            Plugin.logger.LogMessage("Current challenge list");
-            foreach (var gruh in ExpeditionData.challengeList)
-            {
-                Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
             }
             SteamTest.UpdateOnlineBingo();
             UpdateChallenges();
@@ -90,7 +85,7 @@ namespace BingoMode
             }
         }
 
-        public bool CheckWin(int t, bool checkLose = false) // Checks whether a team won or cant win
+        public bool CheckWin(int t, bool checkLose = false, List<IntVector2> overrideArray = null) // Checks whether a team won or cant win
         {
             bool won = false;
             currentWinLine = [];
@@ -102,7 +97,7 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
@@ -123,7 +118,7 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
+                        line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
@@ -143,7 +138,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
@@ -161,7 +156,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t] && !ch.hidden;
+                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
@@ -172,6 +167,14 @@ namespace BingoMode
                 else currentWinLine.Clear();
             }
 
+            if (overrideArray != null)
+            {
+                foreach (var coord in currentWinLine)
+                {
+                    overrideArray.Add(coord);
+                }
+            }
+            currentWinLine = [];
             return won;
         }
 
@@ -232,16 +235,11 @@ namespace BingoMode
                         //else 
                         challengeGrid[i, j] = recreateList[next];
                         //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
+                        //Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
                         next++;
                     }
                 }
                 Plugin.logger.LogMessage("Recreated list from thinj yipe");
-                Plugin.logger.LogMessage("Current recreated challenge list:");
-                foreach (var gruh in ExpeditionData.challengeList)
-                {
-                    Plugin.logger.LogMessage(ExpeditionData.challengeList.IndexOf(gruh) + " - " + gruh);
-                }
                 SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
             }
@@ -268,7 +266,6 @@ namespace BingoMode
         public override string ToString()
         {
             string text = string.Join("bChG", ExpeditionData.challengeList);
-            Plugin.logger.LogMessage("Bingo board to string:\n" + text);
             return text;
         }
         
@@ -276,13 +273,10 @@ namespace BingoMode
         {
             Plugin.logger.LogMessage("Bingo board from string:\n" + text);
             if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
-            Plugin.logger.LogMessage("test tested yes");
             string[] challenges = Regex.Split(text, "bChG");
             size = Mathf.RoundToInt(Mathf.Sqrt(challenges.Length));
             int next = 0;
-            foreach (var gu in challenges) Plugin.logger.LogWarning(gu);
             challengeGrid = new Challenge[size, size];
-            Plugin.logger.LogMessage("All challenges count: " + challenges.Length);
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
@@ -334,17 +328,15 @@ namespace BingoMode
                 }
             }
             if (state != "") state = state.Substring(2);
-            Plugin.logger.LogMessage("Bingo state to string:\n" + state);
             return state;
         }
 
         public void InterpretBingoState(string state)
         {
-            Plugin.logger.LogMessage("Bingo state from string:\n" + state);
             if (challengeGrid == null) { Plugin.logger.LogError("CHALLENGE GRID IS NULL!! Returning"); return; }
 
             string[] challenges = Regex.Split(state, "<>");
-            Plugin.logger.LogMessage("All challenges count: " + challenges.Length);
+            Plugin.logger.LogMessage("All challenges count from interpret bingo state: " + challenges.Length);
 
             int next = 0;
             for (int i = 0; i < size; i++)
@@ -368,7 +360,11 @@ namespace BingoMode
                             {
                                 if (currentTeamsString[k] == '1')
                                 {
-                                    if (!ch.ReverseChallenge() && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
+                                    if (SteamTest.team != 8 && 
+                                        k != SteamTest.team &&
+                                        !ch.ReverseChallenge() && 
+                                        BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
+                                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
                                     {
                                         ch.OnChallengeLockedOut(k);
                                     }

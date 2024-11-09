@@ -67,10 +67,14 @@ namespace BingoMode.Challenges
             List<WinState.EndgameID> list = new List<WinState.EndgameID>();
             for (int i = 0; i < ChallengeTools.achievementScores.Count; i++)
             {
-                if (!ModManager.MSC || (!(ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Mother) && !(ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Gourmand)))
-                {
-                    list.Add(ChallengeTools.achievementScores.ElementAt(i).Key);
-                }
+                if (ModManager.MSC && 
+                    (ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Mother ||
+                    ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Gourmand ||
+                    (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint && 
+                    ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Scholar)))
+                    continue;
+
+                list.Add(ChallengeTools.achievementScores.ElementAt(i).Key);
             }
             WinState.EndgameID id = list[Random.Range(0, list.Count)];
             return new BingoAchievementChallenge

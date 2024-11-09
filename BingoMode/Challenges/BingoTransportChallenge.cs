@@ -186,7 +186,6 @@ namespace BingoMode.Challenges
                 crit = SettingBoxFromString(array[2]) as SettingBox<string>;
                 string[] arr = array[3].Split('|');
                 origins = [];
-                Plugin.logger.LogMessage("Transport challenge origins list from string!");
                 if (arr != null && arr.Length > 0)
                 {
                     for (int i = 0; i < arr.Length; i++)

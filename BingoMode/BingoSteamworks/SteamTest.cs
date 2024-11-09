@@ -85,6 +85,19 @@ namespace BingoMode.BingoSteamworks
             {
                 if (BingoData.globalMenu.currentPage != 4)
                 {
+                    if (page.grid == null)
+                    {
+                        BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
+                        if (page.grid != null)
+                        {
+                            page.grid.RemoveSprites();
+                            page.RemoveSubObject(page.grid);
+                            page.grid = null;
+                        }
+                        page.grid = new BingoGrid(BingoData.globalMenu, page, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                        page.subObjects.Add(page.grid);
+                    }
+                    page.multiButton.Clicked();
                     BingoData.globalMenu.UpdatePage(4);
                     BingoData.globalMenu.MovePage(new Vector2(1500f, 0f));
                 }
@@ -293,8 +306,8 @@ namespace BingoMode.BingoSteamworks
                     if (!LobbyMembers.Contains(newMember) && newMember.GetSteamID64() != selfIdentity.GetSteamID64()) { LobbyMembers.Add(newMember); }
                     if (SteamMatchmaking.GetLobbyOwner(CurrentLobby) == selfIdentity.GetSteamID())
                     {
-                        int tim = team + 1;
-                        if (tim >= 7) tim = 0;
+                        int tim = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "nextTeam"), NumberStyles.Any) + 1;
+                        if (tim >= 8) tim = 0;
                         SteamMatchmaking.SetLobbyData(CurrentLobby, "nextTeam", tim.ToString());
                     }
 
@@ -394,6 +407,16 @@ namespace BingoMode.BingoSteamworks
                 return;
             }
             Plugin.logger.LogMessage("Found " + result.m_nLobbiesMatching + " lobbies.");
+            List<CSteamID> frens = [];
+            int frenCount = SteamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
+            if (frenCount != -1)
+            {
+                for (int f = 0; f < frenCount; f++)
+                {
+                    frens.Add(SteamFriends.GetFriendByIndex(f, EFriendFlags.k_EFriendFlagImmediate));
+                }
+            } 
+
             List<CSteamID> JoinableLobbies = new();
             for (int i = 0; i < result.m_nLobbiesMatching; i++)
             {
@@ -401,9 +424,12 @@ namespace BingoMode.BingoSteamworks
                 if (SteamMatchmaking.GetLobbyData(lobbyID, "mode") != "BingoMode") continue;
                 if (SteamMatchmaking.GetLobbyData(lobbyID, "friendsOnly") == "1" || CurrentFilters.friendsOnly)
                 {
-                    CSteamID owner = SteamMatchmaking.GetLobbyOwner(lobbyID);
-                    Plugin.logger.LogMessage($"Relationship to owner: {SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend} - {SteamFriends.GetFriendRelationship(owner)}");
-                    if (SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend) continue;
+                    CSteamID owner = (CSteamID)ulong.Parse(SteamMatchmaking.GetLobbyData(lobbyID, "hostID"), NumberStyles.Any);
+                    //Plugin.logger.LogMessage($"Relationship to owner: {SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend} - {SteamFriends.GetFriendRelationship(owner)}");
+                    if (frens.Count > 0 && !frens.Contains(owner))
+                    {
+                        continue;
+                    }
                 }
                 JoinableLobbies.Add(lobbyID);
                 //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);

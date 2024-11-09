@@ -3,10 +3,7 @@ using Expedition;
 using Menu;
 using Menu.Remix.MixedUI;
 using RWCustom;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection.Emit;
 using UnityEngine;
 
 namespace BingoMode
@@ -27,10 +24,6 @@ namespace BingoMode
         public bool boxVisible;
         public bool mouseOver;
         public bool lastMouseOver;
-        public TriangleMesh[] teamColors;
-        public Vector2[] corners;
-        public bool showBG;
-        public List<TriangleMesh> visible;
         public bool resetPhrase;
 
         public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
@@ -41,29 +34,6 @@ namespace BingoMode
             challenge = BingoHooks.GlobalBoard.challengeGrid[x, y];
 
             labelColor = Menu.Menu.MenuColor(Menu.Menu.MenuColors.MediumGrey);
-
-            visible = [];
-            showBG = true;
-            corners = new Vector2[4];
-            corners[0] = pos + new Vector2(-size.x / 2f, -size.x / 2f);
-            corners[1] = pos + new Vector2(-size.x / 2f, size.x / 2f);
-            corners[2] = pos + new Vector2(size.x / 2f, -size.x / 2f);
-            corners[3] = pos + new Vector2(size.x / 2f, size.x / 2f);
-
-            teamColors = new TriangleMesh[8];
-            TriangleMesh.Triangle[] tris = [
-                new(0, 1, 2),
-                new(1, 2, 3)
-                ];
-            for (int i = 0; i < teamColors.Length; i++)
-            {
-                teamColors[i] = new TriangleMesh("Futile_White", tris, false)
-                {
-                    color = BingoPage.TEAM_COLOR[i],
-                    alpha = 0.3f
-                };
-                Container.AddChild(teamColors[i]);
-            }
 
             bkgRect = new RoundedRect(menu, owner, pos, size, true);
             subObjects.Add(bkgRect);
@@ -126,41 +96,8 @@ namespace BingoMode
                 }
             }
 
-            (challenge as BingoChallenge).ValueChanged += UpdateText;
-            (challenge as BingoChallenge).ChallengeCompleted += OnChallengeCompleted;
-            (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
-
             UpdateText();
-            UpdateTeamColors();
             buttonBehav.greyedOut = menu is not ExpeditionMenu;
-        }
-
-        public void OnChallengeFailed(int tea)
-        {
-            UpdateTeamColors();
-        }
-
-        public void OnChallengeCompleted(int tea)
-        {
-            UpdateTeamColors();
-        }
-
-        public void UpdateTeamColors()
-        {
-            //Plugin.logger.LogMessage($"Updating team colors for " + challenge);
-            visible = [];
-            bool g = false;
-            for (int i = 0; i < teamColors.Length; i++)
-            {
-                teamColors[i].isVisible = false;
-                if ((challenge as BingoChallenge).TeamsCompleted[i])
-                {
-                    //Plugin.logger.LogMessage("Making it visible!");
-                    visible.Add(teamColors[i]);
-                    g = true;
-                }
-            }
-            if (g) showBG = false;
         }
 
         public string SplitString(string s)
@@ -197,7 +134,7 @@ namespace BingoMode
             mouseOver = IsMouseOverMe;
             base.Update();
             buttonBehav.Update();
-            bkgRect.fillAlpha = showBG ? Mathf.Lerp(0.3f, 0.6f, buttonBehav.col) : 0f;
+            bkgRect.fillAlpha = Mathf.Lerp(0.3f, 0.6f, buttonBehav.col);
             //bkgRect.addSize = new Vector2(10f, 6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
             selectRect.addSize = new Vector2(-10f, -6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
 
@@ -279,27 +216,6 @@ namespace BingoMode
             boxSprites[3].SetPosition(pos + new Vector2(size.x + 5, -yStep + size.y / 2f));
             boxSprites[4].SetPosition(pos + new Vector2(size.x + 5 + boxSprites[0].scaleX, -yStep + size.y / 2f));
             infoLabel.SetPosition(pos + new Vector2(size.x + 5 + boxSprites[0].scaleX / 2f, size.y / 2f));
-
-            if (visible.Count == 0) return;
-            float dist = size.x / visible.Count;
-            float halfStep = dist * 0.3f;
-            Vector2 offset = new Vector2(size.x / 2f, size.y / 2f) + pagePos;
-            int pixelStep = 2;
-            for (int i = 0; i < visible.Count; i++)
-            {
-                visible[i].isVisible = true;
-
-                int isFirst = i == 0 ? 0 : 1;
-                int invIsFirst = i == 0 ? 1 : 0;
-                int isLast = i == visible.Count - 1 ? 0 : 1;
-                int invIsLast = i == visible.Count - 1 ? 1 : 0;
-
-                visible[i].MoveVertice(0, corners[0] + offset + new Vector2(dist * i - halfStep * isFirst + pixelStep * invIsFirst, pixelStep));
-                visible[i].MoveVertice(1, corners[1] + offset + new Vector2(dist * i + halfStep * isFirst + pixelStep * invIsFirst, -pixelStep));
-
-                visible[i].MoveVertice(2, corners[0] + offset + new Vector2(dist * (i + 1) - halfStep * isLast - pixelStep * invIsLast, pixelStep));
-                visible[i].MoveVertice(3, corners[1] + offset + new Vector2(dist * (i + 1) + halfStep * isLast - pixelStep * invIsLast, -pixelStep));
-            }
         }
 
         public override void RemoveSprites()
@@ -314,13 +230,6 @@ namespace BingoMode
                 g.RemoveFromContainer();
             }
             infoLabel.RemoveFromContainer();
-            foreach (var g in teamColors)
-            {
-                g.RemoveFromContainer();
-            }
-            (challenge as BingoChallenge).ValueChanged -= UpdateText;
-            (challenge as BingoChallenge).ChallengeCompleted -= OnChallengeCompleted;
-            (challenge as BingoChallenge).ChallengeFailed -= OnChallengeFailed;
         }
 
         public override void Clicked()

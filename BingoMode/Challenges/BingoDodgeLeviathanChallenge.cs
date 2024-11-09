@@ -67,7 +67,7 @@ namespace BingoMode.Challenges
                             {
                                 if (levi.InBiteArea(player.bodyChunks[1].pos, 10f))
                                 {
-                                    wasInArea = 60;
+                                    wasInArea = 120;
                                 }
                             }
                         }

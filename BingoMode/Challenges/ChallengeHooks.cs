@@ -523,6 +523,8 @@ namespace BingoMode.Challenges
         {
             ItemType origItem = orig.Invoke(self);
 
+            if (origItem == null) return origItem;
+
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoCraftChallenge c)

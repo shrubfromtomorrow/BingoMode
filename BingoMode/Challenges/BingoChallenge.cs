@@ -209,46 +209,6 @@ namespace BingoMode.Challenges
             hidden = true;
             TeamsCompleted[team] = true;
             if (!lastHidden) ChallengeLockedOut?.Invoke(team);
-            //CheckWinLose();
-        }
-
-        public static void CheckWinLose()
-        {
-            int teamsLost = 0;
-            for (int t = 0; t < 8; t++)
-            {
-                if (!BingoHooks.GlobalBoard.CheckWin(SteamTest.team, true)) teamsLost++;
-            }
-            bool allChallengesDone = true;
-            for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
-            {
-                if (!allChallengesDone) break;
-                for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
-                {
-                    if (!(BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted.Any(x => x == true))
-                    {
-                        allChallengesDone = false;
-                        break;
-                    }
-                }
-            }
-            if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
-            {
-                Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
-                Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                return;
-            }
-
-            for (int t = 0; t < 8; t++)
-            {
-                if (BingoHooks.GlobalBoard.CheckWin(t, false))
-                {
-                    Plugin.logger.LogMessage($"Team {t} won!");
-                    Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
-                    Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                    return;
-                }
-            }
         }
 
         public void ChangeValue()

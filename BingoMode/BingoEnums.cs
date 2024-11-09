@@ -8,6 +8,8 @@
         public static Menu.Slider.SliderID CustomizerSlider;
         public static Menu.Slider.SliderID MultiplayerSlider;
 
+        public static SoundID BINGO_FINAL_BONG;
+
         //public static SoundID Bingo_Complete;
         //public static SoundID Bingo_Complete_Enemy;
         //public static SoundID Square_Complete;
@@ -24,6 +26,8 @@
 
             CustomizerSlider = new("CustomizerSlider", true);
             MultiplayerSlider = new("MultiplayerSlider", true);
+
+            BINGO_FINAL_BONG = new("BINGO_FINAL_BONG", true);
 
             //Bingo_Complete = new("Bingo_Complete", true);
             //Bingo_Complete_Enemy = new("Bingo_Complete_Enemy", true);

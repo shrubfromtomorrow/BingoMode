@@ -48,7 +48,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Hitting creatures");
+            return ChallengeTools.IGT.Translate("Hitting creatures with items");
         }
 
         public override Challenge Generate()
@@ -78,10 +78,13 @@ namespace BingoMode.Challenges
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             Plugin.logger.LogMessage("hit " + weaponn.value + " " + weapon.Value);
             bool glug = false;
+            bool weaponCheck = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;
             if (victim.Value == "Any Creature" && victimm is not Player) glug = true;
+            if (weaponn.value.ToLowerInvariant() == weapon.Value.ToLowerInvariant()) weaponCheck = true;
+            if (weapon.Value == "Any Weapon") weaponCheck = true;
 
-            if (weaponn.value.ToLowerInvariant() == weapon.Value.ToLowerInvariant() && glug)
+            if (weaponCheck && glug)
             {
                 current++;
                 UpdateDescription();

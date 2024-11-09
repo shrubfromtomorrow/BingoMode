@@ -15,6 +15,7 @@ namespace BingoMode
 
     public class BingoHUD : HudPart
     {
+        public static bool ReadyForLeave;
         public BingoBoard board;
         public Vector2 pos;
         public BingoInfo[,] grid;
@@ -31,18 +32,185 @@ namespace BingoMode
         public int animation = 0;
         public List<BingoInfo> queue;
 
+        // Bingo complete business
+        public struct BingoCompleteInfo
+        {
+            public int team;
+            public string subTitle;
+            public string evenSubtlerTitle;
+
+            public BingoCompleteInfo(int team, string subTitle, string evenSubtlerTitle)
+            {
+                this.team = team;
+                this.subTitle = subTitle;
+                this.evenSubtlerTitle = evenSubtlerTitle;
+            }
+        }
+        public FSprite bingoCompleteTitle;
+        public FLabel bingoCompleteInfo;
+        public FLabel bingoCompleteInfoShadow;
+        public float completeAlpha;
+        public float lastCompleteAlpha;
+        public bool addCompleteAlpha;
+        public int completeAnimation = 0;
+        public List<BingoInfo> completeQueue;
+        public float textShake;
+        public float sinCounter;
+        public Color colorToFadeTo;
+        //public bool mouseOverCompleteText
+        //{
+        //    get
+        //    {
+        //        bool isHost = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+        //            (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default ||
+        //            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64());
+        //        return isHost && mousePosition.x > hud.rainWorld.screenSize.x * 0.5f - 130f && mousePosition.y > hud.rainWorld.screenSize.y * 0.9f - 80f 
+        //                && mousePosition.x < hud.rainWorld.screenSize.x * 0.5f + 130f && mousePosition.y < hud.rainWorld.screenSize.y * 0.9f + 80f;
+        //    }
+        //}
+
         public BingoHUD(HUD.HUD hud) : base(hud)
         {
             pos = new Vector2(20.2f, 725.2f);
             board = BingoHooks.GlobalBoard;
             toggled = false;
             queue = [];
+            completeQueue = [];
             GenerateBingoGrid();
             if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen)
             {
                 AddRevealedToQueue();
             }
             ChallengeHooks.revealInMemory = [];
+            bingoCompleteTitle = new FSprite("bingotitle")
+            {
+                x = hud.rainWorld.screenSize.x * 0.5f,
+                y = hud.rainWorld.screenSize.y * 0.92f,
+                alpha = 0f
+            };
+
+            bingoCompleteInfo = new FLabel(Custom.GetDisplayFont(), "")
+            {
+                alignment = FLabelAlignment.Center,
+                alpha = 0f
+            };
+            bingoCompleteInfoShadow = new FLabel(Custom.GetDisplayFont(), "")
+            {
+                alignment = FLabelAlignment.Center,
+                alpha = 0f,
+                color = new Color(0.05f, 0.05f, 0.05f)
+            };
+            hud.fContainers[1].AddChild(bingoCompleteTitle);
+            hud.fContainers[1].AddChild(bingoCompleteInfo);
+            hud.fContainers[1].AddChild(bingoCompleteInfoShadow);
+            addCompleteAlpha = false;
+            colorToFadeTo = Color.white;
+
+            BingoCompleteInfo? potentialEndGame = CheckWinLose();
+            if (potentialEndGame.HasValue)
+            {
+                DoComplete(potentialEndGame.Value, true);
+                ShowWinText();
+                textShake = 0f;
+            }
+        }
+
+        public void ShowWinText()
+        {
+            addCompleteAlpha = true;
+            textShake = 1f;
+            sinCounter = 0.5f;
+        }
+
+        public void DoComplete(BingoCompleteInfo endGameInfo, bool fromStart = false)
+        {
+            Plugin.logger.LogMessage("DOING COMPLETING");
+            if (!fromStart)
+            {
+                List<IntVector2> winCoords = [];
+                BingoHooks.GlobalBoard.CheckWin(endGameInfo.team, false, winCoords);
+                foreach (var g in winCoords)
+                {
+                    completeQueue.Add(grid[g.x, g.y]);
+                    grid[g.x, g.y].teamResponsible = endGameInfo.team;
+                }
+                completeAnimation = 150;
+            }
+            bingoCompleteInfo.text = endGameInfo.subTitle.Replace("<team_name>", BingoPage.TeamName(endGameInfo.team)) + "\n" + endGameInfo.evenSubtlerTitle;
+            bingoCompleteInfo.color = BingoPage.TEAM_COLOR[endGameInfo.team];
+            colorToFadeTo = bingoCompleteInfo.color;
+        }
+
+        public BingoCompleteInfo? CheckWinLose()
+        {
+            int teamsLost = 0;
+            for (int t = 0; t < 8; t++)
+            {
+                if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost++;
+            }
+            bool allChallengesDone = true;
+            for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+            {
+                if (!allChallengesDone) break;
+                for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+                {
+                    if (!(BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted.Any(x => x == true))
+                    {
+                        allChallengesDone = false;
+                        break;
+                    }
+                }
+            }
+
+            bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
+            string addText = "Exit game to end bingo session.";
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
+            {
+                addText = "Waiting for host to end session...";
+            }
+
+            if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
+            {
+                //Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
+                //Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                int[] completeCounts = new int[8];
+                for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+                {
+                    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+                    {
+                        BingoChallenge ch = grid[i, j].challenge as BingoChallenge;
+                        for (int t = 0; t < 8; t++)
+                        {
+                            if (ch.TeamsCompleted[t]) completeCounts[t]++;
+                        }
+                    }
+                }
+                string addEvenMoreText = "";
+                for (int i = 0; i < 8; i++)
+                {
+                    if (completeCounts[i] > 0)
+                    {
+                        addEvenMoreText += "\n" + BingoPage.TeamName(i) + " team completed squares: " + completeCounts[i];
+                    }
+                }
+                return new BingoCompleteInfo(SteamTest.team, "No possible bingos to complete!" + addEvenMoreText, addText); // Count the tyeah
+            }
+
+            for (int t = 0; t < 8; t++)
+            {
+                if (BingoHooks.GlobalBoard.CheckWin(t, false))
+                {
+                    Plugin.logger.LogMessage($"Team {t} won!");
+                    //Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
+                    //Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    return new BingoCompleteInfo(t, isMultiplayer ? "Team <team_name> won!" : "You won!", addText);
+                }
+            }
+
+            return null;
         }
 
         public void AddRevealedToQueue()
@@ -74,7 +242,11 @@ namespace BingoMode
                     grid[i, j].Clear();
                 }
             }
+            bingoCompleteInfo.RemoveFromContainer();
+            bingoCompleteTitle.RemoveFromContainer();
+            bingoCompleteInfoShadow.RemoveFromContainer();
             queue.Clear();
+            completeQueue.Clear();
         }
 
         public override void Update()
@@ -95,10 +267,26 @@ namespace BingoMode
                     queue[0].StartAnim();
                     queue.RemoveAt(0);
                     animation = animationLength;
-                    if (queue.Count == 0)
+                    if (queue.Count == 0 && completeQueue.Count == 0 && !addCompleteAlpha)
                     {
-                        BingoChallenge.CheckWinLose(); // CHANGE
+                        BingoCompleteInfo? potentialEndGame = CheckWinLose();
+                        if (potentialEndGame.HasValue)
+                        {
+                            DoComplete(potentialEndGame.Value);
+                        }
                     }
+                }
+            }
+
+            if (completeQueue.Count != 0)
+            {
+                completeAnimation--;
+                if (completeAnimation <= 0)
+                {
+                    completeQueue[0].context = completeQueue.Count == 1 ? BingoInfo.AnimationContext.BingoLast : BingoInfo.AnimationContext.Bingo;
+                    completeQueue[0].StartAnim();
+                    completeQueue.RemoveAt(0);
+                    completeAnimation = completeQueue.Count * 3;
                 }
             }
 
@@ -132,7 +320,37 @@ namespace BingoMode
                 }
             }
             lastAlpha = alpha;
-            alpha = Mathf.Clamp01(alpha + 0.1f * (toggled ? 1f : -1f));
+            alpha = BingoData.SpectatorMode ? 1f : Mathf.Clamp01(alpha + 0.1f * (toggled ? 1f : -1f));
+
+            lastCompleteAlpha = completeAlpha;
+            if (addCompleteAlpha) completeAlpha = Mathf.Clamp01(completeAlpha + 0.15f);
+
+            textShake = Mathf.Max(0f, textShake - 0.034f);
+            if (addCompleteAlpha) Cursor.visible = true;
+
+            sinCounter += 0.016f;
+            if (sinCounter >= 1f)
+            {
+                sinCounter -= 1f;
+            }
+
+            //if (mouseOverCompleteText && mouseDown && !lastMouseDown)
+            //{
+            //    EndBingoSessionHost();
+            //}
+        }
+
+        public static void EndBingoSessionHost()
+        {
+            if (SteamFinal.ConnectedPlayers.Count > 0)
+            {
+                foreach (var player in SteamFinal.ConnectedPlayers)
+                {
+                    InnerWorkings.SendMessage("x", player);
+                }
+            }
+            Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
+            Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
         }
 
         public void GenerateBingoGrid()
@@ -143,11 +361,11 @@ namespace BingoMode
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    float size = 420f / board.size;
+                    float size = (BingoData.SpectatorMode ? 475f : 420f) / board.size;
                     float topLeft = -size * board.size / 2f;
-                    Vector2 center = new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
+                    Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f, hud.rainWorld.screenSize.y * 0.5f - 35f) : new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
                     grid[i, j] = new BingoInfo(hud, this,
-                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.owner is SleepAndDeathScreen s ? s.container : hud.fContainers[1], board.challengeGrid[i, j], i, j);
+                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.owner is SleepAndDeathScreen s ? s.hudContainers[1].Container : hud.fContainers[1], board.challengeGrid[i, j], i, j);
                 }
             }
         }
@@ -166,17 +384,29 @@ namespace BingoMode
                     grid[i, j].Draw(timeStacker);
                 }
             }
+
+            float cAlfa = Custom.LerpCircEaseOut(0f, 1f, Mathf.Lerp(lastCompleteAlpha, completeAlpha, timeStacker));
+            bingoCompleteTitle.alpha = cAlfa;
+            bingoCompleteInfo.alpha = cAlfa;
+
+            Vector2 random = Custom.RNV() * textShake * 7f;
+            bingoCompleteTitle.SetPosition(new Vector2(hud.rainWorld.screenSize.x * 0.5f, hud.rainWorld.screenSize.y * 0.93f) + Custom.RNV() * textShake * 8f);
+            bingoCompleteInfo.SetPosition(new Vector2(hud.rainWorld.screenSize.x * 0.5f, hud.rainWorld.screenSize.y * 0.84f) + Custom.RNV() * textShake * 6f);
+            bingoCompleteInfoShadow.SetPosition(bingoCompleteInfo.GetPosition() + new Vector2(2f, 2f));
+            bingoCompleteInfo.color = Color.Lerp(Color.white, colorToFadeTo, Mathf.Abs(Mathf.Sin(sinCounter * Mathf.PI)));
         }
 
         public class BingoInfo
         {
-            public enum CompleteContext
+            public enum AnimationContext
             {
                 Complete,
                 Lockout,
                 AlmostComplete,
                 Failure,
-                ValueChange
+                ValueChange,
+                Bingo,
+                BingoLast
             }
 
             public HUD.HUD hud;
@@ -208,14 +438,16 @@ namespace BingoMode
             public float goalScaleSpeed;
             public List<TriangleMesh> visible;
             public int updateTextCounter;
-            public int flashBorder;
             public float sinCounter;
-            public bool doSin;
             public BorderEffect effect;
-            public CompleteContext context;
+            public AnimationContext context;
             public int teamResponsible;
             public float shakeLock;
             public SoundID contextSound;
+            public Color baseBorderColor;
+            public List<Color> borderColors;
+            public int borderColorIndex1;
+            public int borderColorIndex2;
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
@@ -258,6 +490,21 @@ namespace BingoMode
                 container.AddChild(sprite);
 
                 float scaleFac = (size / 84f);
+
+                teamColors = new TriangleMesh[8];
+                TriangleMesh.Triangle[] tris = [
+                    new(0, 1, 2),
+                    new(1, 2, 3)
+                    ];
+                for (int i = 0; i < teamColors.Length; i++)
+                {
+                    teamColors[i] = new TriangleMesh("Futile_White", tris, false)
+                    {
+                        color = BingoPage.TEAM_COLOR[i],
+                    };
+                    container.AddChild(teamColors[i]);
+                }
+
                 border = new FSprite[4];
                 for (int i = 0; i < border.Length; i++)
                 {
@@ -279,21 +526,6 @@ namespace BingoMode
                 border[1].SetPosition(corners[1]);
                 border[2].SetPosition(corners[0]);
                 border[3].SetPosition(corners[2]);
-                flashBorder = -1;
-
-                teamColors = new TriangleMesh[8];
-                TriangleMesh.Triangle[] tris = [
-                    new(0, 1, 2),
-                    new(1, 2, 3)
-                    ];
-                for (int i = 0; i < teamColors.Length; i++)
-                {
-                    teamColors[i] = new TriangleMesh("Futile_White", tris, false)
-                    {
-                        color = BingoPage.TEAM_COLOR[i],
-                    };
-                    container.AddChild(teamColors[i]);
-                }
 
                 container.AddChild(label);
 
@@ -351,47 +583,48 @@ namespace BingoMode
                     }
                 }
                 contextSound = SoundID.None;
+                baseBorderColor = (challenge as BingoChallenge).Failed ? Color.grey : Color.white;
+                if (challenge.hidden) context = AnimationContext.Lockout;
                 UpdateText();
                 UpdateTeamColors();
             }
 
             private void BingoInfo_ChallengeAlmostComplete(int tea)
             {
-                context = CompleteContext.AlmostComplete;
+                context = AnimationContext.AlmostComplete;
                 teamResponsible = tea;
                 UpdateText();
-                flashBorder = tea;
                 sinCounter = 0f;
             }
 
             private void BingoInfo_ChallengeLockedOut(int tea)
             {
-                context = CompleteContext.Lockout;
+                context = AnimationContext.Lockout;
                 teamResponsible = tea;
                 UpdateText();
-                flashBorder = tea;
                 sinCounter = 0f;
             }
 
             public void OnChallengeFailed(int tea)
             {
-                context = CompleteContext.Failure;
+                context = AnimationContext.Failure;
                 teamResponsible = tea;
+                baseBorderColor = Color.grey;
                 UpdateText();
+                sinCounter = 0f;
             }
 
             public void ChallengeCompleted(int tea)
             {
-                context = CompleteContext.Complete;
+                context = AnimationContext.Complete;
                 teamResponsible = tea;
                 UpdateText();
-                flashBorder = tea;
                 sinCounter = 0f;
             }
 
             public void OnValueChanged()
             {
-                context = CompleteContext.ValueChange;
+                context = AnimationContext.ValueChange;
                 UpdateText();
             }
 
@@ -421,32 +654,56 @@ namespace BingoMode
 
             public void UpdateTeamColors()
             {
+                borderColors = [baseBorderColor];
                 visible = [];
                 bool g = false;
-                bool gpart2 = false;
+                bool g2 = false;
                 for (int i = 0; i < teamColors.Length; i++)
                 {
                     teamColors[i].isVisible = false;
                     if ((challenge as BingoChallenge).TeamsCompleted[i])
                     {
-                        if (i == SteamTest.team)
-                        {
-                            sinCounter = UnityEngine.Random.value;
-                            doSin = true;
-                            flashBorder = i;
-                            gpart2 = true;
-                        }
                         visible.Add(teamColors[i]);
                         g = true;
+                        if (SteamTest.team == i)
+                        {
+                            if (challenge.completed)
+                            {
+                                borderColors.Add(BingoPage.TEAM_COLOR[i]);
+                                g2 = true;
+                            }
+                        }
+                        else borderColors.Add(BingoPage.TEAM_COLOR[i]);
                     }
                 }
-                if (!gpart2 && challenge.revealed)
+                if (!g2 && challenge.revealed)
                 {
-                    sinCounter = UnityEngine.Random.value;
-                    doSin = true;
-                    flashBorder = SteamTest.team;
+                    borderColors = [baseBorderColor, BingoPage.TEAM_COLOR[SteamTest.team]];
+                    borderColorIndex1 = 0;
+                    borderColorIndex2 = 1;
                 }
+                if (g) borderColors.Remove(baseBorderColor);
                 showBG = !g;
+                sinCounter = UnityEngine.Random.value;
+            }
+
+            public void ShiftBorderColors()
+            {
+                bool skipSecond = borderColorIndex1 == borderColorIndex2;
+
+                borderColorIndex2 += 1;
+                if (borderColorIndex2 >= borderColors.Count)
+                {
+                    borderColorIndex2 = 0;
+                }
+
+                if (skipSecond) return;
+                borderColorIndex1 += 1;
+                if (borderColorIndex1 >= borderColors.Count)
+                {
+                    borderColorIndex1 = 0;
+                }
+
             }
 
             public void Update()
@@ -488,16 +745,14 @@ namespace BingoMode
                 }
                 else overwriteAlpha = Mathf.Max(overwriteAlpha - 0.02f, 0f);
 
-                if (doSin)
+                sinCounter += 0.032f;
+                if (sinCounter >= 1f)
                 {
-                    sinCounter += 0.016f;
-                    if (sinCounter > 1f)
-                    {
-                        sinCounter -= 2f;
-                    }
+                    ShiftBorderColors();
+                    sinCounter -= 1f;
                 }
 
-                if (scale == (context == CompleteContext.Failure ? 0.85f : 1.135f))
+                if (scale == (context == AnimationContext.Failure ? 0.85f : 1.135f))
                 {
                     goalScale = 1f;
                     goalScaleSpeed = 0.6f;
@@ -554,8 +809,8 @@ namespace BingoMode
                 border[2].SetPosition(corners[0]);
                 border[3].SetPosition(corners[2]);
 
-                Color flashColor = Color.Lerp(Color.white, flashBorder == -1 ? Color.white : BingoPage.TEAM_COLOR[flashBorder], Mathf.Abs(Mathf.Sin(sinCounter * Mathf.PI)));
-                for (int i = 0; i < 4; i++)
+                Color flashColor = Color.Lerp(borderColors[borderColorIndex1], borderColors[borderColorIndex2], Mathf.Abs(Mathf.Sin(sinCounter * Mathf.PI * 0.5f))).CloneWithNewAlpha(1f);
+                for (int i = 0; i < border.Length; i++)
                 {
                     border[i].color = flashColor;
                 }
@@ -622,37 +877,34 @@ namespace BingoMode
 
             public void StartAnim()
             {
+                goalScale = 0.85f;
+                goalScaleSpeed = 0.0125f;
+                updateTextCounter = 50;
+                contextSound = SoundID.HUD_Karma_Reinforce_Bump;
                 switch (context)
                 {
-                    case CompleteContext.Lockout:
-                        goalScale = 0.85f;
-                        goalScaleSpeed = 0.0125f;
-                        updateTextCounter = 50;
-                        contextSound = SoundID.HUD_Karma_Reinforce_Bump;
-                        break;
-                    case CompleteContext.Complete:
-                        goalScale = 0.85f;
-                        goalScaleSpeed = 0.0125f;
-                        updateTextCounter = 50;
-                        contextSound = SoundID.HUD_Karma_Reinforce_Bump;
-                        break;
-                    case CompleteContext.AlmostComplete:
-                        goalScale = 0.85f;
-                        goalScaleSpeed = 0.0125f;
-                        updateTextCounter = 50;
+                    case AnimationContext.AlmostComplete:
                         contextSound = MMFEnums.MMFSoundID.Tock;
                         break;
-                    case CompleteContext.Failure:
+                    case AnimationContext.Failure:
                         goalScale = 1.135f;
                         goalScaleSpeed = 0.0125f;
                         updateTextCounter = 50;
-                        contextSound = SoundID.HUD_Karma_Reinforce_Bump;
                         break;
-                    case CompleteContext.ValueChange:
-                        goalScale = 0.85f;
-                        goalScaleSpeed = 0.0125f;
-                        updateTextCounter = 50;
+                    case AnimationContext.ValueChange:
                         contextSound = MMFEnums.MMFSoundID.Tick;
+                        break;
+                    case AnimationContext.Bingo:
+                        goalScale = 0.85f;
+                        goalScaleSpeed = 0.013f;
+                        updateTextCounter = 80;
+                        contextSound = SoundID.Moon_Wake_Up_Swarmer_Ping;
+                        break;
+                    case AnimationContext.BingoLast:
+                        goalScale = 0.8f;
+                        goalScaleSpeed = 0.01f;
+                        updateTextCounter = 80;
+                        contextSound = BingoEnums.BINGO_FINAL_BONG;
                         break;
                 }
             }
@@ -663,8 +915,8 @@ namespace BingoMode
                 {
                     phrase.ClearAll();
                 }
-                phrase = context == CompleteContext.Lockout ? Phrase.LockPhrase() : (challenge as BingoChallenge).ConstructPhrase();
-                if (context == CompleteContext.Lockout) shakeLock = 1f;
+                phrase = context == AnimationContext.Lockout ? Phrase.LockPhrase() : (challenge as BingoChallenge).ConstructPhrase();
+                if (context == AnimationContext.Lockout) shakeLock = 1f;
                 if (phrase != null)
                 {
                     phrase.AddAll(container);
@@ -683,31 +935,36 @@ namespace BingoMode
                     }
                     infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
                 }
+                if (challenge.revealed && !challenge.completed) infoLabel.text += "\nREQUIRES HIBERNATION";
+                if ((challenge as BingoChallenge).Failed) infoLabel.text += "\nFAILED";
+                if (context == AnimationContext.BingoLast)
+                {
+                    owner.ShowWinText();
+                }
                 if (overwriteAlpha > 0f)
                 {
                     hud.PlaySound(contextSound);
                     bool chCompleted = (challenge as BingoChallenge).TeamsCompleted[SteamTest.team];
                     goalScale = 1.135f;
-                    if (context == CompleteContext.Failure)
+                    if (context == AnimationContext.Failure)
                     {
                         sinCounter = 0f;
-                        flashBorder = -1;
                         goalScale = 0.85f;
                     }
                     goalScaleSpeed = 0.7f;
                     UpdateTeamColors();
-                    doSin = challenge.revealed || chCompleted;
-                    sinCounter = 0.5f;
+                    sinCounter = 1f;
 
-                    if (context == CompleteContext.Complete || context == CompleteContext.AlmostComplete || context == CompleteContext.Lockout)
+                    if (context == AnimationContext.Complete || context == AnimationContext.AlmostComplete || context == AnimationContext.Lockout || context == AnimationContext.Bingo || context == AnimationContext.BingoLast)
                     {
-                        effect = new BorderEffect(container, pos, BingoPage.TEAM_COLOR[teamResponsible], size, chCompleted ? 2.8f : 1.5f);
+                        float randomVariation = Mathf.Lerp(0.9f, 1.1f, UnityEngine.Random.value);
+                        effect = new BorderEffect(container, pos, BingoPage.TEAM_COLOR[teamResponsible], size, (context == AnimationContext.BingoLast ? 4f : chCompleted ? 2.8f : 1.7f) * randomVariation);
 
                         if (owner.hud.owner is Player p && p.room != null)
                         {
                             for (int i = 0; i < p.room.game.cameras.Length; i++)
                             {
-                                p.room.game.cameras[i].ScreenMovement(pos, default, chCompleted ? 0.5f : 0.1f);
+                                p.room.game.cameras[i].ScreenMovement(pos, default, (context == AnimationContext.BingoLast ? 0.8f : chCompleted ? 0.5f : 0.1f) * randomVariation);
                             }
                         }
                     }
@@ -763,9 +1020,9 @@ namespace BingoMode
                 public void Update()
                 {
                     lastAlpha = alpha;
-                    alpha = Mathf.Max(0f, alpha - 0.075f);
+                    alpha = Mathf.Max(0f, alpha - 0.025f);
                     lastSize = size;
-                    size = Mathf.Lerp(size, initSize * maxSizeIncrease, 0.3f);
+                    size = Mathf.Lerp(size, initSize * maxSizeIncrease, 0.33f);
                 }
 
                 public void Draw(float timeStacker)

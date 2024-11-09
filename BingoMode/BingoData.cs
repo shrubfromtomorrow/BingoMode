@@ -37,6 +37,7 @@ namespace BingoMode
         public static LobbySettings globalSettings = new LobbySettings();
         public static string BingoDen = "random";
         public static List<int> TeamsInBingo = [0];
+        public static bool SpectatorMode = false;
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
@@ -197,17 +198,17 @@ namespace BingoMode
             foreach (BingoChallenge challenge in from challenge in challenges where challenge is BingoChallenge select challenge)
             {
                 string name = (challenge as Challenge).ChallengeName();
-                Plugin.logger.LogMessage("Hooking " + name);
+                //Plugin.logger.LogMessage("Hooking " + name);
                 if (add && !appliedChallenges.Contains(name))
                 {
                     challenge.AddHooks();
                     appliedChallenges.Add(name);
-                    Plugin.logger.LogMessage("Adding this one");
+                    //Plugin.logger.LogMessage("Adding this one");
                 }
                 else if (!add)
                 {
                     challenge.RemoveHooks();
-                    Plugin.logger.LogMessage("Removing this one");
+                    //Plugin.logger.LogMessage("Removing this one");
                 }
             }
         }

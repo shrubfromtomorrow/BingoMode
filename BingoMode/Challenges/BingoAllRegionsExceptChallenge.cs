@@ -13,6 +13,8 @@ namespace BingoMode.Challenges
     {
         public SettingBox<string> region;
         public List<string> regionsToEnter = [];
+        public int current;
+        public int required;
 
         public override void UpdateDescription()
         {
@@ -22,7 +24,7 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("TravellerA", 1f, Color.white), new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value)], []);
+            return new Phrase([new Icon("TravellerA", 1f, Color.white), new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value), new Counter(current, required)], [3]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -45,14 +47,13 @@ namespace BingoMode.Challenges
         {
             List<string> regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
-            regiones.Remove(regionn);
-
-            foreach (var s in regiones) Plugin.logger.LogMessage(s);
+            int req = regiones.Count - 1;
 
             return new BingoAllRegionsExcept
             {
                 region = new(regionn, "Region", 0, listName: "regions"),
                 regionsToEnter = regiones,
+                required = req
             };
         }
 
@@ -60,9 +61,9 @@ namespace BingoMode.Challenges
 
         public void Entered(string regionName)
         {
-            if (completed && region.Value == regionName && !Failed)
+            if (region.Value == regionName && !Failed)
             {
-                regionsToEnter.Add("failed");
+                //regionsToEnter.Add("failed");
                 FailChallenge(SteamTest.team);
                 return;
             }
@@ -71,13 +72,17 @@ namespace BingoMode.Challenges
                 Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
 
-                if (regionsToEnter.Count == 0)
+                current++;
+                UpdateDescription();
+                if (current >= required)
                 {
                     CompleteChallenge();
                 }
-                else ChangeValue();
-                UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
+                else
+                {
+                    ChangeValue();
+                    Expedition.Expedition.coreFile.Save(false);
+                }
             }
         }
 
@@ -106,6 +111,10 @@ namespace BingoMode.Challenges
                 "><",
                 string.Join("|", regionsToEnter),
                 "><",
+                current.ToString(),
+                "><",
+                required.ToString(),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 hidden ? "1" : "0",
@@ -125,11 +134,13 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 region = SettingBoxFromString(array[0]) as SettingBox<string>;
                 regionsToEnter = [.. array[1].Split('|')];
-                completed = (array[2] == "1");
-                hidden = (array[3] == "1");
-                revealed = (array[4] == "1");
-                TeamsFromString(array[5]);
-                Failed = array[6] == "1";
+                current = int.Parse(array[2], System.Globalization.NumberStyles.Any);
+                required = int.Parse(array[3], System.Globalization.NumberStyles.Any);
+                completed = (array[4] == "1");
+                hidden = (array[5] == "1");
+                revealed = (array[6] == "1");
+                TeamsFromString(array[7]);
+                Failed = array[8] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

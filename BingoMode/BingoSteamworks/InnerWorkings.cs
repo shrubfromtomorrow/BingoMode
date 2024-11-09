@@ -14,7 +14,7 @@ namespace BingoMode.BingoSteamworks
         {
             if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID()) return;
             IntPtr ptr = Marshal.StringToHGlobalAuto(data);
-            Plugin.logger.LogMessage("TEST: " + Marshal.PtrToStringAuto(ptr) + " " + (uint)(data.Length * sizeof(char)));
+            Plugin.logger.LogMessage("SENDING: " + Marshal.PtrToStringAuto(ptr) + " " + (uint)(data.Length * sizeof(char)));
 
             if (SteamNetworkingMessages.SendMessageToUser(ref receiver, ptr, (uint)(data.Length * sizeof(char)), reliable ? 40 : 32, 0) != EResult.k_EResultOK)
             {
@@ -31,7 +31,6 @@ namespace BingoMode.BingoSteamworks
         {
             char type = message[0];
             message = message.Substring(1);
-            Plugin.logger.LogMessage("MESSAGE TYPE IS " + type + " " + (type == '!'));
             string[] data = message.Split(';');
             switch (type)
             {
@@ -51,21 +50,16 @@ namespace BingoMode.BingoSteamworks
                     if (x != -1 && y != -1)
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
-                        (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeCompleted(teamCredit);
+                        if (SteamTest.team != 8 &&
+                            BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+                            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout && 
+                            teamCredit != SteamTest.team)
+                        {
+                            (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeLockedOut(teamCredit);
+                        }
+                        else (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeCompleted(teamCredit);
 
                         SteamFinal.BroadcastCurrentBoardState();
-
-                        //(BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = playerCredit;
-                        //if (teamCredit != SteamTest.team)
-                        //{
-                        //    if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).LockoutChallenge();
-                        //    else BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
-                        //}
-                        //else
-                        //{
-                        //    BingoHooks.GlobalBoard.challengeGrid[x, y].CompleteChallenge();
-                        //}
-                        //(BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).completeCredit = default;
                         break;
                     }
                     else
@@ -151,10 +145,29 @@ namespace BingoMode.BingoSteamworks
                     }
                     break;
 
-                // End game ! !!! ! ! ! !!
+                // Finish game request from host
                 case 'x':
-                    Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "Cannot reconnect to host."));
+                    //ulong hostID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
+                    //SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
+                    //hostIdentity.SetSteamID64(hostID);
+                    //SendMessage("f;" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
+                    if (Custom.rainWorld.processManager.currentMainLoop is RainWorldGame game2)
+                    {
+                        if (game2.manager.musicPlayer != null)
+                        {
+                            game2.manager.musicPlayer.DeathEvent();
+                        }
+                        game2.ExitGame(false, false);
+                    }
+                    Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
+                    Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                     break;
+
+                //case 'f':
+                //    ulong playerID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
+                //    SteamNetworkingIdentity playerIdentity = new SteamNetworkingIdentity();
+                //    playerIdentity.SetSteamID64(playerID);
+                //    break;
 
                 // Receive new bingo state
                 case 'B':
@@ -178,7 +191,7 @@ namespace BingoMode.BingoSteamworks
                         {
                             Plugin.logger.LogMessage("Reconnected to host " + data[0] + "!");
                             SteamFinal.ReceivedHostUpKeep = true;
-                            SteamFinal.HostUpkeep = 0;
+                            SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
                             Plugin.logger.LogMessage($"Got new bingo board state!");
                             BingoHooks.GlobalBoard.InterpretBingoState(data[1]);
                         } 
