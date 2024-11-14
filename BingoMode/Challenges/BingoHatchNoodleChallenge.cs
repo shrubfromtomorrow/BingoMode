@@ -23,8 +23,6 @@ namespace BingoMode.Challenges
             base.UpdateDescription();
         }
 
-       // public override bool RequireSave() => false;
-
         public override Phrase ConstructPhrase()
         {
             Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))], [atOnce.Value ? 3 : 2]);
@@ -49,7 +47,7 @@ namespace BingoMode.Challenges
             return new BingoHatchNoodleChallenge
             {
                 atOnce = new(onc, "At Once", 0),
-                amount = new(UnityEngine.Random.Range(1, onc ? 3 : 5) * 2, "Amount", 1),
+                amount = new(UnityEngine.Random.Range(1, onc ? 4 : 6), "Amount", 1),
             };
         }
 

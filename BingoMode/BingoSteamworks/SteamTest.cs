@@ -59,7 +59,7 @@ namespace BingoMode.BingoSteamworks
         {
             Plugin.logger.LogMessage("Getting lobby list! Friends only? " + CurrentFilters.friendsOnly);
 
-            SteamMatchmaking.AddRequestLobbyListDistanceFilter((ELobbyDistanceFilter)CurrentFilters.distance);
+            SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
             if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("name", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
             SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
             SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
@@ -153,10 +153,10 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());
-            Plugin.logger.LogWarning("SETTINGS TEAM TO " + team.ToString() + " AS HOST");
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "burdenList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")).ToList()));
+            SteamMatchmaking.SetLobbyData(lobbyID, "lobbyVersion", Plugin.VERSION);
             // other settings idk
             UpdateOnlineBingo();
             SteamMatchmaking.SetLobbyJoinable(lobbyID, true);

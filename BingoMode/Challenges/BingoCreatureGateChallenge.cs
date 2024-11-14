@@ -1,10 +1,10 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using CreatureType = CreatureTemplate.Type;
 
@@ -16,7 +16,7 @@ namespace BingoMode.Challenges
         public SettingBox<int> amount;
         public int current;
         public SettingBox<string> crit;
-        public List<string> gates = [];
+        public Dictionary<EntityID, List<string>> creatureGates = [];
 
         public override void UpdateDescription()
         {
@@ -24,7 +24,7 @@ namespace BingoMode.Challenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            this.description = ChallengeTools.IGT.Translate("Transport a <crit> through [<current>/<amount>] gates")
+            this.description = ChallengeTools.IGT.Translate("Transport the same <crit> through [<current>/<amount>] gates")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
@@ -42,53 +42,84 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCreatureGateChallenge;
+            return challenge is not BingoCreatureGateChallenge g || g.crit.Value != crit.Value;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Transporting a creature through gates");
+            return ChallengeTools.IGT.Translate("Transporting the same creature through gates");
         }
 
         public override Challenge Generate()
         {
             return new BingoCreatureGateChallenge
             {
-                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
-                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - (ModManager.MSC ? 0 : 1))], "Creature Type", 1, listName: "transport")
+                amount = new(UnityEngine.Random.Range(2, 6), "Amount", 0),
+                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - ((!ModManager.MSC || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0))], "Creature Type", 1, listName: "transport")
             };
         }
 
         public void Gate(string roomName)
         {
-            bool g = false;
+            if (hidden || revealed || TeamsCompleted[SteamTest.team] || completed) return;
+
+            List<AbstractCreature> foundCreatures = [];
+            bool addedGateCreatures = false;
+
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null)
                 {
-                    g = (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value) ||
-                        player.room.abstractRoom.creatures.Any(x => x.creatureTemplate.type.value == crit.Value);
-                    if (g) break;
+                    if (!addedGateCreatures)
+                    {
+                        foundCreatures.AddRange(player.room.abstractRoom.creatures.FindAll(x => x.creatureTemplate.type.value == crit.Value));
+                        addedGateCreatures = true;
+                    }
+                    if (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value)
+                    {
+                        if (!foundCreatures.Contains(stomacreature)) foundCreatures.Add(stomacreature);
+                    }
                 }
             }
 
-            if (g && !completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && !gates.Contains(roomName))
-            {
-                gates.Add(roomName);
-                current++;
-                UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
+            if (foundCreatures.Count == 0) return;
 
-                if (current >= amount.Value) CompleteChallenge();
-                else ChangeValue();
+            foreach (var gateCrit in foundCreatures)
+            {
+                EntityID id = gateCrit.ID;
+                if (!creatureGates.ContainsKey(id))
+                {
+                    Plugin.logger.LogMessage($"Adding {crit.Value} of ID {id} to the dictionary. Room name: {roomName}");
+                    creatureGates.Add(id, [roomName]);
+                }
+                else
+                {
+                    Plugin.logger.LogMessage($"{crit.Value} of ID {id} already in dictionary. Room name: {roomName}");
+                    if (!creatureGates[id].Contains(roomName))
+                    {
+                        creatureGates[id].Add(roomName);
+                    }
+                }
             }
+            foundCreatures.Sort(delegate(AbstractCreature one, AbstractCreature two)
+            {
+                int count1 = creatureGates[one.ID].Count;
+                int count2 = creatureGates[two.ID].Count;
+                return count2.CompareTo(count1);
+            });
+            int last = current;
+            current = creatureGates[foundCreatures[0].ID].Count;
+            UpdateDescription();
+            if (current >= amount.Value) CompleteChallenge();
+            else if (last != current) ChangeValue();
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            gates = [];
+            creatureGates?.Clear();
+            creatureGates = [];
             current = 0;
         }
 
@@ -107,6 +138,42 @@ namespace BingoMode.Challenges
             return true;
         }
 
+        public string CreatureGatesToString()
+        {
+            List<string> joinLater = [];
+
+            foreach (var kvp in creatureGates)
+            {
+                joinLater.Add(kvp.Key.ToString() + "|" + string.Join("|", kvp.Value));
+            }
+
+            if (joinLater.Count == 0) return "empty";
+
+            return string.Join("%", joinLater);
+        }
+
+        public Dictionary<EntityID, List<string>> CreatureGatesFromString(string from)
+        {
+            Dictionary<EntityID, List<string>> gates = [];
+
+            if (from == "empty") return gates;
+
+            string[] gateCrits = from.Split('%');
+            for (int i = 0; i < gateCrits.Length; i++)
+            {
+                string[] split = gateCrits[i].Split('|');
+                EntityID id = EntityID.FromString(split[0]);
+                List<string> rooms = [];
+                for (int r = 1; r < split.Length; r++)
+                {
+                    rooms.Add(split[r]);
+                }
+                gates[id] = rooms;
+            }
+
+            return gates;
+        }
+
         public override string ToString()
         {
             return string.Concat(new string[]
@@ -119,7 +186,7 @@ namespace BingoMode.Challenges
                 "><",
                 amount.ToString(),
                 "><",
-                string.Join("|", gates),
+                CreatureGatesToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -139,7 +206,7 @@ namespace BingoMode.Challenges
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                gates = array[3].Split('|').ToList();
+                creatureGates = CreatureGatesFromString(array[3]);
                 completed = (array[4] == "1");
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");

@@ -29,7 +29,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoStealChallenge c || (c.subject.Value != subject.Value || c.toll.Value != toll.Value);
+            return challenge is not BingoStealChallenge c || c.subject.Value != subject.Value || c.toll.Value != toll.Value;
         }
 
         public override string ChallengeName()

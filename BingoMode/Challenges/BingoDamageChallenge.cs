@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoDamageChallenge || (challenge as BingoDamageChallenge).weapon != weapon || (challenge as BingoDamageChallenge).victim != victim;
+            return challenge is not BingoDamageChallenge c || c.weapon.Value != weapon.Value || c.victim.Value != victim.Value;
         }
 
         public override string ChallengeName()

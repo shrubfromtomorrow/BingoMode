@@ -55,6 +55,7 @@ namespace BingoMode.Challenges
                 case "tolls": return BombableOutposts;
                 case "food": return FoodTypes;
                 case "weapons": return Weapons;
+                case "weaponsnojelly": return Weapons.Where(x => x != "JellyFish").ToArray();
                 case "theft": return [.. StealableStolable, "DataPearl"];
                 case "ban": return Bannable;
                 case "friend": return Befriendable;
@@ -63,7 +64,7 @@ namespace BingoMode.Challenges
                 case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
-                case "depths": return ["Hazer", "VultureGrub"];
+                case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
@@ -133,7 +134,7 @@ namespace BingoMode.Challenges
                     if (slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.Add("VS");
                     break;
                 case "Hazer":
-                    r.AddRange(["HI", "GW", "SL", "DS", "LF"]);
+                    r.AddRange(["HI", "GW", "SL", slug == MoreSlugcatsEnums.SlugcatStatsName.Saint ? "UG" : "DS", "LF"]);
                     break;
                 case "VultureGrub":
                     r.AddRange(["HI", "GW", "CC", "LF"]);
@@ -142,12 +143,27 @@ namespace BingoMode.Challenges
                     r.Add((slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer || slug == MoreSlugcatsEnums.SlugcatStatsName.Spear) ? "LM" : "SL");
                     break;
                 case "Yeek":
-                    r.Add("OE"); if (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint || slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.AddRange(["SB", "LF"]);
+                    r.Add("OE"); if (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint || slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+                    {
+                        r.AddRange(["SB", "LF"]);
+                        r.Remove("OE");
+                    }
                     break;
             }
 
             return r;
         }
+
+        public static readonly string[] Depthable = 
+        {
+            "Hazer",
+            "VultureGrub",
+            "SmallNeedleWorm",
+            "TubeWorm",
+            "SmallCentipede",
+            "Snail",
+            "LanternMouse",
+        };
 
         public static readonly string[] AllSubregions =
         {
@@ -347,7 +363,6 @@ namespace BingoMode.Challenges
             "Spear",
             "Rock",
             "ScavengerBomb",
-            //"FlareBomb",
             "JellyFish",
             "PuffBall",
             "LillyPuck"
@@ -412,19 +427,21 @@ namespace BingoMode.Challenges
 
         public static readonly string[] CraftableItems =
         {
-            "Rock",
             "FlareBomb",
             "SporePlant",
             "ScavengerBomb",
-            "VultureMask",
+            "JellyFish",
+            "DataPearl",
+            "BubbleGrass",
+            "FlyLure",
             "SlimeMold",
             "FirecrackerPlant",
             "PuffBall",
             "Mushroom",
+            "Lantern",
             "GlowWeed",
             "GooieDuck",
             "FireEgg",
-            "SingularityBomb"
         };
     }
 }

@@ -45,7 +45,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            int num = Mathf.RoundToInt(Mathf.Lerp(20f, 125f, UnityEngine.Random.value) / 10f) * 10;
+            int num = Mathf.RoundToInt(Mathf.Lerp(20f, 150f, UnityEngine.Random.value) / 10f) * 10;
             return new BingoCycleScoreChallenge
             {
                 target = new(num, "Target Score", 0)

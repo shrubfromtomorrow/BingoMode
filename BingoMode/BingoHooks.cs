@@ -1,6 +1,5 @@
 ﻿using Expedition;
 using Menu;
-using Menu.Remix;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
@@ -30,7 +29,6 @@ namespace BingoMode
             // Ignoring bingo challenges in bingo (has to be done here)
             On.Expedition.ChallengeOrganizer.SetupChallengeTypes += ChallengeOrganizer_SetupChallengeTypes;
             // Remove all hooks while at it
-            //On.Expedition.ExpeditionData.ClearActiveChallengeList += ExpeditionData_ClearActiveChallengeList;
             // Add the bingo challenges when loading challenges from string
             IL.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromStringIL;
             On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
@@ -138,7 +136,7 @@ namespace BingoMode
                 {
                     if (GlobalBoard != null && ExpeditionData.slugcatPlayer == slug)
                     {
-                        //Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
+                        Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
                         GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[slug].Last());
                     }
                 });
@@ -162,15 +160,16 @@ namespace BingoMode
                             Plugin.logger.LogInfo("Regenerating broken challenge " + challenge);
                             if (!ExpeditionData.allChallengeLists.ContainsKey(name))
                             {
-                                ExpeditionData.allChallengeLists.Add(name, []);
+                                ExpeditionData.allChallengeLists.Add(name, new List<Challenge>());
                             }
                             ExpeditionData.allChallengeLists[name].Add(challenge);
+                            if (GlobalBoard != null) GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[name].Last());
                         }
                     }
                     catch (Exception ex)
                     {
                         Plugin.logger.LogError("Error while regenerating broken challenge, call that shit inception fr how did this happen: " + ex);
-                        Challenge challenge = Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoDodgeLeviathanChallenge").GetType()) as Challenge;
+                        Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate();
                         challenge.FromString(array11[1]);
                         if (challenge != null)
                         {
@@ -180,6 +179,7 @@ namespace BingoMode
                                 ExpeditionData.allChallengeLists.Add(name, []);
                             }
                             ExpeditionData.allChallengeLists[name].Add(challenge);
+                            if (GlobalBoard != null) GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[name].Last());
                         }
                     }
                 });
@@ -345,9 +345,17 @@ namespace BingoMode
                 SteamFinal.TryToReconnect = false;
                 SpectatorHooks.UnHook();
                 SteamTest.LeaveLobby();
+                ChallengeHooks.revealInMemory = [];
                 if (BingoHUD.ReadyForLeave)
                 {
-                    BingoHUD.EndBingoSessionHost();
+                    if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost)
+                    {
+                        BingoHUD.EndBingoSessionHost();
+                    }
+                    else
+                    {
+                        Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    }
                     BingoHUD.ReadyForLeave = false;
                 }
                 else

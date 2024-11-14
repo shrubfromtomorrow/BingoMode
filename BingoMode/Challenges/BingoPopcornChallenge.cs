@@ -38,7 +38,7 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             BingoPopcornChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
+            ch.amound = new(UnityEngine.Random.Range(2, 7), "Amount", 0);
             return ch;
         }
 

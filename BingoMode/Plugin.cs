@@ -18,9 +18,10 @@ namespace BingoMode
     using BingoSteamworks;
     using Challenges;
 
-    [BepInPlugin("nacu.bingomode", "Expedition Bingo", "0.5")]
+    [BepInPlugin("nacu.bingomode", "Expedition Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        public const string VERSION = "0.61";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
 

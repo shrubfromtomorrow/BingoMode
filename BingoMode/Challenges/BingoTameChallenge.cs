@@ -24,7 +24,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTameChallenge;
+            return challenge is not BingoTameChallenge c || c.crit.Value != crit.Value;
         }
 
         public override string ChallengeName()

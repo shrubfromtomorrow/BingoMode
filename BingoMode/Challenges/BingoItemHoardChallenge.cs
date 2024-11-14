@@ -4,7 +4,6 @@ using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return !(challenge is BingoItemHoardChallenge) || (challenge as BingoItemHoardChallenge).target != target;
+            return !(challenge is BingoItemHoardChallenge) || (challenge as BingoItemHoardChallenge).target.Value != target.Value;
         }
 
         public override string ChallengeName()

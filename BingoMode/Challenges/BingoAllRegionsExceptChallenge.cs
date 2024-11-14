@@ -61,6 +61,7 @@ namespace BingoMode.Challenges
 
         public void Entered(string regionName)
         {
+            if (SteamTest.team == 8) return;
             if (region.Value == regionName && !Failed)
             {
                 //regionsToEnter.Add("failed");

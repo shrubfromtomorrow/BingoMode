@@ -11,6 +11,7 @@ namespace BingoMode
         float num;
         SimpleButton closeButton;
         FLabel infoText;
+        int wait; // they dont love you like i love you
 
         // Extremely hardcoded info thing hi
         public InfoDialog(ProcessManager manager, string message) : base(manager)
@@ -26,7 +27,9 @@ namespace BingoMode
             float yTop = 578f;
 
             closeButton = new SimpleButton(this, pages[0], message == "Trying to reconnect to the host." ? Translate("CANCEL") : Translate("CLOSE"), message == "Trying to reconnect to the host." ? "STOPRECONNECT" : message == "Cannot reconnect to host." ? "QUITGAEM" : "CLOSE", new Vector2(683f - num / 2f, yTop - 305f), new Vector2(num, 35f));
+            closeButton.buttonBehav.greyedOut = true;
             pages[0].subObjects.Add(closeButton);
+            wait = 80;
             infoText = new FLabel(Custom.GetFont(), message)
             {
                 anchorX = 0.5f,
@@ -46,6 +49,9 @@ namespace BingoMode
         public override void Update()
         {
             base.Update();
+
+            wait = Mathf.Max(0, wait - 1);
+            closeButton.buttonBehav.greyedOut = wait != 0;
 
             if ((infoText.text == "Trying to reconnect to the host." || infoText.text == "Cannot reconnect to host.") && manager.currentMainLoop is RainWorldGame game)
             {

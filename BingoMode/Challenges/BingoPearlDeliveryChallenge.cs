@@ -80,7 +80,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return !(challenge is BingoPearlDeliveryChallenge) || !((challenge as BingoPearlDeliveryChallenge).region == this.region);
+            return challenge is not BingoPearlDeliveryChallenge c || c.region.Value != region.Value;
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)

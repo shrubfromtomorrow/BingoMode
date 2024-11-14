@@ -38,12 +38,14 @@ namespace BingoMode
             public int team;
             public string subTitle;
             public string evenSubtlerTitle;
+            public bool majorityWin;
 
-            public BingoCompleteInfo(int team, string subTitle, string evenSubtlerTitle)
+            public BingoCompleteInfo(int team, string subTitle, string evenSubtlerTitle, bool majorityWin = false)
             {
                 this.team = team;
                 this.subTitle = subTitle;
                 this.evenSubtlerTitle = evenSubtlerTitle;
+                this.majorityWin = majorityWin;
             }
         }
         public FSprite bingoCompleteTitle;
@@ -120,6 +122,7 @@ namespace BingoMode
             addCompleteAlpha = true;
             textShake = 1f;
             sinCounter = 0.5f;
+            ReadyForLeave = true;
         }
 
         public void DoComplete(BingoCompleteInfo endGameInfo, bool fromStart = false)
@@ -127,12 +130,29 @@ namespace BingoMode
             Plugin.logger.LogMessage("DOING COMPLETING");
             if (!fromStart)
             {
-                List<IntVector2> winCoords = [];
-                BingoHooks.GlobalBoard.CheckWin(endGameInfo.team, false, winCoords);
-                foreach (var g in winCoords)
+                if (endGameInfo.majorityWin)
                 {
-                    completeQueue.Add(grid[g.x, g.y]);
-                    grid[g.x, g.y].teamResponsible = endGameInfo.team;
+                    for (int x = 0; x < grid.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < grid.GetLength(0); y++)
+                        {
+                            if (grid[x, y].challenge is BingoChallenge bimbo && bimbo.TeamsCompleted[endGameInfo.team])
+                            {
+                                completeQueue.Add(grid[x, y]);
+                                grid[x, y].teamResponsible = endGameInfo.team;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    List<IntVector2> winCoords = [];
+                    BingoHooks.GlobalBoard.CheckWin(endGameInfo.team, false, winCoords);
+                    foreach (var g in winCoords)
+                    {
+                        completeQueue.Add(grid[g.x, g.y]);
+                        grid[g.x, g.y].teamResponsible = endGameInfo.team;
+                    }
                 }
                 completeAnimation = 150;
             }
@@ -143,64 +163,43 @@ namespace BingoMode
 
         public BingoCompleteInfo? CheckWinLose()
         {
-            int teamsLost = 0;
+            bool[] teamsLost = new bool[8]; // Teams that cant do a bingo
             for (int t = 0; t < 8; t++)
             {
-                if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost++;
+                if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost[t] = true;
             }
-            bool allChallengesDone = true;
-            for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
-            {
-                if (!allChallengesDone) break;
-                for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
-                {
-                    if (!(BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted.Any(x => x == true))
-                    {
-                        allChallengesDone = false;
-                        break;
-                    }
-                }
-            }
+            //bool allChallengesDone = true;
+            //for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+            //{
+            //    if (!allChallengesDone) break;
+            //    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+            //    {
+            //        if (!(BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted.Any(x => x == true))
+            //        {
+            //            allChallengesDone = false;
+            //            break;
+            //        }
+            //    }
+            //}
 
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
-            string addText = "Exit game to end bingo session.";
+            string addText = "Exit the game to end the bingo session for everyone.";
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
             {
-                addText = "Waiting for host to end session...";
-            }
-
-            if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
-            {
-                //Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
-                //Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                int[] completeCounts = new int[8];
-                for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
-                {
-                    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
-                    {
-                        BingoChallenge ch = grid[i, j].challenge as BingoChallenge;
-                        for (int t = 0; t < 8; t++)
-                        {
-                            if (ch.TeamsCompleted[t]) completeCounts[t]++;
-                        }
-                    }
-                }
-                string addEvenMoreText = "";
-                for (int i = 0; i < 8; i++)
-                {
-                    if (completeCounts[i] > 0)
-                    {
-                        addEvenMoreText += "\n" + BingoPage.TeamName(i) + " team completed squares: " + completeCounts[i];
-                    }
-                }
-                return new BingoCompleteInfo(SteamTest.team, "No possible bingos to complete!" + addEvenMoreText, addText); // Count the tyeah
+                addText = "Exit the game or wait for host to end the session.";
             }
 
             for (int t = 0; t < 8; t++)
             {
+                if (teamsLost[t] == true && CompletedChallengesForTeam(t) > Mathf.FloorToInt(Mathf.Pow(grid.GetLength(0), 2f) / 2f))
+                {
+                    Plugin.logger.LogMessage($"Team {t} won through majority!");
+                    return new BingoCompleteInfo(t, "Team <team_name> won!", addText, true);
+                }
+
                 if (BingoHooks.GlobalBoard.CheckWin(t, false))
                 {
                     Plugin.logger.LogMessage($"Team {t} won!");
@@ -210,7 +209,48 @@ namespace BingoMode
                 }
             }
 
+            //if (teamsLost == BingoData.TeamsInBingo.Count && allChallengesDone) // Noone can complete bingo anymore, game ending, stats on who got the most tiles
+            //{
+            //    //Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoLoseScreen);
+            //    //Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+            //    int[] completeCounts = new int[8];
+            //    for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
+            //    {
+            //        for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
+            //        {
+            //            BingoChallenge ch = grid[i, j].challenge as BingoChallenge;
+            //            for (int t = 0; t < 8; t++)
+            //            {
+            //                if (ch.TeamsCompleted[t]) completeCounts[t]++;
+            //            }
+            //        }
+            //    }
+            //    string addEvenMoreText = "";
+            //    for (int i = 0; i < 8; i++)
+            //    {
+            //        if (completeCounts[i] > 0)
+            //        {
+            //            addEvenMoreText += "\n" + BingoPage.TeamName(i) + " team completed squares: " + completeCounts[i];
+            //        }
+            //    }
+            //    return new BingoCompleteInfo(SteamTest.team, "No possible bingos to complete!" + addEvenMoreText, addText); // Count the tyeah
+            //}
+
             return null;
+        }
+
+        public int CompletedChallengesForTeam(int team)
+        {
+            int all = 0;
+            for (int x = 0; x < grid.GetLength(0); x++)
+            {
+                for (int y = 0; y < grid.GetLength(0); y++)
+                {
+                    if ((BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[team]) all++;
+                }
+            }
+            Plugin.logger.LogWarning($"Completed challenges for team {BingoPage.TeamName(team)} - {all}");
+            return all;
         }
 
         public void AddRevealedToQueue()
@@ -345,11 +385,11 @@ namespace BingoMode
             if (SteamFinal.ConnectedPlayers.Count > 0)
             {
                 foreach (var player in SteamFinal.ConnectedPlayers)
-                {
+                {   
                     InnerWorkings.SendMessage("x", player);
                 }
             }
-            Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
+            //Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
             Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
         }
 
@@ -682,7 +722,7 @@ namespace BingoMode
                     borderColorIndex1 = 0;
                     borderColorIndex2 = 1;
                 }
-                if (g) borderColors.Remove(baseBorderColor);
+                if (g && SteamTest.team == 8) borderColors.Remove(baseBorderColor);
                 showBG = !g;
                 sinCounter = UnityEngine.Random.value;
             }
@@ -722,10 +762,10 @@ namespace BingoMode
                     infoLabel.MoveToFront();
                 }
 
-                if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
-                {
-                    challenge.CompleteChallenge();
-                }
+                //if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
+                //{
+                //    challenge.CompleteChallenge();
+                //}
 
                 bool doOverwriteAlpha = false;
                 if (updateTextCounter > 0)
@@ -928,15 +968,15 @@ namespace BingoMode
                 infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
                 if ((challenge as BingoChallenge).TeamsCompleted.Any(x => x == true))
                 {
-                    infoLabel.text += "\nCompleted by: ";
+                    infoLabel.text += "\nCOMPLETED BY: ";
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
                     {
                         if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
                     }
                     infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
                 }
-                if (challenge.revealed && !challenge.completed) infoLabel.text += "\nREQUIRES HIBERNATION";
-                if ((challenge as BingoChallenge).Failed) infoLabel.text += "\nFAILED";
+                if (challenge.revealed && !challenge.completed) infoLabel.text += "\nSave the game to Complete";
+                if ((challenge as BingoChallenge).Failed) infoLabel.text += "\nFailed";
                 if (context == AnimationContext.BingoLast)
                 {
                     owner.ShowWinText();

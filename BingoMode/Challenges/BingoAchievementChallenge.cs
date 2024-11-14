@@ -34,7 +34,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return !(challenge is BingoAchievementChallenge) || !((challenge as BingoAchievementChallenge).ID.Value == ID.Value);
+            return challenge is not BingoAchievementChallenge c || c.ID.Value != ID.Value;
         }
 
         public override int Points()
@@ -90,7 +90,7 @@ namespace BingoMode.Challenges
 
         public void CheckAchievementProgress(WinState winState)
         {
-            if (completed || TeamsCompleted[SteamTest.team] || revealed || this.game == null)
+            if (completed || TeamsCompleted[SteamTest.team] || revealed || this.game == null || hidden)
             {
                 return;
             }

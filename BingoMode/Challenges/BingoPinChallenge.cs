@@ -28,7 +28,7 @@ namespace BingoMode.Challenges
                 .Replace("<current_pin>", current.ToString())
                 .Replace("<pin_amount>", target.Value.ToString())
                 .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : "creatures")
-                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
+                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different unique regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
     
@@ -40,11 +40,11 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             string r = "";
-            string c = Random.value < 0.5f ? "Any Creature" : ChallengeUtils.Pinnable[Random.Range(0, ChallengeUtils.Pinnable.Length)];
+            string c = Random.value < 0.3f ? "Any Creature" : ChallengeUtils.Pinnable[Random.Range(0, ChallengeUtils.Pinnable.Length)];
             List<string> regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
             regions.Remove("ss");
             float radom = Random.value;
-            if (radom < 0.66f) r = regions[Random.Range(0, regions.Count)];
+            if (radom < 0.7f) r = regions[Random.Range(0, regions.Count)];
             else r = "Any Region";
     
             return new BingoPinChallenge

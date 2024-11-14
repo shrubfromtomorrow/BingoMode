@@ -11,8 +11,8 @@ namespace BingoMode.BingoSteamworks
 {
     public class SteamFinal
     {
-        public const int PlayerUpkeepTime = 2600;
-        public const int MaxHostUpKeepTime = 5200;
+        public const int PlayerUpkeepTime = 1200;
+        public const int MaxHostUpKeepTime = 4000;
         public const int TryToReconnectTime = 50;
         public const int MaxUpkeepCounter = 200;
 

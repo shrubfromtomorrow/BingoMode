@@ -25,7 +25,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoNoRegionChallenge;
+            return challenge is not BingoNoRegionChallenge c || c.region.Value != region.Value;
         }
 
         public override string ChallengeName()

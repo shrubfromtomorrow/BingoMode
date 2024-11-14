@@ -6,7 +6,6 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || TeamsCompleted[SteamTest.team] || revealed) return;
+            if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden) return;
 
             for (int i = 0; i < this.game.Players.Count; i++)
             {

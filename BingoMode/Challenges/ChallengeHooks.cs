@@ -9,7 +9,6 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -23,16 +22,14 @@ namespace BingoMode.Challenges
         public Type type;
         public string name;
         public int index;
-        public int[] locks; // mutually exclusive settings
         public T Value;
         public string listName;
-        public SettingBox(T value, string displayName, int index, int[] locks = null, string listName = null)
+        public SettingBox(T value, string displayName, int index, string listName = null)
         {
             Value = value;
             type = typeof(T);
             name = displayName;
             this.index = index;
-            this.locks = locks;
             this.listName = listName;
         }
 
@@ -51,14 +48,6 @@ namespace BingoMode.Challenges
         public override string ToString()
         {
             string excl = "NULL";
-            //if (locks != null)
-            //{
-            //    excl = locks[0].ToString();
-            //    for (int i = 1; i < locks.Length; i++)
-            //    {
-            //        excl += "," + locks[i];
-            //    }
-            //}
             if (listName != null)
             {
                 excl = listName;
@@ -76,16 +65,6 @@ namespace BingoMode.Challenges
                 );
         }
     }
-
-    //public interface BingoChallenge
-    //{
-    //    void AddHooks();
-    //    void RemoveHooks();
-    //    List<object> Settings();
-    //    bool RequireSave { get; set; }
-    //    bool Failed { get; set; }
-    //    bool[] TeamsCompleted { get; set; }
-    //}
 
     public static class ChallengeHooks
     {
@@ -115,17 +94,17 @@ namespace BingoMode.Challenges
                     case "System.Int32":
                     case "System.Int64":
                         //Plugin.logger.LogMessage("Generating it as int!");
-                        bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), null, listName);
+                        bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), listName);
                         break;
                     case "Boolean":
                     case "System.Boolean":
                         //Plugin.logger.LogMessage("Generating it as bool!");
-                        bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), null, listName);
+                        bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), listName);
                         break;
                     case "String":
                     case "System.String":
                         //Plugin.logger.LogMessage("Generating it as string!");
-                        bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), null, listName);
+                        bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), listName);
                         break;
                 }
                 //Plugin.logger.LogMessage("Recreation successful!");
@@ -167,6 +146,39 @@ namespace BingoMode.Challenges
             //IL.FlareBomb.Update += FlareBomb_Update;
             //On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
             //IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
+        }
+
+        public static void Player_SpitUpCraftedObjectIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(
+                x => x.MatchLdloc(0),
+                x => x.MatchLdfld<AbstractPhysicalObject>("realizedObject"),
+                x => x.MatchLdarg(0),
+                x => x.MatchCallOrCallvirt<Player>("FreeHand"),
+                x => x.MatchCallOrCallvirt<Player>("SlugcatGrab")
+                ) && c.TryGotoNext(MoveType.After,
+                x => x.MatchLdloc(0),
+                x => x.MatchLdfld<AbstractPhysicalObject>("realizedObject"),
+                x => x.MatchLdarg(0),
+                x => x.MatchCallOrCallvirt<Player>("FreeHand"),
+                x => x.MatchCallOrCallvirt<Player>("SlugcatGrab")
+                ))
+            {
+                c.Emit(OpCodes.Ldloc_0);
+                c.EmitDelegate<Action<AbstractPhysicalObject>>((obj) =>
+                {
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoCraftChallenge c)
+                        {
+                            c.Crafted(obj.type);
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Player_SpitUpCraftedObjectIL FAILURE " + il);
         }
 
         public static void ShelterDoor_Close(On.ShelterDoor.orig_Close orig, ShelterDoor self)
@@ -410,7 +422,6 @@ namespace BingoMode.Challenges
         public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
         {
             orig.Invoke(self);
-            Plugin.logger.LogMessage("HALO HALOO 2");
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -424,7 +435,6 @@ namespace BingoMode.Challenges
         public static void RegionGate_NewWorldLoaded1(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
         {
             orig.Invoke(self);
-            Plugin.logger.LogMessage("HALO HALOO");
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -483,14 +493,17 @@ namespace BingoMode.Challenges
         {
             if (BingoData.BingoMode)
             {
-                revealInMemory = [];
-
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                if (survived && !newMalnourished)
                 {
-                    if (survived && ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
+                    revealInMemory = [];
+
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
-                        revealInMemory.Add(g);
-                        g.revealed = false;
+                        if (survived && ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
+                        {
+                            revealInMemory.Add(g);
+                            g.revealed = false;
+                        }
                     }
                 }
 
@@ -517,23 +530,6 @@ namespace BingoMode.Challenges
                     }
                 }
             }
-        }
-
-        public static ItemType Player_CraftingResults(On.Player.orig_CraftingResults orig, Player self)
-        {
-            ItemType origItem = orig.Invoke(self);
-
-            if (origItem == null) return origItem;
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is BingoCraftChallenge c)
-                {
-                    c.Crafted(origItem);
-                }
-            }
-
-            return origItem;
         }
 
         public static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel self)
@@ -970,7 +966,6 @@ namespace BingoMode.Challenges
         
         public static void Room_LoadedGreenNeuron(ILContext il)
         {
-            //Plugin.logger.LogMessage("Ass " + il);
             ILCursor b = new(il);
             if (b.TryGotoNext(
                 x => x.MatchLdsfld("Expedition.ExpeditionData", "startingDen")
@@ -983,18 +978,15 @@ namespace BingoMode.Challenges
                 b.Emit(OpCodes.Ldloc, 72);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
-                    if (ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge))
+                    AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == ItemType.NSHSwarmer);
+                    if (existingFucker != null)
                     {
-                        AbstractPhysicalObject startItem = new (room.world, ItemType.NSHSwarmer, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID());
-                        room.abstractRoom.entities.Add(startItem);
-                        startItem.Realize();
-                        //Player player = room.game.Players[0].realizedCreature as Player;
-                        //if (player != null && startItem.realizedObject != null)
-                        //{
-                        //    startItem.realizedObject.firstChunk.HardSetPosition(player.mainBodyChunk.pos + new Vector2(-30f, 0f));
-                        //    player.SlugcatGrab(startItem.realizedObject, 0);
-                        //}
+                        room.abstractRoom.RemoveEntity(existingFucker);
                     }
+
+                    AbstractPhysicalObject startItem = new(room.world, ItemType.NSHSwarmer, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID());
+                    room.abstractRoom.entities.Add(startItem);
+                    startItem.Realize();
                 });
             }
             else Plugin.logger.LogError("Ass " + il);

@@ -39,15 +39,11 @@ namespace BingoMode
         public RoundedRect multiMenuBg;
         public FSprite divider;
         public SymbolButton createLobby;
-        public SymbolButton friendsNoFriends;
-        public SymbolButton refreshSearch;
-        public OpComboBox distanceFilter;
-        public ConfigurableBase distanceFilterConf;
-        public UIelementWrapper distanceFilterWrapper;
+        public SimpleButton friendsNoFriends;
+        public SimpleButton refreshSearch;
         public OpTextBox nameFilter;
         public ConfigurableBase nameFilterConf;
         public UIelementWrapper nameFilterWrapper;
-        //public MenuTab tab;
         public List<LobbyInfo> foundLobbies;
         public FSprite[] lobbyDividers;
         public VerticalSlider slider;
@@ -174,7 +170,6 @@ namespace BingoMode
             divider.anchorX = 0f;
             Container.AddChild(divider);
 
-            distanceFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_DistanceFilterBingo", "Near", (ConfigAcceptableBase)null);
             nameFilterConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_NameFilterBingo", "", (ConfigAcceptableBase)null);
             CreateSearchPage();
 
@@ -204,23 +199,6 @@ namespace BingoMode
         private void NameFilter_OnValueUpdate(UIconfig config, string value, string oldValue)
         {
             SteamTest.CurrentFilters.text = value;
-            SteamTest.GetJoinableLobbies();
-        }
-
-        private void DistanceFilter_OnValueChanged(UIconfig config, string value, string oldValue)
-        {
-            int num = 1;
-            switch (value)
-            {
-                case "Far":
-                    num = 2;
-                    break;
-                case "Worldwide":
-                    num = 3;
-                    break;
-            }
-
-            SteamTest.CurrentFilters.distance = num;
             SteamTest.GetJoinableLobbies();
         }
 
@@ -413,7 +391,7 @@ namespace BingoMode
 
                 ExpeditionGame.PrepareExpedition();
                 ExpeditionData.AddExpeditionRequirements(ExpeditionData.slugcatPlayer, false);
-                ExpeditionData.earnedPassages++;
+                ExpeditionData.earnedPassages = 1;
                 bool isHost = false;
                 SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
                 SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
@@ -463,19 +441,6 @@ namespace BingoMode
                         SteamMatchmaking.SetLobbyJoinable(SteamTest.CurrentLobby, false);
                     }
                 }
-
-                // This will be decided by the host when sending the first bingo state
-                //for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
-                //{
-                //    for (int j = 0; j < BingoHooks.GlobalBoard.size; j++)
-                //    {
-                //        if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).ReverseChallenge) 
-                //        {
-                //            Plugin.logger.LogMessage("Completing reverse challenge as team " + SteamTest.team);
-                //            BingoHooks.GlobalBoard.challengeGrid[i, j].CompleteChallenge();
-                //        }
-                //    }
-                //}
                 return;
             }
 
@@ -487,15 +452,17 @@ namespace BingoMode
 
             if (message == "ADDSIZE")
             {
-                BingoHooks.GlobalBoard.size += 1;
-                Regen(true);
+                int lastSize = BingoHooks.GlobalBoard.size;
+                BingoHooks.GlobalBoard.size = Mathf.Min(lastSize + 1, 9);
+                if (lastSize != BingoHooks.GlobalBoard.size) Regen(true);
                 return;
             }
 
             if (message == "REMOVESIZE")
             {
-                BingoHooks.GlobalBoard.size = Mathf.Max(1, BingoHooks.GlobalBoard.size - 1);
-                Regen(true);
+                int lastSize = BingoHooks.GlobalBoard.size;
+                BingoHooks.GlobalBoard.size = Mathf.Max(1, lastSize - 1);
+                if (lastSize != BingoHooks.GlobalBoard.size) Regen(true);
                 return;
             }
 
@@ -525,6 +492,7 @@ namespace BingoMode
                 if (slideStep == 0f) slideStep = 1f;
                 else slideStep = -slideStep;
                 float ff = slideStep == 1f ? 1f : 0f;
+                if (slideStep == 1f) SteamTest.GetJoinableLobbies();
                 slider.subtleSliderNob.outerCircle.alpha = ff;
                 foreach (var line in slider.lineSprites)
                 {
@@ -544,7 +512,7 @@ namespace BingoMode
             if (message == "TOGGLE_FRIENDSONLY")
             {
                 SteamTest.CurrentFilters.friendsOnly = !SteamTest.CurrentFilters.friendsOnly;
-                friendsNoFriends.symbolSprite.SetElementByName(SteamTest.CurrentFilters.friendsOnly ? "Kill_Slugcat" : "Multiplayer_Death");
+                friendsNoFriends.menuLabel.text = SteamTest.CurrentFilters.friendsOnly ? "Friends only: Yes" : "Friends only: No";
                 return;
             }
 
@@ -556,6 +524,12 @@ namespace BingoMode
                 {
                     Plugin.logger.LogMessage("Joining" + lobid);
                     CSteamID lobbid = new CSteamID(lobid);
+                    string lobbyVersion = SteamMatchmaking.GetLobbyData(lobbid, "lobbyVersion");
+                    if (lobbyVersion != Plugin.VERSION)
+                    {
+                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same mod version as the lobby.\nYour version: {Plugin.VERSION}. Lobby version: {lobbyVersion}"));
+                        return;
+                    }
                     if (SteamMatchmaking.GetLobbyData(lobbid, "banCheats") == "1")
                     {
                         List<string> totallyevilmods = [];
@@ -675,16 +649,13 @@ namespace BingoMode
                 createLobby.pos.x = multiMenuBg.pos.x + 338f;
                 createLobby.pos.y = divider.y + 5.25f;
 
-                friendsNoFriends.pos.x = createLobby.pos.x - 40f;
-                friendsNoFriends.pos.y = createLobby.pos.y;
+                friendsNoFriends.pos.x = createLobby.pos.x - 117f;
+                friendsNoFriends.pos.y = createLobby.pos.y + 5f;
 
-                refreshSearch.pos.x = friendsNoFriends.pos.x - 40f;
-                refreshSearch.pos.y = createLobby.pos.y;
+                refreshSearch.pos.x = friendsNoFriends.pos.x - 67f;
+                refreshSearch.pos.y = createLobby.pos.y + 5f;
 
-                distanceFilter.PosX = refreshSearch.pos.x - 105f;
-                distanceFilter.PosY = createLobby.pos.y + 5f;
-
-                nameFilter.PosX = distanceFilter.PosX - 145f;
+                nameFilter.PosX = refreshSearch.pos.x - 147f;
                 nameFilter.PosY = createLobby.pos.y + 5f;
 
                 if (foundLobbies != null && foundLobbies.Count > 0) DrawDisplayedLobbies(timeStacker);
@@ -726,13 +697,16 @@ namespace BingoMode
             pageTitle.RemoveFromContainer();
             unlocksButton.Hide();
             shelterSetting.Hide();
-            //tab.RemoveItems(unlocksButton, shelterSetting);
             unlocksButton.Unload();
             shelterSetting.Unload();
+            shelterSetting.OnValueUpdate -= ShelterSetting_OnValueUpdate;
+            nameFilter.OnValueUpdate -= NameFilter_OnValueUpdate;
             menuTabWrapper.wrappers.Remove(unlocksButton);
             menuTabWrapper.wrappers.Remove(shelterSetting);
+            menuTabWrapper.wrappers.Remove(nameFilter);
             menuTabWrapper.subObjects.Remove(unlockWrapper);
             menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
+            menuTabWrapper.subObjects.Remove(nameFilterWrapper);
             if (inLobby) RemoveLobbyPage();
             else RemoveSearchPage();
         }
@@ -794,20 +768,11 @@ namespace BingoMode
             createLobby.symbolSprite.scale = 0.9f;
             subObjects.Add(createLobby);
 
-            friendsNoFriends = new SymbolButton(menu, this, "Multiplayer_Death", "TOGGLE_FRIENDSONLY", default);
-            friendsNoFriends.size = new Vector2(35f, 35f);
-            friendsNoFriends.roundedRect.size = friendsNoFriends.size;
-            friendsNoFriends.symbolSprite.scale = 0.9f;
+            friendsNoFriends = new SimpleButton(menu, this, "Friends only: No", "TOGGLE_FRIENDSONLY", default, new Vector2(110f, 25f));
             subObjects.Add(friendsNoFriends);
 
-            refreshSearch = new SymbolButton(menu, this, "Menu_Symbol_Repeats", "REFRESH_SEARCH", default);
-            refreshSearch.size = new Vector2(35f, 35f);
-            refreshSearch.roundedRect.size = refreshSearch.size;
-            refreshSearch.symbolSprite.scale = 1.2f;
+            refreshSearch = new SimpleButton(menu, this, "Refresh", "REFRESH_SEARCH", default, new Vector2(60f, 25f));
             subObjects.Add(refreshSearch);
-
-            distanceFilter = new OpComboBox(distanceFilterConf as Configurable<string>, default, 100f, ["Near", "Far", "Worldwide"]);
-            distanceFilter.OnValueChanged += DistanceFilter_OnValueChanged;
 
             nameFilter = new OpTextBox(nameFilterConf as Configurable<string>, default, 140f);
             nameFilter.allowSpace = true;
@@ -816,21 +781,16 @@ namespace BingoMode
             createLobby.pos.x = multiMenuBg.pos.x + 338f;
             createLobby.pos.y = divider.y + 5.25f;
 
-            friendsNoFriends.pos.x = createLobby.pos.x - 40f;
-            friendsNoFriends.pos.y = createLobby.pos.y;
+            friendsNoFriends.pos.x = createLobby.pos.x - 117f;
+            friendsNoFriends.pos.y = createLobby.pos.y + 5f;
 
-            refreshSearch.pos.x = friendsNoFriends.pos.x - 40f;
-            refreshSearch.pos.y = createLobby.pos.y;
+            refreshSearch.pos.x = friendsNoFriends.pos.x - 67f;
+            refreshSearch.pos.y = createLobby.pos.y + 5f;
 
-            distanceFilter.PosX = refreshSearch.pos.x - 105f;
-            distanceFilter.PosY = createLobby.pos.y + 5f;
-            distanceFilter.lastScreenPos = distanceFilter.ScreenPos;
-
-            nameFilter.PosX = distanceFilter.PosX - 145f;
+            nameFilter.PosX = refreshSearch.pos.x - 147f;
             nameFilter.PosY = createLobby.pos.y + 5f;
             nameFilter.lastScreenPos = nameFilter.ScreenPos;
 
-            distanceFilterWrapper = new UIelementWrapper(menuTabWrapper, distanceFilter);
             nameFilterWrapper = new UIelementWrapper(menuTabWrapper, nameFilter);
         }
 
@@ -842,14 +802,9 @@ namespace BingoMode
             RemoveSubObject(createLobby);
             RemoveSubObject(friendsNoFriends);
             RemoveSubObject(refreshSearch);
-            distanceFilter.Hide();
             nameFilter.Hide();
-            //tab.RemoveItems(distanceFilter, nameFilter);
-            distanceFilter.Unload();
             nameFilter.Unload();
-            menuTabWrapper.wrappers.Remove(distanceFilter);
             menuTabWrapper.wrappers.Remove(nameFilter);
-            menuTabWrapper.subObjects.Remove(distanceFilterWrapper);
             menuTabWrapper.subObjects.Remove(nameFilterWrapper);
             RemoveLobbiesSprites();
         }
@@ -1011,13 +966,14 @@ namespace BingoMode
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
                     bool lockout = SteamMatchmaking.GetLobbyData(lobby, "lockout") == "1";
                     bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "banCheats") == "1";
+                    string lobbyVersion = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion");
                     Plugin.logger.LogMessage($"Perks: {SteamMatchmaking.GetLobbyData(lobby, "perks").Trim()}");
                     Plugin.logger.LogMessage($"Burdens: {SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim()}");
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
                     Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
-                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, perks, burdens));
+                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, lobbyVersion, perks, burdens));
                     //Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
                 }
                 catch (System.Exception e)
@@ -1148,6 +1104,7 @@ namespace BingoMode
             public int currentPlayers;
             public bool lockout;
             public bool banCheats;
+            public string version;
             public AllowUnlocks perks;
             public AllowUnlocks burdens;
             public FLabel nameLabel;
@@ -1157,7 +1114,7 @@ namespace BingoMode
             BingoPage page;
             public InfoPanel panel;
 
-            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool banCheats, AllowUnlocks perks, AllowUnlocks burdens)
+            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool banCheats, string version, AllowUnlocks perks, AllowUnlocks burdens)
             {
                 this.lobbyID = lobbyID;
                 this.name = name;
@@ -1165,6 +1122,7 @@ namespace BingoMode
                 this.currentPlayers = currentPlayers;
                 this.lockout = lockout;
                 this.banCheats = banCheats;
+                this.version = version;
                 this.perks = perks;
                 this.burdens = burdens;
                 this.page = page;
@@ -1271,6 +1229,7 @@ namespace BingoMode
                     }
 
                     labels[0].text = "Lockout: " + (info.lockout ? "Yes" : "No");
+                    labels[1].text = "Mod version: " + info.version;
                     labels[2].text = "Perks: " + (info.perks == AllowUnlocks.Any ? "Allowed" : info.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
                     labels[3].text = "Burdens: " + (info.burdens == AllowUnlocks.Any ? "Allowed" : info.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
                     labels[4].text = "Banned cheat mods: " + (info.banCheats ? "YES" : "NO");

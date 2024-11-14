@@ -30,7 +30,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoDontUseItemChallenge c || (c.item != item && c.isFood != isFood);
+            return challenge is not BingoDontUseItemChallenge c || (c.item.Value != item.Value);
         }
 
         public override string ChallengeName()

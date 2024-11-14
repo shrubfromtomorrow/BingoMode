@@ -31,7 +31,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return !(challenge is BingoPearlHoardChallenge);
+            return challenge is not BingoPearlHoardChallenge c || (c.common.Value != common.Value && c.region.Value != region.Value);
         }
 
         public override string ChallengeName()

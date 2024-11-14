@@ -1,4 +1,5 @@
-﻿using BingoMode.Challenges;
+﻿using BingoMode.BingoSteamworks;
+using BingoMode.Challenges;
 using Expedition;
 using Menu;
 using Menu.Remix;
@@ -289,6 +290,7 @@ namespace BingoMode
                 case "CLOSE":
                     closing = true;
                     targetAlpha = 0f;
+                    SteamTest.UpdateOnlineBingo();
                     break;
                 case "RANDOMIZE_VARIABLE":
                     AssignChallenge(onSettings ? owner.challenge : null);

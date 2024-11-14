@@ -99,25 +99,25 @@ namespace BingoMode.Challenges
         {
             float diff = UnityEngine.Random.value;
             ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(ExpeditionData.slugcatPlayer, diff);
-            int num = (int)Mathf.Lerp(3f, 15f, (float)Math.Pow(diff, 2.5));
+            int num = (int)Mathf.Lerp(1f, 10f, (float)Math.Pow(diff, 2.5));
             if (expeditionCreature.points < 7)
             {
-                num += UnityEngine.Random.Range(3, 6);
+                num += UnityEngine.Random.Range(2, 4);
             }
             if (num > expeditionCreature.spawns)
             {
                 num = expeditionCreature.spawns;
             }
-            if (num > 15)
+            if (num > 12)
             {
-                num = 15;
+                num = 12;
             }
             bool onePiece = UnityEngine.Random.value < 0.2f;
             bool starvv = UnityEngine.Random.value < 0.2f;
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
             num = Mathf.Max(1, num);
             List<string> clone = ChallengeUtils.Weapons.ToList();
-            clone.RemoveAll(x => x == "PuffBall" || x == "FlareBomb" || x == "Rock");
+            clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish");
             bool doWeapon = UnityEngine.Random.value < 0.5f;
             bool doCreature = !doWeapon || UnityEngine.Random.value < 0.8f;
             string weapo = doWeapon ? "Any Weapon" : clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
@@ -125,10 +125,7 @@ namespace BingoMode.Challenges
                 expeditionCreature.creature == CreatureType.Centiwing ||
                 expeditionCreature.creature == CreatureType.SmallCentipede ||
                 expeditionCreature.creature == CreatureType.RedCentipede ||
-                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = "PuffBall"; 
-            else if ((expeditionCreature.creature == CreatureType.Spider ||
-                expeditionCreature.creature == CreatureType.BigSpider ||
-                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.MotherSpider) && UnityEngine.Random.value < 0.3f) weapo = "FlareBomb"; 
+                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = "PuffBall";
             return new BingoKillChallenge
             {
                 crit = new(doCreature ? expeditionCreature.creature.value : "Any Creature", "Creature Type", 0, listName: "creatures"),
@@ -137,8 +134,7 @@ namespace BingoMode.Challenges
                 oneCycle = new(onePiece, "In one Cycle", 3),
                 sub = new("Any Subregion", "Subregion", 4, listName: "subregions"),
                 region = new("Any Region", "Region", 5, listName: "regions"),
-                //room = new("", "Room", 6, listName: "regions"),
-                weapon = new(weapo, "Weapon Used", 6, listName: "weapons"),
+                weapon = new(weapo, "Weapon Used", 6, listName: "weaponsnojelly"),
                 deathPit = new(false, "Via a Death Pit", 7)
             };
         }
@@ -235,7 +231,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return true;// challenge is not BingoKillChallenge c;
+            return challenge is not BingoKillChallenge c || (c.crit.Value != crit.Value && c.weapon.Value != weapon.Value && c.starve.Value != starve.Value);
         }
 
         public override string ToString()

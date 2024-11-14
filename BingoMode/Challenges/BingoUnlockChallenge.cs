@@ -63,7 +63,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoUnlockChallenge c || c.unlock != unlock;
+            return challenge is not BingoUnlockChallenge c || c.unlock.Value != unlock.Value;
         }
 
         public override string ChallengeName()

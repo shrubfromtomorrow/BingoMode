@@ -215,5 +215,9 @@ namespace BingoMode.Challenges
         {
             ValueChanged?.Invoke();
         }
+
+        public override void UpdateDescription()
+        {
+        }
     }
 }

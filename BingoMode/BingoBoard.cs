@@ -54,7 +54,7 @@ namespace BingoMode
                     {
                         continue;
                     }
-                    challengeGrid[i, j] = RandomBingoChallenge();
+                    challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                 }
             }
             SteamTest.UpdateOnlineBingo();
@@ -178,7 +178,7 @@ namespace BingoMode
             return won;
         }
 
-        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false)
+        public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)
         {
             if (BingoData.availableBingoChallenges == null)
             {
@@ -211,9 +211,46 @@ namespace BingoMode
                 }
             }
 
-            if (ch == null) goto resette;
+            if (x != -1 && y != -1 && (ch as BingoChallenge).ReverseChallenge() && ReverseCollisionCheck(x, y))
+            {
+                list.Remove(ch);
+                goto resette;
+            }
+            if (ch == null) ch = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate(); ;
             if (!ExpeditionData.challengeList.Contains(ch) && !ignore) ExpeditionData.challengeList.Add(ch);
             return ch;
+        }
+
+        public bool ReverseCollisionCheck(int x, int y)
+        {
+            // Horizontal check
+            for (int i = 0; i < size; i++)
+            {
+                if (challengeGrid[i, y] != null && (challengeGrid[i, y] as BingoChallenge).ReverseChallenge()) return true;
+            }
+            // Vertical check
+            for (int i = 0; i < size; i++)
+            {
+                if (challengeGrid[x, i] != null && (challengeGrid[x, i] as BingoChallenge).ReverseChallenge()) return true;
+            }
+            // Horizontal 1 check
+            if (x == y)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    if (challengeGrid[i, i] != null && (challengeGrid[i, i] as BingoChallenge).ReverseChallenge()) return true;
+                }
+            }
+            // Horizontal 2 check
+            if (size - 1 - y == x)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    if (challengeGrid[size - 1 - i, i] != null && (challengeGrid[size - 1 - i, i] as BingoChallenge).ReverseChallenge()) return true;
+                }
+            }
+
+            return false;
         }
 
         public void RecreateFromList()
@@ -343,9 +380,8 @@ namespace BingoMode
             {
                 for (int j = 0; j < size; j++)
                 {
-                    if (challengeGrid[i, j] == null)
+                    if (challengeGrid[i, j] == null || challengeGrid[i, j].hidden)
                     {
-                        Plugin.logger.LogWarning("is null");
                         continue;
                     }
                     BingoChallenge ch = challengeGrid[i, j] as BingoChallenge;

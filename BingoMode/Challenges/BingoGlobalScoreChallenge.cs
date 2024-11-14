@@ -39,7 +39,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            int num = Mathf.RoundToInt(Mathf.Lerp(150f, 300f, UnityEngine.Random.value) / 10f) * 10;
+            int num = Mathf.RoundToInt(Mathf.Lerp(80f, 300f, UnityEngine.Random.value) / 10f) * 10;
             return new BingoGlobalScoreChallenge
             {
                 target = new(num, "Target Score", 0)

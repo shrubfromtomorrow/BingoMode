@@ -36,7 +36,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoBombTollChallenge;
+            return challenge is not BingoBombTollChallenge c;
         }
 
         public override string ChallengeName()

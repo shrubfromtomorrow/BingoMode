@@ -49,7 +49,7 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTransportChallenge c || (crit != c.crit && (from != c.from || to != c.to));
+            return challenge is not BingoTransportChallenge c || (crit.Value != c.crit.Value && (from.Value != c.from.Value || to.Value != c.to.Value));
         }
 
         public override string ChallengeName()
