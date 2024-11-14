@@ -1,6 +1,5 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
-using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,45 +8,44 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoPopcornChallenge : BingoChallenge
+    public class BingoKarmaFlowerChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> amound;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
+            description = ChallengeTools.IGT.Translate("Consume [<current>/<amount>] Karma Flowers")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amound.Value.ToString());
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("Symbol_Spear", 1f, UnityEngine.Color.white), new Icon("popcorn_plant", 1f, new UnityEngine.Color(0.41f, 0.16f, 0.23f)), new Counter(current, amound.Value)], [2]);
+        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold), new Counter(current, amound.Value)], [2]);
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoPopcornChallenge;
+            return challenge is not BingoKarmaFlowerChallenge;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Popping popcorn plants");
+            return ChallengeTools.IGT.Translate("Consuming karma flowers");
         }
 
         public override Challenge Generate()
         {
-            BingoPopcornChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(2, 7), "Amount", 0);
+            BingoKarmaFlowerChallenge ch = new();
+            ch.amound = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
             return ch;
         }
 
-        public void Pop()
+        public void Karmad()
         {
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
                 current++;
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= (int)amound.Value) CompleteChallenge();
                 else ChangeValue();
             }
@@ -71,14 +69,14 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return slugcat != MoreSlugcatsEnums.SlugcatStatsName.Saint;
+            return slugcat != SlugcatStats.Name.Red;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "BingoPopcornChallenge",
+                "BingoKarmaFlowerChallenge",
                 "~",
                 current.ToString(),
                 "><",
@@ -109,19 +107,21 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoPopcornChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoKarmaFlowerChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            IL.SeedCob.HitByWeapon += SeedCob_HitByWeapon;
+            On.Player.ObjectEaten += Player_ObjectEatenKarmaFlower;
+            IL.Room.Loaded += Room_LoadedKarmaFlower;
         }
 
         public override void RemoveHooks()
         {
-            IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
+            On.Player.ObjectEaten -= Player_ObjectEatenKarmaFlower;
+            IL.Room.Loaded -= Room_LoadedKarmaFlower;
         }
 
         public override List<object> Settings() => [amound];

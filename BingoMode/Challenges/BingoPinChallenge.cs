@@ -49,7 +49,7 @@ namespace BingoMode.Challenges
     
             return new BingoPinChallenge
             {
-                target = new(Mathf.FloorToInt(Random.Range(4, 8) / (r == "Any Region" ? 2.5f : 1f)), "Amount", 0),
+                target = new(Mathf.FloorToInt(Random.Range(3, 7) / (r == "Any Region" ? 2.5f : 1f)), "Amount", 0),
                 crit = new(c, "Creature Type", 1, listName: "creatures"),
                 region = new(r, "Region", 2, listName: "regions"),
             };

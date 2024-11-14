@@ -91,14 +91,15 @@
     <Compile Include="BingoGrid.cs" />
     <Compile Include="BingoHUD.cs" />
     <Compile Include="BingoHooks.cs" />
+    <Compile Include="BingoHUDCursor.cs" />
+    <Compile Include="BingoHUDHint.cs" />
+    <Compile Include="BingoModOptions.cs" />
     <Compile Include="BingoPage.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\LobbyFilters.cs" />
     <Compile Include="BingoSteamworks\LobbySettings.cs" />
     <Compile Include="BingoSteamworks\SteamFinal.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
-    <Compile Include="BingoLoseScreen.cs" />
-    <Compile Include="BingoWinScreen.cs" />
     <Compile Include="Challenges\BingoAchievementChallenge.cs" />
     <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />
     <Compile Include="Challenges\BingoBombTollChallenge.cs" />
@@ -116,7 +117,9 @@
     <Compile Include="Challenges\BingoDontUseItemChallenge.cs" />
     <Compile Include="Challenges\BingoEatChallenge.cs" />
     <Compile Include="Challenges\BingoHatchNoodleChallenge.cs" />
+    <Compile Include="Challenges\BingoHellChallenge.cs" />
     <Compile Include="Challenges\BingoItemHoardChallenge.cs" />
+    <Compile Include="Challenges\BingoKarmaFlowerChallenge.cs" />
     <Compile Include="Challenges\BingoKillChallenge.cs" />
     <Compile Include="Challenges\BingoNeuronDeliveryChallenge.cs" />
     <Compile Include="Challenges\BingoNoRegionChallenge.cs" />

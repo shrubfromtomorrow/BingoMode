@@ -41,7 +41,7 @@ namespace BingoMode
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
-        public struct BingoSaveData
+        public class BingoSaveData
         {
             public int size;
             public SteamNetworkingIdentity hostID;
@@ -49,13 +49,16 @@ namespace BingoMode
             public string playerWhiteList;
             public int team;
             public bool lockout;
+            public bool showedWin;
 
-            public BingoSaveData(int size)
+            public BingoSaveData(int size, bool showedWin, int team)
             {
                 this.size = size;
+                this.showedWin = showedWin;
+                this.team = team;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout, bool showedWin)
             {
                 this.size = size;
                 this.team = team;
@@ -63,6 +66,7 @@ namespace BingoMode
                 this.isHost = isHost;
                 this.playerWhiteList = playerWhiteList;
                 this.lockout = lockout;
+                this.showedWin = showedWin;
             }
         }
 

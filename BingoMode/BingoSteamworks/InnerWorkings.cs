@@ -84,20 +84,11 @@ namespace BingoMode.BingoSteamworks
                     {
                         Plugin.logger.LogMessage($"Failing online challenge at {xx}, {yy}");
                         //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).TeamsCompleted[teamCredit2] = false;
-                        (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = playerCredit2;
+                        //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = playerCredit2;
                         (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).OnChallengeFailed(teamCredit2);
-                        (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = default;
+                        //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = default;
 
                         SteamFinal.BroadcastCurrentBoardState();
-                        //if (teamCredit2 != SteamTest.team)
-                        //{
-                        //    if (BingoData.globalSettings.lockout) (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).LockoutChallenge();
-                        //    else BingoHooks.GlobalBoard.challengeGrid[xx, yy].CompleteChallenge();
-                        //}
-                        //else
-                        //{
-                        //    BingoHooks.GlobalBoard.challengeGrid[xx, yy].CompleteChallenge();
-                        //}
 
                         break;
                     }
@@ -160,7 +151,9 @@ namespace BingoMode.BingoSteamworks
                         game2.ExitGame(false, false);
                     }
                     Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
+                    Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer); 
                     Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                    BingoData.FinishBingo();
                     break;
 
                 //case 'f':

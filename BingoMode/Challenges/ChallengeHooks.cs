@@ -144,8 +144,22 @@ namespace BingoMode.Challenges
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
             //IL.FlareBomb.Update += FlareBomb_Update;
-            //On.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallenge;
-            //IL.Expedition.Challenge.CompleteChallenge += Challenge_CompleteChallengeIL;
+        }
+
+        public static void Room_LoadedKarmaFlower(ILContext il)
+        {
+            ILCursor c = new(il);
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchBrfalse(out _),
+                x => x.MatchLdstr("Preventing natural KarmaFlower spawn")
+                ))
+            {
+                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                {
+                    return false;
+                });
+            }
+            else Plugin.logger.LogError("Room_LoadedKarmaFlower FAILURE " + il);
         }
 
         public static void Player_SpitUpCraftedObjectIL(ILContext il)
@@ -1015,6 +1029,20 @@ namespace BingoMode.Challenges
                 if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge g && g.isFood)
                 {
                     g.Eated(edible);
+                }
+            }
+        }
+
+        public static void Player_ObjectEatenKarmaFlower(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+            orig.Invoke(self, edible);
+
+            if (edible is not KarmaFlower) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoKarmaFlowerChallenge c)
+                {
+                    c.Karmad();
                 }
             }
         }

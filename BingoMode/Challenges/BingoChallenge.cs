@@ -14,8 +14,7 @@ namespace BingoMode.Challenges
         public abstract void AddHooks();
         public abstract void RemoveHooks();
         public abstract List<object> Settings();
-        //public bool RequireSave = true;
-        public bool Failed;
+        public bool[] TeamsFailed = new bool[9];
         public bool[] TeamsCompleted = new bool[9];
         public ulong completeCredit = 0;
         public virtual Phrase ConstructPhrase() => null;
@@ -30,9 +29,21 @@ namespace BingoMode.Challenges
 
         public string TeamsToString()
         {
-            string data = "";
-            foreach (bool t in TeamsCompleted) data += t ? "1" : 0;
-            return data;
+            char[] data = "000000000".ToCharArray();
+            for (int t = 0; t < TeamsCompleted.Length; t++)
+            {
+                if (TeamsFailed[t] == true)
+                {
+                    data[t] = '2';
+                    continue;
+                }
+                if (TeamsCompleted[t] == true)
+                {
+                    data[t] = '1';
+                    continue;
+                }
+            }
+            return new string(data);
         }
 
         public void TeamsFromString(string data)
@@ -40,6 +51,7 @@ namespace BingoMode.Challenges
             if (TeamsCompleted.Length != data.Length) return;
             for (int i = 0; i < data.Length; i++)
             {
+                TeamsFailed[i] = data[i] == '2';
                 TeamsCompleted[i] = data[i] == '1';
             }
         }
@@ -152,6 +164,7 @@ namespace BingoMode.Challenges
         public void OnChallengeCompleted(int team)
         {
             Plugin.logger.LogMessage($"Completing challenge for {BingoPage.TeamName(team)}: {this}");
+            Plugin.logger.LogInfo(Environment.StackTrace);
             bool lastCompleted = TeamsCompleted[team];
 
             TeamsCompleted[team] = true;
@@ -190,16 +203,20 @@ namespace BingoMode.Challenges
 
         public void OnChallengeFailed(int team)
         {
-            bool lastFailed = Failed;
-            Plugin.logger.LogMessage($"Failing challenge for {completeCredit}: {this}");
+            Plugin.logger.LogMessage($"Failing challenge for {BingoPage.TeamName(team)}: {this}");
+            Plugin.logger.LogInfo(Environment.StackTrace);
+
             if (team == SteamTest.team)
             {
-                Failed = true;
                 completed = false;
             }
+            TeamsFailed[team] = true;
             TeamsCompleted[team] = false;
+
+            UpdateDescription();
+
+            ChallengeFailed?.Invoke(team);
             Expedition.Expedition.coreFile.Save(false);
-            if (!lastFailed) ChallengeFailed?.Invoke(team);
         }
 
         public void OnChallengeLockedOut(int team)

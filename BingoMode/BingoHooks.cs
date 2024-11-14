@@ -83,19 +83,25 @@ namespace BingoMode
                             string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
                             for (int i = 0; i < array.Length; i++)
                             {
+                                Plugin.logger.LogMessage(array[i]);
                                 string[] array2 = array[i].Split('#');
                                 int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                if (array2.Length > 2)
+                                if (array2.Length > 4)
                                 {
                                     int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                                     SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
                                     hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
                                     bool isHost = array2[4] == "1";
                                     bool lockout = array2[6] == "1";
+                                    bool showedWin = false;
+                                    if (array2.Length > 7)
+                                    {
+                                        showedWin = array2[7] == "1";
+                                    }
 
                                     Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}");
 
-                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout);
+                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin);
 
                                     //if (array[5] != "")
                                     //{
@@ -109,7 +115,7 @@ namespace BingoMode
                                     //    //}
                                     //}
                                 }
-                                else BingoData.BingoSaves[new(array2[0])] = new(size);
+                                else BingoData.BingoSaves[new(array2[0])] = new(size, array2.Length > 2 ? array2[2] == "1" : false, array2.Length > 3 ? int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture) : SteamTest.team);
                             }
                         }
                     }
@@ -210,7 +216,6 @@ namespace BingoMode
 
             // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
-            IL.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcessIL;
 
             // Add Bingo HUD and Stop the base Expedition HUD from appearing
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
@@ -253,6 +258,55 @@ namespace BingoMode
 
             // No red karma 1
             IL.Menu.KarmaLadder.KarmaSymbol.Update += KarmaSymbol_UpdateIL;
+
+            // Shift the position of the kills in menu
+            On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
+
+            // No force watch sleep screen
+            On.Menu.SleepAndDeathScreen.GetDataFromGame += SleepAndDeathScreen_GetDataFromGame;
+        }
+
+        private static void SleepAndDeathScreen_GetDataFromGame(On.Menu.SleepAndDeathScreen.orig_GetDataFromGame orig, SleepAndDeathScreen self, KarmaLadderScreen.SleepDeathScreenDataPackage package)
+        {
+            orig.Invoke(self, package);
+
+            if (BingoData.BingoMode)
+            {
+                Plugin.logger.LogFatal("doing your biological father");
+                self.forceWatchAnimation = false;
+
+                if (self.hud == null || self.hud.parts == null) return;
+                Plugin.logger.LogFatal("doing your biological uncle");
+                HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUD);
+                if (binguHUD is BingoHUD hude)
+                {
+                    Plugin.logger.LogFatal("doing your biological mother");
+                    self.forceWatchAnimation = hude.queue.Count > 0 || hude.completeQueue.Count > 0;
+                }
+            }
+        }
+
+        private static void SleepAndDeathScreen_Update(On.Menu.SleepAndDeathScreen.orig_Update orig, SleepAndDeathScreen self)
+        {
+            orig.Invoke(self);
+                
+            if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
+            HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUD);
+            if (binguHUD is BingoHUD hude)
+            {
+                self.killsDisplay.pos.x = self.LeftHandButtonsPosXAdd + 420f * hude.alpha;
+            }
+        }
+
+        private static void SleepAndDeathScreen_GrafUpdate(On.Menu.SleepAndDeathScreen.orig_GrafUpdate orig, SleepAndDeathScreen self, float timeStacker)
+        {
+            orig.Invoke(self, timeStacker);
+
+            BingoHUD binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUD) as BingoHUD;
+            if (binguHUD != null)
+            {
+                //self.killsDisplay
+            }
         }
 
         private static void KarmaSymbol_UpdateIL(ILContext il)
@@ -287,7 +341,7 @@ namespace BingoMode
                         Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
-                            if (!challenge.completed && challenge is BingoChallenge b && !b.Failed && b.ReverseChallenge())
+                            if (!challenge.completed && challenge is BingoChallenge b && !b.TeamsFailed[SteamTest.team] && b.ReverseChallenge())
                             {
                                 b.OnChallengeCompleted(SteamTest.team);
                             }
@@ -305,10 +359,11 @@ namespace BingoMode
                         Plugin.logger.LogMessage("Saving game and completing reverse challenges");
                         foreach (Challenge challenge in ExpeditionData.challengeList)
                         {
-                            if (!challenge.completed && challenge is BingoChallenge b && !b.Failed && b.ReverseChallenge())
+                            if (!challenge.completed && challenge is BingoChallenge b && b.ReverseChallenge())
                             {
                                 foreach (int team in BingoData.TeamsInBingo)
                                 {
+                                    if (b.TeamsFailed[team]) continue;
                                     b.OnChallengeCompleted(team);
                                 }
                             }
@@ -354,7 +409,9 @@ namespace BingoMode
                     }
                     else
                     {
+                        if (BingoData.BingoSaves != null && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                         Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
+                        BingoData.FinishBingo();
                     }
                     BingoHUD.ReadyForLeave = false;
                 }
@@ -446,15 +503,25 @@ namespace BingoMode
                         {
                             text +=
                             "#" +
-                            saveData.team + 
+                            saveData.team +
                             "#" +
-                            saveData.hostID.GetSteamID64() + 
-                            "#" + 
+                            saveData.hostID.GetSteamID64() +
+                            "#" +
                             (saveData.isHost ? "1" : "0") +
                             "#" +
                             saveData.playerWhiteList +
                             "#" +
-                            (saveData.lockout ? "1" : "0");
+                            (saveData.lockout ? "1" : "0") + 
+                            "#" + 
+                            (saveData.showedWin ? "1" : "0");
+                        }
+                        else
+                        {
+                            text +=
+                            "#" +
+                            (saveData.showedWin ? "1" : "0") + 
+                            "#" +
+                            saveData.team;
                         }
                         if (i < BingoData.BingoSaves.Count - 1)
                         {
@@ -473,10 +540,13 @@ namespace BingoMode
         {
             orig.Invoke(self, manager, ID);
 
-            if (!ExpeditionGame.activeUnlocks.Contains("unl-passage") && BingoData.BingoMode)
+            if (BingoData.BingoMode)
             {
-                ExpLog.Log("Add Expedition Passage but bingo");
-                self.AddExpeditionPassageButton();
+                if (!ExpeditionGame.activeUnlocks.Contains("unl-passage"))
+                {
+                    ExpLog.Log("Add Expedition Passage but bingo");
+                    self.AddExpeditionPassageButton();
+                }
             }
         }
 
@@ -521,53 +591,9 @@ namespace BingoMode
             orig.Invoke(self);
         }
 
-        public static void ProcessManager_PostSwitchMainProcessIL(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(
-                x => x.MatchLdsfld("Expedition.ExpeditionEnums/ProcessID", "ExpeditionMenu")
-                ))
-            {
-                c.Emit(OpCodes.Ldarg_1);
-                c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Action<ProcessManager.ProcessID, ProcessManager>>((orig, self) =>
-                {
-                    if (orig == BingoEnums.BingoWinScreen)
-                    {
-                        self.currentMainLoop = new BingoWinScreen(self);
-                        self.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                    }
-                    if (orig == BingoEnums.BingoLoseScreen)
-                    {
-                        self.currentMainLoop = new BingoLoseScreen(self);
-                        self.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
-                    }
-                });
-            }
-            else Plugin.logger.LogError(nameof(ProcessManager_PostSwitchMainProcessIL) + " Threw :(( " + il);
-        }
-
         public static void WinState_CycleCompleted(ILContext il)
         {
-            ILCursor c = new(il);
             ILCursor b = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdsfld("Expedition.ExpeditionEnums/ProcessID", "ExpeditionWinScreen")
-                ))
-            {
-                c.EmitDelegate<Func<ProcessManager.ProcessID, ProcessManager.ProcessID>>((orig) =>
-                {
-                    if (BingoData.BingoMode)
-                    {
-                        orig = BingoEnums.BingoWinScreen;
-                    }
-
-                    return orig;
-                });
-            }
-            else Plugin.logger.LogError(nameof(WinState_CycleCompleted) + " Threw 1 :(( " + il);
 
             if (b.TryGotoNext(MoveType.After,
                 x => x.MatchLdstr("Cycle complete, saving run data"),
@@ -772,6 +798,8 @@ namespace BingoMode
                 }
             }
             SteamTest.team = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team;
+            //if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default) SteamTest.team = BingoPage.TeamNumber(Plugin.bingoConfig.SinglePlayerTeam.Value);
+            //else 
             if (SteamTest.team == 8)
             {
                 SpectatorHooks.Hook();

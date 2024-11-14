@@ -250,6 +250,7 @@ namespace BingoMode.BingoSteamworks
 
         public static void BroadcastCurrentBoardState()
         {
+            Plugin.logger.LogInfo(Environment.StackTrace);
             string state = BingoHooks.GlobalBoard.GetBingoState();
             foreach (var player in ConnectedPlayers)
             {

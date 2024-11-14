@@ -17,18 +17,21 @@ namespace BingoMode
 {
     using BingoSteamworks;
     using Challenges;
+    using UnityEngine;
 
-    [BepInPlugin("nacu.bingomode", "Expedition Bingo", VERSION)]
+    [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.61";
+        public const string VERSION = "0.66";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
+        public static BingoModOptions bingoConfig;
 
         public void OnEnable()
         {
             new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
+            bingoConfig = new();
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
         }
@@ -43,6 +46,14 @@ namespace BingoMode
             logger = null;
         }
 
+        public void Update()
+        {
+            if (Input.anyKeyDown && Input.GetKeyDown(bingoConfig.HUDKeybind.Value))
+            {
+                BingoHUD.Toggled = !BingoHUD.Toggled;
+            }
+        }
+
         public static void OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld raingame)
         {
             orig(raingame);
@@ -50,6 +61,8 @@ namespace BingoMode
             if (!AppliedAlreadyDontDoItAgainPlease)
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
+
+                MachineConnector.SetRegisteredOI("nacu.bingomode", bingoConfig);
 
                 SteamTest.Apply();
 

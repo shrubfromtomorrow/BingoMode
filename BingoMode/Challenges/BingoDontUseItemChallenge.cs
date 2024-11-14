@@ -65,7 +65,7 @@ namespace BingoMode.Challenges
 
         public void Used(AbstractPhysicalObject.AbstractObjectType used)
         {
-            if (used.value == item.Value && !Failed && completed)
+            if (used.value == item.Value && !TeamsFailed[SteamTest.team] && completed)
             {
                 FailChallenge(SteamTest.team);
             }
@@ -73,7 +73,7 @@ namespace BingoMode.Challenges
 
         public void Eated(IPlayerEdible used)
         {
-            if (Failed || !completed) return;
+            if (TeamsFailed[SteamTest.team] || !completed) return;
             if (used is PhysicalObject p && (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == item.Value) : (p.abstractPhysicalObject.type.value == item.Value)))
             {
                 FailChallenge(SteamTest.team);
@@ -124,8 +124,6 @@ namespace BingoMode.Challenges
                 "><",
                 TeamsToString(),
                 "><",
-                Failed ? "1" : "0",
-                "><",
                 isCreature ? "1" : "0",
             });
         }
@@ -141,8 +139,7 @@ namespace BingoMode.Challenges
                 hidden = (array[3] == "1");
                 revealed = (array[4] == "1");
                 TeamsFromString(array[5]);
-                Failed = array[6] == "1";
-                isCreature = array[7] == "1";
+                isCreature = array[6] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

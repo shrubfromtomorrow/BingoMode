@@ -50,7 +50,7 @@ namespace BingoMode.Challenges
 
         public void Entered(string regionName)
         {
-            if (completed && region.Value == regionName && !Failed)
+            if (completed && region.Value == regionName && !TeamsFailed[SteamTest.team])
             {
                 FailChallenge(SteamTest.team);
             }
@@ -87,8 +87,6 @@ namespace BingoMode.Challenges
                 revealed ? "1" : "0",
                 "><",
                 TeamsToString(),
-                "><",
-                Failed ? "1" : "0"
             });
         }
 
@@ -102,7 +100,6 @@ namespace BingoMode.Challenges
                 hidden = (array[2] == "1");
                 revealed = (array[3] == "1");
                 TeamsFromString(array[4]);
-                Failed = array[5] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

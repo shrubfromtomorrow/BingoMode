@@ -97,7 +97,7 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
@@ -118,7 +118,7 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                        line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
@@ -138,7 +138,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
@@ -156,7 +156,7 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).Failed && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
@@ -380,36 +380,110 @@ namespace BingoMode
             {
                 for (int j = 0; j < size; j++)
                 {
-                    if (challengeGrid[i, j] == null || challengeGrid[i, j].hidden)
+                    if (challengeGrid[i, j] == null)
                     {
+                        next++;
                         continue;
                     }
                     BingoChallenge ch = challengeGrid[i, j] as BingoChallenge;
-                    string lastTeamsString = ch.TeamsToString();
-                    string currentTeamsString = challenges[next];
+                    string currentTeamsString = ch.TeamsToString();
+                    string newTeamsString = challenges[next];
 
-                    if (lastTeamsString != currentTeamsString)
+                    Plugin.logger.LogFatal($"Comparing {currentTeamsString} to {newTeamsString}");
+                    if (currentTeamsString != newTeamsString)
                     {
-                        for (int k = 0; k < lastTeamsString.Length; k++)
+                        for (int k = 0; k < currentTeamsString.Length; k++)
                         {
-                            if (lastTeamsString[k] != currentTeamsString[k])
+                            if (currentTeamsString[k] != newTeamsString[k])
                             {
-                                if (currentTeamsString[k] == '1')
+                                switch (newTeamsString[k])
                                 {
-                                    if (SteamTest.team != 8 && 
-                                        k != SteamTest.team &&
-                                        !ch.ReverseChallenge() && 
-                                        BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
-                                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
-                                    {
-                                        ch.OnChallengeLockedOut(k);
-                                    }
-                                    else ch.OnChallengeCompleted(k);
+                                    case '0':
+                                        break;
+                                    case '1':
+                                        // If lockout
+                                        if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
+                                        {
+                                            // If its the same team
+                                            if (SteamTest.team == k || SteamTest.team == 8 || ch.ReverseChallenge())
+                                            {
+                                                switch (currentTeamsString[k])
+                                                {
+                                                    case '0':
+                                                        ch.OnChallengeCompleted(k);
+                                                        break;
+                                                    case '1':
+                                                        // Do nothing
+                                                        break;
+                                                    case '2':
+                                                        // Do nothing
+                                                        break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                switch (currentTeamsString[k])
+                                                {
+                                                    case '0':
+                                                        ch.OnChallengeLockedOut(k);
+                                                        break;
+                                                    case '1':
+                                                        // Do nothing
+                                                        break;
+                                                    case '2':
+                                                        ch.OnChallengeLockedOut(k);
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            switch (currentTeamsString[k])
+                                            {
+                                                case '0':
+                                                    ch.OnChallengeCompleted(k);
+                                                    break;
+                                                case '1':
+                                                    // Do nothing
+                                                    break;
+                                                case '2':
+                                                    // Do nothing
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case '2':
+                                        switch (currentTeamsString[k])
+                                        {
+                                            case '0':
+                                                ch.OnChallengeFailed(k);
+                                                break;
+                                            case '1':
+                                                ch.OnChallengeFailed(k);
+                                                break;
+                                            case '2':
+                                                // Do nothing
+                                                break;
+                                        }
+                                        break;
                                 }
-                                else
-                                {
-                                    ch.OnChallengeFailed(k);
-                                }
+
+                                //if (currentTeamsString[k] == '1')
+                                //{
+                                //    //if (SteamTest.team != 8 && 
+                                //    //    k != SteamTest.team &&
+                                //    //    !ch.ReverseChallenge() && 
+                                //    //    BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
+                                //    //    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
+                                //    //{
+                                //    //    ch.OnChallengeLockedOut(k);
+                                //    //}
+                                //    ch.OnChallengeCompleted(k);
+                                //}
+                                //else
+                                //{
+                                //    ch.OnChallengeFailed(k);
+                                //}
                             }
                         }
                     }

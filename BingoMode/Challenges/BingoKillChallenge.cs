@@ -316,7 +316,7 @@ namespace BingoMode.Challenges
         public override void CreatureKilled(Creature c, int playerNumber)
         {
             Plugin.logger.LogMessage("killed " + this);
-            if (deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
+            if (c.Template.smallCreature || deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
             if (!CreatureHitByDesired(c)) return;
             if (!CritInLocation(c)) return;
             if (starve.Value && game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && !p.Malnourished) return;

@@ -62,13 +62,12 @@ namespace BingoMode.Challenges
         public void Entered(string regionName)
         {
             if (SteamTest.team == 8) return;
-            if (region.Value == regionName && !Failed)
+            if (region.Value == regionName && !TeamsFailed[SteamTest.team])
             {
-                //regionsToEnter.Add("failed");
                 FailChallenge(SteamTest.team);
                 return;
             }
-            else if (!Failed && !completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && regionsToEnter.Contains(regionName))
+            else if (!TeamsFailed[SteamTest.team] && !completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && regionsToEnter.Contains(regionName))
             {
                 Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
@@ -122,9 +121,7 @@ namespace BingoMode.Challenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                TeamsToString(),
-                "><",
-                Failed ? "1" : "0",
+                TeamsToString()
             });
         }
 
@@ -141,7 +138,6 @@ namespace BingoMode.Challenges
                 hidden = (array[5] == "1");
                 revealed = (array[6] == "1");
                 TeamsFromString(array[7]);
-                Failed = array[8] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

@@ -7,11 +7,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using RWCustom;
 using Steamworks;
+using MoreSlugcats;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BingoMode
 {
     using BingoSteamworks;
-    using System.Linq;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -239,6 +242,75 @@ namespace BingoMode
             GrafUpdate(menu.myTimeStacker);
         }
 
+        public static string ExpeditionRandomStartsUnlocked(RainWorld rainWorld, SlugcatStats.Name slug)
+        {
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            Dictionary<string, List<string>> dictionary2 = new Dictionary<string, List<string>>();
+            List<string> list2 = SlugcatStats.SlugcatStoryRegions(slug);
+            if (File.Exists(AssetManager.ResolveFilePath("randomstarts.txt")))
+            {
+                string[] array = File.ReadAllLines(AssetManager.ResolveFilePath("randomstarts.txt"));
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (!array[i].StartsWith("//") && array[i].Length > 0)
+                    {
+                        string text = Regex.Split(array[i], "_")[0];
+                        if (!(ExpeditionGame.lastRandomRegion == text))
+                        {
+                            if (!dictionary2.ContainsKey(text))
+                            {
+                                dictionary2.Add(text, new List<string>());
+                            }
+                            if (list2.Contains(text))
+                            {
+                                dictionary2[text].Add(array[i]);
+                            }
+                            else if (ModManager.MSC && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow))
+                            {
+                                if (text == "OE")
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                                if (text == "LC")
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                                if (text == "MS" && array[i] != "MS_S07")
+                                {
+                                    dictionary2[text].Add(array[i]);
+                                }
+                            }
+                            if (dictionary2[text].Contains(array[i]) && !dictionary.ContainsKey(text))
+                            {
+                                dictionary.Add(text, ExpeditionGame.GetRegionWeight(text));
+                            }
+                        }
+                    }
+                }
+                System.Random random = new System.Random();
+                int maxValue = dictionary.Values.Sum();
+                int randomIndex = random.Next(0, maxValue);
+                string key = dictionary.First(delegate (KeyValuePair<string, int> x)
+                {
+                    randomIndex -= x.Value;
+                    return randomIndex < 0;
+                }).Key;
+                ExpeditionGame.lastRandomRegion = key;
+                int num = (from list in dictionary2.Values
+                           select list.Count).Sum();
+                string text2 = dictionary2[key].ElementAt(UnityEngine.Random.Range(0, dictionary2[key].Count - 1));
+                ExpLog.Log(string.Format("{0} | {1} valid regions for {2} with {3} possible dens", new object[]
+                {
+            text2,
+            dictionary.Keys.Count,
+            slug.value,
+            num
+                }));
+                return text2;
+            }
+            return "SU_S01";
+        }
+
         public override void Singal(MenuObject sender, string message)
         {
             base.Singal(sender, message);
@@ -333,7 +405,6 @@ namespace BingoMode
                 {
                     BingoData.TeamsInBingo = [];
                     SpectatorHooks.Hook();
-                    BingoData.BingoDen = "su_s01";
                 }
                 else BingoData.TeamsInBingo = [SteamTest.team];
                 foreach (var playere in SteamTest.LobbyMembers)
@@ -370,8 +441,13 @@ namespace BingoMode
                 if (BingoData.BingoDen == "random")
                 {
                 reset:
-                    ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
+
+                    if (SteamTest.team == 8)
+                    {
+                        ExpeditionData.startingDen = "su_s01";
+                    }
 
                     if (bannedRegions.Count > 0)
                     {
@@ -426,9 +502,15 @@ namespace BingoMode
                         InnerWorkings.SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
                     }
 
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout, false);
                 }
-                else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
+                else
+                {
+                    int newTeam = TeamNumber(Plugin.bingoConfig.SinglePlayerTeam.Value);
+                    Plugin.logger.LogWarning("Setting new team to: " + newTeam);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam);
+                    SteamTest.team = newTeam;
+                }
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game, 0.1f);
@@ -1017,6 +1099,23 @@ namespace BingoMode
                 case 8: return "Spectator";
             }
             return "Change";
+        }
+
+        public static int TeamNumber(string teamName)
+        {
+            switch (teamName)
+            {
+                case "Red": return 0;
+                case "Blue": return 1;
+                case "Green": return 2;
+                case "Yellow": return 3;
+                case "Pink": return 4;
+                case "Cyan": return 5;
+                case "Orange": return 6;
+                case "Purple": return 7;
+                case "Spectator": return 8;
+            }
+            return 0;
         }
 
         public class PlayerInfo
