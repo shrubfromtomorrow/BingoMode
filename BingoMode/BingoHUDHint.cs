@@ -21,7 +21,7 @@ namespace BingoMode
             this.origRoom = origRoom;
             this.offset = offset;
             this.followCamera = followCamera;
-            sprite = new FSprite(elementName);
+            sprite = new FSprite(elementName) { color = color };
             if (shader != "") sprite.shader = Custom.rainWorld.Shaders[shader];
 
             objectPos = followObject.firstChunk.pos;
@@ -36,7 +36,7 @@ namespace BingoMode
                 deathFade = Mathf.Max(0f, deathFade - 0.09f);
                 return;
             }
-            if (followObject == null || followObject.room == null || followObject.room.abstractRoom.index != followCamera.room.abstractRoom.index || origRoom == -1 || followObject.room.abstractRoom.index != origRoom || (sprite.element.name != "pipis" && followObject.grabbedBy.Count != 0))
+            if (followObject == null || followObject.room == null || followObject.room.abstractRoom.index != followCamera.room.abstractRoom.index || origRoom == -1 || followObject.room.abstractRoom.index != origRoom || (followObject is Creature crit && crit.dead) || (sprite.element.name != "pipis" && followObject.grabbedBy.Count != 0))
             {
                 requestRemove = true;
                 return;

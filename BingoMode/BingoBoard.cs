@@ -6,6 +6,7 @@ using RWCustom;
 using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -89,6 +90,7 @@ namespace BingoMode
         {
             bool won = false;
             currentWinLine = [];
+            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout;
 
             // Vertical lines
             for (int i = 0; i < size; i++)
@@ -97,7 +99,22 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    if (checkLose)
+                    {
+                        if ((ch as BingoChallenge).TeamsFailed[t])
+                        {
+                            line = false;
+                        }
+                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
+                        {
+                            line = false;
+                        }
+                    }
+                    else
+                    {
+                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    }
+                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && (!lockout || ((ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])) : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
@@ -118,7 +135,22 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                        if (checkLose)
+                        {
+                            if ((ch as BingoChallenge).TeamsFailed[t])
+                            {
+                                line = false;
+                            }
+                            if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
+                            {
+                                line = false;
+                            }
+                        }
+                        else
+                        {
+                            line &= (ch as BingoChallenge).TeamsCompleted[t];
+                        }
+                        //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
@@ -138,7 +170,22 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    if (checkLose)
+                    {
+                        if ((ch as BingoChallenge).TeamsFailed[t])
+                        {
+                            line = false;
+                        }
+                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
+                        {
+                            line = false;
+                        }
+                    }
+                    else
+                    {
+                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    }
+                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
@@ -156,7 +203,22 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
+                    if (checkLose)
+                    {
+                        if ((ch as BingoChallenge).TeamsFailed[t])
+                        {
+                            line = false;
+                        }
+                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
+                        {
+                            line = false;
+                        }
+                    }
+                    else
+                    {
+                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    }
+                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;

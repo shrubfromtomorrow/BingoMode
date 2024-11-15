@@ -45,7 +45,7 @@ namespace BingoMode.Challenges
             {
                 itme = UnityEngine.Random.value < 0.5f ? "Spear": "DataPearl";
             }
-            else itme = ChallengeUtils.StealableStolable[UnityEngine.Random.Range(0, ChallengeUtils.StealableStolable.Length)];
+            else itme = ChallengeUtils.StealableStolable[UnityEngine.Random.Range(0, ChallengeUtils.StealableStolable.Length - (ModManager.MSC ? 0 : 2))];
 
             return new BingoStealChallenge
             {
@@ -84,6 +84,7 @@ namespace BingoMode.Challenges
         {
             base.Reset();
             current = 0;
+            checkedIDs = [];
         }
 
         public void Stoled(AbstractPhysicalObject item, bool tollCheck)
@@ -153,12 +154,14 @@ namespace BingoMode.Challenges
         {
             On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update;
             On.SocialEventRecognizer.Theft += SocialEventRecognizer_Theft;
+            On.Player.SlugcatGrab += Player_SlugcatGrabNoStealExploit;
         }
 
         public override void RemoveHooks()
         {
             On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update;
             On.SocialEventRecognizer.Theft -= SocialEventRecognizer_Theft;
+            On.Player.SlugcatGrab -= Player_SlugcatGrabNoStealExploit;
         }
 
         public override List<object> Settings() => [amount, toll, subject];

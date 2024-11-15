@@ -15,7 +15,7 @@ namespace BingoMode
 
         public BingoModOptions() : base()
         {
-            HUDKeybind = config.Bind<KeyCode>("HUDKeybind", KeyCode.Tab);
+            HUDKeybind = config.Bind<KeyCode>("HUDKeybind", KeyCode.Space);
             SinglePlayerTeam = config.Bind<string>("SinglePlayerTeam", "Red");
         }
 

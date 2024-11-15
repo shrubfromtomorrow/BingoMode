@@ -68,7 +68,7 @@ namespace BingoMode.Challenges
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
-                case "expobject": return ["FirecrackerPlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
+                case "expobject": return ["FirecrackerPlant", "SporePlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
                 case "vista": // hate
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
                     foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
@@ -372,7 +372,10 @@ namespace BingoMode.Challenges
         {
             "Spear",
             "Rock",
-            "ScavengerBomb"
+            "ScavengerBomb",
+            "Lantern",
+            "GooieDuck",
+            "GlowWeed"
         };
 
         public static readonly string[] Bannable =

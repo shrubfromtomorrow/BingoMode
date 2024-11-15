@@ -3,6 +3,7 @@ using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
@@ -116,12 +117,14 @@ namespace BingoMode.Challenges
         {
             On.Player.ObjectEaten += Player_ObjectEatenKarmaFlower;
             IL.Room.Loaded += Room_LoadedKarmaFlower;
+            placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
         }
 
         public override void RemoveHooks()
         {
             On.Player.ObjectEaten -= Player_ObjectEatenKarmaFlower;
             IL.Room.Loaded -= Room_LoadedKarmaFlower;
+            placeKarmaFlowerHook?.Dispose();
         }
 
         public override List<object> Settings() => [amound];

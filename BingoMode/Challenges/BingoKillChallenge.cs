@@ -113,7 +113,7 @@ namespace BingoMode.Challenges
                 num = 12;
             }
             bool onePiece = UnityEngine.Random.value < 0.2f;
-            bool starvv = UnityEngine.Random.value < 0.2f;
+            bool starvv = UnityEngine.Random.value < 0.1f;
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
             num = Mathf.Max(1, num);
             List<string> clone = ChallengeUtils.Weapons.ToList();

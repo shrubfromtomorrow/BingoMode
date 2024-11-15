@@ -1,5 +1,6 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
+using Menu;
 using Menu.Remix;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -125,6 +126,7 @@ namespace BingoMode.Challenges
 
         // Runtime detour hooks
         public static Hook tokenColorHook;
+        public static Hook placeKarmaFlowerHook;
 
         // Sporecloud fix for owner recognition
         public static Dictionary<UpdatableAndDeletable, EntityID> ownerOfUAD = [];
@@ -146,6 +148,29 @@ namespace BingoMode.Challenges
             //IL.FlareBomb.Update += FlareBomb_Update;
         }
 
+       //public static void EndgameMeter_UpdateIL(ILContext il)
+       //{
+       //    ILCursor c = new(il);
+       //
+       //    if (c.TryGotoNext(MoveType.After,
+       //        x => x.MatchCallOrCallvirt<ProcessManager>("CueAchievement")
+       //        ))
+       //    {
+       //        c.Emit(OpCodes.Ldarg_0);
+       //        c.EmitDelegate<Action<EndgameMeter>>((meter) =>
+       //        {
+       //            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+       //            {
+       //                if (ExpeditionData.challengeList[j] is BingoAchievementChallenge c)
+       //                {
+       //                    c.CheckAchievementProgress(meter.tracker.ID);
+       //                }
+       //            }
+       //        });
+       //    }
+       //    else Plugin.logger.LogError("EndgameMeter_UpdateIL FAILURE " + il);
+       //}
+
         public static void Room_LoadedKarmaFlower(ILContext il)
         {
             ILCursor c = new(il);
@@ -156,7 +181,8 @@ namespace BingoMode.Challenges
             {
                 c.EmitDelegate<Func<bool, bool>>((orig) =>
                 {
-                    return false;
+                    if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig;
+                    else return false;
                 });
             }
             else Plugin.logger.LogError("Room_LoadedKarmaFlower FAILURE " + il);
@@ -267,7 +293,7 @@ namespace BingoMode.Challenges
         public static void WinState_CycleCompleted(ILContext il)
         {
             ILCursor c = new(il);
-
+        
             if (c.TryGotoNext(
                 x => x.MatchStloc(42),
                 x => x.MatchLdloc(42),
@@ -433,6 +459,19 @@ namespace BingoMode.Challenges
             }
         }
 
+        public static void Player_SlugcatGrabNoStealExploit(On.Player.orig_SlugcatGrab orig, Player self, PhysicalObject obj, int graspUsed)
+        {
+            orig.Invoke(self, obj, graspUsed);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoStealChallenge c)
+                {
+                    c.checkedIDs.Add(obj.abstractPhysicalObject.ID);
+                }
+            }
+        }
+
         public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
         {
             orig.Invoke(self);
@@ -503,6 +542,7 @@ namespace BingoMode.Challenges
         }
 
         public static List<Challenge> revealInMemory = [];
+        public static List<Challenge> failedInMemory = [];
         private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
             if (BingoData.BingoMode)
@@ -513,10 +553,22 @@ namespace BingoMode.Challenges
 
                     for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
-                        if (survived && ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
+                        if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
                         {
                             revealInMemory.Add(g);
                             g.revealed = false;
+                        }
+                    }
+                }
+                else if (!survived)
+                {
+                    failedInMemory = [];
+
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && !hell.TeamsFailed[SteamTest.team] && hell.current < hell.amound.Value)
+                        {
+                            failedInMemory.Add(hell);
                         }
                     }
                 }
@@ -953,6 +1005,13 @@ namespace BingoMode.Challenges
         {
             if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString + (d.isRed ? "-safari" : ""))) return Color.white;//Color.Lerp(orig.Invoke(self), Color.white, 0.8f);
             else return orig.Invoke(self);
+        }
+
+        public delegate bool orig_PlaceKarmaFlower(Player self);
+        public static bool Player_PlaceKarmaFlower_get(orig_PlaceKarmaFlower orig, Player self)
+        {
+            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
+            return false;
         }
 
         public static void Room_LoadedUnlock(ILContext il)

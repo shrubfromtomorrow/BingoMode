@@ -172,9 +172,21 @@ namespace BingoMode.Challenges
 
             UpdateDescription();
 
-            if (!lastCompleted) ChallengeCompleted?.Invoke(team);
+            if (!lastCompleted)
+            {
+                ChallengeCompleted?.Invoke(team);
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
+                    {
+                        Plugin.logger.LogFatal("hell challenge gaboogad challenge");
+                        c.GetChallenge();
+                    }
+                }
+            }
             if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
-            
+
+
             Expedition.Expedition.coreFile.Save(false);
         }
 

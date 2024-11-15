@@ -18,8 +18,6 @@ namespace BingoMode.Challenges
         public string region;
         public Vector2 location;
 
-        public override bool RequireSave() => false;
-
         public override Phrase ConstructPhrase()
         {
             return new Phrase([new Icon("vistaicon", 1f, Color.white), new Verse(room.Value.Substring(0, 2))], [1]);

@@ -43,11 +43,11 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            AbstractPhysicalObject.AbstractObjectType abstractObjectType = ChallengeTools.ObjectTypes[UnityEngine.Random.Range(0, ChallengeTools.ObjectTypes.Count - 1)];
+            string[] liste = ChallengeUtils.GetCorrectListForChallenge("expobject");
             return new BingoItemHoardChallenge
             {
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 1),
-                target = new(abstractObjectType.value, "Item", 0, listName: "expobject")
+                target = new(liste[UnityEngine.Random.Range(0, liste.Length)], "Item", 0, listName: "expobject")
             };
         }
 

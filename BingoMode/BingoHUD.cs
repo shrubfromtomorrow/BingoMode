@@ -1,13 +1,13 @@
 ﻿using BingoMode.Challenges;
 using Expedition;
 using HUD;
-using RWCustom;
-using UnityEngine;
-using System.Collections.Generic;
-using Menu.Remix.MixedUI;
-using System.Linq;
 using Menu;
+using Menu.Remix.MixedUI;
 using MoreSlugcats;
+using RWCustom;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace BingoMode
 {
@@ -84,7 +84,13 @@ namespace BingoMode
             {
                 AddRevealedToQueue();
             }
+            if (ChallengeHooks.failedInMemory.Count > 0)
+            {
+                AddFailedToQueue();
+            }
+
             ChallengeHooks.revealInMemory = [];
+            ChallengeHooks.failedInMemory = [];
             bingoCompleteTitle = new FSprite("bingotitle")
             {
                 x = hud.rainWorld.screenSize.x * 0.5f,
@@ -109,14 +115,17 @@ namespace BingoMode
             addCompleteAlpha = false;
             colorToFadeTo = Color.white;
 
-            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin)
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
                 BingoCompleteInfo? potentialEndGame = CheckWinLose();
                 if (potentialEndGame.HasValue)
                 {
-                    DoComplete(potentialEndGame.Value, true);
-                    ShowWinText();
-                    textShake = 0f;
+                    DoComplete(potentialEndGame.Value, BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin);
+                    if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin)
+                    {
+                        ShowWinText();
+                        textShake = 0f;
+                    }
                 }
             }
 
@@ -173,11 +182,11 @@ namespace BingoMode
 
         public BingoCompleteInfo? CheckWinLose()
         {
-            bool[] teamsLost = new bool[8]; // Teams that cant do a bingo
-            for (int t = 0; t < 8; t++)
-            {
-                if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost[t] = true;
-            }
+            //bool[] teamsLost = new bool[8]; // Teams that cant do a bingo
+            //for (int t = 0; t < 8; t++)
+            //{
+            //    if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost[t] = true;
+            //}
             //bool allChallengesDone = true;
             //for (int i = 0; i < BingoHooks.GlobalBoard.size; i++)
             //{
@@ -204,7 +213,8 @@ namespace BingoMode
 
             for (int t = 0; t < 8; t++)
             {
-                if (teamsLost[t] == true && CompletedChallengesForTeam(t) > Mathf.FloorToInt(Mathf.Pow(grid.GetLength(0), 2f) / 2f))
+                //teamsLost[t] == true && 
+                if (isMultiplayer && CompletedChallengesForTeam(t) > Mathf.FloorToInt(Mathf.Pow(grid.GetLength(0), 2f) / 2f))
                 {
                     Plugin.logger.LogMessage($"Team {t} won through majority!");
                     return new BingoCompleteInfo(t, "Team <team_name> won!", addText, true);
@@ -282,6 +292,22 @@ namespace BingoMode
             animation = 100;
         }
 
+        public void AddFailedToQueue()
+        {
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    if (grid[i, j].challenge is BingoChallenge g && ChallengeHooks.failedInMemory.Any(x => x.ToString() == g.ToString()))
+                    {
+                        g.FailChallenge(SteamTest.team);
+                        queue.Add(grid[i, j]);
+                    }
+                }
+            }
+            animation = 100;
+        }
+
         public override void ClearSprites()
         {
             base.ClearSprites();
@@ -324,6 +350,7 @@ namespace BingoMode
                     queue[0].StartAnim();
                     queue.RemoveAt(0);
                     animation = animationLength;
+                    if (queue.Count == 0 && completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                     if (queue.Count == 0 && completeQueue.Count == 0 && !addCompleteAlpha)
                     {
                         BingoCompleteInfo? potentialEndGame = CheckWinLose();
@@ -343,7 +370,7 @@ namespace BingoMode
                     completeQueue[0].context = completeQueue.Count == 1 ? BingoInfo.AnimationContext.BingoLast : BingoInfo.AnimationContext.Bingo;
                     completeQueue[0].StartAnim();
                     completeQueue.RemoveAt(0);
-                    completeAnimation = completeQueue.Count * 3;
+                    completeAnimation = Mathf.Min(completeQueue.Count * 3, 60);
                 }
             }
 
@@ -404,9 +431,10 @@ namespace BingoMode
                             !hints.Any(x => x.followObject == obj.realizedObject))
                         {
                             var tradeded = ExpeditionData.challengeList.FirstOrDefault(x => x is BingoTradeTradedChallenge);
-                            if (tradeded is BingoTradeTradedChallenge tradeChallenge)
+                            var traded = ExpeditionData.challengeList.FirstOrDefault(x => x is BingoTradeChallenge);
+                            if (tradeded is BingoTradeTradedChallenge || traded is BingoTradeChallenge)
                             {
-                                if (tradeChallenge.traderItems.Keys.Any(x => x == room.abstractRoom.entities[i].ID) &&
+                                if (tradeded is BingoTradeTradedChallenge tradeChallenge && tradeChallenge.traderItems.Count > 0 && tradeChallenge.traderItems.Keys.Any(x => x == room.abstractRoom.entities[i].ID) &&
                                     obj.realizedObject.grabbedBy.Count == 0)
                                 {
                                     BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "scav_merchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0], "Hologram");
@@ -414,12 +442,32 @@ namespace BingoMode
                                     hud.fContainers[1].AddChild(hint.sprite);
                                     continue;
                                 }
+                                if (room.abstractRoom.scavengerTrader && obj is AbstractCreature crit && crit.state.alive && crit.creatureTemplate.type == CreatureTemplate.Type.Scavenger)
+                                {
+                                    BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "scav_merchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0], "Hologram");
+                                    hints.Add(hint);
+                                    hud.fContainers[1].AddChild(hint.sprite);
+                                    if ((crit.abstractAI as ScavengerAbstractAI).squad != null && (crit.abstractAI as ScavengerAbstractAI).squad.missionType == ScavengerAbstractAI.ScavengerSquad.MissionID.Trade)
+                                    {
+                                        BingoHUDHint checkMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "Menu_Symbol_CheckBox", Color.green, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
+                                        hints.Add(checkMark);
+                                        hud.fContainers[1].AddChild(checkMark.sprite);
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        BingoHUDHint wrongMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "Menu_Symbol_Clear_All", Color.red, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
+                                        hints.Add(wrongMark);
+                                        hud.fContainers[1].AddChild(wrongMark.sprite);
+                                        continue;
+                                    }
+                                }
                             }
                             if (obj.type == AbstractPhysicalObject.AbstractObjectType.DangleFruit)
                             {
                                 Random.State state = Random.state;
                                 Random.InitState(obj.ID.RandomSeed);
-                                if (Random.value < 0.001f)
+                                if (Random.value < 0.003f)
                                 {
                                     BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "pipis", Color.white, new Vector2(-17f, -22f), player.abstractCreature.world.game.cameras[0]);
                                     hints.Add(hint);
@@ -838,16 +886,16 @@ namespace BingoMode
                     infoLabel.MoveToFront();
                 }
 
-                if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
-                {
-                    if ((challenge as BingoChallenge).RequireSave()) challenge.revealed = true;
-                    challenge.CompleteChallenge();
-                    //if (UnityEngine.Random.value < 0.5f)
-                    //{
-                    //    BingoHooks.GlobalBoard.InterpretBingoState("010000000<>010000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>111000000<>000000000<>000000000<>100000000<>000000000<>010000000<>100000000<>010000000<>000000000<>000000000<>100000000<>010000000<>010000000");
-                    //}
-                    //else BingoHooks.GlobalBoard.InterpretBingoState("000000000<>000000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>111000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>000000000<>000000000<>000000000<>010000000<>010000000");
-                }
+                //if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
+                //{
+                //    if ((challenge as BingoChallenge).RequireSave()) challenge.revealed = true;
+                //    challenge.CompleteChallenge();
+                //    //if (UnityEngine.Random.value < 0.5f)
+                //    //{
+                //    //    BingoHooks.GlobalBoard.InterpretBingoState("010000000<>010000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>111000000<>000000000<>000000000<>100000000<>000000000<>010000000<>100000000<>010000000<>000000000<>000000000<>100000000<>010000000<>010000000");
+                //    //}
+                //    //else BingoHooks.GlobalBoard.InterpretBingoState("000000000<>000000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>111000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>000000000<>000000000<>000000000<>010000000<>010000000");
+                //}
 
                 bool doOverwriteAlpha = false;
                 if (updateTextCounter > 0)
@@ -1070,6 +1118,7 @@ namespace BingoMode
                 if (context == AnimationContext.BingoLast)
                 {
                     owner.ShowWinText();
+                    if (owner.queue.Count == 0 && owner.completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                 }
                 if (overwriteAlpha > 0f)
                 {
@@ -1098,8 +1147,6 @@ namespace BingoMode
                             }
                         }
                     }
-
-                    if (owner.queue.Count == 0 && owner.completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                 }
             }
 

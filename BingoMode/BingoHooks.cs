@@ -272,15 +272,12 @@ namespace BingoMode
 
             if (BingoData.BingoMode)
             {
-                Plugin.logger.LogFatal("doing your biological father");
                 self.forceWatchAnimation = false;
 
                 if (self.hud == null || self.hud.parts == null) return;
-                Plugin.logger.LogFatal("doing your biological uncle");
                 HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUD);
                 if (binguHUD is BingoHUD hude)
                 {
-                    Plugin.logger.LogFatal("doing your biological mother");
                     self.forceWatchAnimation = hude.queue.Count > 0 || hude.completeQueue.Count > 0;
                 }
             }
@@ -401,6 +398,7 @@ namespace BingoMode
                 SpectatorHooks.UnHook();
                 SteamTest.LeaveLobby();
                 ChallengeHooks.revealInMemory = [];
+                ChallengeHooks.failedInMemory = [];
                 if (BingoHUD.ReadyForLeave)
                 {
                     if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost)

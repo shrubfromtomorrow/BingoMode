@@ -62,7 +62,7 @@ namespace BingoMode.Challenges
             return new BingoEchoChallenge
             {
                 ghost = new(list[Random.Range(0, list.Count)], "Region", 0, listName: "echoes"),
-                starve = new(Random.value < 0.25f, "While Starving", 1),
+                starve = new(Random.value < 0.1f, "While Starving", 1),
             };
         }
 
