@@ -103,11 +103,7 @@ namespace BingoMode.Challenges
                 "><",
                 this.completed ? "1" : "0",
                 "><",
-                this.hidden ? "1" : "0",
-                "><",
                 this.revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -118,9 +114,7 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 this.region = SettingBoxFromString(array[0]) as SettingBox<string>;
                 this.completed = (array[1] == "1");
-                this.hidden = (array[2] == "1");
-                this.revealed = (array[3] == "1");
-                TeamsFromString(array[4]);
+                this.revealed = (array[2] == "1");
                 this.UpdateDescription();
             }
             catch (Exception ex)

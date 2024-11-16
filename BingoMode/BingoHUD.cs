@@ -886,16 +886,16 @@ namespace BingoMode
                     infoLabel.MoveToFront();
                 }
 
-                //if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
-                //{
-                //    if ((challenge as BingoChallenge).RequireSave()) challenge.revealed = true;
-                //    challenge.CompleteChallenge();
-                //    //if (UnityEngine.Random.value < 0.5f)
-                //    //{
-                //    //    BingoHooks.GlobalBoard.InterpretBingoState("010000000<>010000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>111000000<>000000000<>000000000<>100000000<>000000000<>010000000<>100000000<>010000000<>000000000<>000000000<>100000000<>010000000<>010000000");
-                //    //}
-                //    //else BingoHooks.GlobalBoard.InterpretBingoState("000000000<>000000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>111000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>000000000<>000000000<>000000000<>010000000<>010000000");
-                //}
+                if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
+                {
+                    if ((challenge as BingoChallenge).RequireSave()) challenge.revealed = true;
+                    challenge.CompleteChallenge();
+                    //if (UnityEngine.Random.value < 0.5f)
+                    //{
+                    //    BingoHooks.GlobalBoard.InterpretBingoState("010000000<>010000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>111000000<>000000000<>000000000<>100000000<>000000000<>010000000<>100000000<>010000000<>000000000<>000000000<>100000000<>010000000<>010000000");
+                    //}
+                    //else BingoHooks.GlobalBoard.InterpretBingoState("000000000<>000000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>111000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>000000000<>000000000<>000000000<>010000000<>010000000");
+                }
 
                 bool doOverwriteAlpha = false;
                 if (updateTextCounter > 0)

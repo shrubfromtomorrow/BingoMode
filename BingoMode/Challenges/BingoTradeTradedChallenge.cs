@@ -59,7 +59,6 @@ namespace BingoMode.Challenges
                 traderItems.Remove(item);
                 current++;
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= amount.Value)
                 {
                     CompleteChallenge();
@@ -116,11 +115,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -138,10 +133,8 @@ namespace BingoMode.Challenges
                     string[] kv = s.Split('|');
                     if (kv[0] != string.Empty && kv[1] != string.Empty) traderItems[EntityID.FromString(kv[0])] = EntityID.FromString(kv[1]);
                 }
-                completed = (array[2] == "1");
-                hidden = (array[3] == "1");
+                completed = (array[3] == "1");
                 revealed = (array[4] == "1");
-                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

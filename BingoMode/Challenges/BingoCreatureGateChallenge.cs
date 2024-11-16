@@ -190,11 +190,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
-                revealed ? "1" : "0",
-                "><",
-                TeamsToString()
+                revealed ? "1" : "0"
             });
         }
 
@@ -208,9 +204,7 @@ namespace BingoMode.Challenges
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;
                 creatureGates = CreatureGatesFromString(array[3]);
                 completed = (array[4] == "1");
-                hidden = (array[5] == "1");
-                revealed = (array[6] == "1");
-                TeamsFromString(array[7]);
+                revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

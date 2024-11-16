@@ -147,11 +147,7 @@ namespace BingoMode.Challenges
                 "><",
                 this.completed ? "1" : "0",
                 "><",
-                this.hidden ? "1" : "0",
-                "><",
                 this.revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -166,9 +162,7 @@ namespace BingoMode.Challenges
                 this.location.x = float.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 this.location.y = float.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
                 this.completed = (array[4] == "1");
-                this.hidden = (array[5] == "1");
-                this.revealed = (array[6] == "1");
-                TeamsFromString(array[7]);
+                this.revealed = (array[5] == "1");
                 this.UpdateDescription();
             }
             catch (Exception ex)

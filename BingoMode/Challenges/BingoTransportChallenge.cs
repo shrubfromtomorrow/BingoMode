@@ -87,7 +87,6 @@ namespace BingoMode.Challenges
                 {
                     origins.Add(c.abstractCreature.ID);
                     Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
-                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 }
             }
         }
@@ -168,11 +167,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -195,9 +190,7 @@ namespace BingoMode.Challenges
                     }
                 }
                 completed = (array[4] == "1");
-                hidden = (array[5] == "1");
-                revealed = (array[6] == "1");
-                TeamsFromString(array[7]);
+                revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (System.Exception ex)

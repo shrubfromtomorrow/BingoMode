@@ -95,11 +95,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
-                revealed ? "1" : "0",
-                "><",
-                TeamsToString()
+                revealed ? "1" : "0"
             ]);
         }
 
@@ -111,9 +107,7 @@ namespace BingoMode.Challenges
                 ghost = SettingBoxFromString(array[0]) as SettingBox<string>;
                 starve = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 completed = (array[2] == "1");
-                hidden = (array[3] == "1");
-                revealed = (array[4] == "1");
-                TeamsFromString(array[5]);
+                revealed = (array[3] == "1");
                 UpdateDescription();
             }
             catch (System.Exception ex)

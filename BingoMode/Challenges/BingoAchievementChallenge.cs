@@ -114,11 +114,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
-                revealed ? "1" : "0",
-                "><",
-                TeamsToString()
+                revealed ? "1" : "0"
             });
         }
 
@@ -129,9 +125,7 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 ID = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
-                hidden = (array[2] == "1");
-                revealed = (array[3] == "1");
-                TeamsFromString(array[4]);
+                revealed = (array[2] == "1");
                 UpdateDescription();
             }
             catch (System.Exception ex)

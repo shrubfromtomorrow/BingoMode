@@ -3,7 +3,6 @@ using Expedition;
 using Menu.Remix;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -106,7 +105,6 @@ namespace BingoMode.Challenges
                     this.current++;
                     if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
-                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                     if (current != target.Value) ChangeValue();
                     this.spearList.Remove(this.spearList[k]);
                     return;
@@ -164,11 +162,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             ]);
         }
     
@@ -181,14 +175,12 @@ namespace BingoMode.Challenges
                 target = SettingBoxFromString(array[1]) as SettingBox<int>;
                 crit = SettingBoxFromString(array[2]) as SettingBox<string>;
                 pinRegions = [];
-                pinRegions = [.. array[1].Split('|')];
+                pinRegions = [.. array[3].Split('|')];
                 region = SettingBoxFromString(array[4]) as SettingBox<string>;
                 completed = (array[5] == "1");
-                hidden = (array[6] == "1");
-                revealed = (array[7] == "1");
+                revealed = (array[6] == "1");
                 pinList = [];
                 spearList = [];
-                TeamsFromString(array[8]);
                 UpdateDescription();
             }
             catch (System.Exception ex)

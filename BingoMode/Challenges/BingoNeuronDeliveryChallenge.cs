@@ -54,7 +54,6 @@ namespace BingoMode.Challenges
                 {
                     this.delivered = this.game.rainWorld.progression.currentSaveState.miscWorldSaveData.SLOracleState.totNeuronsGiven;
                     this.UpdateDescription();
-                    if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                     ChangeValue();
                 }
                 if (!this.completed && this.delivered >= this.neurons.Value)
@@ -105,11 +104,7 @@ namespace BingoMode.Challenges
                 "><",
                 this.completed ? "1" : "0",
                 "><",
-                this.hidden ? "1" : "0",
-                "><",
-                this.revealed ? "1" : "0",
-                "><",
-                TeamsToString()
+                this.revealed ? "1" : "0"
             });
         }
 
@@ -121,9 +116,7 @@ namespace BingoMode.Challenges
                 this.neurons = SettingBoxFromString(array[0]) as SettingBox<int>;
                 this.delivered = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 this.completed = (array[2] == "1");
-                this.hidden = (array[3] == "1");
-                this.revealed = (array[4] == "1");
-                TeamsFromString(array[5]);
+                this.revealed = (array[3] == "1");
                 this.UpdateDescription();
             }
             catch (Exception ex)

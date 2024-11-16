@@ -122,11 +122,7 @@ namespace BingoMode.Challenges
                 "><",
                 this.completed ? "1" : "0",
                 "><",
-                this.hidden ? "1" : "0",
-                "><",
                 this.revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -139,9 +135,7 @@ namespace BingoMode.Challenges
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 region = SettingBoxFromString(array[2]) as SettingBox<string>;
                 completed = (array[3] == "1");
-                hidden = (array[4] == "1");
-                revealed = (array[5] == "1");
-                TeamsFromString(array[6]);
+                revealed = (array[4] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

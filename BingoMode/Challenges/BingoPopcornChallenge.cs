@@ -47,7 +47,6 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (current >= (int)amound.Value) CompleteChallenge();
                 else ChangeValue();
             }
@@ -86,11 +85,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -102,9 +97,7 @@ namespace BingoMode.Challenges
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amound = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
-                hidden = (array[3] == "1");
-                revealed = (array[4] == "1");
-                TeamsFromString(array[5]);
+                revealed = (array[3] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

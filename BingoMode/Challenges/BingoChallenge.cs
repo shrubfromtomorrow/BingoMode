@@ -1,11 +1,7 @@
-﻿using System;
-using HUD;
+﻿using BingoMode.BingoSteamworks;
 using Expedition;
+using System;
 using System.Collections.Generic;
-using Steamworks;
-using BingoMode.BingoSteamworks;
-using System.Linq;
-using RWCustom;
 
 namespace BingoMode.Challenges
 {
@@ -32,6 +28,11 @@ namespace BingoMode.Challenges
             char[] data = "000000000".ToCharArray();
             for (int t = 0; t < TeamsCompleted.Length; t++)
             {
+                if (t == SteamTest.team && hidden == true)
+                {
+                    data[t] = '3';
+                    continue;
+                }
                 if (TeamsFailed[t] == true)
                 {
                     data[t] = '2';
@@ -51,6 +52,7 @@ namespace BingoMode.Challenges
             if (TeamsCompleted.Length != data.Length) return;
             for (int i = 0; i < data.Length; i++)
             {
+                if (i == SteamTest.team) hidden = data[i] == '3';
                 TeamsFailed[i] = data[i] == '2';
                 TeamsCompleted[i] = data[i] == '1';
             }
@@ -180,7 +182,6 @@ namespace BingoMode.Challenges
                     {
                         if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
                         {
-                            Plugin.logger.LogFatal("hell challenge gaboogad challenge");
                             c.GetChallenge();
                         }
                     }
@@ -189,7 +190,7 @@ namespace BingoMode.Challenges
             if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
 
 
-            Expedition.Expedition.coreFile.Save(false);
+            BingoSaveFile.Save();
         }
 
         public void FailChallenge(int team)
@@ -229,7 +230,7 @@ namespace BingoMode.Challenges
             UpdateDescription();
 
             ChallengeFailed?.Invoke(team);
-            Expedition.Expedition.coreFile.Save(false);
+            BingoSaveFile.Save();
         }
 
         public void OnChallengeLockedOut(int team)
@@ -239,7 +240,7 @@ namespace BingoMode.Challenges
             hidden = true;
             TeamsCompleted[team] = true;
             if (!lastHidden) ChallengeLockedOut?.Invoke(team);
-            Expedition.Expedition.coreFile.Save(false);
+            BingoSaveFile.Save();
         }
 
         public void ChangeValue()

@@ -102,7 +102,6 @@ namespace BingoMode.Challenges
             {
                 currentEated++;
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (currentEated >= amountRequired.Value) CompleteChallenge();
                 else ChangeValue();
             }
@@ -130,11 +129,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
     
@@ -148,9 +143,7 @@ namespace BingoMode.Challenges
                 isCreature = (array[2] == "1");
                 foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
                 completed = (array[4] == "1");
-                hidden = (array[5] == "1");
-                revealed = (array[6] == "1");
-                TeamsFromString(array[7]);
+                revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

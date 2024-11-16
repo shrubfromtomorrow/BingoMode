@@ -75,11 +75,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -90,9 +86,7 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 moon = SettingBoxFromString(array[0]) as SettingBox<bool>;
                 completed = (array[1] == "1");
-                hidden = (array[2] == "1");
-                revealed = (array[3] == "1");
-                TeamsFromString(array[4]);
+                revealed = (array[2] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

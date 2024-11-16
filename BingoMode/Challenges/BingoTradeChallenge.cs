@@ -60,7 +60,6 @@ namespace BingoMode.Challenges
                 current += pnts;
                 bannedIDs.Add(ID);
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
 
                 if (current >= amount.Value)
                 {
@@ -103,11 +102,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
-                revealed ? "1" : "0",
-                "><",
-                TeamsToString()
+                revealed ? "1" : "0"
             });
         }
 
@@ -119,10 +114,8 @@ namespace BingoMode.Challenges
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
-                hidden = (array[3] == "1");
-                revealed = (array[4] == "1");
+                revealed = (array[3] == "1");
                 bannedIDs = [];
-                TeamsFromString(array[5]);
                 UpdateDescription();
             }
             catch (Exception ex)

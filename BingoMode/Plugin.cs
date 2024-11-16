@@ -17,23 +17,26 @@ namespace BingoMode
 {
     using BingoSteamworks;
     using Challenges;
+    using System.IO;
     using UnityEngine;
 
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.71";
+        public const string VERSION = "0.72";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         public static BingoModOptions bingoConfig;
 
         public void OnEnable()
         {
+            Directory.CreateDirectory(Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() + "Bingo");
             new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
             bingoConfig = new();
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
+            BingoSaveFile.Apply();
         }
 
         public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)

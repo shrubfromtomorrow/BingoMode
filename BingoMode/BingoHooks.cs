@@ -65,82 +65,82 @@ namespace BingoMode
             }
             else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 1 threw!!! " + il);
 
-            if (b.TryGotoNext(MoveType.After,
-                x => x.MatchLdstr("[CONTENT]")
-                ))
-            {
-                b.Index += 5;
-                b.Emit(OpCodes.Ldloc, 0);
-                b.Emit(OpCodes.Ldloc, 7);
-                b.Emit(OpCodes.Ldelem_Ref);
-                b.EmitDelegate<Action<string>>((text) =>
-                {
-                    BingoData.BingoSaves = [];
-                    try
-                    {
-                        if (text.StartsWith("BINGOS:") && Regex.Split(text, ":")[1] != "")
-                        {
-                            string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
-                            for (int i = 0; i < array.Length; i++)
-                            {
-                                Plugin.logger.LogMessage(array[i]);
-                                string[] array2 = array[i].Split('#');
-                                int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                if (array2.Length > 6)
-                                {
-                                    int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                    SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
-                                    hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
-                                    bool isHost = array2[4] == "1";
-                                    bool lockout = array2[6] == "1";
-                                    bool showedWin = false;
-                                    bool firstCycleSaved = false;
-                                    bool passageUsed = false;
-                                    if (array2.Length > 7)
-                                    {
-                                        showedWin = array2[7] == "1";
-                                        if (array2.Length > 8)
-                                        {
-                                            firstCycleSaved = array2[8] == "1";
-                                            passageUsed = array2[9] == "1";
-                                        }
-                                    }
-
-                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
-
-                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed);
-                                }
-                                else
-                                {
-                                    bool showedWin = false;
-                                    int team = SteamTest.team;
-                                    bool firstCycleSaved = false;
-                                    bool passageUsed = false;
-                                    if (array2.Length > 2)
-                                    {
-                                        showedWin = array2[2] == "1";
-                                        if (array2.Length > 3)
-                                        {
-                                            team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                            if (array2.Length > 4)
-                                            {
-                                                firstCycleSaved = array2[4] == "1";
-                                                passageUsed = array2[5] == "1";
-                                            }
-                                        }
-                                    }
-
-                                    Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
-
-                                    BingoData.BingoSaves[new(array2[0])] = new(size, showedWin, team, firstCycleSaved, passageUsed);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e) { Plugin.logger.LogError("Failed to do that!!!" + e); }
-                });
-            }
-            else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 2 threw!!! " + il);
+            //if (b.TryGotoNext(MoveType.After,
+            //    x => x.MatchLdstr("[CONTENT]")
+            //    ))
+            //{
+            //    b.Index += 5;
+            //    b.Emit(OpCodes.Ldloc, 0);
+            //    b.Emit(OpCodes.Ldloc, 7);
+            //    b.Emit(OpCodes.Ldelem_Ref);
+            //    b.EmitDelegate<Action<string>>((text) =>
+            //    {
+            //        BingoData.BingoSaves = [];
+            //        try
+            //        {
+            //            if (text.StartsWith("BINGOS:") && Regex.Split(text, ":")[1] != "")
+            //            {
+            //                string[] array = Regex.Split(Regex.Split(text, ":")[1], "<>");
+            //                for (int i = 0; i < array.Length; i++)
+            //                {
+            //                    Plugin.logger.LogMessage(array[i]);
+            //                    string[] array2 = array[i].Split('#');
+            //                    int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+            //                    if (array2.Length > 6)
+            //                    {
+            //                        int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+            //                        SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
+            //                        hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
+            //                        bool isHost = array2[4] == "1";
+            //                        bool lockout = array2[6] == "1";
+            //                        bool showedWin = false;
+            //                        bool firstCycleSaved = false;
+            //                        bool passageUsed = false;
+            //                        if (array2.Length > 7)
+            //                        {
+            //                            showedWin = array2[7] == "1";
+            //                            if (array2.Length > 8)
+            //                            {
+            //                                firstCycleSaved = array2[8] == "1";
+            //                                passageUsed = array2[9] == "1";
+            //                            }
+            //                        }
+            //
+            //                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+            //
+            //                        BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed);
+            //                    }
+            //                    else
+            //                    {
+            //                        bool showedWin = false;
+            //                        int team = SteamTest.team;
+            //                        bool firstCycleSaved = false;
+            //                        bool passageUsed = false;
+            //                        if (array2.Length > 2)
+            //                        {
+            //                            showedWin = array2[2] == "1";
+            //                            if (array2.Length > 3)
+            //                            {
+            //                                team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+            //                                if (array2.Length > 4)
+            //                                {
+            //                                    firstCycleSaved = array2[4] == "1";
+            //                                    passageUsed = array2[5] == "1";
+            //                                }
+            //                            }
+            //                        }
+            //
+            //                        Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+            //
+            //                        BingoData.BingoSaves[new(array2[0])] = new(size, showedWin, team, firstCycleSaved, passageUsed);
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        catch (Exception e) { Plugin.logger.LogError("Failed to do that!!!" + e); }
+            //    });
+            //}
+            //else Plugin.logger.LogError("ExpeditionCoreFile_FromStringIL 2 threw!!! " + il);
 
             if (a.TryGotoNext(
                 x => x.MatchLdcI4(6),
@@ -251,8 +251,7 @@ namespace BingoMode
             On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
 
             // Saving and loaading shit
-            IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
-            On.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToString;
+            //IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
             On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
 
             // Preventing expedition antics
@@ -285,6 +284,18 @@ namespace BingoMode
             On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
             On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
+
+            On.Menu.CharacterSelectPage.Update += CharacterSelectPage_Update;
+        }
+
+        private static void CharacterSelectPage_Update(On.Menu.CharacterSelectPage.orig_Update orig, CharacterSelectPage self)
+        {
+            orig.Invoke(self);
+
+            if (Input.GetKey(KeyCode.K))
+            {
+                self.AbandonButton_OnPressDone(null);
+            }
         }
 
         private static void FastTravelScreen_Update(ILContext il)
@@ -320,7 +331,7 @@ namespace BingoMode
                 if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
                 {
                     data.passageUsed = true;
-                    Expedition.Expedition.coreFile.Save(false);
+                    BingoSaveFile.Save();
                     self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.FastTravelScreen);
                     self.PlaySound(SoundID.MENU_Passage_Button);
                 }
@@ -604,11 +615,6 @@ namespace BingoMode
             }
         }
 
-        private static string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
-        {
-            return orig.Invoke(self);
-        }
-
         private static void RainWorldGame_GoToDeathScreen(ILContext il)
         {
             ILCursor c = new(il);
@@ -674,6 +680,7 @@ namespace BingoMode
                             "#" +
                             (saveData.passageUsed ? "1" : "0");
                         }
+                        // Add teams string for all challenges at the end of this
                         if (i < BingoData.BingoSaves.Count - 1)
                         {
                             text += "<>";

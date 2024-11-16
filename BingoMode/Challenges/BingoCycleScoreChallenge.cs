@@ -90,7 +90,6 @@ namespace BingoMode.Challenges
             if (score != lastPoints)
             {
                 UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (score >= target.Value)
                 {
                     score = target.Value;
@@ -126,11 +125,7 @@ namespace BingoMode.Challenges
                 "><",
                 this.completed ? "1" : "0",
                 "><",
-                this.hidden ? "1" : "0",
-                "><",
                 this.revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -141,14 +136,12 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 this.target = SettingBoxFromString(array[0]) as SettingBox<int>;
                 this.completed = (array[1] == "1");
-                this.hidden = (array[2] == "1");
-                this.revealed = (array[3] == "1");
+                this.revealed = (array[2] == "1");
                 if (revealed || completed)
                 {
                     score = target.Value;
                 }
                 else score = 0;
-                TeamsFromString(array[4]);
                 this.UpdateDescription();
             }
             catch (Exception ex)

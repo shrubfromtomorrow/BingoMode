@@ -543,9 +543,10 @@ namespace BingoMode
                     Plugin.logger.LogMessage("Joining" + lobid);
                     CSteamID lobbid = new CSteamID(lobid);
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobbid, "lobbyVersion");
+                    Plugin.logger.LogError($"Our version: {Plugin.VERSION}. Comparing to: {lobbyVersion}");
                     if (lobbyVersion != Plugin.VERSION)
                     {
-                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same mod version as the lobby.\nYour version: {Plugin.VERSION}. Lobby version: {lobbyVersion}"));
+                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same mod version as the lobby.\nYour version: {Plugin.VERSION} Lobby version: {lobbyVersion}"));
                         return;
                     }
                     if (SteamMatchmaking.GetLobbyData(lobbid, "banCheats") == "1")

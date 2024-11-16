@@ -262,11 +262,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -296,9 +292,7 @@ namespace BingoMode.Challenges
                 deathPit = SettingBoxFromString(array[7]) as SettingBox<bool>;
                 starve = SettingBoxFromString(array[8]) as SettingBox<bool>;
                 completed = (array[9] == "1");
-                hidden = (array[10] == "1");
-                revealed = (array[11] == "1");
-                TeamsFromString(array[12]);
+                revealed = (array[10] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -331,7 +325,6 @@ namespace BingoMode.Challenges
                 this.current++;
                 ExpLog.Log("Player " + (playerNumber + 1).ToString() + " killed " + type.value);
                 this.UpdateDescription();
-                if (!RequireSave()) Expedition.Expedition.coreFile.Save(false);
                 if (this.current >= this.amount.Value)
                 {
                     this.CompleteChallenge();

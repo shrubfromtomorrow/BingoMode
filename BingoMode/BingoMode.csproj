@@ -95,6 +95,7 @@
     <Compile Include="BingoHUDHint.cs" />
     <Compile Include="BingoModOptions.cs" />
     <Compile Include="BingoPage.cs" />
+    <Compile Include="BingoSaveFile.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\LobbyFilters.cs" />
     <Compile Include="BingoSteamworks\LobbySettings.cs" />

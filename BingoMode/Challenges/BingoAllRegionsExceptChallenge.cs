@@ -81,7 +81,6 @@ namespace BingoMode.Challenges
                 else
                 {
                     ChangeValue();
-                    Expedition.Expedition.coreFile.Save(false);
                 }
             }
         }
@@ -117,11 +116,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -135,9 +130,7 @@ namespace BingoMode.Challenges
                 current = int.Parse(array[2], System.Globalization.NumberStyles.Any);
                 required = int.Parse(array[3], System.Globalization.NumberStyles.Any);
                 completed = (array[4] == "1");
-                hidden = (array[5] == "1");
-                revealed = (array[6] == "1");
-                TeamsFromString(array[7]);
+                revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

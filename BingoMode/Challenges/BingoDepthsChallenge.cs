@@ -61,6 +61,7 @@ namespace BingoMode.Challenges
                         if (player.room.updateList[j] is Creature c && c.Template.type.value == crit.Value && c.mainBodyChunk != null && c.mainBodyChunk.pos.y < 2266f)
                         {
                             CompleteChallenge();
+                            return;
                         }
                     }
                 }
@@ -92,11 +93,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                hidden ? "1" : "0",
-                "><",
                 revealed ? "1" : "0",
-                "><",
-                TeamsToString()
             });
         }
 
@@ -107,9 +104,7 @@ namespace BingoMode.Challenges
                 string[] array = Regex.Split(args, "><");
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
-                hidden = (array[2] == "1");
-                revealed = (array[3] == "1");
-                TeamsFromString(array[4]);
+                revealed = (array[2] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
