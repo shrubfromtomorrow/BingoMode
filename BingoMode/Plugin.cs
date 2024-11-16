@@ -22,7 +22,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.7";
+        public const string VERSION = "0.71";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         public static BingoModOptions bingoConfig;
@@ -48,7 +48,11 @@ namespace BingoMode
 
         public void Update()
         {
-            if (Input.anyKeyDown && Input.GetKeyDown(bingoConfig.HUDKeybind.Value))
+            if (Input.anyKeyDown && (Input.GetKeyDown(bingoConfig.HUDKeybindKeyboard.Value) || 
+                                    Input.GetKeyDown(bingoConfig.HUDKeybindC1.Value) ||
+                                    Input.GetKeyDown(bingoConfig.HUDKeybindC2.Value) ||
+                                    Input.GetKeyDown(bingoConfig.HUDKeybindC3.Value) ||
+                                    Input.GetKeyDown(bingoConfig.HUDKeybindC4.Value)))
             {
                 BingoHUD.Toggled = !BingoHUD.Toggled;
             }

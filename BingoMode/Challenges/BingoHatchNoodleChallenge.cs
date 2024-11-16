@@ -75,7 +75,7 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat.value != "Saint";
         }
 
         public override void Reset()

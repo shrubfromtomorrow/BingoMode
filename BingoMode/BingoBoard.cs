@@ -371,38 +371,46 @@ namespace BingoMode
         public void FromString(string text)
         {
             Plugin.logger.LogMessage("Bingo board from string:\n" + text);
-            if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
-            string[] challenges = Regex.Split(text, "bChG");
-            size = Mathf.RoundToInt(Mathf.Sqrt(challenges.Length));
-            int next = 0;
-            challengeGrid = new Challenge[size, size];
-            for (int i = 0; i < size; i++)
+            string last = ToString();
+            try
             {
-                for (int j = 0; j < size; j++)
+                if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
+                string[] challenges = Regex.Split(text, "bChG");
+                size = Mathf.RoundToInt(Mathf.Sqrt(challenges.Length));
+                int next = 0;
+                challengeGrid = new Challenge[size, size];
+                for (int i = 0; i < size; i++)
                 {
-                    try
+                    for (int j = 0; j < size; j++)
                     {
-                        string[] array11 = Regex.Split(challenges[next], "~");
-                        string type = array11[0];
-                        string text2 = array11[1];
-                        Challenge challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
-                        challenge.FromString(text2);
-                        ExpLog.Log(challenge.description);
-                        if (!ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer))
+                        try
                         {
-                            ExpeditionData.allChallengeLists.Add(ExpeditionData.slugcatPlayer, new List<Challenge>());
+                            string[] array11 = Regex.Split(challenges[next], "~");
+                            string type = array11[0];
+                            string text2 = array11[1];
+                            Challenge challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                            challenge.FromString(text2);
+                            ExpLog.Log(challenge.description);
+                            if (!ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer))
+                            {
+                                ExpeditionData.allChallengeLists.Add(ExpeditionData.slugcatPlayer, new List<Challenge>());
+                            }
+                            ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Add(challenge);
+                            challengeGrid[i, j] = challenge;
                         }
-                        ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Add(challenge);
-                        challengeGrid[i, j] = challenge;
+                        catch (Exception ex)
+                        {
+                            Plugin.logger.LogError("ERROR: Problem recreating challenge \"" + challenges[next] + "\" with reflection in bingoboard.fromstring: " + ex.Message);
+                        }
+                        next++;
                     }
-                    catch (Exception ex)
-                    {
-                        Plugin.logger.LogError("ERROR: Problem recreating challenge \"" + challenges[next] + "\" with reflection in bingoboard.fromstring: " + ex.Message);
-                    }
-                    next++;
                 }
+                UpdateChallenges();
             }
-            UpdateChallenges();
+            catch
+            {
+                FromString(last);
+            }
         }
 
         public void CompleteChallengeAt(int x, int y)

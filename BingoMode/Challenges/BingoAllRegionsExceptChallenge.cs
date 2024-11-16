@@ -51,7 +51,7 @@ namespace BingoMode.Challenges
 
             return new BingoAllRegionsExcept
             {
-                region = new(regionn, "Region", 0, listName: "regions"),
+                region = new(regionn, "Region", 0, listName: "regionsreal"),
                 regionsToEnter = regiones,
                 required = req
             };

@@ -220,7 +220,7 @@ namespace BingoMode.Challenges
                 sLeaser.sprites[2].y = this.inRoomPos.y - rCam.pos.y;
                 sLeaser.sprites[3].x = this.inRoomPos.x - rCam.pos.x;
                 sLeaser.sprites[3].y = this.inRoomPos.y - rCam.pos.y;
-                if (this.vista != null && this.vista.completed)
+                if (this.vista != null && (this.vista.completed || vista.revealed))
                 {
                     sLeaser.sprites[0].shader = rCam.game.rainWorld.Shaders["Basic"];
                     sLeaser.sprites[1].shader = rCam.game.rainWorld.Shaders["Basic"];
@@ -300,7 +300,7 @@ namespace BingoMode.Challenges
                     this.lightSource.setAlpha = new float?(1f);
                     this.room.AddObject(this.lightSource);
                 }
-                if (this.vista.completed && !this.collected)
+                if ((this.vista.completed || vista.revealed) && !this.collected)
                 {
                     this.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, this.inRoomPos, 1f, 1f);
                     for (int i = 0; i < 20; i++)

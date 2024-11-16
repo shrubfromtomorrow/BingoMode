@@ -39,7 +39,7 @@ namespace BingoMode.Challenges
 
             BingoNoRegionChallenge ch = new BingoNoRegionChallenge
             {
-                region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regions")
+                region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regionsreal")
             };
 
             return ch;

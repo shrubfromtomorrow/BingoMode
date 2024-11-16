@@ -86,7 +86,7 @@ namespace BingoMode
                                 Plugin.logger.LogMessage(array[i]);
                                 string[] array2 = array[i].Split('#');
                                 int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                if (array2.Length > 4)
+                                if (array2.Length > 6)
                                 {
                                     int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                                     SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
@@ -94,28 +94,46 @@ namespace BingoMode
                                     bool isHost = array2[4] == "1";
                                     bool lockout = array2[6] == "1";
                                     bool showedWin = false;
+                                    bool firstCycleSaved = false;
+                                    bool passageUsed = false;
                                     if (array2.Length > 7)
                                     {
                                         showedWin = array2[7] == "1";
+                                        if (array2.Length > 8)
+                                        {
+                                            firstCycleSaved = array2[8] == "1";
+                                            passageUsed = array2[9] == "1";
+                                        }
                                     }
 
-                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}");
+                                    Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
 
-                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin);
-
-                                    //if (array[5] != "")
-                                    //{
-                                    //    SteamFinal.ConnectedPlayers = SteamFinal.PlayersFromString(array[5]);
-                                    //
-                                    //    //foreach (var player in Regex.Split(array[5], "bPlR"))
-                                    //    //{
-                                    //    //    SteamNetworkingIdentity playerIdentity = new();
-                                    //    //    playerIdentity.SetSteamID64(ulong.Parse(player, NumberStyles.Any));
-                                    //    //    SteamFinal.ConnectedPlayers.Add(playerIdentity);
-                                    //    //}
-                                    //}
+                                    BingoData.BingoSaves[new(array2[0], false)] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed);
                                 }
-                                else BingoData.BingoSaves[new(array2[0])] = new(size, array2.Length > 2 ? array2[2] == "1" : false, array2.Length > 3 ? int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture) : SteamTest.team);
+                                else
+                                {
+                                    bool showedWin = false;
+                                    int team = SteamTest.team;
+                                    bool firstCycleSaved = false;
+                                    bool passageUsed = false;
+                                    if (array2.Length > 2)
+                                    {
+                                        showedWin = array2[2] == "1";
+                                        if (array2.Length > 3)
+                                        {
+                                            team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                                            if (array2.Length > 4)
+                                            {
+                                                firstCycleSaved = array2[4] == "1";
+                                                passageUsed = array2[5] == "1";
+                                            }
+                                        }
+                                    }
+
+                                    Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+
+                                    BingoData.BingoSaves[new(array2[0])] = new(size, showedWin, team, firstCycleSaved, passageUsed);
+                                }
                             }
                         }
                     }
@@ -240,9 +258,6 @@ namespace BingoMode
             // Preventing expedition antics
             IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
 
-            // Custom den
-            On.Expedition.ExpeditionGame.ExpeditionRandomStarts += ExpeditionGame_ExpeditionRandomStarts;
-
             // Multiplayer lobbies slider
             On.Menu.ExpeditionMenu.SliderSetValue += ExpeditionMenu_SliderSetValue;
             On.Menu.ExpeditionMenu.ValueOfSlider += ExpeditionMenu_ValueOfSlider;
@@ -254,7 +269,8 @@ namespace BingoMode
             On.ProcessManager.RequestMainProcessSwitch_ProcessID_float += ProcessManager_RequestMainProcessSwitch_ProcessID_float;
 
             // Request host upkeep when going back to the game
-            On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures;
+            //On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures;
+            On.ShelterDoor.Update += ShelterDoor_Update;
 
             // No red karma 1
             IL.Menu.KarmaLadder.KarmaSymbol.Update += KarmaSymbol_UpdateIL;
@@ -264,6 +280,134 @@ namespace BingoMode
 
             // No force watch sleep screen
             On.Menu.SleepAndDeathScreen.GetDataFromGame += SleepAndDeathScreen_GetDataFromGame;
+
+            // One passage per game
+            On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
+            On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
+            IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
+        }
+
+        private static void FastTravelScreen_Update(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            ILLabel label = null;
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchBr(out label),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<MainLoopProcess>("manager"),
+                x => x.MatchLdsfld<ProcessManager.ProcessID>("MainMenu"),
+                x => x.MatchCallOrCallvirt<ProcessManager>("RequestMainProcessSwitch")
+                ))
+            {
+                if (label == null) return;
+                c.Index += 1;
+                c.MoveAfterLabels();
+                c.EmitDelegate<Func<bool>>(() =>
+                {
+                    if (BingoData.BingoMode) return true;
+                    return false;
+                });
+                c.Emit(OpCodes.Brtrue, label);
+            }
+            else Plugin.logger.LogError("FastTravelScreen_Update FAILURE " + il);
+        }
+
+        private static void SleepAndDeathScreen_Singal(On.Menu.SleepAndDeathScreen.orig_Singal orig, SleepAndDeathScreen self, MenuObject sender, string message)
+        {
+            if (BingoData.BingoMode && message != null && message == "EXPPASSAGE")
+            {
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
+                {
+                    data.passageUsed = true;
+                    Expedition.Expedition.coreFile.Save(false);
+                    self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.FastTravelScreen);
+                    self.PlaySound(SoundID.MENU_Passage_Button);
+                }
+
+                return;
+            }
+
+            orig.Invoke(self, sender, message);
+        }
+
+        private static void SleepAndDeathScreen_AddExpeditionPassageButton(On.Menu.SleepAndDeathScreen.orig_AddExpeditionPassageButton orig, SleepAndDeathScreen self)
+        {
+            if (BingoData.BingoMode)
+            {
+                bool available = false;
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
+                {
+                    available = true;
+                }
+
+                self.expPassage = new SimpleButton(self, self.pages[0], self.Translate("PASSAGE"), "EXPPASSAGE", new Vector2(self.LeftHandButtonsPosXAdd + self.manager.rainWorld.options.SafeScreenOffset.x, Mathf.Max(self.manager.rainWorld.options.SafeScreenOffset.y, 15f)), new Vector2(110f, 30f));
+                self.pages[0].subObjects.Add(self.expPassage);
+                self.expPassage.lastPos = self.expPassage.pos;
+                MenuLabel menuLabel = new MenuLabel(self, self.pages[0], self.Translate("AVAILABLE: ") + (available ? "1" : "0"), new Vector2(self.expPassage.pos.x + self.expPassage.size.x / 2f, self.expPassage.pos.y + 45f), default(Vector2), false, null);
+                menuLabel.label.color = new Color(0.7f, 0.7f, 0.7f);
+                self.pages[0].subObjects.Add(menuLabel);
+                return;
+            }
+            orig.Invoke(self);
+        }
+
+        private static void ShelterDoor_Update(On.ShelterDoor.orig_Update orig, ShelterDoor self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            if (!BingoData.BingoMode) return;
+            if (self.IsOpening)
+            {
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.firstCycleSaved)
+                {
+                    if (data.hostID.GetSteamID64() == default)
+                    {
+                        Plugin.logger.LogMessage("Saving game and completing reverse challenges singleplayer");
+                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        {
+                            if (!challenge.completed && challenge is BingoChallenge b && !b.TeamsFailed[SteamTest.team] && b.ReverseChallenge())
+                            {
+                                b.OnChallengeCompleted(SteamTest.team);
+                            }
+                        }
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].firstCycleSaved = true;
+                        Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
+                        Expedition.Expedition.coreFile.Save(false);
+                        return;
+                    }
+                    if (data.hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+                    {
+                        Plugin.logger.LogMessage("Saving game and completing reverse challenges multiplayer host");
+                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        {
+                            if (!challenge.completed && challenge is BingoChallenge b && b.ReverseChallenge())
+                            {
+                                foreach (int team in BingoData.TeamsInBingo)
+                                {
+                                    if (b.TeamsFailed[team]) continue;
+                                    b.OnChallengeCompleted(team);
+                                }
+                            }
+                        }
+                        SteamFinal.BroadcastCurrentBoardState();
+                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].firstCycleSaved = true;
+                        Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
+                        Expedition.Expedition.coreFile.Save(false);
+                    }
+                    else if (!SteamFinal.ReceivedHostUpKeep)
+                    {
+                        self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
+                    }
+                    Plugin.logger.LogMessage("Saving game and completing reverse challenges multiplayer client");
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].firstCycleSaved = true;
+                    Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                    Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
+                    Expedition.Expedition.coreFile.Save(false);
+                }
+            }
         }
 
         private static void SleepAndDeathScreen_GetDataFromGame(On.Menu.SleepAndDeathScreen.orig_GetDataFromGame orig, SleepAndDeathScreen self, KarmaLadderScreen.SleepDeathScreenDataPackage package)
@@ -286,7 +430,14 @@ namespace BingoMode
         private static void SleepAndDeathScreen_Update(On.Menu.SleepAndDeathScreen.orig_Update orig, SleepAndDeathScreen self)
         {
             orig.Invoke(self);
-                
+
+            if (!BingoData.BingoMode) return;
+
+            if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data))
+            {
+                self.expPassage.buttonBehav.greyedOut = data.passageUsed;
+            }
+
             if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
             HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUD);
             if (binguHUD is BingoHUD hude)
@@ -453,12 +604,6 @@ namespace BingoMode
             }
         }
 
-        private static string ExpeditionGame_ExpeditionRandomStarts(On.Expedition.ExpeditionGame.orig_ExpeditionRandomStarts orig, RainWorld rainWorld, SlugcatStats.Name slug)
-        {
-            if (BingoData.BingoMode) return BingoData.RandomBingoDen(slug);
-            else return orig.Invoke(rainWorld, slug);
-        }
-
         private static string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
         {
             return orig.Invoke(self);
@@ -511,7 +656,11 @@ namespace BingoMode
                             "#" +
                             (saveData.lockout ? "1" : "0") + 
                             "#" + 
-                            (saveData.showedWin ? "1" : "0");
+                            (saveData.showedWin ? "1" : "0") +
+                            "#" + 
+                            (saveData.firstCycleSaved ? "1" : "0") +
+                            "#" + 
+                            (saveData.passageUsed ? "1" : "0");
                         }
                         else
                         {
@@ -519,7 +668,11 @@ namespace BingoMode
                             "#" +
                             (saveData.showedWin ? "1" : "0") + 
                             "#" +
-                            saveData.team;
+                            saveData.team +
+                            "#" +
+                            (saveData.firstCycleSaved ? "1" : "0") +
+                            "#" +
+                            (saveData.passageUsed ? "1" : "0");
                         }
                         if (i < BingoData.BingoSaves.Count - 1)
                         {

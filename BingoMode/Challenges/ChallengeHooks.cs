@@ -148,28 +148,19 @@ namespace BingoMode.Challenges
             //IL.FlareBomb.Update += FlareBomb_Update;
         }
 
-       //public static void EndgameMeter_UpdateIL(ILContext il)
-       //{
-       //    ILCursor c = new(il);
-       //
-       //    if (c.TryGotoNext(MoveType.After,
-       //        x => x.MatchCallOrCallvirt<ProcessManager>("CueAchievement")
-       //        ))
-       //    {
-       //        c.Emit(OpCodes.Ldarg_0);
-       //        c.EmitDelegate<Action<EndgameMeter>>((meter) =>
-       //        {
-       //            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-       //            {
-       //                if (ExpeditionData.challengeList[j] is BingoAchievementChallenge c)
-       //                {
-       //                    c.CheckAchievementProgress(meter.tracker.ID);
-       //                }
-       //            }
-       //        });
-       //    }
-       //    else Plugin.logger.LogError("EndgameMeter_UpdateIL FAILURE " + il);
-       //}
+        public static void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
+        {
+            orig.Invoke(self, obj, chunk, appendage);
+
+            if (obj is not KarmaFlower) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoKarmaFlowerChallenge c)
+                {
+                    c.Karmad();
+                }
+            }
+        }
 
         public static void Room_LoadedKarmaFlower(ILContext il)
         {
@@ -465,7 +456,7 @@ namespace BingoMode.Challenges
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is BingoStealChallenge c)
+                if (ExpeditionData.challengeList[j] is BingoStealChallenge c && !c.toll.Value)
                 {
                     c.checkedIDs.Add(obj.abstractPhysicalObject.ID);
                 }

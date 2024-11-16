@@ -61,7 +61,8 @@ namespace BingoMode.Challenges
                 case "friend": return Befriendable;
                 case "pearls": return CollectablePearls;
                 case "craft": return CraftableItems;
-                case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return Depthable;
@@ -380,12 +381,12 @@ namespace BingoMode.Challenges
 
         public static readonly string[] Bannable =
         {
-            "FlyLure",
             "Lantern",
             "PuffBall",
             "VultureMask",
             "ScavengerBomb",
-            "BubbleGrass"
+            "BubbleGrass",
+            "Rock"
         };
 
         public static readonly string[] Befriendable =

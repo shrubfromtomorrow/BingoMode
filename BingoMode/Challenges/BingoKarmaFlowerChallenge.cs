@@ -117,6 +117,7 @@ namespace BingoMode.Challenges
         {
             On.Player.ObjectEaten += Player_ObjectEatenKarmaFlower;
             IL.Room.Loaded += Room_LoadedKarmaFlower;
+            On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
             placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
         }
 
@@ -124,6 +125,7 @@ namespace BingoMode.Challenges
         {
             On.Player.ObjectEaten -= Player_ObjectEatenKarmaFlower;
             IL.Room.Loaded -= Room_LoadedKarmaFlower;
+            On.Spear.HitSomethingWithoutStopping -= Spear_HitSomethingWithoutStopping;
             placeKarmaFlowerHook?.Dispose();
         }
 

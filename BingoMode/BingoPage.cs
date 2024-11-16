@@ -36,6 +36,8 @@ namespace BingoMode
         public ConfigurableBase shelterSettingConf;
         public UIelementWrapper shelterSettingWrapper;
         public MenuLabel shelterLabel;
+        public SimpleButton copyBoard;
+        public SimpleButton pasteBoard;
 
         // Multiplayer
         public SimpleButton multiButton;
@@ -93,12 +95,6 @@ namespace BingoMode
             BingoData.BingoMode = false;
             BingoData.TeamsInBingo = [0];
 
-            //tab = new MenuTab();
-            //Container.AddChild(tab._container);
-            //tab._Activate();
-            //tab._Update();
-            //tab._GrafUpdate(0f);
-
             pageTitle = new FSprite("bingotitle");
             pageTitle.SetAnchor(0.5f, 0f);
             pageTitle.x = 683f;
@@ -117,12 +113,6 @@ namespace BingoMode
             randomize.roundedRect.size = randomize.size;
             subObjects.Add(randomize);
 
-            //grid = new BingoGrid(menu, this, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
-            //subObjects.Add(grid);
-
-            //startGame = new BigSimpleButton(menu, this, "BEGIN", "STARTBINGO",
-            //    new Vector2(menu.manager.rainWorld.screenSize.x * 0.75f, 40f),
-            //    new Vector2(150f, 40f), FLabelAlignment.Center, true);
             float xx = menu.manager.rainWorld.screenSize.x * 0.79f;
             float yy = 85f;
             startGame = new HoldButton(menu, this, "BEGIN", "STARTBINGO",
@@ -156,10 +146,10 @@ namespace BingoMode
             shelterLabel = new MenuLabel(menu, this, "Shelter: ", new Vector2(xx + 26f, yy + 69), default, false);
             subObjects.Add(shelterLabel);
 
-            //tab.AddItems(
-            //[
-            //    shelterSetting
-            //]);
+            copyBoard = new SimpleButton(menu, this, "Copy board", "COPYTOCLIPBOARD", new Vector2(xx - 10f, yy - 25f), new Vector2(80f, 20f));
+            subObjects.Add(copyBoard);
+            pasteBoard = new SimpleButton(menu, this, "Paste board", "PASTEFROMCLIPBOARD", new Vector2(xx + 80f, yy - 25f), new Vector2(80f, 20f));
+            subObjects.Add(pasteBoard);
 
             // Multigameplayguy
             multiButton = new SimpleButton(menu, this, "Multiplayer", "SWITCH_MULTIPLAYER", expMenu.exitButton.pos + new Vector2(0f, -40f), new Vector2(140f, 30f));
@@ -218,6 +208,7 @@ namespace BingoMode
                 randomize.buttonBehav.greyedOut = !create || fromContinueGame;
                 plusButton.buttonBehav.greyedOut = !create || fromContinueGame;
                 minusButton.buttonBehav.greyedOut = !create || fromContinueGame;
+                pasteBoard.buttonBehav.greyedOut = !create || fromContinueGame;
                 multiButton.menuLabel.text = "Leave Lobby";
                 multiButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
@@ -233,6 +224,7 @@ namespace BingoMode
             randomize.buttonBehav.greyedOut = false;
             plusButton.buttonBehav.greyedOut = false;
             minusButton.buttonBehav.greyedOut = false;
+            pasteBoard.buttonBehav.greyedOut = false;
             multiButton.menuLabel.text = "Multiplayer";
             multiButton.signalText = "SWITCH_MULTIPLAYER";
             grid.Switch(false);
@@ -315,6 +307,19 @@ namespace BingoMode
         {
             base.Singal(sender, message);
 
+            if (message == "COPYTOCLIPBOARD")
+            {
+                UniClipboard.SetText(BingoHooks.GlobalBoard.ToString());
+                return;
+            }
+
+            if (message == "PASTEFROMCLIPBOARD")
+            {
+                BingoHooks.GlobalBoard.FromString(UniClipboard.GetText());
+                SteamTest.UpdateOnlineBingo();
+                return;
+            }
+
             if (message == "GOBACK")
             {
                 slideStep = -1f;
@@ -331,75 +336,6 @@ namespace BingoMode
             if (message == "STARTBINGO")
             {
                 if (menu.manager.dialog != null) menu.manager.StopSideProcess(menu.manager.dialog);
-                /*
-                if (SteamTest.team == 8) // Spectator
-                {
-                    spectatorMode = true;
-
-                    randomize.RemoveSprites();
-                    RemoveSubObject(randomize);
-                    plusButton.RemoveSprites();
-                    RemoveSubObject(plusButton);
-                    minusButton.RemoveSprites();
-                    RemoveSubObject(minusButton);
-                    shelterLabel.RemoveSprites();
-                    RemoveSubObject(shelterLabel);
-                    rightPage.RemoveSprites();
-                    RemoveSubObject(rightPage);
-                    startGame.RemoveSprites();
-                    RemoveSubObject(startGame);
-
-                    unlocksButton.Hide();
-                    shelterSetting.Hide();
-                    unlocksButton.Unload();
-                    shelterSetting.Unload();
-                    menuTabWrapper.wrappers.Remove(unlocksButton);
-                    menuTabWrapper.wrappers.Remove(shelterSetting);
-                    menuTabWrapper.subObjects.Remove(unlockWrapper);
-                    menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
-
-                    grid.Switch(true);
-
-                    if (slideStep == 0f) slideStep = 1f;
-                    else slideStep = -slideStep;
-                    float ff = slideStep == 1f ? 1f : 0f;
-                    slider.subtleSliderNob.outerCircle.alpha = ff;
-                    foreach (var line in slider.lineSprites)
-                    {
-                        line.alpha = ff;
-                    }
-
-                    menu.PlaySound(SoundID.MENU_Start_New_Game);
-
-                    List<string> bannedRegionss = [];
-                    foreach (var ch in ExpeditionData.challengeList)
-                    {
-                        if (ch is BingoNoRegionChallenge r) bannedRegionss.Add(r.region.Value);
-                        if (ch is BingoAllRegionsExcept g) bannedRegionss.Add(g.region.Value);
-                    }
-                resette:
-                    ExpeditionData.startingDen = ExpeditionGame.ExpeditionRandomStarts(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
-                    BingoData.BingoDen = ExpeditionData.startingDen;
-                    foreach (var banned in bannedRegionss)
-                    {
-                        if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto resette;
-                    }
-
-                    if (BingoData.MultiplayerGame)
-                    {
-                        SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
-                        hostIdentity.SetSteamID(SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby));
-                        string connectedPlayers = "";
-
-
-                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, hostIdentity.GetSteamID() == SteamTest.selfIdentity.GetSteamID(), );
-                    }
-                    else BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size);
-                    if (SteamTest.LobbyMembers.Count > 0 && SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID()) SteamTest.BroadcastStartGame();
-
-                    return;
-                }
-                */
 
                 if (SteamTest.team == 8)
                 {
@@ -438,16 +374,11 @@ namespace BingoMode
                     if (ch is BingoNoRegionChallenge r) bannedRegions.Add(r.region.Value);
                     if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
                 }
-                if (BingoData.BingoDen == "random")
+                if (BingoData.BingoDen.ToLowerInvariant() == "random")
                 {
                 reset:
                     ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
-
-                    if (SteamTest.team == 8)
-                    {
-                        ExpeditionData.startingDen = "su_s01";
-                    }
 
                     if (bannedRegions.Count > 0)
                     {
@@ -458,7 +389,12 @@ namespace BingoMode
                         }
                     }
                 }
-                else ExpeditionData.startingDen = BingoData.BingoDen;
+                else ExpeditionData.startingDen = BingoData.BingoDen.ToUpperInvariant();
+
+                if (SteamTest.team == 8)
+                {
+                    ExpeditionData.startingDen = "SU_S01";
+                }
 
                 foreach (var kvp in menu.manager.rainWorld.progression.mapDiscoveryTextures)
                 {
@@ -502,13 +438,13 @@ namespace BingoMode
                         InnerWorkings.SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
                     }
 
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout, false);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout, false, false, false);
                 }
                 else
                 {
                     int newTeam = TeamNumber(Plugin.bingoConfig.SinglePlayerTeam.Value);
                     Plugin.logger.LogWarning("Setting new team to: " + newTeam);
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
                     SteamTest.team = newTeam;
                 }
                 Expedition.Expedition.coreFile.Save(false);

@@ -350,7 +350,7 @@ namespace BingoMode
                     queue[0].StartAnim();
                     queue.RemoveAt(0);
                     animation = animationLength;
-                    if (queue.Count == 0 && completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
+                    //if (queue.Count == 0 && completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                     if (queue.Count == 0 && completeQueue.Count == 0 && !addCompleteAlpha)
                     {
                         BingoCompleteInfo? potentialEndGame = CheckWinLose();
@@ -519,7 +519,7 @@ namespace BingoMode
                     float topLeft = -size * board.size / 2f;
                     Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f, hud.rainWorld.screenSize.y * 0.5f - 35f) : new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
                     grid[i, j] = new BingoInfo(hud, this,
-                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.owner is SleepAndDeathScreen s ? s.hudContainers[1].Container : hud.fContainers[1], board.challengeGrid[i, j], i, j);
+                        center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.fContainers[0], board.challengeGrid[i, j], i, j);
                 }
             }
         }
@@ -1118,7 +1118,7 @@ namespace BingoMode
                 if (context == AnimationContext.BingoLast)
                 {
                     owner.ShowWinText();
-                    if (owner.queue.Count == 0 && owner.completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
+                    //if (owner.queue.Count == 0 && owner.completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                 }
                 if (overwriteAlpha > 0f)
                 {

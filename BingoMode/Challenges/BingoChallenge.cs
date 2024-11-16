@@ -164,7 +164,6 @@ namespace BingoMode.Challenges
         public void OnChallengeCompleted(int team)
         {
             Plugin.logger.LogMessage($"Completing challenge for {BingoPage.TeamName(team)}: {this}");
-            Plugin.logger.LogInfo(Environment.StackTrace);
             bool lastCompleted = TeamsCompleted[team];
 
             TeamsCompleted[team] = true;
@@ -175,12 +174,15 @@ namespace BingoMode.Challenges
             if (!lastCompleted)
             {
                 ChallengeCompleted?.Invoke(team);
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                if (team == SteamTest.team)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
-                        Plugin.logger.LogFatal("hell challenge gaboogad challenge");
-                        c.GetChallenge();
+                        if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
+                        {
+                            Plugin.logger.LogFatal("hell challenge gaboogad challenge");
+                            c.GetChallenge();
+                        }
                     }
                 }
             }
@@ -216,7 +218,6 @@ namespace BingoMode.Challenges
         public void OnChallengeFailed(int team)
         {
             Plugin.logger.LogMessage($"Failing challenge for {BingoPage.TeamName(team)}: {this}");
-            Plugin.logger.LogInfo(Environment.StackTrace);
 
             if (team == SteamTest.team)
             {
@@ -238,6 +239,7 @@ namespace BingoMode.Challenges
             hidden = true;
             TeamsCompleted[team] = true;
             if (!lastHidden) ChallengeLockedOut?.Invoke(team);
+            Expedition.Expedition.coreFile.Save(false);
         }
 
         public void ChangeValue()
