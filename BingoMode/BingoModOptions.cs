@@ -1,6 +1,5 @@
-﻿using Menu.Remix.MixedUI;
-using Menu.Remix.MixedUI.ValueTypes;
-using RWCustom;
+﻿using BepInEx.Logging;
+using Menu.Remix.MixedUI;
 using UnityEngine;
 
 
@@ -14,10 +13,11 @@ namespace BingoMode
         public readonly Configurable<KeyCode> HUDKeybindC3;
         public readonly Configurable<KeyCode> HUDKeybindC4;
         public readonly Configurable<string> SinglePlayerTeam;
+        public readonly Configurable<bool> UseMapInput;
 
         private UIelement[] optionse;
 
-        public BingoModOptions() : base()
+        public BingoModOptions(Plugin plugin)
         {
             HUDKeybindKeyboard = config.Bind<KeyCode>("HUDKeybind", KeyCode.Space);
             HUDKeybindC1 = config.Bind<KeyCode>("HUDKeybindC1", KeyCode.Joystick1Button5);
@@ -25,6 +25,7 @@ namespace BingoMode
             HUDKeybindC3 = config.Bind<KeyCode>("HUDKeybindC3", KeyCode.Joystick3Button5);
             HUDKeybindC4 = config.Bind<KeyCode>("HUDKeybindC4", KeyCode.Joystick4Button5);
             SinglePlayerTeam = config.Bind<string>("SinglePlayerTeam", "Red");
+            UseMapInput = config.Bind<bool>("UseMapInput", false);
         }
 
         public override void Initialize()
@@ -51,9 +52,26 @@ namespace BingoMode
                 new OpKeyBinder(HUDKeybindC4, new Vector2(170f, 345f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller4),
 
                 new OpLabel(10f, 310f, "Singleplayer team color:") {alignment = FLabelAlignment.Left, description = "Which team's color to use in singleplayer"},
-                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 310f), 140f, ["Red", "Blue", "Green", "Yellow", "Pink", "Cyan", "Orange", "Purple"])
+                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 310f), 140f, ["Red", "Blue", "Green", "Yellow", "Pink", "Cyan", "Orange", "Purple"]),
+
+                new OpLabel(430f, 510f, "Use map input instead:") {alignment = FLabelAlignment.Left},
+                new OpCheckBox(UseMapInput, 560f, 510f)
             };
             tab.AddItems(optionse);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            bool greyedOut = UseMapInput.Value;
+
+            foreach (var item in Tabs[0].items)
+            {
+                if (item is OpKeyBinder g)
+                {
+                    g.greyedOut = greyedOut;
+                }
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ namespace BingoMode.Challenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= (int)amound.Value) CompleteChallenge();
+                if (current >= amound.Value) CompleteChallenge();
                 else ChangeValue();
             }
         }
@@ -113,6 +113,8 @@ namespace BingoMode.Challenges
             IL.Room.Loaded += Room_LoadedKarmaFlower;
             On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
             placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
+
+            IL.Player.FoodInRoom_Room_bool += Player_FoodInRoom_Room_bool;
         }
 
         public override void RemoveHooks()
@@ -121,6 +123,7 @@ namespace BingoMode.Challenges
             IL.Room.Loaded -= Room_LoadedKarmaFlower;
             On.Spear.HitSomethingWithoutStopping -= Spear_HitSomethingWithoutStopping;
             placeKarmaFlowerHook?.Dispose();
+            IL.Player.FoodInRoom_Room_bool -= Player_FoodInRoom_Room_bool;
         }
 
         public override List<object> Settings() => [amound];

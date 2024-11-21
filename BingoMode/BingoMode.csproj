@@ -122,12 +122,16 @@
     <Compile Include="Challenges\BingoItemHoardChallenge.cs" />
     <Compile Include="Challenges\BingoKarmaFlowerChallenge.cs" />
     <Compile Include="Challenges\BingoKillChallenge.cs" />
+    <Compile Include="Challenges\BingoMaulTypesChallenge.cs" />
+    <Compile Include="Challenges\BingoMaulXChallenge.cs" />
     <Compile Include="Challenges\BingoNeuronDeliveryChallenge.cs" />
+    <Compile Include="Challenges\BingoNoNeedleTradingChallenge.cs" />
     <Compile Include="Challenges\BingoNoRegionChallenge.cs" />
     <Compile Include="Challenges\BingoPearlDeliveryChallenge.cs" />
     <Compile Include="Challenges\BingoPearlHoardChallenge.cs" />
     <Compile Include="Challenges\BingoPinChallenge.cs" />
     <Compile Include="Challenges\BingoPopcornChallenge.cs" />
+    <Compile Include="Challenges\BingoRivCellChallenge.cs" />
     <Compile Include="Challenges\BingoStealChallenge.cs" />
     <Compile Include="Challenges\BingoTameChallenge.cs" />
     <Compile Include="Challenges\BingoTradeChallenge.cs" />

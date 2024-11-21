@@ -146,6 +146,202 @@ namespace BingoMode.Challenges
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
             //IL.FlareBomb.Update += FlareBomb_Update;
+
+            // No need for unlocked slugs
+            IL.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
+        }
+
+        public static void Player_FoodInRoom_Room_bool(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchStfld<DeathPersistentSaveData>("reinforcedKarma")
+                ))
+            {
+                c.EmitDelegate<Action>(() =>
+                {
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoKarmaFlowerChallenge c)
+                        {
+                            c.Karmad();
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Player_FoodInRoom_Room_bool FAILED" + il);
+        }
+
+        public static void Room_LoadedBlessedNeedles(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdfld<AbstractSpear>("needle")
+                ))
+            {
+                c.Emit(OpCodes.Ldloc, 8);
+                c.EmitDelegate<Func<bool, AbstractSpear, bool>>((orig, spear) =>
+                {
+                    if (ExpeditionData.challengeList.Any(x => x is BingoTradeTradedChallenge c && c.traderItems.Keys.Count > 0 && c.traderItems.Keys.Contains(spear.ID)))
+                    {
+                        orig = false;
+                    }
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("Room_LoadedBlessedNeedles FAILED" + il);
+        }
+
+        private static void ChallengeTools_ParseCreatureSpawns(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld("Expedition.ExpeditionGame", "unlockedExpeditionSlugcats")
+                ))
+            {
+                c.EmitDelegate<Func<List<SlugcatStats.Name>, List<SlugcatStats.Name>>>((orig) =>
+                {
+                    List<SlugcatStats.Name> slugs = [];
+                    foreach (string name in ExtEnum<SlugcatStats.Name>.values.entries)
+                    {
+                        slugs.Add(new(name, false));
+                    }
+                    return slugs;
+                });
+            }
+            else Plugin.logger.LogError("ChallengeTools_ParseCreatureSpawns FAILED" + il);
+        }
+
+        public static void BigEel_Update(On.BigEel.orig_Update orig, BigEel self, bool eu)
+        {
+            if (ExpeditionData.challengeList.Any(x => x is BingoDodgeLeviathanChallenge d && !d.TeamsCompleted[SteamTest.team] && !d.completed))
+            {
+                self.jawChargeFatigue = 0f;
+            }
+            orig.Invoke(self, eu);
+        }
+
+        public static void ScavengerAI_RecognizePlayerOfferingGift(On.ScavengerAI.orig_RecognizePlayerOfferingGift orig, ScavengerAI self, Tracker.CreatureRepresentation subRep, Tracker.CreatureRepresentation objRep, bool objIsMe, PhysicalObject item)
+        {
+            orig.Invoke(self, subRep, objRep, objIsMe, item);
+
+            if (self.giftForMe == item.abstractPhysicalObject && item is Spear spear && spear.IsNeedle)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoNoNeedleTradingChallenge c)
+                    {
+                        c.Traded();
+                    }
+                }
+            }
+        }
+
+        public static void Player_GrabUpdateArtiMaulTypes(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("Mauled target"),
+                x => x.MatchStelemRef(),
+                x => x.MatchCallOrCallvirt("RWCustom.Custom", "Log")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.Emit(OpCodes.Ldloc, 8);
+                c.EmitDelegate<Action<Player, int>>((self, grasp) =>
+                {
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoMaulTypesChallenge c)
+                        {
+                            c.Maul((self.grasps[grasp].grabbed as Creature).Template.type.value);
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Player_GrabUpdateArtiMaulX FAILURE " + il);
+        }
+
+        public static void Player_GrabUpdateArtiMaulX(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("Mauled target"),
+                x => x.MatchStelemRef(),
+                x => x.MatchCallOrCallvirt("RWCustom.Custom", "Log")
+                ))
+            {
+                c.EmitDelegate<Action>(() =>
+                {
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoMaulXChallenge c)
+                        {
+                            c.Maul();
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Player_GrabUpdateArtiMaulX FAILURE " + il);
+        }
+
+        public static void EnergyCell_Update(On.MoreSlugcats.EnergyCell.orig_Update orig, EnergyCell self, bool eu)
+        {
+            if (ExpeditionData.challengeList.Any(x => x is BingoRivCellChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) self.KeepOff();
+            orig.Invoke(self, eu);
+        }
+
+        public static void Room_LoadedEnergyCell(ILContext il)
+        {
+            ILCursor b = new(il);
+            if (b.TryGotoNext(
+                x => x.MatchLdsfld("Expedition.ExpeditionData", "startingDen")
+                ) &&
+                b.TryGotoNext(MoveType.After,
+                x => x.MatchCallOrCallvirt<WorldCoordinate>(".ctor")
+                ))
+            {
+                b.Emit(OpCodes.Ldarg_0);
+                b.Emit(OpCodes.Ldloc, 72);
+                b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
+                {
+                    AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.EnergyCell);
+                    if (existingFucker != null)
+                    {
+                        room.abstractRoom.RemoveEntity(existingFucker);
+                    }
+
+                    AbstractPhysicalObject startItem = new(room.world, MSCItemType.EnergyCell, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID());
+                    room.abstractRoom.entities.Add(startItem);
+                    startItem.Realize();
+                });
+            }
+            else Plugin.logger.LogError("Ass " + il);
+        }
+
+        public static void EnergyCell_Use(On.MoreSlugcats.EnergyCell.orig_Use orig, EnergyCell self, bool forced)
+        {
+            if (ExpeditionData.challengeList.Any(x => x is BingoRivCellChallenge c && c.TeamsCompleted[SteamTest.team])) return;
+            orig.Invoke(self, forced);
+        }
+
+        public static void EnergyCell_Explode(On.MoreSlugcats.EnergyCell.orig_Explode orig, EnergyCell self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoRivCellChallenge c)
+                {
+                    c.CellExploded();
+                }
+            }
         }
 
         public static void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
@@ -551,7 +747,7 @@ namespace BingoMode.Challenges
                         }
                     }
                 }
-                else if (!survived)
+                if (!survived)
                 {
                     failedInMemory = [];
 
@@ -559,11 +755,12 @@ namespace BingoMode.Challenges
                     {
                         if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && !hell.TeamsFailed[SteamTest.team] && hell.current < hell.amound.Value)
                         {
+                            Plugin.logger.LogFatal("Doing hell halang");
                             failedInMemory.Add(hell);
                         }
                     }
                 }
-
+                 
                 ownerOfUAD.Clear();
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();
@@ -589,18 +786,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        public static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel self)
-        {
-            orig.Invoke(self);
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (!self.clampedObjects.Any(x => x.chunk.owner is Player) && ExpeditionData.challengeList[j] is BingoDodgeLeviathanChallenge c && c.wasInArea > 0)
-                {
-                    c.Dodged();
-                }
-            }
-        }
+        //public static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel self)
+        //{
+        //    orig.Invoke(self);
+        //
+        //    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+        //    {
+        //        if (!self.clampedObjects.Any(x => x.chunk.owner is Player) && ExpeditionData.challengeList[j] is BingoDodgeLeviathanChallenge c && c.wasInArea > 0)
+        //        {
+        //            c.Dodged();
+        //        }
+        //    }
+        //}
 
         public static void FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
         {
@@ -759,6 +956,7 @@ namespace BingoMode.Challenges
                 {
                     if (weapon.thrownBy != null && weapon.thrownBy is Player p)
                     {
+                        if (p.slugcatStats.name == MoreSlugcatsEnums.SlugcatStatsName.Spear && weapon is Spear spear && !spear.IsNeedle) return;
                         for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                         {
                             if (ExpeditionData.challengeList[j] is BingoPopcornChallenge c)
@@ -796,7 +994,35 @@ namespace BingoMode.Challenges
                     }
                 });
             }
-            else Plugin.logger.LogError("Uh oh, ScavengerAI_RecognizeCreatureAcceptingGift il fucked up " + il);
+            else Plugin.logger.LogError("Uh oh, ScavengerAI_RecognizeCreatureAcceptingGift1 il fucked up " + il);
+        }
+
+        public static void ScavengerAI_RecognizeCreatureAcceptingGiftNeedles(ILContext il)
+        {
+            ILCursor c = new(il);
+        
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchCallOrCallvirt<ItemTracker>("RepresentationForObject")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.Emit(OpCodes.Ldarg, 4);
+                c.EmitDelegate<Action<ScavengerAI, PhysicalObject>>((self, item) =>
+                {
+                    Plugin.logger.LogWarning(item.abstractPhysicalObject);
+                    if (item is Spear spear && spear.IsNeedle)
+                    {
+                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                        {
+                            if (ExpeditionData.challengeList[j] is BingoNoNeedleTradingChallenge c)
+                            {
+                                c.Traded();
+                            }
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, ScavengerAI_RecognizeCreatureAcceptingGiftNeedles il fucked up " + il);
         }
 
         public static void ScavengerAI_RecognizeCreatureAcceptingGift2(ILContext il)
@@ -831,7 +1057,7 @@ namespace BingoMode.Challenges
                     }
                 });
             }
-            else Plugin.logger.LogError("Uh oh, ScavengerAI_RecognizeCreatureAcceptingGift il fucked up " + il);
+            else Plugin.logger.LogError("Uh oh, ScavengerAI_RecognizeCreatureAcceptingGift2 il fucked up " + il);
         }
 
         public static void PlayerTracker_Update(On.ScavengerOutpost.PlayerTracker.orig_Update orig, ScavengerOutpost.PlayerTracker self)

@@ -51,6 +51,12 @@ namespace BingoMode.Challenges
                 data.unlockIconColor = Color.white;
                 data.iconColor = CollectToken.RedColor.rgb;
             }
+            else if (unlockName == "FireSpear")
+            {
+                data.unlockIconName = "Symbol_FireSpear";
+                data.unlockIconColor = new Color(0.9019608f, 0.05490196f, 0.05490196f);
+                data.iconColor = RainWorld.AntiGold.rgb;
+            }
             else
             {
                 data.unlockIconName = "";
@@ -73,12 +79,18 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
+            gibacj:
             int type = UnityEngine.Random.Range(0, ModManager.MSC ? (SlugcatStats.IsSlugcatFromMSC(ExpeditionData.slugcatPlayer) ? 4 : 3) : 2);
             string unl = "ERROR";
 
             try
             {
                 unl = BingoData.possibleTokens[type][UnityEngine.Random.Range(0, BingoData.possibleTokens[type].Count)];
+                if (unl.ToLowerInvariant().StartsWith("ms"))
+                {
+                    if (ExpeditionData.slugcatPlayer.value == "Rivulet" || ExpeditionData.slugcatPlayer.value == "Saint") { }
+                    else goto gibacj;
+                }
             }
             catch (Exception e)
             {

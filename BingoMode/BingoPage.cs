@@ -442,7 +442,7 @@ namespace BingoMode
                 }
                 else
                 {
-                    int newTeam = TeamNumber(Plugin.bingoConfig.SinglePlayerTeam.Value);
+                    int newTeam = TeamNumber(Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value);
                     Plugin.logger.LogWarning("Setting new team to: " + newTeam);
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
                     SteamTest.team = newTeam;
@@ -546,7 +546,7 @@ namespace BingoMode
                     Plugin.logger.LogError($"Our version: {Plugin.VERSION}. Comparing to: {lobbyVersion}");
                     if (lobbyVersion != Plugin.VERSION)
                     {
-                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same mod version as the lobby.\nYour version: {Plugin.VERSION} Lobby version: {lobbyVersion}"));
+                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same Bingo mod version as the lobby.\nYour version: {Plugin.VERSION} Lobby version: {lobbyVersion}"));
                         return;
                     }
                     if (SteamMatchmaking.GetLobbyData(lobbid, "banCheats") == "1")

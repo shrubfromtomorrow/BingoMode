@@ -18,6 +18,7 @@ namespace BingoMode
         {
             On.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToString;
             On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
+            Directory.CreateDirectory(Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() + "Bingo");
         }
 
         private static void ExpeditionCoreFile_FromString(On.Expedition.ExpeditionCoreFile.orig_FromString orig, ExpeditionCoreFile self, string saveString)
@@ -77,6 +78,10 @@ namespace BingoMode
                 // Add teams string for all challenges at the end of this
                 text += "#";
                 List<string> teamStrings = [];
+                if (!ExpeditionData.allChallengeLists.ContainsKey(BingoData.BingoSaves.ElementAt(i).Key))
+                {
+                    ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key] = [];
+                }
                 for (int c = 0; c < ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key].Count; c++)
                 {
                     teamStrings.Add((ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key][c] as BingoChallenge).TeamsToString());
@@ -102,7 +107,6 @@ namespace BingoMode
         public static void Load()
         {
             if (Custom.rainWorld.options == null) return;
-            Plugin.logger.LogFatal(ExpeditionData.challengeList.Count);
 
             string path = Application.persistentDataPath +
                 Path.DirectorySeparatorChar.ToString() +
@@ -126,7 +130,7 @@ namespace BingoMode
                 int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 try
                 {
-                    if (array2.Length > 6)
+                    if (array2.Length > 7)
                     {
                         int team = int.Parse(array2[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                         SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
@@ -146,7 +150,7 @@ namespace BingoMode
                             }
                         }
 
-                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
 
                         BingoData.BingoSaves[slug] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed);
                     }
@@ -177,6 +181,7 @@ namespace BingoMode
                     string teamString = array2[array2.Length - 1];
                     string[] teams = teamString.Split('|');
                     int next = 0;
+                    Plugin.logger.LogFatal(ExpeditionData.allChallengeLists[slug].Count);
                     for (int x = 0; x < size; x++)
                     {
                         for (int y = 0; y < size; y++)

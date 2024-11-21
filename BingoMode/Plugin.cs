@@ -23,17 +23,20 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.72";
+        public const string VERSION = "0.76";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
-        public static BingoModOptions bingoConfig;
+        private BingoModOptions _bingoConfig;
+        public BingoModOptions BingoConfig => _bingoConfig;
+
+        public static Plugin PluginInstance;
 
         public void OnEnable()
         {
-            Directory.CreateDirectory(Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() + "Bingo");
+            PluginInstance = this;
+            _bingoConfig = new BingoModOptions(this);
             new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
-            bingoConfig = new();
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
@@ -51,11 +54,12 @@ namespace BingoMode
 
         public void Update()
         {
-            if (Input.anyKeyDown && (Input.GetKeyDown(bingoConfig.HUDKeybindKeyboard.Value) || 
-                                    Input.GetKeyDown(bingoConfig.HUDKeybindC1.Value) ||
-                                    Input.GetKeyDown(bingoConfig.HUDKeybindC2.Value) ||
-                                    Input.GetKeyDown(bingoConfig.HUDKeybindC3.Value) ||
-                                    Input.GetKeyDown(bingoConfig.HUDKeybindC4.Value)))
+            if (_bingoConfig == null || _bingoConfig.UseMapInput.Value) return;
+            if (Input.anyKeyDown && (Input.GetKeyDown(_bingoConfig.HUDKeybindKeyboard.Value) || 
+                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC1.Value) ||
+                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC2.Value) ||
+                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC3.Value) ||
+                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC4.Value)))
             {
                 BingoHUD.Toggled = !BingoHUD.Toggled;
             }
@@ -69,7 +73,6 @@ namespace BingoMode
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
 
-                MachineConnector.SetRegisteredOI("nacu.bingomode", bingoConfig);
 
                 SteamTest.Apply();
 
@@ -83,6 +86,8 @@ namespace BingoMode
 
                 // Timeline fix
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
+
+                MachineConnector.SetRegisteredOI("nacu.bingomode", PluginInstance.BingoConfig);
             }
         }
 

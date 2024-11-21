@@ -107,7 +107,7 @@ namespace BingoMode.Challenges
                     this.UpdateDescription();
                     if (current != target.Value) ChangeValue();
                     this.spearList.Remove(this.spearList[k]);
-                    return;
+                    break;
                 }
             }
             if (this.current >= this.target.Value)

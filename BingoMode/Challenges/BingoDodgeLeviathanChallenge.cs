@@ -10,7 +10,7 @@ namespace BingoMode.Challenges
     using static ChallengeHooks;
     public class BingoDodgeLeviathanChallenge : BingoChallenge
     {
-        public int wasInArea;
+        //public int wasInArea;
 
         public override void UpdateDescription()
         {
@@ -49,7 +49,7 @@ namespace BingoMode.Challenges
         {
             base.Update();
             if (completed || hidden || revealed || TeamsCompleted[SteamTest.team]) return;
-            wasInArea = Mathf.Max(0, wasInArea - 1);
+            //wasInArea = Mathf.Max(0, wasInArea - 1);
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null
@@ -63,23 +63,19 @@ namespace BingoMode.Challenges
                     {
                         for (int k = 0; k < room.physicalObjects[j].Count; k++)
                         {
-                            if (!room.physicalObjects[j][k].slatedForDeletetion && room.physicalObjects[j][k] is BigEel levi)
+                            if (!room.physicalObjects[j][k].slatedForDeletetion && room.physicalObjects[j][k] is BigEel levi && levi.jawCharge > 0f && levi.InBiteArea(player.bodyChunks[1].pos, 10f))
                             {
                                 if (levi.InBiteArea(player.bodyChunks[1].pos, 10f))
                                 {
-                                    wasInArea = 100;
+                                    CompleteChallenge();
+                                    return;
+                                    //wasInArea = 100;
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-            wasInArea = 0;
         }
 
         public override int Points()
@@ -127,12 +123,14 @@ namespace BingoMode.Challenges
 
         public override void AddHooks()
         {
-            On.BigEel.JawsSnap += BigEel_JawsSnap;
+            //On.BigEel.JawsSnap += BigEel_JawsSnap;
+            //On.BigEel.Update += BigEel_Update;
         }
 
         public override void RemoveHooks()
         {
-            On.BigEel.JawsSnap -= BigEel_JawsSnap;
+            //On.BigEel.JawsSnap -= BigEel_JawsSnap;
+            //On.BigEel.Update -= BigEel_Update;
         }
 
         public override List<object> Settings() => [];

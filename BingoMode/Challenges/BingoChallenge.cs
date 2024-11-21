@@ -52,9 +52,13 @@ namespace BingoMode.Challenges
             if (TeamsCompleted.Length != data.Length) return;
             for (int i = 0; i < data.Length; i++)
             {
-                if (i == SteamTest.team) hidden = data[i] == '3';
                 TeamsFailed[i] = data[i] == '2';
                 TeamsCompleted[i] = data[i] == '1';
+                if (i == SteamTest.team)
+                {
+                    if (TeamsCompleted[i]) completed = true;
+                    hidden = data[i] == '3';
+                }
             }
         }
 

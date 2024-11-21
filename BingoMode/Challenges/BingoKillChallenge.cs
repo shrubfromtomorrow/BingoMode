@@ -114,8 +114,8 @@ namespace BingoMode.Challenges
             }
             bool onePiece = UnityEngine.Random.value < 0.2f;
             bool starvv = UnityEngine.Random.value < 0.1f;
-            if (onePiece || starvv) num = Mathf.CeilToInt(num / 3);
-            num = Mathf.Max(1, num);
+            if (onePiece || starvv) num = Mathf.CeilToInt(num / 2);
+            num = Mathf.Max(2, num);
             List<string> clone = ChallengeUtils.Weapons.ToList();
             clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish");
             bool doWeapon = UnityEngine.Random.value < 0.5f;

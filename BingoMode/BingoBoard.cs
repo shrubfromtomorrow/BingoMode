@@ -488,6 +488,9 @@ namespace BingoMode
                                                     case '2':
                                                         // Do nothing
                                                         break;
+                                                    case '3':
+                                                        // Do nothing
+                                                        break;
                                                 }
                                             }
                                             else
@@ -502,6 +505,9 @@ namespace BingoMode
                                                         break;
                                                     case '2':
                                                         ch.OnChallengeLockedOut(k);
+                                                        break;
+                                                    case '3':
+                                                        // Do nothing
                                                         break;
                                                 }
                                             }
@@ -519,6 +525,9 @@ namespace BingoMode
                                                 case '2':
                                                     // Do nothing
                                                     break;
+                                                case '3':
+                                                    // Do nothing
+                                                    break;
                                             }
                                         }
                                         break;
@@ -532,6 +541,9 @@ namespace BingoMode
                                                 ch.OnChallengeFailed(k);
                                                 break;
                                             case '2':
+                                                // Do nothing
+                                                break;
+                                            case '3':
                                                 // Do nothing
                                                 break;
                                         }

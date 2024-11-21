@@ -152,7 +152,6 @@ namespace BingoMode.BingoSteamworks
                     }
                     Custom.rainWorld.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
                     Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer); 
-                    Custom.rainWorld.processManager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                     BingoData.FinishBingo();
                     break;
 

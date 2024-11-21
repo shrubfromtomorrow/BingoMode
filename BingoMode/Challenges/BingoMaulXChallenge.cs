@@ -9,39 +9,39 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoPopcornChallenge : BingoChallenge
+    public class BingoMaulXChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> amound;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] popcorn plants")
+            description = ChallengeTools.IGT.Translate("Maul creatures [<current>/<amount>] times")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amound.Value.ToString());
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("Symbol_Spear", 1f, UnityEngine.Color.white), new Icon("popcorn_plant", 1f, new UnityEngine.Color(0.41f, 0.16f, 0.23f)), new Counter(current, amound.Value)], [2]);
+        public override Phrase ConstructPhrase() => new Phrase([new Icon("artimaul", 1f, UnityEngine.Color.white), new Counter(current, amound.Value)], [1]);
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoPopcornChallenge;
+            return challenge is not BingoMaulXChallenge;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Popping popcorn plants");
+            return ChallengeTools.IGT.Translate("Mauling creatures a certain amount of times");
         }
 
         public override Challenge Generate()
         {
-            BingoPopcornChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
+            BingoMaulXChallenge ch = new();
+            ch.amound = new(UnityEngine.Random.Range(7, 29), "Amount", 0);
             return ch;
         }
 
-        public void Pop()
+        public void Maul()
         {
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
@@ -70,14 +70,14 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return slugcat != MoreSlugcatsEnums.SlugcatStatsName.Saint;
+            return slugcat == MoreSlugcatsEnums.SlugcatStatsName.Artificer;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "BingoPopcornChallenge",
+                "BingoMaulXChallenge",
                 "~",
                 current.ToString(),
                 "><",
@@ -102,19 +102,19 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoPopcornChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoMaulXChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            IL.SeedCob.HitByWeapon += SeedCob_HitByWeapon;
+            IL.Player.GrabUpdate += Player_GrabUpdateArtiMaulX;
         }
 
         public override void RemoveHooks()
         {
-            IL.SeedCob.HitByWeapon -= SeedCob_HitByWeapon;
+            IL.Player.GrabUpdate -= Player_GrabUpdateArtiMaulX;
         }
 
         public override List<object> Settings() => [amound];

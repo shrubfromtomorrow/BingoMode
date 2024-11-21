@@ -38,6 +38,7 @@ namespace BingoMode
         public static string BingoDen = "random";
         public static List<int> TeamsInBingo = [0];
         public static bool SpectatorMode = false;
+        public static bool CreateKarmaFlower = false;
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
