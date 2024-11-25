@@ -2,6 +2,7 @@
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -33,7 +34,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Collecting items");
+            return ChallengeTools.IGT.Translate("Hoarding items in shelters");
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
@@ -69,7 +70,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 if (this.game.Players[i] != null && this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].Room.shelter)
@@ -85,6 +86,7 @@ namespace BingoMode.Challenges
                     if (num >= this.amount.Value)
                     {
                         this.CompleteChallenge();
+                        return;
                     }
                 }
             }

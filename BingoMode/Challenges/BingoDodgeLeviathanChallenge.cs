@@ -1,5 +1,6 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -33,11 +34,6 @@ namespace BingoMode.Challenges
             return ChallengeTools.IGT.Translate("Dodging a leviathan");
         }
 
-        public void Dodged()
-        {
-            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden) CompleteChallenge();
-        }
-
         public override Challenge Generate()
         {
             return new BingoDodgeLeviathanChallenge
@@ -48,7 +44,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || hidden || revealed || TeamsCompleted[SteamTest.team]) return;
+            if (completed || hidden || revealed || TeamsCompleted[SteamTest.team] || Custom.rainWorld.processManager.upcomingProcess != null) return;
             //wasInArea = Mathf.Max(0, wasInArea - 1);
             for (int i = 0; i < game.Players.Count; i++)
             {

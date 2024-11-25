@@ -16,7 +16,7 @@ namespace BingoMode.Challenges
     {
         public SettingBox<int> amount;
         public int current;
-        public Dictionary<EntityID, EntityID> traderItems; // Key - item, Value - trader (Save this later) (i think i saved this thanks me)
+        public Dictionary<EntityID, string> traderItems; // Key - item, Value - room (Save this later) (i think i saved this thanks me)
 
         public override void UpdateDescription()
         {
@@ -50,10 +50,10 @@ namespace BingoMode.Challenges
             };
         }
 
-        public void Traded(EntityID item, EntityID scav)
+        public void Traded(EntityID item, string room)
         {
-            Plugin.logger.LogMessage("Ttraded " + item);
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && traderItems.ContainsKey(item) && traderItems[item] != scav)
+            Plugin.logger.LogMessage($"Ttraded {item}, {room}, {(traderItems.ContainsKey(item) ? traderItems[item] : "nuhuh")}");
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && traderItems.ContainsKey(item) && traderItems[item].ToLowerInvariant() != room.ToLowerInvariant())
             {
                 Plugin.logger.LogMessage("Suck ces");
                 traderItems.Remove(item);
@@ -135,7 +135,7 @@ namespace BingoMode.Challenges
                     foreach (var s in dict)
                     {
                         string[] kv = s.Split('|');
-                        if (kv[0] != string.Empty && kv[1] != string.Empty) traderItems[EntityID.FromString(kv[0])] = EntityID.FromString(kv[1]);
+                        if (kv[0] != string.Empty && kv[1] != string.Empty) traderItems[EntityID.FromString(kv[0])] = kv[1];
                     }
                 }
                 completed = (array[3] == "1");
@@ -152,12 +152,14 @@ namespace BingoMode.Challenges
         public override void AddHooks()
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift += ScavengerAI_RecognizeCreatureAcceptingGift2;
+            On.Scavenger.Grab += Scavenger_Grab;
             IL.Room.Loaded += Room_LoadedBlessedNeedles;
         }
 
         public override void RemoveHooks()
         {
             IL.ScavengerAI.RecognizeCreatureAcceptingGift -= ScavengerAI_RecognizeCreatureAcceptingGift2;
+            On.Scavenger.Grab -= Scavenger_Grab;
             IL.Room.Loaded -= Room_LoadedBlessedNeedles;
         }
 

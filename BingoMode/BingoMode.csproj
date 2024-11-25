@@ -91,6 +91,7 @@
     <Compile Include="BingoGrid.cs" />
     <Compile Include="BingoHUD.cs" />
     <Compile Include="BingoHooks.cs" />
+    <Compile Include="BingoHUDCheatButton.cs" />
     <Compile Include="BingoHUDCursor.cs" />
     <Compile Include="BingoHUDHint.cs" />
     <Compile Include="BingoModOptions.cs" />

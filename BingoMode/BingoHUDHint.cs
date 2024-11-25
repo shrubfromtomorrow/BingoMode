@@ -36,7 +36,14 @@ namespace BingoMode
                 deathFade = Mathf.Max(0f, deathFade - 0.09f);
                 return;
             }
-            if (followObject == null || followObject.room == null || followObject.room.abstractRoom.index != followCamera.room.abstractRoom.index || origRoom == -1 || followObject.room.abstractRoom.index != origRoom || (followObject is Creature crit && crit.dead) || (sprite.element.name != "pipis" && followObject.grabbedBy.Count != 0))
+            if (followObject == null || 
+                followObject.room == null || 
+                followObject.room.abstractRoom.index != followCamera.room.abstractRoom.index || 
+                origRoom == -1 || 
+                followObject.room.abstractRoom.index != origRoom || 
+                (followObject is Creature crit && crit.dead) || 
+                (sprite.element.name != "pipis" && followObject.grabbedBy.Count != 0) ||
+                (sprite.element.name == "yesmerchant" && followObject is Scavenger scav && scav.abstractCreature.abstractAI is ScavengerAbstractAI ai && ai.squad != null && ai.squad.missionType != ScavengerAbstractAI.ScavengerSquad.MissionID.Trade))
             {
                 requestRemove = true;
                 return;

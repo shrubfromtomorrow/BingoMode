@@ -16,6 +16,7 @@ namespace BingoMode.Challenges
         public virtual Phrase ConstructPhrase() => null;
         public event Action ValueChanged;
         public event Action<int> ChallengeCompleted;
+        public event Action<int> ChallengeDepleted;
         public event Action<int> ChallengeFailed;
         public event Action<int> ChallengeAlmostComplete;
         public event Action<int> ChallengeLockedOut;
@@ -64,6 +65,7 @@ namespace BingoMode.Challenges
 
         public override void CompleteChallenge()
         {
+            Plugin.logger.LogWarning(Environment.StackTrace);
             // Singleplayer
             if (SteamFinal.GetHost().GetSteamID64() == default)
             {
@@ -193,7 +195,6 @@ namespace BingoMode.Challenges
             }
             if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
 
-
             BingoSaveFile.Save();
         }
 
@@ -244,6 +245,21 @@ namespace BingoMode.Challenges
             hidden = true;
             TeamsCompleted[team] = true;
             if (!lastHidden) ChallengeLockedOut?.Invoke(team);
+            BingoSaveFile.Save();
+        }
+
+        public void OnChallengeDepleted(int team)
+        {
+            bool lastCompleted = TeamsCompleted[team];
+            TeamsCompleted[team] = false;
+            if (team == SteamTest.team) completed = false;
+            if (this is BingoUnlockChallenge uch && !BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Add(uch.unlock.Value);
+            if (hidden && team != SteamTest.team) hidden = false;
+            if (lastCompleted)
+            {
+                ChallengeDepleted?.Invoke(team);
+            }
+            UpdateDescription();
             BingoSaveFile.Save();
         }
 

@@ -151,6 +151,32 @@ namespace BingoMode.Challenges
             IL.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
         }
 
+        public static bool Scavenger_Grab(On.Scavenger.orig_Grab orig, Scavenger self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
+        {
+            if (self.room != null && self.abstractCreature.abstractAI is ScavengerAbstractAI ai && ai.squad != null && 
+                self.room.abstractRoom.scavengerTrader &&
+                ai.squad.missionType == ScavengerAbstractAI.ScavengerSquad.MissionID.Trade)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoTradeTradedChallenge t)
+                    {
+                        if (t.traderItems.ContainsKey(obj.abstractPhysicalObject.ID))
+                        {
+                            string room = self.room.abstractRoom.name;
+                            Plugin.logger.LogWarning(room + " - yess - " + t.traderItems[obj.abstractPhysicalObject.ID]);
+                            if (t.traderItems[obj.abstractPhysicalObject.ID].ToLowerInvariant() != room.ToLowerInvariant())
+                            {
+                                t.Traded(obj.abstractPhysicalObject.ID, room);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return orig.Invoke(self, obj, graspUsed, chunkGrabbed, shareability, dominance, overrideEquallyDominant, pacifying);
+        }
+
         public static void Player_FoodInRoom_Room_bool(ILContext il)
         {
             ILCursor c = new(il);
@@ -737,7 +763,7 @@ namespace BingoMode.Challenges
                 if (survived && !newMalnourished)
                 {
                     revealInMemory = [];
-
+                
                     for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
                         if (ExpeditionData.challengeList[j] is BingoChallenge g && g.RequireSave() && g.revealed)
@@ -750,7 +776,7 @@ namespace BingoMode.Challenges
                 if (!survived)
                 {
                     failedInMemory = [];
-
+                
                     for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
                         if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && !hell.TeamsFailed[SteamTest.team] && hell.current < hell.amound.Value)
@@ -883,7 +909,7 @@ namespace BingoMode.Challenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge c && !c.isFood)
+                    if (ExpeditionData.challengeList[j] is BingoDontUseItemChallenge c && !c.isFood && self.grasps[grasp].grabbed is Weapon)
                     {
                         c.Used(self.grasps[grasp].grabbed.abstractPhysicalObject.type);
                     }
@@ -1046,12 +1072,12 @@ namespace BingoMode.Challenges
                             {
                                 EntityID givenItem = self.scavenger.room.socialEventRecognizer.ownedItemsOnGround[i].item.abstractPhysicalObject.ID;
                                 EntityID receivedItem = item.abstractPhysicalObject.ID;
-                                EntityID scavenger = self.scavenger.abstractCreature.ID;
+                                string room = self.creature.Room.name;
                                 Plugin.logger.LogMessage("GAVE " + givenItem);
                                 Plugin.logger.LogMessage("RECEIVED " + receivedItem);
 
-                                if (!t.traderItems.ContainsKey(givenItem) && givenItem != receivedItem) t.traderItems.Add(givenItem, scavenger);
-                                t.Traded(receivedItem, scavenger);
+                                if (givenItem != receivedItem && !t.traderItems.ContainsKey(givenItem)) t.traderItems.Add(givenItem, room);
+                                //t.Traded(receivedItem, room);
                             }
                         }
                     }

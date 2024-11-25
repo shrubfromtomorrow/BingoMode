@@ -528,7 +528,6 @@ namespace BingoMode
 
             if (ID == ProcessManager.ProcessID.MainMenu)
             {
-
                 if (ExpeditionData.challengeList != null && ExpeditionData.challengeList.Count > 0) BingoData.HookAll(ExpeditionData.challengeList, false);
 
                 BingoData.BingoDen = "random";

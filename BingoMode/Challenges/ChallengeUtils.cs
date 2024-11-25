@@ -385,6 +385,7 @@ namespace BingoMode.Challenges
             "PuffBall",
             "VultureMask",
             "ScavengerBomb",
+            "FirecrackerPlant",
             "BubbleGrass",
             "Rock"
         };

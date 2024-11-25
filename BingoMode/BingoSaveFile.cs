@@ -35,12 +35,13 @@ namespace BingoMode
 
         public static void Save()
         {
-            if (Custom.rainWorld.options == null || BingoData.BingoSaves.Count == 0) return;
+            if (Custom.rainWorld == null || ExpeditionData.allChallengeLists == null|| Custom.rainWorld.options == null || BingoData.BingoSaves == null || BingoData.BingoSaves.Count == 0) return;
 
             string text = "";
             for (int i = 0; i < BingoData.BingoSaves.Count; i++)
             {
                 BingoData.BingoSaveData saveData = BingoData.BingoSaves.ElementAt(i).Value;
+                if (saveData == null) continue;
                 text += BingoData.BingoSaves.ElementAt(i).Key + "#" + saveData.size.ToString();
                 if (SteamFinal.IsSaveMultiplayer(saveData))
                 {
@@ -78,13 +79,19 @@ namespace BingoMode
                 // Add teams string for all challenges at the end of this
                 text += "#";
                 List<string> teamStrings = [];
-                if (!ExpeditionData.allChallengeLists.ContainsKey(BingoData.BingoSaves.ElementAt(i).Key))
+                SlugcatStats.Name scug = BingoData.BingoSaves.ElementAt(i).Key;
+                if (!ExpeditionData.allChallengeLists.ContainsKey(scug))
                 {
-                    ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key] = [];
+                    ExpeditionData.allChallengeLists[scug] = [];
                 }
-                for (int c = 0; c < ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key].Count; c++)
+                for (int c = 0; c < ExpeditionData.allChallengeLists[scug].Count; c++)
                 {
-                    teamStrings.Add((ExpeditionData.allChallengeLists[BingoData.BingoSaves.ElementAt(i).Key][c] as BingoChallenge).TeamsToString());
+                    string teams = "000000000";
+                    if (ExpeditionData.allChallengeLists[scug][c] is BingoChallenge b) 
+                    {
+                        teams = b.TeamsToString();
+                    }
+                    teamStrings.Add(teams);
                 }
                 text += string.Join("|", teamStrings);
 

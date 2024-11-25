@@ -1,6 +1,7 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
+using RWCustom;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null) return;
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && (!starve.Value || player.Malnourished))
@@ -38,6 +39,7 @@ namespace BingoMode.Challenges
                         if (player.room.updateList[j] is Ghost && game.Players[i].world.worldGhost != null && (player.room.updateList[j] as Ghost).onScreenCounter > 30 && game.Players[i].world.worldGhost.ghostID.value == ghost.Value)
                         {
                             CompleteChallenge();
+                            return;
                         }
                     }
                 }

@@ -322,6 +322,7 @@ namespace BingoMode
             if (recreateList != null && Mathf.RoundToInt(Mathf.Sqrt(recreateList.Count)) == size)
             {
                 Plugin.logger.LogMessage("Went through");
+                challengeGrid = new Challenge[size, size];
                 int next = 0;
                 for (int i = 0; i < size; i++)
                 {
@@ -334,7 +335,7 @@ namespace BingoMode
                         //else 
                         challengeGrid[i, j] = recreateList[next];
                         //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                        //Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
+                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
                         next++;
                     }
                 }
@@ -469,6 +470,21 @@ namespace BingoMode
                                 switch (newTeamsString[k])
                                 {
                                     case '0':
+                                        switch (currentTeamsString[k])
+                                        {
+                                            case '0':
+                                                ch.OnChallengeDepleted(k);
+                                                break;
+                                            case '1':
+                                                // Do nothing
+                                                break;
+                                            case '2':
+                                                // Do nothing
+                                                break;
+                                            case '3':
+                                                ch.OnChallengeDepleted(k);
+                                                break;
+                                        }
                                         break;
                                     case '1':
                                         // If lockout

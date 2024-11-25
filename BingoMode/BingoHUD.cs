@@ -25,6 +25,10 @@ namespace BingoMode
         public Vector2 lastMousePosition;
         public bool mouseDown;
         public bool lastMouseDown;
+        public bool MouseLeftDown => mouseDown && !lastMouseDown && cantClickCounter == 0;
+        public bool mouseRightDown;
+        public bool lastMouseRightDown;
+        public bool MouseRightDown => mouseRightDown && !lastMouseRightDown && cantClickCounter == 0;
         public float alpha;
         public float lastAlpha;
         const int animationLength = 20;
@@ -34,6 +38,9 @@ namespace BingoMode
         public List<BingoHUDHint> hints;
         public bool mapOpen;
         public bool lastMapOpen;
+        public bool cheatsEnabled;
+        public bool cheatingRnAtThisMoment;
+        public int cantClickCounter;
 
         // Bingo complete business
         public struct BingoCompleteInfo
@@ -80,7 +87,11 @@ namespace BingoMode
             board = BingoHooks.GlobalBoard;
             queue = [];
             completeQueue = [];
-            hints = [];
+            hints = []; 
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
+            {
+                cheatsEnabled = SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
+            }
             GenerateBingoGrid();
             if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen)
             {
@@ -341,8 +352,12 @@ namespace BingoMode
             lastMousePosition = mousePosition;
             mousePosition = Futile.mousePosition;
 
+            cantClickCounter = Mathf.Max(0, cantClickCounter - 1);
+
             lastMouseDown = mouseDown;
             mouseDown = Input.GetMouseButton(0);
+            lastMouseRightDown = mouseRightDown;
+            mouseRightDown = Input.GetMouseButton(1);
 
             if (Plugin.PluginInstance.BingoConfig.UseMapInput.Value)
             {
@@ -460,7 +475,10 @@ namespace BingoMode
                             var traded = ExpeditionData.challengeList.FirstOrDefault(x => x is BingoTradeChallenge);
                             if (tradeded is BingoTradeTradedChallenge || traded is BingoTradeChallenge)
                             {
-                                if (tradeded is BingoTradeTradedChallenge tradeChallenge && tradeChallenge.traderItems.Keys.Count > 0 && tradeChallenge.traderItems.Keys.Contains(room.abstractRoom.entities[i].ID) &&
+                                if (obj.type != AbstractPhysicalObject.AbstractObjectType.Creature && 
+                                    tradeded is BingoTradeTradedChallenge tradeChallenge && 
+                                    tradeChallenge.traderItems.Keys.Count > 0 && 
+                                    tradeChallenge.traderItems.Keys.Contains(room.abstractRoom.entities[i].ID) &&
                                     obj.realizedObject.grabbedBy.Count == 0)
                                 {
                                     BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "scav_merchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0], "Hologram");
@@ -470,19 +488,16 @@ namespace BingoMode
                                 }
                                 if (room.abstractRoom.scavengerTrader && obj is AbstractCreature crit && crit.state.alive && crit.creatureTemplate.type == CreatureTemplate.Type.Scavenger)
                                 {
-                                    BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "scav_merchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0], "Hologram");
-                                    hints.Add(hint);
-                                    hud.fContainers[1].AddChild(hint.sprite);
                                     if ((crit.abstractAI as ScavengerAbstractAI).squad != null && (crit.abstractAI as ScavengerAbstractAI).squad.missionType == ScavengerAbstractAI.ScavengerSquad.MissionID.Trade)
                                     {
-                                        BingoHUDHint checkMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "Menu_Symbol_CheckBox", Color.green, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
+                                        BingoHUDHint checkMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "yesmerchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
                                         hints.Add(checkMark);
                                         hud.fContainers[1].AddChild(checkMark.sprite);
                                         continue;
                                     }
                                     else
                                     {
-                                        BingoHUDHint wrongMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "Menu_Symbol_Clear_All", Color.red, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
+                                        BingoHUDHint wrongMark = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "nomerchant", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0]);
                                         hints.Add(wrongMark);
                                         hud.fContainers[1].AddChild(wrongMark.sprite);
                                         continue;
@@ -498,6 +513,7 @@ namespace BingoMode
                                     BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "pipis", Color.white, new Vector2(-17f, -22f), player.abstractCreature.world.game.cameras[0]);
                                     hints.Add(hint);
                                     hud.fContainers[1].AddChild(hint.sprite);
+                                    Random.state = state;
                                     continue;
                                 }
                                 Random.state = state;
@@ -514,10 +530,6 @@ namespace BingoMode
                 if (hint.requestRemove && hint.deathFade == 0f) hint.RemoveSprites();
             }
             hints.RemoveAll(x => x.requestRemove == true && x.deathFade == 0f);
-            //if (mouseOverCompleteText && mouseDown && !lastMouseDown)
-            //{
-            //    EndBingoSessionHost();
-            //}
         }
 
         public static void EndBingoSessionHost()
@@ -638,6 +650,9 @@ namespace BingoMode
             public List<Color> borderColors;
             public int borderColorIndex1;
             public int borderColorIndex2;
+            public bool beingCheatedBeepBoop;
+            public bool lastBeingCheatedBeepBoop;
+            public BingoHUDCheatButton[] cheatsHeeHee;
 
             public BingoInfo(HUD.HUD hud, BingoHUD owner, Vector2 pos, float size, FContainer container, Challenge challenge, int x, int y)
             {
@@ -655,6 +670,7 @@ namespace BingoMode
                 (challenge as BingoChallenge).ChallengeFailed += OnChallengeFailed;
                 (challenge as BingoChallenge).ChallengeLockedOut += BingoInfo_ChallengeLockedOut;
                 (challenge as BingoChallenge).ChallengeAlmostComplete += BingoInfo_ChallengeAlmostComplete;
+                (challenge as BingoChallenge).ChallengeDepleted += BingoInfo_ChallengeDepleted;
                 showBG = true;
                 scale = 1f;
                 goalScale = 1f;
@@ -772,11 +788,30 @@ namespace BingoMode
                         boxSprites[i].shader = hud.rainWorld.Shaders["MenuText"];
                     }
                 }
+
+                if (owner.cheatsEnabled)
+                {
+                    cheatsHeeHee = new BingoHUDCheatButton[8];
+                    for (int i = 0; i < cheatsHeeHee.Length; i++)
+                    {
+                        float angle = 45f * i;
+                        cheatsHeeHee[i] = new BingoHUDCheatButton(this, i, angle);
+                    }
+                }
+
                 contextSound = SoundID.None;
                 baseBorderColor = (challenge as BingoChallenge).TeamsFailed[SteamTest.team] ? Color.grey : Color.white;
                 if (challenge.hidden) context = AnimationContext.Lockout;
                 UpdateText();
                 UpdateTeamColors();
+            }
+
+            private void BingoInfo_ChallengeDepleted(int tea)
+            {
+                context = AnimationContext.Failure;
+                teamResponsible = tea;
+                UpdateText();
+                sinCounter = 0f;
             }
 
             private void BingoInfo_ChallengeAlmostComplete(int tea)
@@ -840,6 +875,13 @@ namespace BingoMode
                     g.RemoveFromContainer();
                 }
                 infoLabel.RemoveFromContainer();
+                if (owner.cheatsEnabled)
+                {
+                    for (int i = 0; i < cheatsHeeHee.Length; i++)
+                    {
+                        cheatsHeeHee[i].Remove();
+                    }
+                }
             }
 
             public void UpdateTeamColors()
@@ -889,7 +931,15 @@ namespace BingoMode
                 {
                     borderColorIndex1 = 0;
                 }
+            }
 
+            public void ChangeCheetah(bool cheetah)
+            {
+                for (int i = 0; i < cheatsHeeHee.Length; i++)
+                {
+                    cheatsHeeHee[i].tickSprite.SetElementByName(cheetah ? "Menu_Symbol_Clear_All" : "Menu_Symbol_CheckBox");
+                    cheatsHeeHee[i].tickColor = cheetah ? Color.red : Color.green;
+                }
             }
 
             public void Update()
@@ -897,7 +947,7 @@ namespace BingoMode
                 lastMouseOver = mouseOver;
                 mouseOver = owner.mousePosition.x > pos.x - size / 2f && owner.mousePosition.y > pos.y - size / 2f
                         && owner.mousePosition.x < pos.x + size / 2f && owner.mousePosition.y < pos.y + size / 2f;
-                boxVisible = alpha > 0f && mouseOver;
+                boxVisible = alpha > 0f && mouseOver && (!owner.cheatsEnabled || !owner.cheatingRnAtThisMoment);
 
                 if (mouseOver && lastMouseOver != mouseOver)
                 {
@@ -908,15 +958,29 @@ namespace BingoMode
                     infoLabel.MoveToFront();
                 }
 
-                //if (alpha > 0f && mouseOver && owner.mouseDown && !owner.lastMouseDown)
+                lastBeingCheatedBeepBoop = beingCheatedBeepBoop;
+                if (owner.cheatsEnabled && (!owner.cheatingRnAtThisMoment || beingCheatedBeepBoop) && alpha > 0f && mouseOver)
+                {
+                    if (owner.MouseLeftDown)
+                    {
+                        if (!beingCheatedBeepBoop) ChangeCheetah(false);
+                        beingCheatedBeepBoop = !beingCheatedBeepBoop;
+                        owner.cheatingRnAtThisMoment = beingCheatedBeepBoop;
+                    }
+                    else if (owner.MouseRightDown)
+                    {
+                        if (!beingCheatedBeepBoop) ChangeCheetah(true);
+                        beingCheatedBeepBoop = !beingCheatedBeepBoop;
+                        owner.cheatingRnAtThisMoment = beingCheatedBeepBoop;
+                    }
+                }
+
+                //if (beingCheatedBeepBoop && lastBeingCheatedBeepBoop != beingCheatedBeepBoop)
                 //{
-                //    if ((challenge as BingoChallenge).RequireSave()) challenge.revealed = true;
-                //    challenge.CompleteChallenge();
-                //    //if (UnityEngine.Random.value < 0.5f)
-                //    //{
-                //    //    BingoHooks.GlobalBoard.InterpretBingoState("010000000<>010000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>111000000<>000000000<>000000000<>100000000<>000000000<>010000000<>100000000<>010000000<>000000000<>000000000<>100000000<>010000000<>010000000");
-                //    //}
-                //    //else BingoHooks.GlobalBoard.InterpretBingoState("000000000<>000000000<>100000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>111000000<>000000000<>000000000<>000000000<>000000000<>000000000<>000000000<>010000000<>000000000<>000000000<>000000000<>010000000<>010000000");
+                //    for (int i = 0; i < cheatsHeeHee.Length; i++)
+                //    {
+                //        cheatsHeeHee[i].MoveToFront();
+                //    }
                 //}
 
                 bool doOverwriteAlpha = false;
@@ -959,6 +1023,15 @@ namespace BingoMode
                 }
 
                 shakeLock = Mathf.Max(shakeLock - 0.07f, 0f);
+
+                if (owner.cheatsEnabled)
+                {
+                    for (int i = 0; i < cheatsHeeHee.Length; i++)
+                    {
+                        cheatsHeeHee[i].appear = beingCheatedBeepBoop;
+                        cheatsHeeHee[i].Update();
+                    }
+                }
             }
 
             public void Draw(float timeStacker)
@@ -1038,6 +1111,14 @@ namespace BingoMode
                 infoLabel.SetPosition(pos + new Vector2(size / 2f + 10f + boxSprites[0].scaleX / 2f, 0) + new Vector2(0.01f, 0.01f));
 
                 effect?.Draw(timeStacker);
+
+                if (owner.cheatsEnabled)
+                {
+                    for (int i = 0; i < cheatsHeeHee.Length; i++)
+                    {
+                        cheatsHeeHee[i].Draw(timeStacker);
+                    }
+                }
             }
 
             public string SplitString(string s)

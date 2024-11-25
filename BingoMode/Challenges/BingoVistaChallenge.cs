@@ -33,6 +33,7 @@ namespace BingoMode.Challenges
                 if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == this.room.Value && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
                 {
                     this.CompleteChallenge();
+                    return;
                 }
             }
             if (this.game.world != null && this.game.world.activeRooms != null)

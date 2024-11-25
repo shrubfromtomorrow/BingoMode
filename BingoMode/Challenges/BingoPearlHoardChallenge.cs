@@ -2,6 +2,7 @@
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Hoarding pearls");
+            return ChallengeTools.IGT.Translate("Hoarding pearls in shelters");
         }
 
         public override Challenge Generate()
@@ -57,7 +58,7 @@ namespace BingoMode.Challenges
             return new BingoPearlHoardChallenge
             {
                 common = new(flag, "Common Pearls", 0),
-                amount = new((int)Mathf.Lerp(2f, 5f, UnityEngine.Random.value), "Amount", 1),
+                amount = new(UnityEngine.Random.Range(2, 4), "Amount", 1),
                 region = new(text, "In Region", 2, listName: "regions")
             };
         }
@@ -75,7 +76,7 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 int num = 0;
@@ -102,6 +103,7 @@ namespace BingoMode.Challenges
                         if ((this.common.Value && num >= this.amount.Value) || (!this.common.Value && num2 >= this.amount.Value))
                         {
                             this.CompleteChallenge();
+                            return;
                         }
                     }
                 }

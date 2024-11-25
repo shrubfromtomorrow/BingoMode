@@ -35,7 +35,7 @@ namespace BingoMode.Challenges
     
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Eating food");
+            return ChallengeTools.IGT.Translate("Eating specific food");
         }
     
         public override bool Duplicable(Challenge challenge)
@@ -96,7 +96,14 @@ namespace BingoMode.Challenges
     
         public void FoodEated(IPlayerEdible thisEdibleIsShit)
         {
-            if (thisEdibleIsShit is PhysicalObject gasd) Plugin.logger.LogMessage($"Eated: {gasd.abstractPhysicalObject.type}. Our type: {foodType.Value}");
+            if (thisEdibleIsShit is PhysicalObject gasd)
+            {
+                if (gasd is Creature c)
+                {
+                    Plugin.logger.LogMessage($"Eated: {c.Template.type}. Our type: {foodType.Value}. Creature? {isCreature}");
+                }
+                else Plugin.logger.LogMessage($"Eated: {gasd.abstractPhysicalObject.type}. Our type: {foodType.Value}. Creature? {isCreature}");
+            }
             if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
             {
