@@ -52,10 +52,12 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
+            List<string> crits = [.. ChallengeUtils.Transportable];
+            if (ExpeditionData.slugcatPlayer.value != "Red") crits.Remove("JetFish");
             return new BingoCreatureGateChallenge
             {
-                amount = new(UnityEngine.Random.Range(2, 6), "Amount", 0),
-                crit = new(ChallengeUtils.Transportable[UnityEngine.Random.Range(0, ChallengeUtils.Transportable.Length - ((!ModManager.MSC || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0))], "Creature Type", 1, listName: "transport")
+                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
+                crit = new(crits[UnityEngine.Random.Range(0, crits.Count - ((!ModManager.MSC || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0))], "Creature Type", 1, listName: "transport")
             };
         }
 

@@ -263,13 +263,13 @@ namespace BingoMode
         {
             if (owner.challenge is BingoEatChallenge c)
             {
-                c.isCreature = ChallengeUtils.FoodTypes.IndexOf(c.foodType.Value) > 9;
+                c.isCreature = ChallengeUtils.FoodTypes.IndexOf(c.foodType.Value) >= ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
             }
             else if (owner.challenge is BingoDontUseItemChallenge cc)
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                cc.isFood = l.IndexOf(cc.item.Value) < (l.Length - 6);
-                if (cc.isFood) cc.isCreature = ChallengeUtils.FoodTypes.IndexOf(cc.item.Value) > 9;
+                cc.isFood = l.IndexOf(cc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
+                if (cc.isFood) cc.isCreature = ChallengeUtils.FoodTypes.IndexOf(cc.item.Value) >= ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {

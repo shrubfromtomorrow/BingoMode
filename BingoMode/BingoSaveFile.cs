@@ -35,7 +35,7 @@ namespace BingoMode
 
         public static void Save()
         {
-            if (Custom.rainWorld == null || ExpeditionData.allChallengeLists == null|| Custom.rainWorld.options == null || BingoData.BingoSaves == null || BingoData.BingoSaves.Count == 0) return;
+            if (Custom.rainWorld == null || ExpeditionData.allChallengeLists == null|| Custom.rainWorld.options == null || BingoData.BingoSaves == null) return;
 
             string text = "";
             for (int i = 0; i < BingoData.BingoSaves.Count; i++)
@@ -127,8 +127,10 @@ namespace BingoMode
 
             BingoData.BingoSaves = [];
             string data = File.ReadAllText(path);
+            if (string.IsNullOrEmpty(data)) return;
 
             string[] array = Regex.Split(data, "<>");
+            if (array.Length == 0) return;
             for (int i = 0; i < array.Length; i++)
             {
                 Plugin.logger.LogMessage(array[i]);

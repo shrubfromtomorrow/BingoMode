@@ -14,8 +14,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            //this.description = ChallengeTools.IGT.Translate("Deliver the green neuron to " + (moon ? "Looks to the Moon" : "Five Pebbles"));
-            this.description = ChallengeTools.IGT.Translate(moon.Value ? "Reactivate Looks to the Moon" : "Deliver the green neuron to Five Pebbles");
+            description = ChallengeTools.IGT.Translate(moon.Value ? "Reactivate Looks to the Moon" : "Deliver the green neuron to Five Pebbles");
             base.UpdateDescription();
         }
 
@@ -100,7 +99,7 @@ namespace BingoMode.Challenges
         {
             IL.SaveState.ctor += SaveState_ctor;
             On.SLOracleWakeUpProcedure.NextPhase += SLOracleWakeUpProcedure_NextPhase;
-            On.SSOracleBehavior.SSOracleGetGreenNeuron.ctor += SSOracleGetGreenNeuron_ctor;
+            On.SSOracleBehavior.SSOracleGetGreenNeuron.HoldingNeuronUpdate += SSOracleGetGreenNeuron_HoldingNeuronUpdate;
             IL.Room.Loaded += Room_LoadedGreenNeuron;
         }
 
@@ -108,7 +107,7 @@ namespace BingoMode.Challenges
         {
             IL.SaveState.ctor -= SaveState_ctor;
             On.SLOracleWakeUpProcedure.NextPhase -= SLOracleWakeUpProcedure_NextPhase;
-            On.SSOracleBehavior.SSOracleGetGreenNeuron.ctor -= SSOracleGetGreenNeuron_ctor;
+            On.SSOracleBehavior.SSOracleGetGreenNeuron.HoldingNeuronUpdate -= SSOracleGetGreenNeuron_HoldingNeuronUpdate;
             IL.Room.Loaded -= Room_LoadedGreenNeuron;
         }
 

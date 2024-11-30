@@ -1,5 +1,6 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,61 +9,47 @@ using System.Text.RegularExpressions;
 namespace BingoMode.Challenges
 {
     using static ChallengeHooks;
-    public class BingoHellChallenge : BingoChallenge
+    public class BingoSaintPopcornChallenge : BingoChallenge
     {
         public int current;
         public SettingBox<int> amound;
 
-        public override bool RequireSave() => false;
-        public override bool ReverseChallenge() => true;
-
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Do not die before completing [<current>/<amount>] bingo challenges")
+            description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] popcorn plant seeds")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amound.Value.ToString());
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([
-            new Icon("completechallenge", 1f, UnityEngine.Color.white), 
-            new Counter(current, amound.Value),
-            new Icon("buttonCrossA", 1f, UnityEngine.Color.red),
-            new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)]
-        , [2]);
+        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("Symbol_Seed", 1f, Menu.Menu.MenuRGB(Menu.Menu.MenuColors.MediumGrey)), new Counter(current, amound.Value)], [2]);
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoHellChallenge;
+            return challenge is not BingoSaintPopcornChallenge;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Not dying before completing challenges");
+            return ChallengeTools.IGT.Translate("Eating popcorn plant seeds");
         }
 
         public override Challenge Generate()
         {
-            BingoHellChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(2, 6), "Amount", 0);
+            BingoSaintPopcornChallenge ch = new();
+            ch.amound = new(UnityEngine.Random.Range(2, 10), "Amount", 0);
             return ch;
         }
 
-        public void GetChallenge()
+        public void Consume()
         {
-            if (!TeamsFailed[SteamTest.team] && completed && current < amound.Value)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
                 current++;
                 UpdateDescription();
-                ChangeValue();
+                if (current >= (int)amound.Value) CompleteChallenge();
+                else ChangeValue();
             }
-        }
-
-        public void Fail()
-        {
-            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amound.Value)) return;
-            Plugin.logger.LogFatal("Doing hell halang");
-            FailChallenge(SteamTest.team);
         }
 
         public override int Points()
@@ -83,14 +70,14 @@ namespace BingoMode.Challenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == MoreSlugcatsEnums.SlugcatStatsName.Saint;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "BingoHellChallenge",
+                "BingoSaintPopcornChallenge",
                 "~",
                 current.ToString(),
                 "><",
@@ -98,7 +85,7 @@ namespace BingoMode.Challenges
                 "><",
                 completed ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
             });
         }
 
@@ -115,23 +102,19 @@ namespace BingoMode.Challenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoHellChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoSaintPopcornChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.Player.Die += Player_DieHell;
-            On.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreenHell;
-            On.RainWorldGame.GoToStarveScreen += RainWorldGame_GoToStarveScreenHell;
+            On.Player.ObjectEaten += Player_ObjectEatenSeed;
         }
 
         public override void RemoveHooks()
         {
-            On.Player.Die -= Player_DieHell;
-            On.RainWorldGame.GoToDeathScreen -= RainWorldGame_GoToDeathScreenHell;
-            On.RainWorldGame.GoToStarveScreen -= RainWorldGame_GoToStarveScreenHell;
+            On.Player.ObjectEaten -= Player_ObjectEatenSeed;
         }
 
         public override List<object> Settings() => [amound];

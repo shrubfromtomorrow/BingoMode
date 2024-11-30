@@ -192,10 +192,10 @@ namespace BingoMode
             On.ProcessManager.RequestMainProcessSwitch_ProcessID_float += ProcessManager_RequestMainProcessSwitch_ProcessID_float;
 
             // Request host upkeep when going back to the game
-            //On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures;
+            On.ShelterDoor.UpdatePathfindingCreatures += ShelterDoor_UpdatePathfindingCreatures; // Lil update thing
             On.ShelterDoor.Update += ShelterDoor_Update;
 
-            // No red karma 1
+            // No red karma 1 + vanilla echo fix
             IL.Menu.KarmaLadder.KarmaSymbol.Update += KarmaSymbol_UpdateIL;
 
             // Shift the position of the kills in menu
@@ -215,6 +215,56 @@ namespace BingoMode
             // Stop void win from happening
             On.Expedition.DepthsFinishScript.Update += DepthsFinishScript_Update;
             On.Player.ctor += Player_ctor;
+
+            // Make Saint's echoes work like in their campaign
+            IL.World.SpawnGhost += World_SpawnGhostIL;
+
+            // Something something echo vanilla fix
+            IL.Menu.GhostEncounterScreen.GetDataFromGame += GhostEncounterScreen_GetDataFromGameIL;
+        }
+
+        private static void GhostEncounterScreen_GetDataFromGameIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdarg(1),
+                x => x.MatchCallOrCallvirt<KarmaLadderScreen>("GetDataFromGame")
+                ))
+            {
+                c.MoveAfterLabels();
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<GhostEncounterScreen>>((self) =>
+                {
+                    if (ModManager.Expedition && self.manager.rainWorld.ExpeditionMode)
+                    {
+                        self.preGhostEncounterKarmaCap = 0;
+                    }
+                });
+            }
+            else Plugin.logger.LogError("GhostEncounterScreen_GetDataFromGameIL FAILURE " + il);
+        }
+
+        private static void World_SpawnGhostIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld<ModManager>("MSC"),
+                x => x.MatchBrfalse(out _),
+                x => x.MatchLdsfld<ModManager>("Expedition"),
+                x => x.MatchBrfalse(out _)
+                ))
+            {
+                c.Index -= 1;
+                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                {
+                    if (BingoData.BingoMode) return false;
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("World_SpawnGhostIL FAILURE " + il);
         }
 
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
@@ -454,6 +504,7 @@ namespace BingoMode
         private static void KarmaSymbol_UpdateIL(ILContext il)
         {
             ILCursor c = new(il);
+            //ILCursor b = new(il);
 
             if (c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld<ModManager>("Expedition")
@@ -466,7 +517,26 @@ namespace BingoMode
                     return orig;
                 });
             } 
-            else Plugin.logger.LogError("KarmaSymbol_UpdateIL FAILURE " + il);
+            else Plugin.logger.LogError("KarmaSymbol_UpdateIL 1 FAILURE " + il);
+
+            //if (b.TryGotoNext(MoveType.After,
+            //    x => x.MatchLdflda<KarmaLadder.KarmaSymbol>("displayKarma"),
+            //    x => x.MatchLdfld<IntVector2>("x"),
+            //    x => x.MatchLdarg(0),
+            //    x => x.MatchLdflda<KarmaLadder.KarmaSymbol>("displayKarma"),
+            //    x => x.MatchLdfld<IntVector2>("y"),
+            //    x => x.MatchBge(out _)
+            //    ))
+            //{
+            //    b.Index--;
+            //    b.EmitDelegate<Func<int, int>>((orig) =>
+            //    {
+            //        Plugin.logger.LogFatal("hewwo " + orig);
+            //        if (ModManager.Expedition && Custom.rainWorld.ExpeditionMode) return orig - 1;
+            //        return orig;
+            //    });
+            //} 
+            //else Plugin.logger.LogError("KarmaSymbol_UpdateIL 2 FAILURE " + il);
         }
 
         private static void ShelterDoor_UpdatePathfindingCreatures(On.ShelterDoor.orig_UpdatePathfindingCreatures orig, ShelterDoor self)
@@ -475,50 +545,30 @@ namespace BingoMode
             if (!BingoData.BingoMode) return;
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == default)
+                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default && 
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                 {
-                    if (!Custom.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
-                        (Custom.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
-                    {
-                        Plugin.logger.LogMessage("Saving game and completing reverse challenges");
-                        foreach (Challenge challenge in ExpeditionData.challengeList)
-                        {
-                            if (!challenge.completed && challenge is BingoChallenge b && !b.TeamsFailed[SteamTest.team] && b.ReverseChallenge())
-                            {
-                                b.OnChallengeCompleted(SteamTest.team);
-                            }
-                        }
-                        Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
-                        Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
-                    }
-                    return;
+                    SteamFinal.BroadcastCurrentBoardState();
                 }
-                if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
+
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (!Custom.rainWorld.progression.IsThereASavedGame(ExpeditionData.slugcatPlayer) ||
-                        (Custom.rainWorld.progression.currentSaveState != null && self.room.game.manager.rainWorld.progression.currentSaveState.cycleNumber == 0)) // First cycle
+                    if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                     {
-                        Plugin.logger.LogMessage("Saving game and completing reverse challenges");
-                        foreach (Challenge challenge in ExpeditionData.challengeList)
+                        int newCurrent = 0;
+
+                        foreach (var cha in ExpeditionData.challengeList)
                         {
-                            if (!challenge.completed && challenge is BingoChallenge b && b.ReverseChallenge())
-                            {
-                                foreach (int team in BingoData.TeamsInBingo)
-                                {
-                                    if (b.TeamsFailed[team]) continue;
-                                    b.OnChallengeCompleted(team);
-                                }
-                            }
+                            if (cha is BingoChallenge ch && !ch.ReverseChallenge() && ch.TeamsCompleted[SteamTest.team]) newCurrent++;
                         }
-                        SteamFinal.BroadcastCurrentBoardState();
+
+                        if (hell.current != newCurrent)
+                        {
+                            hell.current = newCurrent;
+                            hell.ChangeValue();
+                        }
                     }
                 }
-                else if (!SteamFinal.ReceivedHostUpKeep)
-                {
-                    self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
-                }
-                Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
-                Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
             }
         }
 
@@ -542,7 +592,6 @@ namespace BingoMode
                 SpectatorHooks.UnHook();
                 SteamTest.LeaveLobby();
                 ChallengeHooks.revealInMemory = [];
-                ChallengeHooks.failedInMemory = [];
                 BingoData.CreateKarmaFlower = false;
                 if (BingoHUD.ReadyForLeave)
                 {
@@ -575,6 +624,7 @@ namespace BingoMode
         private static void CharacterSelectPage_AbandonButton_OnPressDone(On.Menu.CharacterSelectPage.orig_AbandonButton_OnPressDone orig, CharacterSelectPage self, Menu.Remix.MixedUI.UIfocusable trigger)
         {
             BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
+            BingoSaveFile.Save();
             orig.Invoke(self, trigger);
         }
 

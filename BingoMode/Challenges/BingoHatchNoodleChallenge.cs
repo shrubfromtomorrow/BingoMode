@@ -43,11 +43,11 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            bool onc = UnityEngine.Random.value < 0.5f;
+            bool onc = UnityEngine.Random.value < 0.33f;
             return new BingoHatchNoodleChallenge
             {
                 atOnce = new(onc, "At Once", 0),
-                amount = new(UnityEngine.Random.Range(1, onc ? 4 : 6), "Amount", 1),
+                amount = new(UnityEngine.Random.Range(onc ? 2 : 1, onc ? 4 : 6), "Amount", 1),
             };
         }
 

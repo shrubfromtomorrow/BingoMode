@@ -2,6 +2,7 @@
 using Expedition;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
+            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").ToArray();
 
             BingoNoRegionChallenge ch = new BingoNoRegionChallenge
             {

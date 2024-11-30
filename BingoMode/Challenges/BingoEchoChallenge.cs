@@ -23,7 +23,13 @@ namespace BingoMode.Challenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("echo_icon", 1f, Color.white), new Verse(ghost.Value)], []);
+            Phrase phrase = new Phrase([new Icon("echo_icon", 1f, Color.white), new Verse(ghost.Value)], []);
+            if (starve.Value)
+            {
+                phrase.words.Add(new Icon("Multiplayer_Death", 1f, Color.white));
+                phrase.newLines = [2];
+            }
+            return phrase;
         }
 
         public override void Update()
@@ -36,7 +42,7 @@ namespace BingoMode.Challenges
                 {
                     for (int j = 0; j < player.room.updateList.Count; j++)
                     {
-                        if (player.room.updateList[j] is Ghost && game.Players[i].world.worldGhost != null && (player.room.updateList[j] as Ghost).onScreenCounter > 30 && game.Players[i].world.worldGhost.ghostID.value == ghost.Value)
+                        if (player.room.updateList[j] is Ghost echo && game.Players[i].world.worldGhost != null && (echo.onScreenCounter > 80 || echo.fadeOut > 0f || echo.hasRequestedShutDown) && game.Players[i].world.worldGhost.ghostID.value == ghost.Value)
                         {
                             CompleteChallenge();
                             return;

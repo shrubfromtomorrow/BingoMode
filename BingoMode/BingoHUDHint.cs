@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using RWCustom;
+using MoreSlugcats;
 
 namespace BingoMode
 {
@@ -23,6 +24,7 @@ namespace BingoMode
             this.followCamera = followCamera;
             sprite = new FSprite(elementName) { color = color };
             if (shader != "") sprite.shader = Custom.rainWorld.Shaders[shader];
+            sprite.alpha = 1f;
 
             objectPos = followObject.firstChunk.pos;
             lastObjectPos = objectPos;
@@ -43,6 +45,7 @@ namespace BingoMode
                 followObject.room.abstractRoom.index != origRoom || 
                 (followObject is Creature crit && crit.dead) || 
                 (sprite.element.name != "pipis" && followObject.grabbedBy.Count != 0) ||
+                (sprite.element.name == "musicSymbol" && followObject is HalcyonPearl p && p.hoverPos.HasValue) ||
                 (sprite.element.name == "yesmerchant" && followObject is Scavenger scav && scav.abstractCreature.abstractAI is ScavengerAbstractAI ai && ai.squad != null && ai.squad.missionType != ScavengerAbstractAI.ScavengerSquad.MissionID.Trade))
             {
                 requestRemove = true;

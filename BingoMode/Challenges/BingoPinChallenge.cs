@@ -3,6 +3,7 @@ using Expedition;
 using Menu.Remix;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -27,7 +28,7 @@ namespace BingoMode.Challenges
                 .Replace("<current_pin>", current.ToString())
                 .Replace("<pin_amount>", target.Value.ToString())
                 .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : "creatures")
-                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different unique regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
+                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
     
@@ -35,20 +36,36 @@ namespace BingoMode.Challenges
         {
             return 20;
         }
-    
+
         public override Challenge Generate()
         {
             string r = "";
+            int tries = 0;
+            List<string> regions = [];
+        shitGoBack:
             string c = Random.value < 0.3f ? "Any Creature" : ChallengeUtils.Pinnable[Random.Range(0, ChallengeUtils.Pinnable.Length)];
-            List<string> regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
-            regions.Remove("ss");
-            float radom = Random.value;
-            if (radom < 0.7f) r = regions[Random.Range(0, regions.Count)];
+
+            if (BingoData.pinnableCreatureRegions == null || tries > 10)
+            {
+                regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+            }
+            else
+            {
+                if (!BingoData.pinnableCreatureRegions.ContainsKey(c)) 
+                {
+                    tries += 1;
+                    goto shitGoBack;
+                };
+                regions = BingoData.pinnableCreatureRegions[c].Where(x => x.StartsWith(ExpeditionData.slugcatPlayer.value)).ToList();
+            }
+            float radom = Random.value; // Radom mentioned
+            if (radom < 0.7f && regions.Count > 0) r = regions[Random.Range(0, regions.Count)];
             else r = "Any Region";
+            if (r.IndexOf('_') != -1) r = r.Split('_')[1];
     
             return new BingoPinChallenge
             {
-                target = new(Mathf.FloorToInt(Random.Range(3, 7) / (r == "Any Region" ? 2.5f : 1f)), "Amount", 0),
+                target = new(Mathf.Max(2, Mathf.FloorToInt(Random.Range(2, 7) / (r == "Any Region" ? 2f : 1f))), "Amount", 0),
                 crit = new(c, "Creature Type", 1, listName: "creatures"),
                 region = new(r, "Region", 2, listName: "regions"),
             };

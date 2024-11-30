@@ -12,7 +12,7 @@ namespace BingoMode.Challenges
     {
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Do not give Needles to Scavengers");
+            this.description = ChallengeTools.IGT.Translate("Do not gift Needles to Scavengers");
             base.UpdateDescription();
         }
 
@@ -31,7 +31,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Avoiding giving Needles to Scavengers");
+            return ChallengeTools.IGT.Translate("Avoiding gifting Needles to Scavengers");
         }
 
         public override Challenge Generate()

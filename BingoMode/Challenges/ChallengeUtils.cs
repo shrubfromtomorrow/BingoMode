@@ -51,7 +51,7 @@ namespace BingoMode.Challenges
             switch (ln)
             {
                 case "transport": return Transportable;
-                case "pin": return Pinnable;
+                case "pin": return ["Any Creature", ..Pinnable];
                 case "tolls": return BombableOutposts;
                 case "food": return FoodTypes;
                 case "weapons": return Weapons;
@@ -121,6 +121,7 @@ namespace BingoMode.Challenges
             creatureNames[(int)CreatureType.SmallNeedleWorm] = ChallengeTools.IGT.Translate("Small Noodleflies");
             creatureNames[(int)CreatureType.VultureGrub] = ChallengeTools.IGT.Translate("Vulture Grubs");
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
+            creatureNames[(int)CreatureType.Salamander] = ChallengeTools.IGT.Translate("Salamanders");
             creatureNames[(int)MoreSlugcatsEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
         }
 
@@ -131,7 +132,7 @@ namespace BingoMode.Challenges
             {
                 case "CicadaA":
                 case "CicadaB":
-                    r.AddRange(["SU", "HI", "LF", "SI"]);
+                    r.AddRange(["SU", "LF", "SI"]);
                     if (slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) r.Add("VS");
                     break;
                 case "Hazer":
@@ -276,8 +277,11 @@ namespace BingoMode.Challenges
             "YellowLizard",
             "WhiteLizard",
             "GreenLizard",
+            "Salamander",
+            "Dropbug",
             "Snail",
             "Centipede",
+            "Centiwing",
             "LanternMouse"
         };
 
@@ -347,10 +351,14 @@ namespace BingoMode.Challenges
             "SlimeMold",
             "JellyFish",
             "Mushroom",
-            "GooieDuck",
+
+            // MSC
+            "GooieDuck", 
             "LillyPuck",
             "DandelionPeach",
             "GlowWeed",
+
+            // Crits
             "VultureGrub",
             "Hazer",
             "SmallNeedleWorm",

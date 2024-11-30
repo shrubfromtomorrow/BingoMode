@@ -133,6 +133,8 @@
     <Compile Include="Challenges\BingoPinChallenge.cs" />
     <Compile Include="Challenges\BingoPopcornChallenge.cs" />
     <Compile Include="Challenges\BingoRivCellChallenge.cs" />
+    <Compile Include="Challenges\BingoSaintDeliveryChallenge.cs" />
+    <Compile Include="Challenges\BingoSaintPopcornChallenge.cs" />
     <Compile Include="Challenges\BingoStealChallenge.cs" />
     <Compile Include="Challenges\BingoTameChallenge.cs" />
     <Compile Include="Challenges\BingoTradeChallenge.cs" />

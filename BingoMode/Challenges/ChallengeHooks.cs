@@ -148,7 +148,82 @@ namespace BingoMode.Challenges
             //IL.FlareBomb.Update += FlareBomb_Update;
 
             // No need for unlocked slugs
-            IL.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
+            IL.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawnsIL;
+            On.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
+        }
+
+        public static void RainWorldGame_GoToStarveScreenHell(On.RainWorldGame.orig_GoToStarveScreen orig, RainWorldGame self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
+                {
+                    hell.Fail();
+                }
+            }
+        }
+
+        public static void RainWorldGame_GoToDeathScreenHell(On.RainWorldGame.orig_GoToDeathScreen orig, RainWorldGame self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
+                {
+                    hell.Fail();
+                }
+            }
+        }
+
+        public static void Player_DieHell(On.Player.orig_Die orig, Player self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
+                {
+                    hell.Fail();
+                }
+            }
+        }
+
+        public static void SaveState_ctorHalcyon(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
+        {
+            orig.Invoke(self, saveStateNumber, progression);
+
+            self.miscWorldSaveData.halcyonStolen = true;
+        }
+
+        public static void CLOracleBehavior_Update(On.MoreSlugcats.CLOracleBehavior.orig_Update orig, CLOracleBehavior self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            if (!self.FocusedOnHalcyon) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoSaintDeliveryChallenge c)
+                {
+                    c.Delivered();
+                }
+            }
+        }
+
+        public static void SSOracleGetGreenNeuron_HoldingNeuronUpdate(On.SSOracleBehavior.SSOracleGetGreenNeuron.orig_HoldingNeuronUpdate orig, SSOracleBehavior.SSOracleGetGreenNeuron self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            if (!self.holdingNeuron) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && !c.moon.Value)
+                {
+                    c.Delivered();
+                }
+            }
         }
 
         public static bool Scavenger_Grab(On.Scavenger.orig_Grab orig, Scavenger self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
@@ -221,10 +296,41 @@ namespace BingoMode.Challenges
             else Plugin.logger.LogError("Room_LoadedBlessedNeedles FAILED" + il);
         }
 
-        private static void ChallengeTools_ParseCreatureSpawns(ILContext il)
+        private static void ChallengeTools_ParseCreatureSpawns(On.Expedition.ChallengeTools.orig_ParseCreatureSpawns orig)
         {
-            ILCursor c = new(il);
+            BingoData.pinnableCreatureRegions = [];
+            orig.Invoke();
+        }
 
+        private static void ChallengeTools_ParseCreatureSpawnsIL(ILContext il)
+        {
+            ILCursor b = new(il);
+            if (b.TryGotoNext(MoveType.After,
+                x => x.MatchLdstr("FAILED TO PARSE: ")
+                ))
+            {
+                b.Index += 4;
+                b.MoveAfterLabels();
+
+                b.Emit(OpCodes.Ldloc, 16);
+                b.Emit(OpCodes.Ldloc, 6);
+                b.Emit(OpCodes.Ldloc, 1);
+                b.EmitDelegate<Action<string, string, SlugcatStats.Name>>((creature, region, slug) =>
+                {
+                    if (string.IsNullOrEmpty(creature) || !ChallengeUtils.Pinnable.Contains(creature)) return;
+                    string regionString = slug.value + "_" + region;
+                    if (!BingoData.pinnableCreatureRegions.ContainsKey(creature))
+                    {
+                        BingoData.pinnableCreatureRegions.Add(creature, [regionString]);
+                        return;
+                    }
+                    if (BingoData.pinnableCreatureRegions[creature] == null) BingoData.pinnableCreatureRegions[creature] = [];
+                    if (!BingoData.pinnableCreatureRegions[creature].Contains(regionString)) BingoData.pinnableCreatureRegions[creature].Add(regionString);
+                });
+            }
+            else Plugin.logger.LogError("ChallengeTools_ParseCreatureSpawns FAILED" + il);
+
+            ILCursor c = new(il);
             if (c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld("Expedition.ExpeditionGame", "unlockedExpeditionSlugcats")
                 ))
@@ -374,7 +480,7 @@ namespace BingoMode.Challenges
         {
             orig.Invoke(self, obj, chunk, appendage);
 
-            if (obj is not KarmaFlower) return;
+            if (obj is not KarmaFlower || !self.IsNeedle || !self.spearmasterNeedle_hasConnection) return;
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoKarmaFlowerChallenge c)
@@ -755,7 +861,6 @@ namespace BingoMode.Challenges
         }
 
         public static List<Challenge> revealInMemory = [];
-        public static List<Challenge> failedInMemory = [];
         private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
             if (BingoData.BingoMode)
@@ -770,19 +875,6 @@ namespace BingoMode.Challenges
                         {
                             revealInMemory.Add(g);
                             g.revealed = false;
-                        }
-                    }
-                }
-                if (!survived)
-                {
-                    failedInMemory = [];
-                
-                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                    {
-                        if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && !hell.TeamsFailed[SteamTest.team] && hell.current < hell.amound.Value)
-                        {
-                            Plugin.logger.LogFatal("Doing hell halang");
-                            failedInMemory.Add(hell);
                         }
                     }
                 }
@@ -917,19 +1009,6 @@ namespace BingoMode.Challenges
             }
 
             orig.Invoke(self, grasp, eu);
-        }
-
-        public static void SSOracleGetGreenNeuron_ctor(On.SSOracleBehavior.SSOracleGetGreenNeuron.orig_ctor orig, SSOracleBehavior.SSOracleGetGreenNeuron self, SSOracleBehavior owner)
-        {
-            orig.Invoke(self, owner);
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && !c.moon.Value)
-                {
-                    c.Delivered();
-                }
-            }
         }
 
         public static void SLOracleWakeUpProcedure_NextPhase(On.SLOracleWakeUpProcedure.orig_NextPhase orig, SLOracleWakeUpProcedure self)
@@ -1307,6 +1386,58 @@ namespace BingoMode.Challenges
             }
             else Plugin.logger.LogError("Ass " + il);
         }
+        
+        public static void Room_LoadedHalcyon(ILContext il)
+        {
+            ILCursor c = new(il);
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdloc(43), // 3696
+                x => x.MatchCallOrCallvirt(typeof(List<PlacedObject>).GetMethod("get_Item")),
+                x => x.MatchLdfld<PlacedObject>("active")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.Emit(OpCodes.Ldloc, 43);
+                c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
+                {
+                    PlacedObject obj = self.roomSettings.placedObjects[i];
+                    if (obj.type == PlacedObject.Type.UniqueDataPearl &&
+                        self.game.session is StoryGameSession session && !session.saveState.ItemConsumed(self.world, false, self.abstractRoom.index, i) &&
+                        (obj.data as PlacedObject.DataPearlData).pearlType == MoreSlugcatsEnums.DataPearlType.RM)
+                    {
+                        return false;
+                    }
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("Room_LoadedHalcyon 1 FAILURE " + il);
+
+            ILCursor b = new(il);
+            if (b.TryGotoNext(
+                x => x.MatchLdsfld("Expedition.ExpeditionData", "startingDen")
+                ) &&
+                b.TryGotoNext(MoveType.After,
+                x => x.MatchCallOrCallvirt<WorldCoordinate>(".ctor")
+                ))
+            {
+                b.Emit(OpCodes.Ldarg_0);
+                b.Emit(OpCodes.Ldloc, 72);
+                b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
+                {
+                    AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.HalcyonPearl);
+                    if (existingFucker != null)
+                    {
+                        room.abstractRoom.RemoveEntity(existingFucker);
+                    }
+
+                    AbstractPhysicalObject startItem = new DataPearl.AbstractDataPearl(room.world, MSCItemType.HalcyonPearl, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID(), -1, -1, null, MoreSlugcatsEnums.DataPearlType.RM);
+                    room.abstractRoom.entities.Add(startItem);
+                    startItem.Realize();
+                });
+            }
+            else Plugin.logger.LogError("Room_LoadedHalcyon 2 FAILURE " + il);
+        }
 
         // Register food for the eat food challenge if its on
         public static void Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
@@ -1318,6 +1449,20 @@ namespace BingoMode.Challenges
                 if (ExpeditionData.challengeList[j] is BingoEatChallenge c)
                 {
                     c.FoodEated(edible);
+                }
+            }
+        }
+
+        public static void Player_ObjectEatenSeed(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+            orig.Invoke(self, edible);
+
+            if (edible is not PhysicalObject p || p.abstractPhysicalObject.type != MSCItemType.Seed) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoSaintPopcornChallenge c)
+                {
+                    c.Consume();
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace BingoMode.Challenges
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times")
-                .Replace("<crit>", victim.Value == "Any Creature" ? "creatures" : ChallengeTools.creatureNames[new CreatureType(victim.Value).Index])
+                .Replace("<crit>", victim.Value == "Any Creature" ? "creatures" : ChallengeTools.creatureNames[new CreatureType(victim.Value, false).Index])
                 .Replace("<weapon>", ChallengeTools.ItemName(new(weapon.Value)))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
@@ -57,7 +57,7 @@ namespace BingoMode.Challenges
             string wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
 
             string crit;
-            if (UnityEngine.Random.value < 0.3f)
+            if (UnityEngine.Random.value < 0.25f)
             {
                 crit = "Any Creature";
                 if (wep == "Any Weapon") wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];

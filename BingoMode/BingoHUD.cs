@@ -97,13 +97,8 @@ namespace BingoMode
             {
                 AddRevealedToQueue();
             }
-            if (ChallengeHooks.failedInMemory.Count > 0)
-            {
-                AddFailedToQueue();
-            }
 
             ChallengeHooks.revealInMemory = [];
-            ChallengeHooks.failedInMemory = [];
             bingoCompleteTitle = new FSprite("bingotitle")
             {
                 x = hud.rainWorld.screenSize.x * 0.5f,
@@ -299,22 +294,6 @@ namespace BingoMode
                         g.revealed = false;
                         queue.Add(grid[i, j]);
                         grid[i, j].teamResponsible = SteamTest.team;
-                    }
-                }
-            }
-            animation = 100;
-        }
-
-        public void AddFailedToQueue()
-        {
-            for (int i = 0; i < grid.GetLength(0); i++)
-            {
-                for (int j = 0; j < grid.GetLength(1); j++)
-                {
-                    if (grid[i, j].challenge is BingoChallenge g && ChallengeHooks.failedInMemory.Any(x => x.ToString() == g.ToString()))
-                    {
-                        g.FailChallenge(SteamTest.team);
-                        queue.Add(grid[i, j]);
                     }
                 }
             }
@@ -517,6 +496,16 @@ namespace BingoMode
                                     continue;
                                 }
                                 Random.state = state;
+                            }
+                            if (obj.realizedObject is HalcyonPearl p &&
+                                p.grabbedBy.Count == 0 && 
+                                p.hoverPos == null &&
+                                ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
+                            {
+                                BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "musicSymbol", Color.white, new Vector2(0f, 30f), player.abstractCreature.world.game.cameras[0], "Hologram");
+                                hints.Add(hint);
+                                hud.fContainers[1].AddChild(hint.sprite);
+                                continue;
                             }
                         }
                     }

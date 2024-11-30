@@ -65,7 +65,7 @@ namespace BingoMode.Challenges
 
         public override void CompleteChallenge()
         {
-            Plugin.logger.LogWarning(Environment.StackTrace);
+            //Plugin.logger.LogWarning(Environment.StackTrace);
             // Singleplayer
             if (SteamFinal.GetHost().GetSteamID64() == default)
             {

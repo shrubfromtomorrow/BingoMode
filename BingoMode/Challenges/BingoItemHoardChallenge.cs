@@ -134,6 +134,6 @@ namespace BingoMode.Challenges
         {
         }
 
-        public override List<object> Settings() => [target];
+        public override List<object> Settings() => [target, amount];
     }
 }
