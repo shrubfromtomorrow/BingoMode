@@ -254,7 +254,7 @@ namespace BingoMode.BingoSteamworks
             string state = BingoHooks.GlobalBoard.GetBingoState();
             foreach (var player in ConnectedPlayers)
             {
-                InnerWorkings.SendMessage("B" + state, player);
+                InnerWorkings.SendMessage("B" + state.Replace('3', '1'), player);
             }
         }
     }

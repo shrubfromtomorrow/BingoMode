@@ -2,7 +2,6 @@
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
-using PearlType = DataPearl.AbstractDataPearl.DataPearlType;
 using System.Collections.Generic;
 using MoreSlugcats;
 using System.Linq;

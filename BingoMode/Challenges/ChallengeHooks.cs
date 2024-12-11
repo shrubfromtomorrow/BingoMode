@@ -152,6 +152,19 @@ namespace BingoMode.Challenges
             On.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
         }
 
+        public static void Ghost_StartConversation(On.Ghost.orig_StartConversation orig, Ghost self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoEchoChallenge c)
+                {
+                    c.SeeGhost(self.worldGhost.ghostID.value);
+                }
+            }
+        }
+
         public static void RainWorldGame_GoToStarveScreenHell(On.RainWorldGame.orig_GoToStarveScreen orig, RainWorldGame self)
         {
             orig.Invoke(self);
@@ -853,7 +866,7 @@ namespace BingoMode.Challenges
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (self.PlayerOnOtherSide && ExpeditionData.challengeList[j] is BingoBombTollChallenge c && c.bombed)
+                if (self.PlayerOnOtherSide && ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
                 {
                     c.Pass(self.outpost.room.abstractRoom.name);
                 }
@@ -974,6 +987,19 @@ namespace BingoMode.Challenges
             }
         }
 
+        public static void WorldLoaderYesRegion1(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        {
+            orig.Invoke(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge r)
+                {
+                    r.Entered(worldName);
+                }
+            }
+        }
+
         public static void Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
         {
             orig.Invoke(self, eu);
@@ -1061,7 +1087,14 @@ namespace BingoMode.Challenges
                 {
                     if (weapon.thrownBy != null && weapon.thrownBy is Player p)
                     {
-                        if (p.slugcatStats.name == MoreSlugcatsEnums.SlugcatStatsName.Spear && weapon is Spear spear && !spear.IsNeedle) return;
+                        if (p.slugcatStats.name == MoreSlugcatsEnums.SlugcatStatsName.Spear && weapon is Spear spear)
+                        {
+                            if (spear.IsNeedle)
+                            {
+                                if (spear.spearmasterNeedle_fadecounter != spear.spearmasterNeedle_fadecounter_max) return;
+                            }
+                            else return;
+                        }
                         for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                         {
                             if (ExpeditionData.challengeList[j] is BingoPopcornChallenge c)

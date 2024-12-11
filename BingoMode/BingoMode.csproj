@@ -127,6 +127,7 @@
     <Compile Include="Challenges\BingoMaulXChallenge.cs" />
     <Compile Include="Challenges\BingoNeuronDeliveryChallenge.cs" />
     <Compile Include="Challenges\BingoNoNeedleTradingChallenge.cs" />
+    <Compile Include="Challenges\BingoEnterRegionChallenge.cs" />
     <Compile Include="Challenges\BingoNoRegionChallenge.cs" />
     <Compile Include="Challenges\BingoPearlDeliveryChallenge.cs" />
     <Compile Include="Challenges\BingoPearlHoardChallenge.cs" />

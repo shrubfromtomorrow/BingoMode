@@ -221,6 +221,19 @@ namespace BingoMode
 
             // Something something echo vanilla fix
             IL.Menu.GhostEncounterScreen.GetDataFromGame += GhostEncounterScreen_GetDataFromGameIL;
+
+            // Same starting seed for everyone
+            On.RainWorldGame.ctor += RainWorldGame_ctor;
+        }
+
+        private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
+        {
+            orig.Invoke(self, manager);
+
+            if (BingoData.RandomStartingSeed == -1 || !BingoData.BingoMode || !BingoData.MultiplayerGame) return;
+            Plugin.logger.LogMessage("SETTING STARTING RANDOM SEED TO " + BingoData.RandomStartingSeed);
+            self.nextIssuedId = BingoData.RandomStartingSeed;
+            BingoData.RandomStartingSeed = -1;
         }
 
         private static void GhostEncounterScreen_GetDataFromGameIL(ILContext il)
@@ -258,9 +271,17 @@ namespace BingoMode
                 ))
             {
                 c.Index -= 1;
-                c.EmitDelegate<Func<bool, bool>>((orig) =>
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<bool, World, bool>>((orig, self) =>
                 {
-                    if (BingoData.BingoMode) return false;
+                    if (BingoData.BingoMode)
+                    {
+                        string ghost = GhostWorldPresence.GetGhostID(self.region.name).value;
+                        if (ExpeditionData.challengeList.Any(x => x is BingoEchoChallenge c && c.ghost.Value.ToUpperInvariant() == ghost.ToUpperInvariant()))
+                        {
+                            return false;
+                        }
+                    }
                     return orig;
                 });
             }
@@ -272,6 +293,17 @@ namespace BingoMode
             orig.Invoke(self, abstractCreature, world);
 
             if (!BingoData.CreateKarmaFlower || !self.room.abstractRoom.shelter) return;
+            if (ExpeditionData.slugcatPlayer.value == "Saint")
+            {
+                Plugin.logger.LogMessage("Creating evil fucked up spear");
+                AbstractSpear spear = new AbstractSpear(world, null, self.room.GetWorldCoordinate(self.mainBodyChunk.pos), self.room.game.GetNewID(), false, Mathf.Lerp(0.35f, 0.6f, Custom.ClampedRandomVariation(0.5f, 0.5f, 2f)));
+                self.room.abstractRoom.entities.Add(spear);
+                spear.RealizeInRoom();
+                spear.realizedObject.firstChunk.HardSetPosition(self.firstChunk.pos);
+                BingoData.CreateKarmaFlower = false;
+
+                return;
+            }
             Plugin.logger.LogMessage("Creating karma flow");
             AbstractConsumable karmaflow = new(world, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, null, self.room.GetWorldCoordinate(self.mainBodyChunk.pos), self.room.game.GetNewID(), -1, -1, null);
             self.room.abstractRoom.entities.Add(karmaflow);
@@ -419,6 +451,7 @@ namespace BingoMode
                             }
                         }
                         Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                        Custom.rainWorld.progression.currentSaveState.denPosition = self.room.abstractRoom.name;
                         Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                         Expedition.Expedition.coreFile.Save(false);
                         return;
@@ -439,6 +472,7 @@ namespace BingoMode
                         }
                         SteamFinal.BroadcastCurrentBoardState();
                         Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                        Custom.rainWorld.progression.currentSaveState.denPosition = self.room.abstractRoom.name;
                         Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                         Expedition.Expedition.coreFile.Save(false);
                     }
@@ -448,6 +482,7 @@ namespace BingoMode
                     }
                     Plugin.logger.LogMessage("Saving game and completing reverse challenges multiplayer client");
                     Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
+                    Custom.rainWorld.progression.currentSaveState.denPosition = self.room.abstractRoom.name;
                     Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
                     Expedition.Expedition.coreFile.Save(false);
                 }
@@ -553,7 +588,7 @@ namespace BingoMode
 
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
+                    if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && hell.TeamsCompleted[SteamTest.team] && !hell.TeamsFailed[SteamTest.team])
                     {
                         int newCurrent = 0;
 
@@ -565,6 +600,7 @@ namespace BingoMode
                         if (hell.current != newCurrent)
                         {
                             hell.current = newCurrent;
+                            hell.UpdateDescription();
                             hell.ChangeValue();
                         }
                     }
@@ -593,6 +629,7 @@ namespace BingoMode
                 SteamTest.LeaveLobby();
                 ChallengeHooks.revealInMemory = [];
                 BingoData.CreateKarmaFlower = false;
+                BingoData.RandomStartingSeed = -1;
                 if (BingoHUD.ReadyForLeave)
                 {
                     if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost)

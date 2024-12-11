@@ -1,5 +1,6 @@
 ﻿using BingoMode.BingoSteamworks;
 using BingoMode.Challenges;
+using Expedition;
 using RWCustom;
 using UnityEngine;
 
@@ -89,7 +90,11 @@ namespace BingoMode
             {
                 if (tickSprite.element.name == "Menu_Symbol_CheckBox")
                 {
-                    (info.challenge as BingoChallenge).OnChallengeCompleted(team);
+                    if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && data.lockout)
+                    {
+                        (info.challenge as BingoChallenge).OnChallengeLockedOut(team);
+                    }
+                    else (info.challenge as BingoChallenge).OnChallengeCompleted(team);
                 }
                 else 
                 {

@@ -1222,7 +1222,7 @@ namespace BingoMode
                 if (overwriteAlpha > 0f)
                 {
                     hud.PlaySound(contextSound);
-                    bool chCompleted = (challenge as BingoChallenge).TeamsCompleted[SteamTest.team];
+                    bool chCompleted = (challenge as BingoChallenge).TeamsCompleted[teamResponsible];
                     goalScale = 1.135f;
                     if (context == AnimationContext.Failure)
                     {

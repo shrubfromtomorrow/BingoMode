@@ -213,7 +213,7 @@ namespace BingoMode.BingoSteamworks
                     {
                         SteamNetworkingIdentity requesterIdentity = new SteamNetworkingIdentity();
                         requesterIdentity.SetSteamID64(requesterID);
-                        SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState(), requesterIdentity);
+                        SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState().Replace('3', '1'), requesterIdentity);
                         var playerwhitelist = SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
                         Plugin.logger.LogMessage("The guy who contacted me: " + requesterID);
                         foreach (var gruh in playerwhitelist)

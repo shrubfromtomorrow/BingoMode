@@ -32,19 +32,25 @@ namespace BingoMode.Challenges
             return phrase;
         }
 
+        public void SeeGhost(string spectre)
+        {
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || spectre != ghost.Value) return;
+            CompleteChallenge();
+        }
+
         public override void Update()
         {
             base.Update();
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null) return;
+            if (Custom.rainWorld.processManager.upcomingProcess != null) return;
             for (int i = 0; i < game.Players.Count; i++)
             {
                 if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null && (!starve.Value || player.Malnourished))
                 {
                     for (int j = 0; j < player.room.updateList.Count; j++)
                     {
-                        if (player.room.updateList[j] is Ghost echo && game.Players[i].world.worldGhost != null && (echo.onScreenCounter > 80 || echo.fadeOut > 0f || echo.hasRequestedShutDown) && game.Players[i].world.worldGhost.ghostID.value == ghost.Value)
+                        if (player.room.updateList[j] is Ghost echo && game.Players[i].world.worldGhost != null && (echo.fadeOut > 0f || echo.hasRequestedShutDown))
                         {
-                            CompleteChallenge();
+                            SeeGhost(game.Players[i].world.worldGhost.ghostID.value);
                             return;
                         }
                     }
@@ -127,10 +133,13 @@ namespace BingoMode.Challenges
 
         public override void AddHooks()
         {
+            On.Ghost.StartConversation += Ghost_StartConversation;
         }
 
         public override void RemoveHooks()
         {
+
+            On.Ghost.StartConversation -= Ghost_StartConversation;
         }
 
         public override List<object> Settings() => [ghost, starve];

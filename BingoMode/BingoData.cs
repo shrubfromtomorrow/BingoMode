@@ -40,6 +40,7 @@ namespace BingoMode
         public static bool SpectatorMode = false;
         public static bool CreateKarmaFlower = false;
         public static Dictionary<string, List<string>> pinnableCreatureRegions;
+        public static int RandomStartingSeed = -1;
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 

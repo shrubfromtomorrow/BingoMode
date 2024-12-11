@@ -195,7 +195,7 @@ namespace BingoMode
                     {
                         for (int y = 0; y < size; y++)
                         {
-                            (ExpeditionData.allChallengeLists[slug][next] as BingoChallenge).TeamsFromString(teams[next]);
+                            (ExpeditionData.allChallengeLists[slug][next] as BingoChallenge).TeamsFromString(teams[next], BingoData.BingoSaves[slug].team);
                             next++;
                         }
                     }

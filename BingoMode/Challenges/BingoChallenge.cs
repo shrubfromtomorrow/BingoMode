@@ -29,11 +29,6 @@ namespace BingoMode.Challenges
             char[] data = "000000000".ToCharArray();
             for (int t = 0; t < TeamsCompleted.Length; t++)
             {
-                if (t == SteamTest.team && hidden == true)
-                {
-                    data[t] = '3';
-                    continue;
-                }
                 if (TeamsFailed[t] == true)
                 {
                     data[t] = '2';
@@ -48,17 +43,20 @@ namespace BingoMode.Challenges
             return new string(data);
         }
 
-        public void TeamsFromString(string data)
+        public void TeamsFromString(string data, int ourTeam)
         {
             if (TeamsCompleted.Length != data.Length) return;
             for (int i = 0; i < data.Length; i++)
             {
                 TeamsFailed[i] = data[i] == '2';
                 TeamsCompleted[i] = data[i] == '1';
-                if (i == SteamTest.team)
+                if (i == ourTeam)
                 {
                     if (TeamsCompleted[i]) completed = true;
-                    hidden = data[i] == '3';
+                }
+                else if (!ReverseChallenge() && TeamsCompleted[i] && BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var saveData) && saveData.lockout)
+                {
+                    hidden = true;
                 }
             }
         }

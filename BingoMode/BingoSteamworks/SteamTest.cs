@@ -157,6 +157,7 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "burdenList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "lobbyVersion", Plugin.VERSION);
+            SteamMatchmaking.SetLobbyData(lobbyID, "randomSeed", UnityEngine.Random.Range(1000, 10000).ToString());
             // other settings idk
             UpdateOnlineBingo();
             SteamMatchmaking.SetLobbyJoinable(lobbyID, true);
@@ -231,23 +232,6 @@ namespace BingoMode.BingoSteamworks
 
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
-                //if (page.fromContinueGame)
-                //{
-                //    BingoData.globalMenu.UpdatePage(4);
-                //    BingoData.globalMenu.MovePage(new Vector2(1500f, 0f));
-                //    if (page.grid != null)
-                //    {
-                //        page.grid.RemoveSprites();
-                //        page.RemoveSubObject(page.grid);
-                //        page.grid = null;
-                //    }
-                //    page.grid = new BingoGrid(BingoData.globalMenu, page, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
-                //    page.grid.Switch(true);
-                //    page.subObjects.Add(page.grid);
-                //    page.multiButton.buttonBehav.greyedOut = false;
-                //    page.multiButton.Clicked();
-                //}
-
                 page.Switch(true, false);
             }
         }
@@ -335,18 +319,6 @@ namespace BingoMode.BingoSteamworks
                     }
 
                     break;
-                //case 0x0004:
-                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                //    text = "disconnected from";
-                //    break;
-                //case 0x0008:
-                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                //    text = "kicked from";
-                //    break;
-                //case 0x0010:
-                //    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
-                //    text = "banned from";
-                //    break;
             }
             Plugin.logger.LogMessage($"User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
 

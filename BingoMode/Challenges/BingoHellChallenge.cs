@@ -28,8 +28,7 @@ namespace BingoMode.Challenges
             new Icon("completechallenge", 1f, UnityEngine.Color.white), 
             new Counter(current, amound.Value),
             new Icon("buttonCrossA", 1f, UnityEngine.Color.red),
-            new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)]
-        , [2]);
+            new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)], [2]);
 
         public override bool Duplicable(Challenge challenge)
         {

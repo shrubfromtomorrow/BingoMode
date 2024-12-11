@@ -67,16 +67,50 @@ namespace BingoMode
         public static readonly float desaturara = 0.1f;
         public static readonly Color[] TEAM_COLOR =
         {
-            Custom.Desaturate(Color.red, desaturara),
-            Custom.Desaturate(Color.blue, desaturara),
-            Custom.Desaturate(Color.green, desaturara),
-            Custom.Desaturate(Color.yellow, desaturara),
-            Custom.Desaturate(Color.magenta, desaturara), // Pink
-            Custom.Desaturate(Color.cyan, desaturara),
-            Custom.Desaturate(new(1f, 0.45f, 0f), desaturara), // orange
-            Custom.Desaturate(new(0.5f, 0f, 0.5f), desaturara), // purple
-            Custom.Desaturate(Color.grey, desaturara), // Spectator
+            Custom.Saturate(new Color(0.9019608f, 0.05490196f, 0.05490196f), desaturara), // Red
+            Custom.Saturate(new Color(0f, 0.5f, 1f), desaturara), // Blue
+            Custom.Saturate(new Color(0.2f, 1f, 0f), desaturara), // Green
+            Custom.Saturate(new Color(1f, 0.6f, 0f), desaturara), // Orange
+            Custom.Saturate(new Color(1f, 0f, 1f), desaturara), // Pink
+            Custom.Saturate(new Color(0f, 0.9098039f, 0.9019608f), desaturara), // Cyan
+            Custom.Saturate(new Color(0.36862746f, 0.36862746f, 0.43529412f), desaturara), // Black
+            Custom.Saturate(new Color(0.3f, 0f, 1f), desaturara), // Hurricane
+            Custom.Saturate(Color.grey, desaturara), // Spectator
         };
+
+        public static string TeamName(int teamIndex)
+        {
+            switch (teamIndex)
+            {
+                case 0: return "Red";
+                case 1: return "Blue";
+                case 2: return "Green";
+                case 3: return "Orange";
+                case 4: return "Pink";
+                case 5: return "Cyan";
+                case 6: return "Black";
+                case 7: return "Hurricane";
+                case 8: return "Spectator";
+            }
+            return "Change";
+        }
+
+        public static int TeamNumber(string teamName)
+        {
+            switch (teamName)
+            {
+                case "Red": return 0;
+                case "Blue": return 1;
+                case "Green": return 2;
+                case "Orange": return 3;
+                case "Pink": return 4;
+                case "Cyan": return 5;
+                case "Black": return 6;
+                case "Hurricane": return 7;
+                case "Spectator": return 8;
+            }
+            return 0;
+        }
 
         public static readonly string[] BANNED_MOD_IDS =
         {
@@ -373,10 +407,13 @@ namespace BingoMode
                 {
                     if (ch is BingoNoRegionChallenge r) bannedRegions.Add(r.region.Value);
                     if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
+                    if (ch is BingoEnterRegionChallenge b) bannedRegions.Add(b.region.Value);
                 }
                 if (BingoData.BingoDen.ToLowerInvariant() == "random")
                 {
+                    int tries = 0;
                 reset:
+                    Plugin.logger.LogMessage("den is random, trying to get one");
                     ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
 
@@ -385,7 +422,16 @@ namespace BingoMode
                         foreach (var banned in bannedRegions)
                         {
                             if (banned == null || banned == "") continue;
-                            if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant()) goto reset;
+                            if (tries > 200)
+                            {
+                                BingoData.BingoDen = "SU_S01";
+                                Plugin.logger.LogWarning("Generation tries past 200, assigning SU_S01");
+                            }
+                            if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant())
+                            {
+                                tries++;
+                                goto reset;
+                            }
                         }
                     }
                 }
@@ -439,6 +485,7 @@ namespace BingoMode
                     }
 
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.lockout, false, false, false);
+                    BingoData.RandomStartingSeed = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "randomSeed"), System.Globalization.NumberStyles.Any);
                 }
                 else
                 {
@@ -1019,40 +1066,6 @@ namespace BingoMode
                 return sliderF;
             }
             return 0f;
-        }
-
-        public static string TeamName(int teamIndex)
-        {
-            switch (teamIndex)
-            {
-                case 0: return "Red";
-                case 1: return "Blue";
-                case 2: return "Green";
-                case 3: return "Yellow";
-                case 4: return "Pink";
-                case 5: return "Cyan";
-                case 6: return "Orange";
-                case 7: return "Purple";
-                case 8: return "Spectator";
-            }
-            return "Change";
-        }
-
-        public static int TeamNumber(string teamName)
-        {
-            switch (teamName)
-            {
-                case "Red": return 0;
-                case "Blue": return 1;
-                case "Green": return 2;
-                case "Yellow": return 3;
-                case "Pink": return 4;
-                case "Cyan": return 5;
-                case "Orange": return 6;
-                case "Purple": return 7;
-                case "Spectator": return 8;
-            }
-            return 0;
         }
 
         public class PlayerInfo

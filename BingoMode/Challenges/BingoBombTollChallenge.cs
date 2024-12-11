@@ -18,7 +18,7 @@ namespace BingoMode.Challenges
         public override void UpdateDescription()
         {
             string region = roomName.Value.Substring(0, 2);
-            description = ChallengeTools.IGT.Translate("Throw a grenade at the <toll> scavenger toll" + (pass.Value ? " and pass it" : ""))
+            description = ChallengeTools.IGT.Translate("Throw a grenade at the <toll> scavenger toll" + (pass.Value ? " then pass it" : ""))
                 .Replace("<toll>", Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer) + (roomName.Value == "gw_c05" ? " surface" : roomName.Value == "gw_c11" ? " underground" : ""));
             base.UpdateDescription();
         }
