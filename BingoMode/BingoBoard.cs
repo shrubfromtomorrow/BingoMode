@@ -249,6 +249,7 @@ namespace BingoMode
 
             List<Challenge> list = [];
             list.AddRange(BingoData.availableBingoChallenges);
+            list.RemoveAll(x => x is BingoHellChallenge);
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
 
         resette:
@@ -461,6 +462,7 @@ namespace BingoMode
                     string newTeamsString = challenges[next];
 
                     //Plugin.logger.LogFatal($"Comparing {currentTeamsString} to {newTeamsString}");
+                    // All the switch statements to make it 100% clear, obviously can be shortened down
                     if (currentTeamsString != newTeamsString)
                     {
                         for (int k = 0; k < currentTeamsString.Length; k++)
@@ -473,10 +475,10 @@ namespace BingoMode
                                         switch (currentTeamsString[k])
                                         {
                                             case '0':
-                                                ch.OnChallengeDepleted(k);
+                                                // Do nothing
                                                 break;
                                             case '1':
-                                                // Do nothing
+                                                ch.OnChallengeDepleted(k);
                                                 break;
                                             case '2':
                                                 // Do nothing
@@ -551,6 +553,7 @@ namespace BingoMode
                                         break;
                                 }
 
+                                // This was the code before the switch hell
                                 //if (currentTeamsString[k] == '1')
                                 //{
                                 //    //if (SteamTest.team != 8 && 

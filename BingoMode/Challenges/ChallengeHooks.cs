@@ -804,6 +804,19 @@ namespace BingoMode.Challenges
             }
         }
 
+        //public static void RegionGate_NewWorldLoaded3(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        //{
+        //    orig.Invoke(self);
+        //
+        //    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+        //    {
+        //        if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge c)
+        //        {
+        //            c.Gated(self.room.abstractRoom.name, self.room.world.region.name.ToUpperInvariant());
+        //        }
+        //    }
+        //}
+
         public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
         {
             orig.Invoke(self);

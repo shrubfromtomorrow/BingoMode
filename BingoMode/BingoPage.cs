@@ -38,6 +38,7 @@ namespace BingoMode
         public MenuLabel shelterLabel;
         public SimpleButton copyBoard;
         public SimpleButton pasteBoard;
+        public SymbolButton eggButton;
 
         // Multiplayer
         public SimpleButton multiButton;
@@ -172,8 +173,9 @@ namespace BingoMode
             shelterSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ShelterSettingBingo", "_", (ConfigAcceptableBase)null);
             shelterSetting = new OpTextBox(shelterSettingConf as Configurable<string>, new Vector2(xx + 48, yy + 56), 100f);
             shelterSetting.alignment = FLabelAlignment.Center;
-            shelterSetting.description = "The shelter players start in. Please type in a valid shelter's room name, or 'random'";
+            shelterSetting.description = "The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'";
             shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
+            shelterSetting.maxLength = 100;
             shelterSettingWrapper = new UIelementWrapper(menuTabWrapper, shelterSetting);
             shelterSetting.value = "random";
 
@@ -208,6 +210,14 @@ namespace BingoMode
             //slider.subtleSliderNob.outerCircle.alpha = 0f;
             subObjects.Add(slider);
             sliderF = 1f;
+
+            if (ExpeditionData.ints.Sum() >= 8)
+            {
+                eggButton = new SymbolButton(menu, this, "GuidanceSlugcat", "EGGBUTTON", new Vector2(663f, 25f));
+                eggButton.roundedRect.size = new Vector2(40f, 40f);
+                eggButton.size = eggButton.roundedRect.size;
+                subObjects.Add(eggButton);
+            }
         }
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
@@ -435,7 +445,7 @@ namespace BingoMode
                         }
                     }
                 }
-                else ExpeditionData.startingDen = BingoData.BingoDen.ToUpperInvariant();
+                else ExpeditionData.startingDen = BingoData.BingoDen;
 
                 if (SteamTest.team == 8)
                 {
@@ -669,6 +679,21 @@ namespace BingoMode
                 InnerWorkings.SendMessage("%" + nextTeam, kickedPlayer);
                 return;
             }
+
+            if (message == "EGGBUTTON")
+            {
+                menu.PlaySound(SoundID.MENU_Player_Join_Game);
+                if (ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer) > -1)
+                {
+                    if (ExpeditionData.ints[ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer)] == 1)
+                    {
+                        ExpeditionData.ints[ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer)] = 2;
+                        return;
+                    }
+                    ExpeditionData.ints[ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer)] = 1;
+                }
+                return;
+            }
         }
 
         public void ResetPlayerLobby()
@@ -697,6 +722,15 @@ namespace BingoMode
 
             pageTitle.x = Mathf.Lerp(owner.page.lastPos.x, owner.page.pos.x, timeStacker) + 680f;
             pageTitle.y = Mathf.Lerp(owner.page.lastPos.y, owner.page.pos.y, timeStacker) + 680f;
+
+            if (eggButton != null && expMenu.challengeSelect != null)
+            {
+                int num = ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer);
+                if (num > -1)
+                {
+                    eggButton.symbolSprite.color = ((ExpeditionData.ints[num] == 2) ? new HSLColor(Mathf.Sin(expMenu.challengeSelect.colorCounter / 20f), 1f, 0.75f).rgb : new Color(0.3f, 0.3f, 0.3f));
+                }
+            }
 
             float slide = Mathf.Lerp(lastLobbySlideIn, lobbySlideIn, timeStacker);
             multiMenuBg.pos = Vector2.Lerp(multiButton.lastPos, multiButton.pos, timeStacker) - new Vector2(25f, 625f) + Vector2.left * (1f - Custom.LerpExpEaseInOut(0f, 1f, slide)) * 1000f;

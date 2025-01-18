@@ -142,12 +142,12 @@ namespace BingoMode.Challenges
         public override void Update()
         {
             base.Update();
-            if (!completed && oneCycle.Value && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (!completed && oneCycle.Value && game != null && game.cameras.Length > 0 && game.cameras[0].room != null && game.cameras[0].room.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
             {
-                if (this.current != 0)
+                if (current != 0)
                 {
-                    this.current = 0;
-                    this.UpdateDescription();
+                    current = 0;
+                    UpdateDescription();
                 }
                 return;
             }

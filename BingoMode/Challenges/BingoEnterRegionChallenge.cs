@@ -26,7 +26,8 @@ namespace BingoMode.Challenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoEnterRegionChallenge c || c.region.Value != region.Value;
+            return (challenge is not BingoEnterRegionChallenge c || c.region.Value != region.Value) && 
+                (challenge is not BingoNoRegionChallenge ch || ch.region.Value != region.Value);
         }
 
         public override string ChallengeName()
@@ -69,7 +70,6 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
-            Plugin.logger.LogMessage(region.ToString());
             return string.Concat(new string[]
             {
                 "BingoEnterRegionChallenge",

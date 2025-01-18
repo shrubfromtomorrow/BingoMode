@@ -22,7 +22,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.83";
+        public const string VERSION = "0.85";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
@@ -71,7 +71,6 @@ namespace BingoMode
             if (!AppliedAlreadyDontDoItAgainPlease)
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
-
 
                 SteamTest.Apply();
 

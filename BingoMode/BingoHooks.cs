@@ -8,8 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Steamworks;
-using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace BingoMode
 {
@@ -224,6 +222,52 @@ namespace BingoMode
 
             // Same starting seed for everyone
             On.RainWorldGame.ctor += RainWorldGame_ctor;
+
+            // Music biz
+            //IL.Menu.ExpeditionJukebox.ctor += ExpeditionJukebox_ctorIL;
+            //IL.Menu.ExpeditionJukebox.Update += ExpeditionJukebox_UpdateIL;
+        }
+
+        private static void ExpeditionJukebox_UpdateIL(ILContext il)
+        {
+            ILCursor c = new(il);
+            ILLabel lable = null;
+
+            if (c.TryGotoNext(
+                x => x.MatchBrfalse(out lable),
+                x => x.MatchLdsfld("Expedition.ExpeditionData", "newSongs")
+                ) && 
+                c.TryGotoPrev(
+                x => x.MatchLdsfld("Expedition.ExpeditionData", "newSongs")
+                ) && lable != null)
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<ExpeditionJukebox, bool>>((self) =>
+                {
+                    if (self.songList[self.selectedTrack] == "BINGO_1 - Loops around the meattree") return true;
+                    return false;
+                });
+                c.Emit(OpCodes.Brtrue, lable);
+            }
+            else Plugin.logger.LogError("ExpeditionJukebox_UpdateIL FAILURE " + il);
+        }
+
+        private static void ExpeditionJukebox_ctorIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchStfld<ExpeditionJukebox>("songList")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<ExpeditionJukebox>>((self) =>
+                {
+                    self.songList.Add("BINGO_1 - Loops around the meattree");
+                    self.demoMode = true;
+                });
+            }
+            else Plugin.logger.LogError("ExpeditionJukebox_ctorIL FAILURE " + il);
         }
 
         private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)

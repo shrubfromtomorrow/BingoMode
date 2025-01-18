@@ -74,7 +74,6 @@ namespace BingoMode.Challenges
 
         public override string ToString()
         {
-            Plugin.logger.LogMessage(region.ToString());
             return string.Concat(new string[]
             {
                 "BingoNoRegionChallenge",

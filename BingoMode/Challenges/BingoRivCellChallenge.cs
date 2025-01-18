@@ -13,7 +13,7 @@ namespace BingoMode.Challenges
     {
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Feed the Rarefaction Cell to a Leviathan");
+            this.description = ChallengeTools.IGT.Translate("Feed the Rarefaction Cell to a Leviathan (completes if you die)");
             base.UpdateDescription();
         }
 

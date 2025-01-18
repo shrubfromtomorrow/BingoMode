@@ -1219,7 +1219,7 @@ namespace BingoMode
                     owner.ShowWinText();
                     //if (owner.queue.Count == 0 && owner.completeQueue.Count == 0 && hud.owner is SleepAndDeathScreen scr) scr.forceWatchAnimation = false;
                 }
-                if (overwriteAlpha > 0f)
+                if (overwriteAlpha > 0f) // Actual visual thonk bonk when the challenge completes
                 {
                     hud.PlaySound(contextSound);
                     bool chCompleted = (challenge as BingoChallenge).TeamsCompleted[teamResponsible];
@@ -1242,7 +1242,17 @@ namespace BingoMode
                         {
                             for (int i = 0; i < p.room.game.cameras.Length; i++)
                             {
-                                p.room.game.cameras[i].ScreenMovement(pos, default, (context == AnimationContext.BingoLast ? 0.8f : chCompleted ? 0.5f : 0.1f) * randomVariation);
+                                RoomCamera cam = p.room.game.cameras[i];
+                                cam.ScreenMovement(pos, default, (context == AnimationContext.BingoLast ? 0.8f : chCompleted ? 0.5f : 0.1f) * randomVariation);
+                                
+                                //for (int e = 0; e < Random.Range(20, 41); e++)
+                                //{
+                                //    p.room.AddObject(new CollectToken.TokenSpark(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (30f + 10f * Random.value), BingoPage.TEAM_COLOR[teamResponsible], false));
+                                //}
+                                for (int e = 0; e < Random.Range(15, 27); e++)
+                                {
+                                    p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value), BingoPage.TEAM_COLOR[teamResponsible], BingoPage.TEAM_COLOR[teamResponsible]));
+                                }
                             }
                         }
                     }
@@ -1330,6 +1340,45 @@ namespace BingoMode
                     for (int i = 0; i < 4; i++)
                     {
                         border[i].RemoveFromContainer();
+                    }
+                }
+            }
+
+            public class Confetti : PuffBallSkin
+            {
+                public Confetti(Vector2 pos, Vector2 vel, Color color, Color color2) : base(pos, vel, color, color2)
+                {
+                    this.lifeTime = Mathf.Lerp(300f, 500f, UnityEngine.Random.value);
+                }
+
+                public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+                {
+                    sLeaser.sprites = new FSprite[1];
+                    sLeaser.sprites[0] = new FSprite("Cicada" + Random.Range(2, 6).ToString() + "shield", true);
+                    sLeaser.sprites[0].scaleX = ((Random.value < 0.5f) ? -1f : 1f) * Mathf.Lerp(0.5f, 1f, Random.value);
+                    sLeaser.sprites[0].scaleY = ((Random.value < 0.5f) ? -1f : 1f) * 1.2f;
+                    this.AddToContainer(sLeaser, rCam, null);
+                }
+
+                public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+                {
+                    if (newContatiner == null)
+                    {
+                        newContatiner = rCam.ReturnFContainer("HUD2");
+                    }
+                    foreach (FSprite fsprite in sLeaser.sprites)
+                    {
+                        fsprite.RemoveFromContainer();
+                        newContatiner.AddChild(fsprite);
+                    }
+                }
+
+                public override void Update(bool eu)
+                {
+                    base.Update(eu);
+                    if (this.room.GetTile(this.pos).Solid)
+                    {
+                        this.life += 0.04f;
                     }
                 }
             }
