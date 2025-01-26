@@ -7,15 +7,18 @@ using MoreSlugcats;
 using System.Linq;
 using UnityEngine;
 using System;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.Challenges
 {
-    public class ChallengeUtils
+    public static class ChallengeUtils
     {
         public static void Apply()
         {
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
+            FetchGatesFromFile();
         }
 
         public static string ItemOrCreatureIconName(string thing)
@@ -73,7 +76,7 @@ namespace BingoMode.Challenges
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
                     foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
                     {
-                        if (SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(keyValuePair.Key))
+                        if (GetCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
                         {
                             foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
                             {
@@ -154,6 +157,39 @@ namespace BingoMode.Challenges
 
             return r;
         }
+
+        private static void FetchGatesFromFile()
+        {
+            List<string> gatesToAdd = [];
+            string path = AssetManager.ResolveFilePath(Path.Combine("world", "gates", "enterableGateCombos.txt"));
+            if (File.Exists(path))
+            {
+                string[] lines = File.ReadAllLines(path);
+                foreach (string line in lines)
+                {
+                    try 
+                    {
+                        string actualLine = line;
+                        if (line.StartsWith("MSC-"))
+                        {
+                            if (!ModManager.MSC) continue;
+                            actualLine = line.Substring(4);
+                        }
+                        string[] gate = actualLine.Split('_');
+                        string regionNames = gate[0] + "_" + gate[1];
+                        gatesToAdd.Add(regionNames);
+                        Plugin.logger.LogMessage("Adding " + regionNames);
+                    }
+                    catch
+                    {
+                        Plugin.logger.LogMessage("Couldnt read gate " + line);
+                    }
+                }
+            }
+            AllGates = gatesToAdd.ToArray();
+        }
+
+        public static string[] AllGates = [];
 
         public static readonly string[] Depthable = 
         {

@@ -37,7 +37,7 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").ToArray();
+            string[] regiones = ChallengeUtils.GetCorrectListForChallenge("regionsreal");
 
             BingoEnterRegionChallenge ch = new BingoEnterRegionChallenge
             {

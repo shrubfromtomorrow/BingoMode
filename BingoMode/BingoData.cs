@@ -268,7 +268,7 @@ namespace BingoMode
                 if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
-                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && SlugcatStats.SlugcatStoryRegions(slug).Concat(SlugcatStats.SlugcatOptionalRegions(slug)).Contains(kvp.Key.ToUpperInvariant()))
+                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
                     {
                         Plugin.logger.LogMessage("ACCESSIBLE SAFARI: " + kvp.Value[n].value + "-safari");
                         possibleTokens[2].Add(kvp.Value[n].value + "-safari");

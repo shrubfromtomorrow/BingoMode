@@ -152,6 +152,29 @@ namespace BingoMode.Challenges
             On.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
         }
 
+        public static void KarmaLadder_ctor(On.Menu.KarmaLadder.orig_ctor orig, KarmaLadder self, Menu.Menu menu, MenuObject owner, Vector2 pos, HUD.HUD hud, IntVector2 displayKarma, bool reinforced)
+        {
+            orig.Invoke(self, menu, owner, pos, hud, displayKarma, reinforced);
+
+            if (self.endGameMeters.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var meter in self.endGameMeters)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoAchievementChallenge c && 
+                        meter.tracker.ID.value.ToUpperInvariant() == c.ID.Value.ToUpperInvariant() &&
+                        meter.tracker.GoalFullfilled)
+                    {
+                        c.GetAchievement();
+                    }
+                }
+            }
+        }
+
         public static void Ghost_StartConversation(On.Ghost.orig_StartConversation orig, Ghost self)
         {
             orig.Invoke(self);
@@ -568,7 +591,6 @@ namespace BingoMode.Challenges
                 }
             }
 
-            Plugin.logger.LogWarning("eggs: " + eggs);
             if (eggs == 0) return;
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -622,26 +644,26 @@ namespace BingoMode.Challenges
         //    if (BingoData.BingoMode) Expedition.Expedition.coreFile.Save(false);
         //}
 
-        public static void WinState_CycleCompleted(ILContext il)
-        {
-            ILCursor c = new(il);
-        
-            if (c.TryGotoNext(
-                x => x.MatchStloc(42),
-                x => x.MatchLdloc(42),
-                x => x.MatchIsinst<AchievementChallenge>()
-                ))
-            {
-                c.Index++;
-                c.Emit(OpCodes.Ldloc, 42);
-                c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Action<Challenge, WinState>>((ch, self) =>
-                {
-                    if (ch is BingoAchievementChallenge c) c.CheckAchievementProgress(self);
-                });
-            }
-            else Plugin.logger.LogError("Uh oh, WinState_CycleCompleted il fucked up " + il);
-        }
+        //public static void WinState_CycleCompleted(ILContext il)
+        //{
+        //    ILCursor c = new(il);
+        //
+        //    if (c.TryGotoNext(
+        //        x => x.MatchStloc(42),
+        //        x => x.MatchLdloc(42),
+        //        x => x.MatchIsinst<AchievementChallenge>()
+        //        ))
+        //    {
+        //        c.Index++;
+        //        c.Emit(OpCodes.Ldloc, 42);
+        //        c.Emit(OpCodes.Ldarg_0);
+        //        c.EmitDelegate<Action<Challenge, WinState>>((ch, self) =>
+        //        {
+        //            if (ch is BingoAchievementChallenge c) c.CheckAchievementProgress(self);
+        //        });
+        //    }
+        //    else Plugin.logger.LogError("Uh oh, WinState_CycleCompleted il fucked up " + il);
+        //}
 
         public static void FlareBomb_Update(ILContext il)
         {
@@ -804,18 +826,18 @@ namespace BingoMode.Challenges
             }
         }
 
-        //public static void RegionGate_NewWorldLoaded3(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
-        //{
-        //    orig.Invoke(self);
-        //
-        //    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-        //    {
-        //        if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge c)
-        //        {
-        //            c.Gated(self.room.abstractRoom.name, self.room.world.region.name.ToUpperInvariant());
-        //        }
-        //    }
-        //}
+        public static void RegionGate_NewWorldLoaded3(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        {
+            orig.Invoke(self);
+        
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge c)
+                {
+                    c.Gated(self.room.abstractRoom.name.ToUpperInvariant(), self.room.world.region.name.ToUpperInvariant());
+                }
+            }
+        }
 
         public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
         {

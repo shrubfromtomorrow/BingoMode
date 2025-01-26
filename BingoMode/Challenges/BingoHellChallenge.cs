@@ -43,7 +43,7 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             BingoHellChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(2, 6), "Amount", 0);
+            ch.amound = new(UnityEngine.Random.Range(1, 5), "Amount", 0);
             return ch;
         }
 

@@ -334,7 +334,7 @@ namespace BingoMode
                 ExpeditionGame.lastRandomRegion = key;
                 int num = (from list in dictionary2.Values
                            select list.Count).Sum();
-                string text2 = dictionary2[key].ElementAt(UnityEngine.Random.Range(0, dictionary2[key].Count - 1));
+                string text2 = dictionary2[key].ElementAt(Random.Range(0, dictionary2[key].Count - 1));
                 ExpLog.Log(string.Format("{0} | {1} valid regions for {2} with {3} possible dens", new object[]
                 {
             text2,
@@ -418,12 +418,12 @@ namespace BingoMode
                     if (ch is BingoNoRegionChallenge r) bannedRegions.Add(r.region.Value);
                     if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
                     if (ch is BingoEnterRegionChallenge b) bannedRegions.Add(b.region.Value);
+                    if (ch is BingoEnterRegionFromChallenge a) bannedRegions.Add(a.to.Value);
                 }
                 if (BingoData.BingoDen.ToLowerInvariant() == "random")
                 {
                     int tries = 0;
                 reset:
-                    Plugin.logger.LogMessage("den is random, trying to get one");
                     ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
 
@@ -507,6 +507,7 @@ namespace BingoMode
                 Expedition.Expedition.coreFile.Save(false);
                 menu.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                 menu.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game, 0.1f);
+                menu.manager.rainWorld.progression.WipeSaveState(ExpeditionData.slugcatPlayer);
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
                 if (BingoData.MultiplayerGame)
                 {

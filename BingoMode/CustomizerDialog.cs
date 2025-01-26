@@ -276,6 +276,7 @@ namespace BingoMode
                 ccc.region = ccc.room.Value.Substring(0, 2);
                 Plugin.logger.LogMessage("Vista bs: " + ccc.region + " " + ccc.room.Value);
                 ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
+                BingoVistaChallenge.ModifyVistaCandidates(ccc);
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();
@@ -440,7 +441,7 @@ namespace BingoMode
                     this.value = i;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting", i.Value, new ConfigAcceptableRange<int>(1, 500));
                     field = new OpUpdown(true, conf, pos, 60f);
-                    field.OnValueChanged += UpdootInt;
+                    field.OnValueUpdate += UpdootInt;
                     label.text = i.name;
                     offSet = new Vector2(5f, -2.5f);
                 }
@@ -449,7 +450,7 @@ namespace BingoMode
                     this.value = s;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting", s.Value, (ConfigAcceptableBase)null);
                     field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName) : ["Whoops errore"]);
-                    field.OnValueChanged += UpdootString;
+                    field.OnValueUpdate += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
                     (field as OpComboBox).OnListClose += UnfocusThing;
                     label.text = s.name;
@@ -460,7 +461,7 @@ namespace BingoMode
                     this.value = b;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting", b.Value, (ConfigAcceptableBase)null);
                     field = new OpCheckBox(conf as Configurable<bool>, pos);
-                    field.OnValueChanged += UpdootBool;
+                    field.OnValueUpdate += UpdootBool;
                     label.text = b.name;
                     offSet = new Vector2(5f, 0f);
                 }
@@ -498,7 +499,7 @@ namespace BingoMode
 
             public void UpdootString(UIconfig config, string v, string oldV)
             {
-                Plugin.logger.LogMessage("new value: " + field.value);
+                //Plugin.logger.LogMessage("new value: " + field.value);
                 (value as SettingBox<string>).Value = field.value;
                 (menu as CustomizerDialog).UpdateChallenge();
             }

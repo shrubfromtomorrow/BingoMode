@@ -47,7 +47,7 @@ namespace BingoMode.Challenges
 
             if (BingoData.pinnableCreatureRegions == null || tries > 10)
             {
-                regions = [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                regions = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
             }
             else
             {

@@ -1244,14 +1244,15 @@ namespace BingoMode
                             {
                                 RoomCamera cam = p.room.game.cameras[i];
                                 cam.ScreenMovement(pos, default, (context == AnimationContext.BingoLast ? 0.8f : chCompleted ? 0.5f : 0.1f) * randomVariation);
-                                
+
                                 //for (int e = 0; e < Random.Range(20, 41); e++)
                                 //{
                                 //    p.room.AddObject(new CollectToken.TokenSpark(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (30f + 10f * Random.value), BingoPage.TEAM_COLOR[teamResponsible], false));
                                 //}
-                                for (int e = 0; e < Random.Range(15, 27); e++)
+                                if (!(challenge as BingoChallenge).TeamsCompleted[SteamTest.team]) continue;
+                                for (int e = 0; e < Random.Range(7, 15) + (context == AnimationContext.BingoLast ? 10 : 0); e++)
                                 {
-                                    p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value), BingoPage.TEAM_COLOR[teamResponsible], BingoPage.TEAM_COLOR[teamResponsible]));
+                                    p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value + (context == AnimationContext.BingoLast ? 8f : 0f)), BingoPage.TEAM_COLOR[teamResponsible], BingoPage.TEAM_COLOR[teamResponsible]));
                                 }
                             }
                         }

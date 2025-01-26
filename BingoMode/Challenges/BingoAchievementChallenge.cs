@@ -88,21 +88,30 @@ namespace BingoMode.Challenges
             return ID.Value == "Chieftain" || ID.Value == "DragonSlayer" || ID.Value == "Hunter" || ID.Value == "Outlaw" || ID.Value == "Gourmand";
         }
 
-        public void CheckAchievementProgress(WinState winState)
+        public void GetAchievement()
         {
-            if (completed || TeamsCompleted[SteamTest.team] || revealed || this.game == null || hidden)
-            {
-                return;
-            }
-            if (winState != null)
-            {
-                WinState.EndgameTracker tracker = winState.GetTracker(new(ID.Value), true);
-                if (tracker != null && tracker.GoalFullfilled)
-                {
-                    this.CompleteChallenge();
-                }
-            }
+            if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden) return;
+            CompleteChallenge();
         }
+
+        //public void CheckAchievementProgress(WinState winState)
+        //{
+        //    Plugin.logger.LogWarning($"THIS '{this.ToString()}' WIN STATE - '{winState.ToString()}'");
+        //    if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden)
+        //    {
+        //        return;
+        //    }
+        //    if (winState != null)
+        //    {
+        //        WinState.EndgameTracker tracker = winState.GetTracker(new(ID.Value), true);
+        //        Plugin.logger.LogWarning("gruhhed " + tracker.ToString());
+        //        if (tracker != null && tracker.GoalFullfilled)
+        //        {
+        //            Plugin.logger.LogWarning("completado");
+        //            this.CompleteChallenge();
+        //        }
+        //    }
+        //}
 
         public override string ToString()
         {
@@ -137,13 +146,15 @@ namespace BingoMode.Challenges
 
         public override void AddHooks()
         {
-            IL.WinState.CycleCompleted += WinState_CycleCompleted;
+            //IL.WinState.CycleCompleted += WinState_CycleCompleted;
+            On.Menu.KarmaLadder.ctor += KarmaLadder_ctor;
         }
 
         public override void RemoveHooks()
         {
 
-            IL.WinState.CycleCompleted -= WinState_CycleCompleted;
+            //IL.WinState.CycleCompleted -= WinState_CycleCompleted;
+            On.Menu.KarmaLadder.ctor -= KarmaLadder_ctor;
         }
 
         public override List<object> Settings() => [ID];

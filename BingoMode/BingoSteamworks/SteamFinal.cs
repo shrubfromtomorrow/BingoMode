@@ -203,7 +203,7 @@ namespace BingoMode.BingoSteamworks
 
         public static bool IsSaveMultiplayer(BingoData.BingoSaveData saveData)
         {
-            Plugin.logger.LogMessage($"TEST BINGOSAVES HOST ID: {saveData.hostID.GetSteamID64()} is default? {saveData.hostID.GetSteamID64() == default}");
+            //Plugin.logger.LogMessage($"TEST BINGOSAVES HOST ID: {saveData.hostID.GetSteamID64()} is default? {saveData.hostID.GetSteamID64() == default}");
             return saveData.hostID.GetSteamID64() != default;
         }
 

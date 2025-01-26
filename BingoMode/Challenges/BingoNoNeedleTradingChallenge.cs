@@ -36,8 +36,6 @@ namespace BingoMode.Challenges
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
-
             BingoNoNeedleTradingChallenge ch = new BingoNoNeedleTradingChallenge
             {
             };

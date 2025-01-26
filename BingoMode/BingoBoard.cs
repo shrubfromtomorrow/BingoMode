@@ -249,7 +249,7 @@ namespace BingoMode
 
             List<Challenge> list = [];
             list.AddRange(BingoData.availableBingoChallenges);
-            list.RemoveAll(x => x is BingoHellChallenge);
+            if (type is not BingoHellChallenge) list.RemoveAll(x => x is BingoHellChallenge);
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
 
         resette:
@@ -366,13 +366,22 @@ namespace BingoMode
 
         public override string ToString()
         {
-            string text = string.Join("bChG", ExpeditionData.challengeList);
+            string text = ExpeditionData.slugcatPlayer.value + "_" + string.Join("bChG", ExpeditionData.challengeList);
             return text;
         }
         
         public void FromString(string text)
         {
-            Plugin.logger.LogMessage("Bingo board from string:\n" + text);
+            if (string.IsNullOrEmpty(text) || !text.Contains("bChG") || !text.Contains('_')) return;
+            string slug = text.Substring(0, text.IndexOf("_"));
+            text = text.Substring(text.IndexOf("_") + 1);
+            Plugin.logger.LogMessage(slug + " Bingo board from string:\n" + text);
+            if (slug.ToLowerInvariant() != ExpeditionData.slugcatPlayer.value.ToLowerInvariant())
+            {
+                if (BingoData.globalMenu != null) BingoData.globalMenu.manager.ShowDialog(new InfoDialog(BingoData.globalMenu.manager, $"Slugcat mismatch\nSelected slugcat: {ExpeditionData.slugcatPlayer.value}\nProvided Slugcat: {slug}\n\nPlease paste a board from the same slugcat that's currently selected."));
+                return;
+            }
+
             string last = ToString();
             try
             {

@@ -57,6 +57,18 @@ namespace BingoMode.Challenges
                 data.unlockIconColor = new Color(0.9019608f, 0.05490196f, 0.05490196f);
                 data.iconColor = RainWorld.AntiGold.rgb;
             }
+            else if (unlockName == "Pearl")
+            {
+                data.unlockIconName = "Symbol_Pearl";
+                data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
+                data.iconColor = RainWorld.AntiGold.rgb;
+            }
+            else if (unlockName == "BigCentipede")
+            {
+                data.unlockIconName = "Kill_Centipede3";
+                data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
+                data.iconColor = RainWorld.AntiGold.rgb;
+            }
             else
             {
                 data.unlockIconName = "";
@@ -90,6 +102,10 @@ namespace BingoMode.Challenges
                 {
                     if (ExpeditionData.slugcatPlayer.value == "Rivulet" || ExpeditionData.slugcatPlayer.value == "Saint") { }
                     else goto gibacj;
+                }
+                if (unl.ToLowerInvariant().StartsWith("ds"))
+                {
+                    if (ExpeditionData.slugcatPlayer.value == "Saint") goto gibacj;
                 }
             }
             catch (Exception e)

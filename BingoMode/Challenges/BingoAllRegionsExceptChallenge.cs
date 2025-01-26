@@ -12,19 +12,20 @@ namespace BingoMode.Challenges
     public class BingoAllRegionsExcept : BingoChallenge
     {
         public SettingBox<string> region;
+        public SettingBox<int> required;
         public List<string> regionsToEnter = [];
         public int current;
-        public int required;
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter all regions except " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));
+            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions that are not " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
+                .Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString());
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("TravellerA", 1f, Color.white), new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value), new Counter(current, required)], [3]);
+            return new Phrase([new Icon("TravellerA", 1f, Color.white), new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value), new Counter(current, required.Value)], [3]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -34,26 +35,26 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Entering all regions except one");
+            return ChallengeTools.IGT.Translate("Entering regions except one");
         }
 
         public override void Reset()
         {
             base.Reset();
-            regionsToEnter = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
+            regionsToEnter = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
         }
 
         public override Challenge Generate()
         {
-            List<string> regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToList();
+            List<string> regiones = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
-            int req = regiones.Count - 1;
+            int req = UnityEngine.Random.Range(3, regiones.Count);
 
             return new BingoAllRegionsExcept
             {
                 region = new(regionn, "Region", 0, listName: "regionsreal"),
                 regionsToEnter = regiones,
-                required = req
+                required = new(req, "Amount", 1)
             };
         }
 
@@ -74,7 +75,7 @@ namespace BingoMode.Challenges
 
                 current++;
                 UpdateDescription();
-                if (current >= required)
+                if (current >= required.Value)
                 {
                     CompleteChallenge();
                 }
@@ -128,7 +129,7 @@ namespace BingoMode.Challenges
                 region = SettingBoxFromString(array[0]) as SettingBox<string>;
                 regionsToEnter = [.. array[1].Split('|')];
                 current = int.Parse(array[2], System.Globalization.NumberStyles.Any);
-                required = int.Parse(array[3], System.Globalization.NumberStyles.Any);
+                required = SettingBoxFromString(array[3]) as SettingBox<int>;
                 completed = (array[4] == "1");
                 revealed = (array[5] == "1");
                 UpdateDescription();
@@ -150,6 +151,6 @@ namespace BingoMode.Challenges
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoaderNoRegion2;
         }
 
-        public override List<object> Settings() => [region];
+        public override List<object> Settings() => [region, required];
     }
 }

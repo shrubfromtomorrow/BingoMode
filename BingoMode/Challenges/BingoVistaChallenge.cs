@@ -6,6 +6,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -78,7 +79,7 @@ namespace BingoMode.Challenges
             List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
             foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
             {
-                if (SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Contains(keyValuePair.Key))
+                if (ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
                 {
                     foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
                     {
@@ -105,20 +106,21 @@ namespace BingoMode.Challenges
             if (input.room.Value == "GW_E02" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
             {
                 input.room.Value = "GW_E02_PAST";
-                ExpLog.Log("Switch room to past version");
                 return;
             }
             if (input.room.Value == "GW_D01" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
             {
                 input.room.Value = "GW_D01_PAST";
-                ExpLog.Log("Switch room to past version");
                 return;
             }
             if (input.room.Value == "UW_C02" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
             {
                 input.room.Value = "UW_C02RIV";
                 input.location = new Vector2(450f, 1170f);
-                ExpLog.Log("Switch room to future version");
+            }
+            if (input.room.Value == "UW_D05" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+            {
+                input.room.Value = "UW_D05RIV";
             }
         }
 

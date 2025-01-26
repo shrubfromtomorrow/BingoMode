@@ -15,6 +15,7 @@ namespace BingoMode
     using Challenges;
     using MoreSlugcats;
     using RWCustom;
+    using System.Text.RegularExpressions;
 
     public class BingoHooks
     {
@@ -115,8 +116,8 @@ namespace BingoMode
                     catch (Exception ex)
                     {
                         Plugin.logger.LogError("Error while regenerating broken challenge, call that shit inception fr how did this happen: " + ex);
-                        Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate();
-                        challenge.FromString(array11[1]);
+                        Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoEatChallenge").GetType()) as Challenge).Generate();
+                        //challenge.FromString(array11[1]);
                         if (challenge != null)
                         {
                             Plugin.logger.LogInfo("Regenerating broken challenge");
@@ -175,6 +176,7 @@ namespace BingoMode
             // Saving and loaading shit
             //IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
             On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
+            On.Player.checkInput += Player_checkInput;
 
             // Preventing expedition antics
             IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
@@ -204,8 +206,8 @@ namespace BingoMode
 
             // One passage per game
             On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
-            On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
+            On.Menu.FastTravelScreen.Singal += FastTravelScreen_Singal;
 
             // Shortcut
             On.Menu.CharacterSelectPage.Update += CharacterSelectPage_Update;
@@ -226,6 +228,27 @@ namespace BingoMode
             // Music biz
             //IL.Menu.ExpeditionJukebox.ctor += ExpeditionJukebox_ctorIL;
             //IL.Menu.ExpeditionJukebox.Update += ExpeditionJukebox_UpdateIL;
+        }
+
+        private static void Player_checkInput(On.Player.orig_checkInput orig, Player self)
+        {
+            if (BingoData.BingoMode && self.room != null )
+
+            orig.Invoke(self);
+        }
+
+        private static void FastTravelScreen_Singal(On.Menu.FastTravelScreen.orig_Singal orig, FastTravelScreen self, MenuObject sender, string message)
+        {
+            orig.Invoke(self, sender, message);
+
+            if (message == "HOLD TO START")
+            {
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
+                {
+                    data.passageUsed = true;
+                    BingoSaveFile.Save();
+                }
+            }
         }
 
         private static void ExpeditionJukebox_UpdateIL(ILContext il)
@@ -411,46 +434,28 @@ namespace BingoMode
 
         private static void FastTravelScreen_Update(ILContext il)
         {
-            ILCursor c = new(il);
-
-            ILLabel label = null;
-            if (c.TryGotoNext(MoveType.Before,
-                x => x.MatchBr(out label),
-                x => x.MatchLdarg(0),
-                x => x.MatchLdfld<MainLoopProcess>("manager"),
-                x => x.MatchLdsfld<ProcessManager.ProcessID>("MainMenu"),
-                x => x.MatchCallOrCallvirt<ProcessManager>("RequestMainProcessSwitch")
-                ))
-            {
-                if (label == null) return;
-                c.Index += 1;
-                c.MoveAfterLabels();
-                c.EmitDelegate<Func<bool>>(() =>
-                {
-                    if (BingoData.BingoMode) return true;
-                    return false;
-                });
-                c.Emit(OpCodes.Brtrue, label);
-            }
-            else Plugin.logger.LogError("FastTravelScreen_Update FAILURE " + il);
-        }
-
-        private static void SleepAndDeathScreen_Singal(On.Menu.SleepAndDeathScreen.orig_Singal orig, SleepAndDeathScreen self, MenuObject sender, string message)
-        {
-            if (BingoData.BingoMode && message != null && message == "EXPPASSAGE")
-            {
-                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
-                {
-                    data.passageUsed = true;
-                    BingoSaveFile.Save();
-                    self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.FastTravelScreen);
-                    self.PlaySound(SoundID.MENU_Passage_Button);
-                }
-
-                return;
-            }
-
-            orig.Invoke(self, sender, message);
+           //ILCursor c = new(il);
+           //
+           //ILLabel label = null;
+           //if (c.TryGotoNext(MoveType.Before,
+           //    x => x.MatchBr(out label),
+           //    x => x.MatchLdarg(0),
+           //    x => x.MatchLdfld<MainLoopProcess>("manager"),
+           //    x => x.MatchLdsfld<ProcessManager.ProcessID>("MainMenu"),
+           //    x => x.MatchCallOrCallvirt<ProcessManager>("RequestMainProcessSwitch")
+           //    ))
+           //{
+           //    if (label == null) return;
+           //    c.Index += 1;
+           //    c.MoveAfterLabels();
+           //    c.EmitDelegate<Func<bool>>(() =>
+           //    {
+           //        if (BingoData.BingoMode) return true;
+           //        return false;
+           //    });
+           //    c.Emit(OpCodes.Brtrue, label);
+           //}
+           //else Plugin.logger.LogError("FastTravelScreen_Update FAILURE " + il);
         }
 
         private static void SleepAndDeathScreen_AddExpeditionPassageButton(On.Menu.SleepAndDeathScreen.orig_AddExpeditionPassageButton orig, SleepAndDeathScreen self)
@@ -484,6 +489,8 @@ namespace BingoMode
                 if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.firstCycleSaved)
                 {
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer].firstCycleSaved = true;
+                    self.room.game.rainWorld.progression.TempDiscoverShelter(self.room.abstractRoom.name);
+
                     if (data.hostID.GetSteamID64() == default)
                     {
                         Plugin.logger.LogMessage("Saving game and completing reverse challenges singleplayer");
