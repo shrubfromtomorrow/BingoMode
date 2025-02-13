@@ -275,7 +275,7 @@ namespace BingoMode
             {
                 ccc.region = ccc.room.Value.Substring(0, 2);
                 Plugin.logger.LogMessage("Vista bs: " + ccc.region + " " + ccc.room.Value);
-                ccc.location = ChallengeTools.VistaLocations[ccc.region][ccc.room.Value];
+                ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
                 BingoVistaChallenge.ModifyVistaCandidates(ccc);
             }
             owner.challenge.UpdateDescription();

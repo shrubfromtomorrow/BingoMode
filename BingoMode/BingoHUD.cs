@@ -90,7 +90,7 @@ namespace BingoMode
             hints = []; 
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                cheatsEnabled = SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
+                cheatsEnabled = true;// SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
             }
             GenerateBingoGrid();
             if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen)
@@ -212,9 +212,7 @@ namespace BingoMode
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
             string addText = isMultiplayer ? "Exit the game to end the bingo session for everyone." : "Exit the game to end the bingo session.";
-            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default &&
-                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
+            if (isMultiplayer && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
             {
                 addText = "Exit the game or wait for host to end the session.";
             }
@@ -1252,7 +1250,7 @@ namespace BingoMode
                                 if (!(challenge as BingoChallenge).TeamsCompleted[SteamTest.team]) continue;
                                 for (int e = 0; e < Random.Range(7, 15) + (context == AnimationContext.BingoLast ? 10 : 0); e++)
                                 {
-                                    p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value + (context == AnimationContext.BingoLast ? 8f : 0f)), BingoPage.TEAM_COLOR[teamResponsible], BingoPage.TEAM_COLOR[teamResponsible]));
+                                    p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value + (context == AnimationContext.BingoLast ? 8f : 0f)), BingoPage.TEAM_COLOR[SteamTest.team], BingoPage.TEAM_COLOR[SteamTest.team]));
                                 }
                             }
                         }

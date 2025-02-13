@@ -17,8 +17,6 @@ namespace BingoMode
     using Challenges;
     using MoreSlugcats;
     using Steamworks;
-    using System.IO;
-    using System.Text.RegularExpressions;
 
     public static class BingoData
     {
@@ -55,6 +53,7 @@ namespace BingoMode
             public bool showedWin;
             public bool firstCycleSaved;
             public bool passageUsed;
+            public string teamsInBingo;
 
             public BingoSaveData(int size, bool showedWin, int team, bool firstCycleSaved, bool passageUsed)
             {
@@ -65,7 +64,7 @@ namespace BingoMode
                 this.passageUsed = passageUsed;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout, bool showedWin, bool firstCycleSaved, bool passageUsed)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo)
             {
                 this.size = size;
                 this.team = team;
@@ -76,7 +75,20 @@ namespace BingoMode
                 this.showedWin = showedWin;
                 this.firstCycleSaved = firstCycleSaved;
                 this.passageUsed = passageUsed;
+                this.teamsInBingo = teamsInBingo;
             }
+        }
+
+        public static string TeamsListToString(List<int> teams)
+        {
+            StringBuilder builder = new("00000000");
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (teams.Contains(i)) builder[0] = '1';
+            }
+
+            return builder.ToString();
         }
 
         public static List<Challenge> GetAdequateChallengeList(SlugcatStats.Name slug)

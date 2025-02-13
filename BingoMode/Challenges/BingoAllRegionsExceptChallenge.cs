@@ -18,7 +18,7 @@ namespace BingoMode.Challenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions that are not " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
+            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions and never visit " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
                 .Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString());
             base.UpdateDescription();
         }
@@ -35,7 +35,7 @@ namespace BingoMode.Challenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Entering regions except one");
+            return ChallengeTools.IGT.Translate("Entering regions while never visiting one");
         }
 
         public override void Reset()

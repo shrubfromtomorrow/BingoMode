@@ -77,8 +77,9 @@ namespace BingoMode.Challenges
         public override Challenge Generate()
         {
             List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
-            foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
+            foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeUtils.BingoVistaLocations)
             {
+                if (keyValuePair.Key.ToUpperInvariant() == "MS" && ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                 if (ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
                 {
                     foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
@@ -90,7 +91,7 @@ namespace BingoMode.Challenges
             ValueTuple<string, string> valueTuple = list[UnityEngine.Random.Range(0, list.Count)];
             string item = valueTuple.Item1;
             string item2 = valueTuple.Item2;
-            Vector2 vector = ChallengeTools.VistaLocations[item][item2];
+            Vector2 vector = ChallengeUtils.BingoVistaLocations[item][item2];
             BingoVistaChallenge vistaChallenge = new BingoVistaChallenge
             {
                 region = item,

@@ -8,17 +8,70 @@ using System.Linq;
 using UnityEngine;
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
+using RWCustom;
 
 namespace BingoMode.Challenges
 {
     public static class ChallengeUtils
     {
+        public static Dictionary<string, Dictionary<string, Vector2>> BingoVistaLocations;
+
         public static void Apply()
         {
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
+            On.Menu.ExpeditionMenu.ExpeditionSetup += ExpeditionMenu_ExpeditionSetup;
             FetchGatesFromFile();
+        }
+
+        private static void ExpeditionMenu_ExpeditionSetup(On.Menu.ExpeditionMenu.orig_ExpeditionSetup orig, Menu.ExpeditionMenu self)
+        {
+            orig.Invoke(self);
+
+            GenerateBingoVistaLocations();
+        }
+
+        public static void GenerateBingoVistaLocations()
+        {
+            BingoVistaLocations = ChallengeTools.VistaLocations.ToDictionary(x => x.Key, x => x.Value);
+            foreach (string text in Custom.rainWorld.progression.regionNames)
+            {
+                if (!BingoVistaLocations.ContainsKey(text))
+                {
+                    BingoVistaLocations[text] = new Dictionary<string, Vector2>();
+                }
+                string path = AssetManager.ResolveFilePath(Path.Combine("world", text, "bingovistas.txt"));
+                if (File.Exists(path))
+                {
+                    string[] lines = File.ReadAllLines(path);
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        string text2 = lines[i];
+                        if (string.IsNullOrEmpty(text2.Trim())) continue;
+                        if (text2.StartsWith("(MSC)"))
+                        {
+                            if (!ModManager.MSC) continue;
+                            text2 = text2.Substring(5);
+                        }
+
+                        string[] array2 = text2.Split(',');
+                        if (array2.Length >= 3)
+                        {
+                            string text3 = array2[0];
+                            int num;
+                            int num2;
+                            if (string.IsNullOrEmpty(text3) || !int.TryParse(array2[1], out num) || !int.TryParse(array2[2], out num2))
+                            {
+                                Custom.LogWarning("Failed to parse bingo vista " + text2);
+                            }
+                            else
+                            {
+                                BingoVistaLocations[text][text3] = new Vector2((float)num, (float)num2);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public static string ItemOrCreatureIconName(string thing)
@@ -74,7 +127,7 @@ namespace BingoMode.Challenges
                 case "expobject": return ["FirecrackerPlant", "SporePlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
                 case "vista": // hate
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
-                    foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeTools.VistaLocations)
+                    foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in BingoVistaLocations)
                     {
                         if (GetCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
                         {

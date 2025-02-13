@@ -61,7 +61,9 @@ namespace BingoMode
                     "#" +
                     (saveData.firstCycleSaved ? "1" : "0") +
                     "#" +
-                    (saveData.passageUsed ? "1" : "0");
+                    (saveData.passageUsed ? "1" : "0") +
+                    "#" +
+                    saveData.teamsInBingo;
                 }
                 else
                 {
@@ -146,22 +148,14 @@ namespace BingoMode
                         hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
                         bool isHost = array2[4] == "1";
                         bool lockout = array2[6] == "1";
-                        bool showedWin = false;
-                        bool firstCycleSaved = false;
-                        bool passageUsed = false;
-                        if (array2.Length > 7)
-                        {
-                            showedWin = array2[7] == "1";
-                            if (array2.Length > 8)
-                            {
-                                firstCycleSaved = array2[8] == "1";
-                                passageUsed = array2[9] == "1";
-                            }
-                        }
+                        bool showedWin = array2[7] == "1";
+                        bool firstCycleSaved = array2[8] == "1";
+                        bool passageUsed = array2[9] == "1";
+                        string teamsInBingo = array[10];
 
-                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}, TeamsInBingo={teamsInBingo}");
 
-                        BingoData.BingoSaves[slug] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed);
+                        BingoData.BingoSaves[slug] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed, teamsInBingo);
                     }
                     else
                     {
@@ -169,19 +163,10 @@ namespace BingoMode
                         int team = SteamTest.team;
                         bool firstCycleSaved = false;
                         bool passageUsed = false;
-                        if (array2.Length > 2)
-                        {
-                            showedWin = array2[2] == "1";
-                            if (array2.Length > 3)
-                            {
-                                team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                                if (array2.Length > 4)
-                                {
-                                    firstCycleSaved = array2[4] == "1";
-                                    passageUsed = array2[5] == "1";
-                                }
-                            }
-                        }
+                        showedWin = array2[2] == "1";
+                        team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                        firstCycleSaved = array2[4] == "1";
+                        passageUsed = array2[5] == "1";
 
                         Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
 
