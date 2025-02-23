@@ -361,4 +361,19 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/lib
+/lib/Assembly-CSharp-firstpass.dll
+/lib/Assembly-CSharp-nstrip.dll
+/lib/BepInEx.dll
+/lib/com.rlabrecque.steamworks.net.dll
+/lib/DevConsole.dll
+/lib/Fisobs.dll
+/lib/HOOKS-Assembly-CSharp.dll
+/lib/Mono.Cecil.dll
+/lib/MonoMod.dll
+/lib/MonoMod.RuntimeDetour.dll
+/lib/MonoMod.Utils.dll
+/lib/Rewired_Core.dll
+/lib/Unity.Mathematics.dll
+/lib/UnityEngine.CoreModule.dll
+/lib/UnityEngine.dll
+/lib/UnityEngine.InputLegacyModule.dll
