@@ -1,5 +1,5 @@
 ﻿using BingoMode.BingoSteamworks;
-using BingoMode.Challenges;
+using BingoMode.BingoChallenges;
 using Expedition;
 using RWCustom;
 using Steamworks;
@@ -55,7 +55,7 @@ namespace BingoMode
                     "#" +
                     saveData.playerWhiteList +
                     "#" +
-                    (saveData.lockout ? "1" : "0") +
+                    ((int)saveData.gamemode) +
                     "#" +
                     (saveData.showedWin ? "1" : "0") +
                     "#" +
@@ -147,15 +147,15 @@ namespace BingoMode
                         SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
                         hostIdentity.SetSteamID64(ulong.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture));
                         bool isHost = array2[4] == "1";
-                        bool lockout = array2[6] == "1";
+                        BingoData.BingoGameMode gamemode = (BingoData.BingoGameMode)int.Parse(array2[6], NumberStyles.Any);
                         bool showedWin = array2[7] == "1";
                         bool firstCycleSaved = array2[8] == "1";
                         bool passageUsed = array2[9] == "1";
-                        string teamsInBingo = array[10];
+                        string teamsInBingo = array2[10];
 
                         Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}, TeamsInBingo={teamsInBingo}");
 
-                        BingoData.BingoSaves[slug] = new(size, team, hostIdentity, isHost, array2[5], lockout, showedWin, firstCycleSaved, passageUsed, teamsInBingo);
+                        BingoData.BingoSaves.Add(slug, new(size, team, hostIdentity, isHost, array2[5], gamemode, showedWin, firstCycleSaved, passageUsed, teamsInBingo));
                     }
                     else
                     {
@@ -170,7 +170,7 @@ namespace BingoMode
 
                         Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
 
-                        BingoData.BingoSaves[slug] = new(size, showedWin, team, firstCycleSaved, passageUsed);
+                        BingoData.BingoSaves.Add(slug, new(size, showedWin, team, firstCycleSaved, passageUsed));
                     }
                     string teamString = array2[array2.Length - 1];
                     string[] teams = teamString.Split('|');

@@ -32,38 +32,53 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="..\lib\Assembly-CSharp-firstpass.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp-nstrip, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\h\Assembly-CSharp-nstrip.dll</HintPath>
+    <Reference Include="..\lib\Assembly-CSharp-nstrip.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
+    <Reference Include="..\lib\BepInEx.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="com.rlabrecque.steamworks.net">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+    <Reference Include="..\lib\com.rlabrecque.steamworks.net.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="HOOKS-Assembly-CSharp">
-      <HintPath>..\..\..\h\HOOKS-Assembly-CSharp.dll</HintPath>
+    <Reference Include="..\lib\DevConsole.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\Mono.Cecil.dll</HintPath>
+    <Reference Include="..\lib\Fisobs.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="MonoMod">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.dll</HintPath>
+    <Reference Include="..\lib\HOOKS-Assembly-CSharp.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+    <Reference Include="..\lib\Mono.Cecil.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.Utils.dll</HintPath>
+    <Reference Include="..\lib\MonoMod.dll">
+      <Private>false</Private>
     </Reference>
-    <Reference Include="netstandard" />
-    <Reference Include="Rewired_Core">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Rewired_Core.dll</HintPath>
+    <Reference Include="..\lib\MonoMod.RuntimeDetour.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\MonoMod.Utils.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\Rewired_Core.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\Unity.Mathematics.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\UnityEngine.CoreModule.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\UnityEngine.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="..\lib\UnityEngine.InputLegacyModule.dll">
+      <Private>false</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -73,87 +88,75 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Unity.Mathematics">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Unity.Mathematics.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
+    <Reference Include="netstandard" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
-    <Compile Include="BingoButton.cs" />
+    <Compile Include="BingoMenu\BingoButton.cs" />
     <Compile Include="BingoData.cs" />
     <Compile Include="BingoEnums.cs" />
-    <Compile Include="BingoGrid.cs" />
-    <Compile Include="BingoHUD.cs" />
+    <Compile Include="BingoMenu\BingoGrid.cs" />
+    <Compile Include="BingoHUD\BingoHUDMain.cs" />
     <Compile Include="BingoHooks.cs" />
-    <Compile Include="BingoHUDCheatButton.cs" />
-    <Compile Include="BingoHUDCursor.cs" />
-    <Compile Include="BingoHUDHint.cs" />
+    <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />
+    <Compile Include="BingoHUD\BingoHUDCursor.cs" />
+    <Compile Include="BingoHUD\BingoHUDHint.cs" />
     <Compile Include="BingoModOptions.cs" />
-    <Compile Include="BingoPage.cs" />
+    <Compile Include="BingoMenu\BingoPage.cs" />
     <Compile Include="BingoSaveFile.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />
     <Compile Include="BingoSteamworks\LobbyFilters.cs" />
     <Compile Include="BingoSteamworks\LobbySettings.cs" />
     <Compile Include="BingoSteamworks\SteamFinal.cs" />
     <Compile Include="BingoSteamworks\SteamTest.cs" />
-    <Compile Include="Challenges\BingoAchievementChallenge.cs" />
-    <Compile Include="Challenges\BingoAllRegionsExceptChallenge.cs" />
-    <Compile Include="Challenges\BingoBombTollChallenge.cs" />
-    <Compile Include="Challenges\BingoChallenge.cs" />
-    <Compile Include="Challenges\BingoCollectPearlChallenge.cs" />
-    <Compile Include="Challenges\BingoCraftChallenge.cs" />
-    <Compile Include="Challenges\BingoCreatureGateChallenge.cs" />
-    <Compile Include="Challenges\BingoCycleScoreChallenge.cs" />
-    <Compile Include="Challenges\BingoDepthsChallenge.cs" />
-    <Compile Include="Challenges\BingoDodgeLeviathanChallenge.cs" />
-    <Compile Include="Challenges\BingoEchoChallenge.cs" />
-    <Compile Include="Challenges\BingoEnterRegionFromChallenge.cs" />
-    <Compile Include="Challenges\BingoGlobalScoreChallenge.cs" />
-    <Compile Include="Challenges\BingoGreenNeuronChallenge.cs" />
-    <Compile Include="Challenges\BingoDamageChallenge.cs" />
-    <Compile Include="Challenges\BingoDontUseItemChallenge.cs" />
-    <Compile Include="Challenges\BingoEatChallenge.cs" />
-    <Compile Include="Challenges\BingoHatchNoodleChallenge.cs" />
-    <Compile Include="Challenges\BingoHellChallenge.cs" />
-    <Compile Include="Challenges\BingoItemHoardChallenge.cs" />
-    <Compile Include="Challenges\BingoKarmaFlowerChallenge.cs" />
-    <Compile Include="Challenges\BingoKillChallenge.cs" />
-    <Compile Include="Challenges\BingoMaulTypesChallenge.cs" />
-    <Compile Include="Challenges\BingoMaulXChallenge.cs" />
-    <Compile Include="Challenges\BingoNeuronDeliveryChallenge.cs" />
-    <Compile Include="Challenges\BingoNoNeedleTradingChallenge.cs" />
-    <Compile Include="Challenges\BingoEnterRegionChallenge.cs" />
-    <Compile Include="Challenges\BingoNoRegionChallenge.cs" />
-    <Compile Include="Challenges\BingoPearlDeliveryChallenge.cs" />
-    <Compile Include="Challenges\BingoPearlHoardChallenge.cs" />
-    <Compile Include="Challenges\BingoPinChallenge.cs" />
-    <Compile Include="Challenges\BingoPopcornChallenge.cs" />
-    <Compile Include="Challenges\BingoRivCellChallenge.cs" />
-    <Compile Include="Challenges\BingoSaintDeliveryChallenge.cs" />
-    <Compile Include="Challenges\BingoSaintPopcornChallenge.cs" />
-    <Compile Include="Challenges\BingoStealChallenge.cs" />
-    <Compile Include="Challenges\BingoTameChallenge.cs" />
-    <Compile Include="Challenges\BingoTradeChallenge.cs" />
-    <Compile Include="Challenges\BingoTradeTradedChallenge.cs" />
-    <Compile Include="Challenges\BingoTransportChallenge.cs" />
-    <Compile Include="Challenges\BingoUnlockChallenge.cs" />
-    <Compile Include="Challenges\BingoVistaChallenge.cs" />
-    <Compile Include="Challenges\ChallengeHooks.cs" />
-    <Compile Include="Challenges\ChallengeUtils.cs" />
-    <Compile Include="Challenges\ChallengeDisplay.cs" />
-    <Compile Include="CreateLobbyDialog.cs" />
-    <Compile Include="CustomizerDialog.cs" />
-    <Compile Include="InfoDialog.cs" />
+    <Compile Include="BingoChallenges\BingoAchievementChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoAllRegionsExceptChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoBombTollChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoCollectPearlChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoCraftChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoCreatureGateChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoCycleScoreChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoDepthsChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoDodgeLeviathanChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoEchoChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoEnterRegionFromChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoGlobalScoreChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoGreenNeuronChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoDamageChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoDontUseItemChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoEatChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoHatchNoodleChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoHellChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoItemHoardChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoKarmaFlowerChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoKillChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoMaulTypesChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoMaulXChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoNeuronDeliveryChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoNoNeedleTradingChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoEnterRegionChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoNoRegionChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoPearlDeliveryChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoPearlHoardChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoPinChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoPopcornChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoRivCellChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoSaintDeliveryChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoSaintPopcornChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoStealChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoTameChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoTradeChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoTradeTradedChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoTransportChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoUnlockChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoVistaChallenge.cs" />
+    <Compile Include="BingoChallenges\ChallengeHooks.cs" />
+    <Compile Include="BingoChallenges\ChallengeUtils.cs" />
+    <Compile Include="BingoChallenges\ChallengeDisplay.cs" />
+    <Compile Include="BingoMenu\CreateLobbyDialog.cs" />
+    <Compile Include="BingoMenu\CustomizerDialog.cs" />
+    <Compile Include="BingoMenu\InfoDialog.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpectatorHooks.cs" />
@@ -161,6 +164,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins\$(TargetName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

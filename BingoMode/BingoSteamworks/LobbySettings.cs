@@ -9,7 +9,7 @@
             None
         }
 
-        public bool lockout;
+        public BingoData.BingoGameMode gamemode;
         public bool friendsOnly;
         public AllowUnlocks perks;
         public AllowUnlocks burdens;
@@ -21,7 +21,7 @@
 
         public void Reset()
         {
-            lockout = false;
+            gamemode = BingoData.BingoGameMode.Bingo;
             perks = AllowUnlocks.Any;
             burdens = AllowUnlocks.Any;
             banMods = false;

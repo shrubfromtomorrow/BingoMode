@@ -1,4 +1,4 @@
-﻿using BingoMode.Challenges;
+﻿using BingoMode.BingoChallenges;
 using Expedition;
 using RWCustom;
 using Steamworks;
@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 namespace BingoMode.BingoSteamworks
 {
+    using BingoMenu;
+
     internal class InnerWorkings
     {
         public static void SendMessage(string data, SteamNetworkingIdentity receiver, bool reliable = true)
@@ -52,7 +54,7 @@ namespace BingoMode.BingoSteamworks
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
                         if (SteamTest.team != 8 &&
                             BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
-                            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout && 
+                            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout && 
                             teamCredit != SteamTest.team)
                         {
                             (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeLockedOut(teamCredit);

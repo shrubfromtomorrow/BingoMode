@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace BingoMode
 {
+    using BingoHUD;
+
     public static class SpectatorHooks
     {
         public static void Hook()
@@ -85,7 +87,7 @@ namespace BingoMode
         private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
             orig.Invoke(self, cam);
-
+            
             for (int i = 0; i < cam.SpriteLayers.Length - 2; i++)
             {
                 cam.SpriteLayers[i].RemoveAllChildren();
@@ -107,7 +109,8 @@ namespace BingoMode
             {
                 self.fContainers[j].RemoveAllChildren();
             }
-            self.AddPart(new BingoHUD(self));
+            if (self.jollyMeter != null) self.parts.Remove(self.jollyMeter);
+            self.AddPart(new BingoHUDMain(self));
             if (cam.virtualMicrophone == null || cam.virtualMicrophone.ambientSoundPlayers == null) return;
             for (int j = 0; j < cam.virtualMicrophone.ambientSoundPlayers.Count; j++)
             {

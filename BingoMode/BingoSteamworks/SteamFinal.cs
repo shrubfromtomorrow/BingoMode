@@ -9,6 +9,8 @@ using RWCustom;
 
 namespace BingoMode.BingoSteamworks
 {
+    using BingoMenu;
+
     public class SteamFinal
     {
         public const int PlayerUpkeepTime = 1200;
@@ -250,7 +252,6 @@ namespace BingoMode.BingoSteamworks
 
         public static void BroadcastCurrentBoardState()
         {
-            Plugin.logger.LogInfo(Environment.StackTrace);
             string state = BingoHooks.GlobalBoard.GetBingoState();
             foreach (var player in ConnectedPlayers)
             {

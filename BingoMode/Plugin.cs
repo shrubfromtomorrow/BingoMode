@@ -7,6 +7,7 @@ using System;
 using System.Reflection;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -16,13 +17,13 @@ using Mono.Cecil.Cil;
 namespace BingoMode
 {
     using BingoSteamworks;
-    using Challenges;
-    using UnityEngine;
+    using BingoChallenges;
+    using BingoHUD;
 
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.86";
+        public const string VERSION = "0.87";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
@@ -39,7 +40,7 @@ namespace BingoMode
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
-            On.Player.Update += Player_Update;
+            //On.Player.Update += Player_Update;
         }
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
@@ -68,7 +69,7 @@ namespace BingoMode
                                     Input.GetKeyDown(_bingoConfig.HUDKeybindC3.Value) ||
                                     Input.GetKeyDown(_bingoConfig.HUDKeybindC4.Value)))
             {
-                BingoHUD.Toggled = !BingoHUD.Toggled;
+                BingoHUDMain.Toggled = !BingoHUDMain.Toggled;
             }
         }
 

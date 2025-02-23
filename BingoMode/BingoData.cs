@@ -14,7 +14,7 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 namespace BingoMode
 {
     using BingoSteamworks;
-    using Challenges;
+    using BingoChallenges;
     using MoreSlugcats;
     using Steamworks;
 
@@ -42,6 +42,13 @@ namespace BingoMode
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
+        public enum BingoGameMode
+        {
+            Bingo,
+            Lockout,
+            Blackout
+        }
+
         public class BingoSaveData
         {
             public int size;
@@ -49,7 +56,7 @@ namespace BingoMode
             public bool isHost;
             public string playerWhiteList;
             public int team;
-            public bool lockout;
+            public BingoGameMode gamemode;
             public bool showedWin;
             public bool firstCycleSaved;
             public bool passageUsed;
@@ -64,19 +71,31 @@ namespace BingoMode
                 this.passageUsed = passageUsed;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, bool lockout, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, BingoGameMode gamemode, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo)
             {
                 this.size = size;
                 this.team = team;
                 this.hostID = hostID;
                 this.isHost = isHost;
                 this.playerWhiteList = playerWhiteList;
-                this.lockout = lockout;
+                this.gamemode = gamemode;
                 this.showedWin = showedWin;
                 this.firstCycleSaved = firstCycleSaved;
                 this.passageUsed = passageUsed;
                 this.teamsInBingo = teamsInBingo;
             }
+        }
+
+        public static List<int> TeamsStringToList(string teams)
+        {
+            List<int> teamsList = [];
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (teams[i] == '1') teamsList.Add(i);
+            }
+
+            return teamsList;
         }
 
         public static string TeamsListToString(List<int> teams)
@@ -85,7 +104,7 @@ namespace BingoMode
 
             for (int i = 0; i < 8; i++)
             {
-                if (teams.Contains(i)) builder[0] = '1';
+                if (teams.Contains(i)) builder[i] = '1';
             }
 
             return builder.ToString();

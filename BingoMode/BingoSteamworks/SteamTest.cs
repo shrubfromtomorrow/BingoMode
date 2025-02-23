@@ -10,6 +10,8 @@ using UnityEngine;
 
 namespace BingoMode.BingoSteamworks
 {
+    using BingoMenu;
+
     internal class SteamTest
     {
         public static List<SteamNetworkingIdentity> LobbyMembers = new ();
@@ -42,7 +44,7 @@ namespace BingoMode.BingoSteamworks
                 Plugin.logger.LogMessage(selfIdentity.GetSteamID());
             }
 
-            BingoData.globalSettings.lockout = false;
+            BingoData.globalSettings.gamemode = BingoData.BingoGameMode.Bingo;
             BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.None;
             BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.None;
         }
@@ -147,7 +149,7 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "hostID", selfIdentity.GetSteamID64().ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
-            SteamMatchmaking.SetLobbyData(lobbyID, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(lobbyID, "gamemode", ((int)BingoData.globalSettings.gamemode).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
             SteamMatchmaking.SetLobbyData(lobbyID, "banCheats", BingoData.globalSettings.banMods ? "1" : "0");
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
@@ -239,7 +241,9 @@ namespace BingoMode.BingoSteamworks
         public static void FetchLobbySettings()
         {
             Plugin.logger.LogMessage("Setting lobby settings");
-            BingoData.globalSettings.lockout = SteamMatchmaking.GetLobbyData(CurrentLobby, "lockout") == "1";
+            Plugin.logger.LogMessage($"Parsing gamemodes from {SteamMatchmaking.GetLobbyData(CurrentLobby, "gamemode")}");
+            int gamjs = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "gamemode").Trim(), NumberStyles.Any);
+            BingoData.globalSettings.gamemode = (BingoData.BingoGameMode)gamjs;
 
             Plugin.logger.LogMessage("- setting perks burdens");
             Plugin.logger.LogMessage($"Parsing perks from {SteamMatchmaking.GetLobbyData(CurrentLobby, "perks")}");
@@ -480,7 +484,7 @@ namespace BingoMode.BingoSteamworks
 
         public static void UpdateOnlineSettings()
         {
-            SteamMatchmaking.SetLobbyData(CurrentLobby, "lockout", BingoData.globalSettings.lockout ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(CurrentLobby, "gamemode", ((int)BingoData.globalSettings.gamemode).ToString());
             SteamMatchmaking.SetLobbyData(CurrentLobby, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
             SteamMatchmaking.SetLobbyData(CurrentLobby, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(CurrentLobby, "burdens", ((int)BingoData.globalSettings.burdens).ToString());

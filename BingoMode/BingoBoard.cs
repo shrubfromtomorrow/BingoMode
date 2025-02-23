@@ -1,5 +1,5 @@
 ﻿using BingoMode.BingoSteamworks;
-using BingoMode.Challenges;
+using BingoMode.BingoChallenges;
 using Expedition;
 using Menu;
 using RWCustom;
@@ -12,6 +12,8 @@ using UnityEngine;
 
 namespace BingoMode
 {
+    using BingoMenu;
+
     public class BingoBoard
     {
         public ExpeditionCoreFile core;
@@ -90,7 +92,7 @@ namespace BingoMode
         {
             bool won = false;
             currentWinLine = [];
-            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout;
+            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout;
 
             // Vertical lines
             for (int i = 0; i < size; i++)
@@ -251,7 +253,6 @@ namespace BingoMode
             list.AddRange(BingoData.availableBingoChallenges);
             if (type is not BingoHellChallenge) list.RemoveAll(x => x is BingoHellChallenge);
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
-
         resette:
             Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
             if (!ch.ValidForThisSlugcat(ExpeditionData.slugcatPlayer))
@@ -259,7 +260,16 @@ namespace BingoMode
                 list.Remove(ch);
                 goto resette;
             }
-            ch = ch.Generate();
+            try
+            {
+                ch = ch.Generate();
+            }
+            catch (Exception e)
+            {
+                Plugin.logger.LogError("Failed to generate random challenge of type: " + ch.GetType());
+                Plugin.logger.LogError(e);
+                goto resette;
+            }
 
             if (ExpeditionData.challengeList.Count > 0 && type == null && !ignore)
             {
@@ -279,7 +289,7 @@ namespace BingoMode
                 list.Remove(ch);
                 goto resette;
             }
-            if (ch == null) ch = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate(); ;
+            if (ch == null) ch = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate();
             if (!ExpeditionData.challengeList.Contains(ch) && !ignore) ExpeditionData.challengeList.Add(ch);
             return ch;
         }
@@ -496,7 +506,7 @@ namespace BingoMode
                                         break;
                                     case '1':
                                         // If lockout
-                                        if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].lockout)
+                                        if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout)
                                         {
                                             // If its the same team
                                             if (SteamTest.team == k || SteamTest.team == 8 || ch.ReverseChallenge())
