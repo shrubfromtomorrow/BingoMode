@@ -23,7 +23,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.87";
+        public const string VERSION = "0.9";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
@@ -40,14 +40,6 @@ namespace BingoMode
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
-            //On.Player.Update += Player_Update;
-        }
-
-        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-        {
-            orig.Invoke(self, eu);
-
-            RWCustom.Custom.LogImportant(self.bodyChunks[1].pos.ToString());
         }
 
         public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)

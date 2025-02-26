@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using Menu.Remix.MixedUI;
+using Menu.Remix.MixedUI.ValueTypes;
 using UnityEngine;
 
 
@@ -16,6 +17,7 @@ namespace BingoMode
         public readonly Configurable<bool> UseMapInput;
 
         private UIelement[] optionse;
+        private bool greyedOut;
 
         public BingoModOptions(Plugin plugin)
         {
@@ -63,10 +65,15 @@ namespace BingoMode
         public override void Update()
         {
             base.Update();
-            bool greyedOut = UseMapInput.Value;
-
+            Plugin.logger.LogMessage(UseMapInput.Value);
+            
             foreach (var item in Tabs[0].items)
             {
+                if (item is OpCheckBox bock && bock.cfgEntry == UseMapInput)
+                {
+                    greyedOut = bock.GetValueBool();
+                }
+
                 if (item is OpKeyBinder g)
                 {
                     g.greyedOut = greyedOut;

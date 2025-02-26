@@ -107,7 +107,7 @@ namespace BingoMode.BingoMenu
                 gamemode[i].buttonBehav.greyedOut = inLobby && !host;
             }
 
-            labels = new FLabel[3];
+            labels = new FLabel[4];
             for (int i = 0; i < 2; i++)
             {
                 labels[i] = new FLabel(Custom.GetFont(), i == 0 ? "Perks:" : "Burdens:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
@@ -115,6 +115,8 @@ namespace BingoMode.BingoMenu
             }
             labels[2] = new FLabel(Custom.GetFont(), "Max Players: ") { anchorX = 1f, anchorY = 0.5f, color = MenuColor(MenuColors.MediumGrey).rgb };
             pages[0].Container.AddChild(labels[2]);
+            labels[3] = new FLabel(Custom.GetFont(), "Game mode:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
+            pages[0].Container.AddChild(labels[3]);
 
             dividers = new FSprite[2];
             for (int i = 0; i < 2; i++)
@@ -151,9 +153,10 @@ namespace BingoMode.BingoMenu
             if (closing && Math.Abs(currentAlpha - targetAlpha) < 0.09f)
             {
                 pageTitle.RemoveFromContainer();
-                labels[0].RemoveFromContainer();
-                labels[1].RemoveFromContainer();
-                labels[2].RemoveFromContainer();
+                foreach (var lable in labels)
+                {
+                    lable.RemoveFromContainer();
+                }
                 for (int i = 0; i < 2; i++)
                 {
                     dividers[i].RemoveFromContainer();
@@ -183,27 +186,28 @@ namespace BingoMode.BingoMenu
             pageTitle.SetPosition(new Vector2(683f - leftAnchor, 685f) + pagePos);
 
             float xPos = 670f;
-            float yTop = 578f;
-            friendsOnly.pos = new Vector2(xPos, yTop - 30f);
-            banCheats.pos = new Vector2(xPos, yTop - 60f);
-            maxPlayers.pos = new Vector2(xPos, yTop - 95f);
+            float yTop = 528f;
+            friendsOnly.pos = new Vector2(xPos, yTop + 30f);
+            banCheats.pos = new Vector2(xPos, yTop);
+            maxPlayers.pos = new Vector2(xPos, yTop - 35f);
 
             for (int i = 0; i < 3; i++)
             {
                 perks[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 150f);
                 burdens[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 200f);
-                gamemode[i].pos = new Vector2(xPos - 120f + 120f * i, yTop);
+                gamemode[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 100f);
             }
 
             labels[0].SetPosition(pagePos + new Vector2(xPos, yTop - 115f));
             labels[1].SetPosition(pagePos + new Vector2(xPos, yTop - 165f)); 
-            labels[2].SetPosition(pagePos + new Vector2(xPos, yTop - 77f)); 
-            
+            labels[2].SetPosition(pagePos + new Vector2(xPos, yTop - 19f));
+            labels[3].SetPosition(pagePos + new Vector2(xPos, yTop - 65f));
+
             for (int i = 0; i < 2; i++)
             {
                 dividers[i].alpha = darkSprite.alpha;
             }
-            dividers[0].SetPosition(pagePos + new Vector2(xPos, yTop - 100f));
+            dividers[0].SetPosition(pagePos + new Vector2(xPos, yTop - 48f));
             dividers[1].SetPosition(pagePos + new Vector2(xPos, yTop - 215f));
 
             float xxx = inLobby ? 683f - num / 2f : 683f - num - 10f;

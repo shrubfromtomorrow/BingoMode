@@ -426,6 +426,18 @@ namespace BingoMode.BingoChallenges
                     return "Dark Magenta";
                 case "VS":
                     return "Deep Purple";
+                case "OE":
+                    return "Light Purple";
+                case "DM":
+                    return "Light Yellow";
+                case "LC":
+                    return "Deep Green";
+                case "LC_second":
+                    return "Bronze";
+                case "SU_filt":
+                    return "Light Pink";
+                case "MS":
+                    return "Dull Yellow";
             }
 
             return "NULL";
@@ -492,6 +504,7 @@ namespace BingoMode.BingoChallenges
             "CicadaB",
             "GreenLizard",
             "PinkLizard",
+            "Salamander",
             "YellowLizard",
             "BlackLizard",
             "CyanLizard",
@@ -523,7 +536,13 @@ namespace BingoMode.BingoChallenges
             "SI_chat3",
             "SI_chat4",
             "SI_chat5",
-            "VS"
+            "VS",
+            "OE",
+            "LC",
+            "DM",
+            "LC_second",
+            "SU_filt",
+            "MS"
         };
 
         public static readonly string[] CraftableItems =

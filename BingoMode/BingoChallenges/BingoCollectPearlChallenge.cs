@@ -106,7 +106,7 @@ namespace BingoMode.BingoChallenges
                 fromList.Remove("SL_bridge");
                 fromList.Remove("SL_moon");
             }
-            string p = fromList[UnityEngine.Random.Range(0, fromList.Count - (ModManager.MSC ? 0 : 4))];
+            string p = fromList[UnityEngine.Random.Range(0, fromList.Count - (ModManager.MSC ? 6 : 10))];
             BingoCollectPearlChallenge chal = new()
             {
                 specific = new SettingBox<bool>(specifi, "Specific Pearl", 0),

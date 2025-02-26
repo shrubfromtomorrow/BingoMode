@@ -1,20 +1,15 @@
-﻿using System;
+﻿using Expedition;
+using Menu;
+using RWCustom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
-using Expedition;
-using Menu;
-using Menu.Remix;
-using UnityEngine;
-using RWCustom;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode
 {
-    using BingoSteamworks;
     using BingoChallenges;
+    using BingoSteamworks;
     using MoreSlugcats;
     using Steamworks;
 

@@ -407,6 +407,7 @@ namespace BingoMode.BingoSteamworks
                         continue;
                     }
                 }
+                if (ExpeditionGame.playableCharacters.IndexOf(new(SteamMatchmaking.GetLobbyData(lobbyID, "slugcat"))) == -1) continue;
                 JoinableLobbies.Add(lobbyID);
                 //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);

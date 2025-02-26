@@ -306,7 +306,7 @@ namespace BingoMode
             {
                 if (challengeGrid[x, i] != null && (challengeGrid[x, i] as BingoChallenge).ReverseChallenge()) return true;
             }
-            // Horizontal 1 check
+            // Diagonal 1 check
             if (x == y)
             {
                 for (int i = 0; i < size; i++)
@@ -314,7 +314,7 @@ namespace BingoMode
                     if (challengeGrid[i, i] != null && (challengeGrid[i, i] as BingoChallenge).ReverseChallenge()) return true;
                 }
             }
-            // Horizontal 2 check
+            // Diagonal 2 check
             if (size - 1 - y == x)
             {
                 for (int i = 0; i < size; i++)

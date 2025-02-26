@@ -99,7 +99,7 @@ namespace BingoMode.BingoHUD
             hints = []; 
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                cheatsEnabled = true;// SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
+                cheatsEnabled = SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
             }
             GenerateBingoGrid();
             if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen)

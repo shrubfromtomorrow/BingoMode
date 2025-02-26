@@ -621,6 +621,15 @@ namespace BingoMode.BingoMenu
                             return;
                         }
                     }
+
+                    string slug = SteamMatchmaking.GetLobbyData(lobbid, "slugcat");
+                    SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(menu.manager, new SlugcatStats.Name(slug));
+                    if (saveGameData != null)
+                    {
+                        menu.manager.ShowDialog(new InfoDialog(menu.manager, $"You already have a saved game session as {SlugcatStats.getSlugcatName(new(slug))}.\nAre you sure you want to join this lobby?", lobbid));
+                        return;
+                    }
+
                     var call = SteamMatchmaking.JoinLobby(lobbid);
                     SteamTest.lobbyEntered.Set(call, SteamTest.OnLobbyEntered);
                 }
@@ -1065,16 +1074,17 @@ namespace BingoMode.BingoMenu
                     string name = SteamMatchmaking.GetLobbyData(lobby, "name");
                     //int maxPlayers = int.Parse(SteamMatchmaking.GetLobbyData(lobby, "maxPlayers"), System.Globalization.NumberStyles.Any);
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
-                    bool lockout = SteamMatchmaking.GetLobbyData(lobby, "lockout") == "1";
+                    BingoData.BingoGameMode gamemode = (BingoData.BingoGameMode)int.Parse(SteamMatchmaking.GetLobbyData(lobby, "gamemode"), System.Globalization.NumberStyles.Any);
                     bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "banCheats") == "1";
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion");
+                    string slugcat = SteamMatchmaking.GetLobbyData(lobby, "slugcat");
                     Plugin.logger.LogMessage($"Perks: {SteamMatchmaking.GetLobbyData(lobby, "perks").Trim()}");
                     Plugin.logger.LogMessage($"Burdens: {SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim()}");
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Lockout - {lockout}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
-                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, lockout, banCheats, lobbyVersion, perks, burdens));
+                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Gamemode - {gamemode}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
+                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, gamemode, banCheats, lobbyVersion, slugcat, perks, burdens));
                     //Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
                 }
                 catch (System.Exception e)
@@ -1186,9 +1196,10 @@ namespace BingoMode.BingoMenu
             public string name;
             public int maxPlayers;
             public int currentPlayers;
-            public bool lockout;
+            public BingoData.BingoGameMode gamemode;
             public bool banCheats;
             public string version;
+            public string slugcat;
             public AllowUnlocks perks;
             public AllowUnlocks burdens;
             public FLabel nameLabel;
@@ -1198,15 +1209,16 @@ namespace BingoMode.BingoMenu
             BingoPage page;
             public InfoPanel panel;
 
-            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, bool lockout, bool banCheats, string version, AllowUnlocks perks, AllowUnlocks burdens)
+            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, BingoData.BingoGameMode gamemode, bool banCheats, string version, string slugcat, AllowUnlocks perks, AllowUnlocks burdens)
             {
                 this.lobbyID = lobbyID;
                 this.name = name;
                 this.maxPlayers = maxPlayers;
                 this.currentPlayers = currentPlayers;
-                this.lockout = lockout;
+                this.gamemode = gamemode;
                 this.banCheats = banCheats;
                 this.version = version;
+                this.slugcat = slugcat;
                 this.perks = perks;
                 this.burdens = burdens;
                 this.page = page;
@@ -1257,12 +1269,12 @@ namespace BingoMode.BingoMenu
 
             public class InfoPanel
             {
-                public FSprite[] border = new FSprite[4];
+                public FSprite[] border;
                 public FSprite background;
-                public FLabel[] labels = new FLabel[5];
+                public FLabel[] labels;
                 public bool visible;
                 readonly float width = 180f;
-                readonly float height = 80f;
+                readonly float height = 100f;
 
                 public InfoPanel(BingoPage page, LobbyInfo info)
                 {
@@ -1276,6 +1288,8 @@ namespace BingoMode.BingoMenu
                         alpha = 0.9f
                     };
                     page.Container.AddChild(background);
+
+                    border = new FSprite[4];
                     for (int i = 0; i < 2; i++)
                     {
                         border[i] = new FSprite("pixel")
@@ -1300,7 +1314,9 @@ namespace BingoMode.BingoMenu
                         };
                         page.Container.AddChild(border[i]);
                     }
-                    for (int i = 0; i < 5; i++)
+
+                    labels = new FLabel[6];
+                    for (int i = 0; i < labels.Length; i++)
                     {
                         labels[i] = new FLabel(Custom.GetFont(), "")
                         {
@@ -1312,11 +1328,12 @@ namespace BingoMode.BingoMenu
                         page.Container.AddChild(labels[i]);
                     }
 
-                    labels[0].text = "Lockout: " + (info.lockout ? "Yes" : "No");
+                    labels[0].text = "Game mode: " + info.gamemode;
                     labels[1].text = "Mod version: " + info.version;
                     labels[2].text = "Perks: " + (info.perks == AllowUnlocks.Any ? "Allowed" : info.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
                     labels[3].text = "Burdens: " + (info.burdens == AllowUnlocks.Any ? "Allowed" : info.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
-                    labels[4].text = "Banned cheat mods: " + (info.banCheats ? "YES" : "NO");
+                    labels[4].text = "Banned cheat mods: " + (info.banCheats ? "Yes" : "No");
+                    labels[5].text = "Slugcat: " + SlugcatStats.getSlugcatName(new(info.slugcat));
                 }
 
                 public void Draw(Vector2 pos)
@@ -1337,12 +1354,13 @@ namespace BingoMode.BingoMenu
                     border[3].SetPosition(pos + new Vector2(width, 0f));
                     background.SetPosition(pos);
                     float xDif = width / 2f;
-                    float yDif = height / 5f;
-                    labels[0].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 4f));
-                    labels[1].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 3f));
-                    labels[2].SetPosition(pos + new Vector2(xDif, 1.5f + yDif * 2f));
-                    labels[3].SetPosition(pos + new Vector2(xDif, 1.5f + yDif));
-                    labels[4].SetPosition(pos + new Vector2(xDif, 1.5f));
+                    float yDif = height / labels.Length;
+                    labels[0].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f + yDif * 5f));
+                    labels[1].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f + yDif * 4f));
+                    labels[2].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f + yDif * 3f));
+                    labels[3].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f + yDif * 2));
+                    labels[4].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f + yDif));
+                    labels[5].SetPosition(pos + new Vector2(xDif + 0.01f, 1.5f));
                 }
 
                 public void Remove()
