@@ -88,7 +88,7 @@ namespace BingoMode
             }
         }
 
-        public bool CheckWin(int t, bool checkLose = false, List<IntVector2> overrideArray = null) // Checks whether a team won or cant win
+        public bool CheckLose(int t)
         {
             bool won = false;
             currentWinLine = [];
@@ -101,28 +101,19 @@ namespace BingoMode
                 for (int j = 0; j < size; j++)
                 {
                     var ch = challengeGrid[i, j];
-                    if (checkLose)
+                    if ((ch as BingoChallenge).TeamsFailed[t])
                     {
-                        if ((ch as BingoChallenge).TeamsFailed[t])
-                        {
-                            line = false;
-                        }
-                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                        {
-                            line = false;
-                        }
+                        line = false;
                     }
-                    else
+                    if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
                     {
-                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                        line = false;
                     }
-                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && (!lockout || ((ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])) : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!checkLose) Plugin.logger.LogMessage("Vertical win");
                     break;
                 }
                 else currentWinLine.Clear();
@@ -137,28 +128,19 @@ namespace BingoMode
                     for (int j = 0; j < size; j++)
                     {
                         var ch = challengeGrid[j, i];
-                        if (checkLose)
+                        if ((ch as BingoChallenge).TeamsFailed[t])
                         {
-                            if ((ch as BingoChallenge).TeamsFailed[t])
-                            {
-                                line = false;
-                            }
-                            if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                            {
-                                line = false;
-                            }
+                            line = false;
                         }
-                        else
+                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
                         {
-                            line &= (ch as BingoChallenge).TeamsCompleted[t];
+                            line = false;
                         }
-                        //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                         if (line) currentWinLine.Add(new IntVector2(j, i));
                     }
                     won = line;
                     if (won)
                     {
-                        if (!checkLose) Plugin.logger.LogMessage("Horizontal win");
                         break;
                     }
                     else currentWinLine.Clear();
@@ -172,28 +154,19 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[i, i];
-                    if (checkLose)
+                    if ((ch as BingoChallenge).TeamsFailed[t])
                     {
-                        if ((ch as BingoChallenge).TeamsFailed[t])
-                        {
-                            line = false;
-                        }
-                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                        {
-                            line = false;
-                        }
+                        line = false;
                     }
-                    else
+                    if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
                     {
-                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                        line = false;
                     }
-                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!checkLose) Plugin.logger.LogMessage("Diagonal 1 win");
                 }
                 else currentWinLine.Clear();
             }
@@ -205,28 +178,106 @@ namespace BingoMode
                 for (int i = 0; i < size; i++)
                 {
                     var ch = challengeGrid[size - 1 - i, i];
-                    if (checkLose)
+                    if ((ch as BingoChallenge).TeamsFailed[t])
                     {
-                        if ((ch as BingoChallenge).TeamsFailed[t])
-                        {
-                            line = false;
-                        }
-                        if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                        {
-                            line = false;
-                        }
+                        line = false;
                     }
-                    else
+                    if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
                     {
-                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                        line = false;
                     }
-                    //line &= checkLose ? !(ch as BingoChallenge).TeamsFailed[t] && !ch.hidden : (ch as BingoChallenge).TeamsCompleted[t];
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
                 if (won)
                 {
-                    if (!checkLose) Plugin.logger.LogMessage("Diagnoal 2 win");
+                }
+                else currentWinLine.Clear();
+            }
+
+            currentWinLine = [];
+            return won;
+        }
+
+        public bool CheckWin(int t, List<IntVector2> overrideArray = null, int? highestCount = null) // Checks whether a team won or cant win
+        {
+            bool won = false;
+            currentWinLine = [];
+            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout;
+
+            // Vertical lines
+            for (int i = 0; i < size; i++)
+            {
+                bool line = true;
+                for (int j = 0; j < size; j++)
+                {
+                    var ch = challengeGrid[i, j];
+                    line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    if (line) currentWinLine.Add(new IntVector2(i, j));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Vertical win");
+                    break;
+                }
+                else currentWinLine.Clear();
+            }
+
+            // Horizontal lines
+            if (!won)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    bool line = true;
+                    for (int j = 0; j < size; j++)
+                    {
+                        var ch = challengeGrid[j, i];
+                        line &= (ch as BingoChallenge).TeamsCompleted[t];
+                        if (line) currentWinLine.Add(new IntVector2(j, i));
+                    }
+                    won = line;
+                    if (won)
+                    {
+                        Plugin.logger.LogMessage("Horizontal win");
+                        break;
+                    }
+                    else currentWinLine.Clear();
+                }
+            }
+
+            // Diagonal line 1
+            if (!won)
+            {
+                bool line = true;
+                for (int i = 0; i < size; i++)
+                {
+                    var ch = challengeGrid[i, i];
+                    line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    if (line) currentWinLine.Add(new IntVector2(i, i));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Diagonal 1 win");
+                }
+                else currentWinLine.Clear();
+            }
+
+            // Diagonal line 2
+            if (!won)
+            {
+                bool line = true;
+                for (int i = 0; i < size; i++)
+                {
+                    var ch = challengeGrid[size - 1 - i, i];
+                    line &= (ch as BingoChallenge).TeamsCompleted[t];
+                    if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
+                }
+                won = line;
+                if (won)
+                {
+                    Plugin.logger.LogMessage("Diagnoal 2 win");
                 }
                 else currentWinLine.Clear();
             }
@@ -240,6 +291,57 @@ namespace BingoMode
             }
             currentWinLine = [];
             return won;
+        }
+
+        public int CheckMaxTeamSquaresInLine(int t) // wonderful name
+        {
+            int squares = 0;
+
+            // Vertical lines
+            for (int i = 0; i < size; i++)
+            {
+                int tempSquaresV = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    var ch = challengeGrid[i, j];
+                    if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresV++;
+                }
+
+                if (tempSquaresV > squares) squares = tempSquaresV;
+            }
+
+            // Horizontal lines
+            for (int i = 0; i < size; i++)
+            {
+                int tempSquaresH = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    var ch = challengeGrid[j, i];
+                    if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresH++;
+                }
+
+                if (tempSquaresH > squares) squares = tempSquaresH;
+            }
+
+            // Diagonal line 1
+            int tempSquaresD1 = 0;
+            for (int i = 0; i < size; i++)
+            {
+                var ch = challengeGrid[i, i];
+                if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresD1++;
+            }
+            if (tempSquaresD1 > squares) squares = tempSquaresD1;
+
+            // Diagonal line 2
+            int tempSquaresD2 = 0;
+            for (int i = 0; i < size; i++)
+            {
+                var ch = challengeGrid[size - 1 - i, i];
+                if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresD2++;
+            }
+            if (tempSquaresD2 > squares) squares = tempSquaresD2;
+
+            return squares;
         }
 
         public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)

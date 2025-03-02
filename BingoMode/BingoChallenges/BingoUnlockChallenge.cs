@@ -33,12 +33,16 @@ namespace BingoMode.BingoChallenges
         public static UnlockIconData IconDataForUnlock(string unlockName)
         {
             UnlockIconData data = new UnlockIconData();
-            if (AbstractPhysicalObject.AbstractObjectType.values.entries.Contains(unlockName) || CreatureTemplate.Type.values.entries.Contains(unlockName))
+            string unlockIconName = ChallengeUtils.ItemOrCreatureIconName(unlockName);
+            if (unlockIconName != "Futile_White")
             {
                 data.unlockIconName = ChallengeUtils.ItemOrCreatureIconName(unlockName);
                 data.unlockIconColor = ChallengeUtils.ItemOrCreatureIconColor(unlockName);
                 data.iconColor = RainWorld.AntiGold.rgb;
             }
+            //if (AbstractPhysicalObject.AbstractObjectType.values.entries.Contains(unlockName) || CreatureTemplate.Type.values.entries.Contains(unlockName))
+            //{
+            //}
             else if (SlugcatStats.Name.values.entries.Contains(unlockName) || unlockName == "Spearmaster")
             {
                 data.unlockIconName = "Kill_Slugcat";
@@ -51,24 +55,24 @@ namespace BingoMode.BingoChallenges
                 data.unlockIconColor = Color.white;
                 data.iconColor = CollectToken.RedColor.rgb;
             }
-            else if (unlockName == "FireSpear")
-            {
-                data.unlockIconName = "Symbol_FireSpear";
-                data.unlockIconColor = new Color(0.9019608f, 0.05490196f, 0.05490196f);
-                data.iconColor = RainWorld.AntiGold.rgb;
-            }
-            else if (unlockName == "Pearl")
-            {
-                data.unlockIconName = "Symbol_Pearl";
-                data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
-                data.iconColor = RainWorld.AntiGold.rgb;
-            }
-            else if (unlockName == "BigCentipede")
-            {
-                data.unlockIconName = "Kill_Centipede3";
-                data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
-                data.iconColor = RainWorld.AntiGold.rgb;
-            }
+            //else if (unlockName == "FireSpear")
+            //{
+            //    data.unlockIconName = "Symbol_FireSpear";
+            //    data.unlockIconColor = new Color(0.9019608f, 0.05490196f, 0.05490196f);
+            //    data.iconColor = RainWorld.AntiGold.rgb;
+            //}
+            //else if (unlockName == "Pearl")
+            //{
+            //    data.unlockIconName = "Symbol_Pearl";
+            //    data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
+            //    data.iconColor = RainWorld.AntiGold.rgb;
+            //}
+            //else if (unlockName == "BigCentipede")
+            //{
+            //    data.unlockIconName = "Kill_Centipede3";
+            //    data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
+            //    data.iconColor = RainWorld.AntiGold.rgb;
+            //}
             else
             {
                 data.unlockIconName = "";
@@ -95,10 +99,6 @@ namespace BingoMode.BingoChallenges
             int type = UnityEngine.Random.Range(0, ModManager.MSC ? (SlugcatStats.IsSlugcatFromMSC(ExpeditionData.slugcatPlayer) ? 4 : 3) : 2);
             string unl = "ERROR";
 
-            for (int i = 0; i < BingoData.possibleTokens.Length; i++)
-            {
-                Plugin.logger.LogInfo(BingoData.possibleTokens[i].Count);
-            }
             unl = BingoData.possibleTokens[type][UnityEngine.Random.Range(0, BingoData.possibleTokens[type].Count)];
             if (unl.ToLowerInvariant().StartsWith("ms"))
             {

@@ -155,7 +155,7 @@ namespace BingoMode.BingoChallenges
 
         public void DeathPit(Creature c, Player p)
         {
-            if (!deathPit.Value || c == null || game == null || !CritInLocation(c) || revealed || completed) return;
+            if (c.Template.smallCreature || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
             if (starve.Value && !p.Malnourished) return;
             string type = c.abstractCreature.creatureTemplate.type.value;
             bool flag = crit == null || type == crit.Value;
@@ -171,6 +171,7 @@ namespace BingoMode.BingoChallenges
                 {
                     this.CompleteChallenge();
                 }
+                else ChangeValue();
             }
         }
 
@@ -231,7 +232,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoKillChallenge c || (c.crit.Value != crit.Value && c.weapon.Value != weapon.Value && c.starve.Value != starve.Value);
+            return challenge is not BingoKillChallenge c || c.crit.Value != crit.Value || c.weapon.Value != weapon.Value || c.starve.Value != starve.Value;
         }
 
         public override string ToString()

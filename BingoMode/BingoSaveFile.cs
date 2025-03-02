@@ -63,7 +63,9 @@ namespace BingoMode
                     "#" +
                     (saveData.passageUsed ? "1" : "0") +
                     "#" +
-                    saveData.teamsInBingo;
+                    saveData.teamsInBingo +
+                    "#" +
+                    (saveData.songPlayed ? "1" : "0");
                 }
                 else
                 {
@@ -152,10 +154,11 @@ namespace BingoMode
                         bool firstCycleSaved = array2[8] == "1";
                         bool passageUsed = array2[9] == "1";
                         string teamsInBingo = array2[10];
+                        bool songPlayed = array2[11] == "1";
 
-                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}, TeamsInBingo={teamsInBingo}");
+                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}, TeamsInBingo={teamsInBingo}, SongPlayed={songPlayed}");
 
-                        BingoData.BingoSaves.Add(slug, new(size, team, hostIdentity, isHost, array2[5], gamemode, showedWin, firstCycleSaved, passageUsed, teamsInBingo));
+                        BingoData.BingoSaves.Add(slug, new(size, team, hostIdentity, isHost, array2[5], gamemode, showedWin, firstCycleSaved, passageUsed, teamsInBingo, songPlayed));
                     }
                     else
                     {

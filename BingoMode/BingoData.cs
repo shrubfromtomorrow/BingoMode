@@ -56,6 +56,7 @@ namespace BingoMode
             public bool firstCycleSaved;
             public bool passageUsed;
             public string teamsInBingo;
+            public bool songPlayed;
 
             public BingoSaveData(int size, bool showedWin, int team, bool firstCycleSaved, bool passageUsed)
             {
@@ -66,7 +67,7 @@ namespace BingoMode
                 this.passageUsed = passageUsed;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, BingoGameMode gamemode, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, BingoGameMode gamemode, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo, bool songPlayed)
             {
                 this.size = size;
                 this.team = team;
@@ -78,6 +79,7 @@ namespace BingoMode
                 this.firstCycleSaved = firstCycleSaved;
                 this.passageUsed = passageUsed;
                 this.teamsInBingo = teamsInBingo;
+                this.songPlayed = songPlayed;
             }
         }
 
@@ -142,93 +144,6 @@ namespace BingoMode
             BingoMode = false;
             Expedition.Expedition.coreFile.Save(false);
         }
-
-        // Mostly taken from vanilla game
-        //public static string RandomBingoDen(SlugcatStats.Name slug)
-        //{
-        //    Plugin.logger.LogMessage($"Getting bingo den! - {BingoDen}");
-        //    if (BingoDen.Trim().ToLowerInvariant() != "random") return BingoDen;
-        //
-        //    List<string> bannedRegions = [];
-        //    foreach (Challenge ch in ExpeditionData.challengeList)
-        //    {
-        //        if (ch is BingoAllRegionsExcept a)
-        //        {
-        //            bannedRegions.Add(a.region.Value);
-        //        }
-        //        else if (ch is BingoNoRegionChallenge b)
-        //        {
-        //            bannedRegions.Add(b.region.Value);
-        //        }
-        //    }
-        //
-        //    Dictionary<string, int> dictionary = [];
-        //    Dictionary<string, List<string>> dictionary2 = [];
-        //    List<string> list2 = SlugcatStats.SlugcatStoryRegions(slug);
-        //    if (File.Exists(AssetManager.ResolveFilePath("randomstarts.txt")))
-        //    {
-        //        string[] array = File.ReadAllLines(AssetManager.ResolveFilePath("randomstarts.txt"));
-        //        for (int i = 0; i < array.Length; i++)
-        //        {
-        //            if (!array[i].StartsWith("//") && array[i].Length > 0)
-        //            {
-        //                string text = Regex.Split(array[i], "_")[0];
-        //                if (ExpeditionGame.lastRandomRegion != text && !bannedRegions.Contains(text))
-        //                {
-        //                    if (!dictionary2.ContainsKey(text))
-        //                    {
-        //                        dictionary2.Add(text, new List<string>());
-        //                    }
-        //                    if (list2.Contains(text))
-        //                    {
-        //                        dictionary2[text].Add(array[i]);
-        //                    }
-        //                    else if (ModManager.MSC && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow))
-        //                    {
-        //                        if (text == "OE" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Gourmand))
-        //                        {
-        //                            dictionary2[text].Add(array[i]);
-        //                        }
-        //                        if (text == "LC" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Artificer))
-        //                        {
-        //                            dictionary2[text].Add(array[i]);
-        //                        }
-        //                        if (text == "MS" && ExpeditionGame.unlockedExpeditionSlugcats.Contains(MoreSlugcatsEnums.SlugcatStatsName.Rivulet) && array[i] != "MS_S07")
-        //                        {
-        //                            dictionary2[text].Add(array[i]);
-        //                        }
-        //                    }
-        //
-        //                    if (dictionary2[text].Contains(array[i]) && !dictionary.ContainsKey(text))
-        //                    {
-        //                        dictionary.Add(text, ExpeditionGame.GetRegionWeight(text));
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        System.Random random = new();
-        //        int maxValue = dictionary.Values.Sum();
-        //        int randomIndex = random.Next(0, maxValue);
-        //        string key = dictionary.First(delegate (KeyValuePair<string, int> x)
-        //        {
-        //            randomIndex -= x.Value;
-        //            return randomIndex < 0;
-        //        }).Key;
-        //        ExpeditionGame.lastRandomRegion = key;
-        //        int num = (from list in dictionary2.Values
-        //                   select list.Count).Sum();
-        //        string text2 = dictionary2[key].ElementAt(UnityEngine.Random.Range(0, dictionary2[key].Count - 1));
-        //        ExpLog.Log(string.Format("{0} | {1} valid regions for {2} with {3} possible dens", new object[]
-        //        {
-        //            text2,
-        //            dictionary.Keys.Count,
-        //            slug.value,
-        //            num
-        //        }));
-        //        return text2;
-        //    }
-        //    return "SU_S01";
-        //}
 
         public static void HookAll(IEnumerable<Challenge> challenges, bool add)
         {

@@ -23,7 +23,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.9";
+        public const string VERSION = "0.91";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
@@ -87,6 +87,9 @@ namespace BingoMode
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
                 MachineConnector.SetRegisteredOI("nacu.bingomode", PluginInstance.BingoConfig);
+                
+                try { Console.RegisterCommands(); }
+                catch { }
             }
         }
 

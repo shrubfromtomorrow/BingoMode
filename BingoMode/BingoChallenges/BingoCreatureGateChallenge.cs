@@ -42,7 +42,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCreatureGateChallenge g || g.crit.Value != crit.Value;
+            return challenge is not BingoCreatureGateChallenge g || (g.crit.Value != crit.Value && !(g.crit.Value.Contains("Cicada") && crit.Value.Contains("Cicada")));
         }
 
         public override string ChallengeName()

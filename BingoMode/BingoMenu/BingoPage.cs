@@ -63,7 +63,6 @@ namespace BingoMode.BingoMenu
         public float lastLobbySlideIn;
         public float slideStep;
         public bool fromContinueGame;
-        public bool spectatorMode;
 
         public static readonly float desaturara = 0.1f;
         public static readonly Color[] TEAM_COLOR =
@@ -91,7 +90,7 @@ namespace BingoMode.BingoMenu
                 case 5: return "Cyan";
                 case 6: return "Black";
                 case 7: return "Hurricane";
-                case 8: return "Spectator";
+                case 8: return "Board view";
             }
             return "Change";
         }
@@ -108,19 +107,10 @@ namespace BingoMode.BingoMenu
                 case "Cyan": return 5;
                 case "Black": return 6;
                 case "Hurricane": return 7;
-                case "Spectator": return 8;
+                case "Board view": return 8;
             }
             return 0;
         }
-
-        public static readonly string[] BANNED_MOD_IDS =
-        {
-            "devtools",
-            "slime-cubed.devconsole",
-            "fyre.BeastMaster",
-            "warp",
-            "maxi-mol.mousedrag"
-        };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -374,6 +364,7 @@ namespace BingoMode.BingoMenu
                 }
                 expMenu.UpdatePage(1);
                 expMenu.MovePage(new Vector2(-1500f, 0f));
+                if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && expMenu.manager.musicPlayer != null) expMenu.manager.musicPlayer.FadeOutAllSongs(50f);
                 return;
             }
 
@@ -494,7 +485,7 @@ namespace BingoMode.BingoMenu
                         InnerWorkings.SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
                     }
 
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.gamemode, false, false, false, BingoData.TeamsListToString(BingoData.TeamsInBingo));
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.gamemode, false, false, false, BingoData.TeamsListToString(BingoData.TeamsInBingo), false);
                     BingoData.RandomStartingSeed = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "randomSeed"), System.Globalization.NumberStyles.Any);
                 }
                 else
@@ -555,11 +546,7 @@ namespace BingoMode.BingoMenu
                     InnerWorkings.SendMessage("g" + SteamTest.selfIdentity.GetSteamID64(), player);
                 }
                 SteamTest.LeaveLobby();
-                if (spectatorMode)
-                {
-                    expMenu.exitButton.buttonBehav.greyedOut = false;
-                    expMenu.exitButton.Clicked();
-                }
+                SteamTest.GetJoinableLobbies();
                 return;
             }
 
@@ -607,17 +594,34 @@ namespace BingoMode.BingoMenu
                         menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same Bingo mod version as the lobby.\nYour version: {Plugin.VERSION} Lobby version: {lobbyVersion}"));
                         return;
                     }
-                    if (SteamMatchmaking.GetLobbyData(lobbid, "banCheats") == "1")
+                    string hostRequiredMods = SteamMatchmaking.GetLobbyData(lobbid, "hostMods");
+                    if (hostRequiredMods != "none")
                     {
-                        List<string> totallyevilmods = [];
+                        List<string> modStrings = Regex.Split(hostRequiredMods, "<bMd>").ToList();
+                        Plugin.logger.LogWarning("Examining " + modStrings);
+                        Dictionary<string, string> requiredMods = [];
+                        foreach (string m in modStrings)
+                        {
+                            Plugin.logger.LogWarning(m);
+                            string[] idAndName = m.Split('|');
+                            requiredMods.Add(idAndName[0], idAndName[1]);
+                        }
+                        bool tooManyMods = false;
+
                         foreach (var mod in ModManager.ActiveMods)
                         {
-                            if (BANNED_MOD_IDS.Contains(mod.id)) totallyevilmods.Add(mod.id);
+                            if (requiredMods.Keys.Count == 0)
+                            {
+                                tooManyMods = true;
+                                break;
+                            }
+
+                            if (requiredMods.ContainsKey(mod.id)) requiredMods.Remove(mod.id);
                         }
 
-                        if (totallyevilmods.Count > 0)
+                        if (tooManyMods || requiredMods.Count > 0)
                         {
-                            menu.manager.ShowDialog(new InfoDialog(menu.manager, "Please disable the following mods if you wish to join this lobby:\n-" + string.Join("\n- ", totallyevilmods)));
+                            menu.manager.ShowDialog(new InfoDialog(menu.manager, (tooManyMods ? "TOO MANY" : "TOO LITTLE") + " Please have only these mods enabled if you wish to join this lobby:\n-" + string.Join("\n- ", requiredMods.Values)));
                             return;
                         }
                     }
@@ -975,6 +979,10 @@ namespace BingoMode.BingoMenu
                     bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.burdens == AllowUnlocks.Inherited && !isHost);
                 }
             }
+            foreach (var bur in unlockDialog.burdenButtons)
+            {
+                if (bur.signalText == "bur-doomed") bur.buttonBehav.greyedOut = true;
+            }
             menu.manager.ShowDialog(unlockDialog);
         }
 
@@ -1075,7 +1083,7 @@ namespace BingoMode.BingoMenu
                     //int maxPlayers = int.Parse(SteamMatchmaking.GetLobbyData(lobby, "maxPlayers"), System.Globalization.NumberStyles.Any);
                     int currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby);
                     BingoData.BingoGameMode gamemode = (BingoData.BingoGameMode)int.Parse(SteamMatchmaking.GetLobbyData(lobby, "gamemode"), System.Globalization.NumberStyles.Any);
-                    bool banCheats = SteamMatchmaking.GetLobbyData(lobby, "banCheats") == "1";
+                    bool hostMods = SteamMatchmaking.GetLobbyData(lobby, "hostMods") != "none";
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion");
                     string slugcat = SteamMatchmaking.GetLobbyData(lobby, "slugcat");
                     Plugin.logger.LogMessage($"Perks: {SteamMatchmaking.GetLobbyData(lobby, "perks").Trim()}");
@@ -1083,8 +1091,8 @@ namespace BingoMode.BingoMenu
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Gamemode - {gamemode}, Ban Cheats - {banCheats}, Perks - {perks}, Burdens - {burdens}");
-                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, gamemode, banCheats, lobbyVersion, slugcat, perks, burdens));
+                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Gamemode - {gamemode}, Require host mods - {hostMods}, Perks - {perks}, Burdens - {burdens}");
+                    foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, gamemode, hostMods, lobbyVersion, slugcat, perks, burdens));
                     //Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
                 }
                 catch (System.Exception e)
@@ -1197,7 +1205,7 @@ namespace BingoMode.BingoMenu
             public int maxPlayers;
             public int currentPlayers;
             public BingoData.BingoGameMode gamemode;
-            public bool banCheats;
+            public bool hostMods;
             public string version;
             public string slugcat;
             public AllowUnlocks perks;
@@ -1209,14 +1217,14 @@ namespace BingoMode.BingoMenu
             BingoPage page;
             public InfoPanel panel;
 
-            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, BingoData.BingoGameMode gamemode, bool banCheats, string version, string slugcat, AllowUnlocks perks, AllowUnlocks burdens)
+            public LobbyInfo(BingoPage page, CSteamID lobbyID, string name, int maxPlayers, int currentPlayers, BingoData.BingoGameMode gamemode, bool hostMods, string version, string slugcat, AllowUnlocks perks, AllowUnlocks burdens)
             {
                 this.lobbyID = lobbyID;
                 this.name = name;
                 this.maxPlayers = maxPlayers;
                 this.currentPlayers = currentPlayers;
                 this.gamemode = gamemode;
-                this.banCheats = banCheats;
+                this.hostMods = hostMods;
                 this.version = version;
                 this.slugcat = slugcat;
                 this.perks = perks;
@@ -1332,7 +1340,7 @@ namespace BingoMode.BingoMenu
                     labels[1].text = "Mod version: " + info.version;
                     labels[2].text = "Perks: " + (info.perks == AllowUnlocks.Any ? "Allowed" : info.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
                     labels[3].text = "Burdens: " + (info.burdens == AllowUnlocks.Any ? "Allowed" : info.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
-                    labels[4].text = "Banned cheat mods: " + (info.banCheats ? "Yes" : "No");
+                    labels[4].text = "Require host's mods: " + (info.hostMods ? "Yes" : "No");
                     labels[5].text = "Slugcat: " + SlugcatStats.getSlugcatName(new(info.slugcat));
                 }
 

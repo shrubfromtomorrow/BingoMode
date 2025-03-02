@@ -13,7 +13,7 @@
         public bool friendsOnly;
         public AllowUnlocks perks;
         public AllowUnlocks burdens;
-        public bool banMods; //Ids
+        public bool hostMods;
 
         public LobbySettings()
         {
@@ -24,7 +24,7 @@
             gamemode = BingoData.BingoGameMode.Bingo;
             perks = AllowUnlocks.Any;
             burdens = AllowUnlocks.Any;
-            banMods = false;
+            hostMods = false;
         }
     }
 }

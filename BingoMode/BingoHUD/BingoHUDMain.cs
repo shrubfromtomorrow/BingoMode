@@ -187,7 +187,7 @@ namespace BingoMode.BingoHUD
 
                     case BingoCompleteReason.Bingo:
                         List<IntVector2> winCoords = [];
-                        BingoHooks.GlobalBoard.CheckWin(endGameInfo.teams[0], false, winCoords);
+                        BingoHooks.GlobalBoard.CheckWin(endGameInfo.teams[0], winCoords);
                         foreach (var g in winCoords)
                         {
                             completeQueue.Add(grid[g.x, g.y]);
@@ -241,9 +241,11 @@ namespace BingoMode.BingoHUD
             string addText = "Exit the game to end the bingo session.";
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
+            bool doDangerMusic = Plugin.PluginInstance.BingoConfig.PlayDangerSong.Value;
 
             if (isMultiplayer)
             {
+                bool songAlreadyPlayed = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed;
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                 {
                     addText = "Exit the game or wait for host to end the session.";
@@ -258,10 +260,17 @@ namespace BingoMode.BingoHUD
                     case BingoData.BingoGameMode.Bingo:
                         foreach (int t in teamsInBingo)
                         {
-                            if (BingoHooks.GlobalBoard.CheckWin(t, false))
+                            if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
                                 Plugin.logger.LogMessage($"Team {t} won!");
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
+                            }
+
+                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLine(t) == grid.GetLength(0) - 1)
+                            {
+                                BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
+                                BingoSaveFile.Save();
                             }
                         }
                         break;
@@ -273,13 +282,13 @@ namespace BingoMode.BingoHUD
                         foreach (int t in teamsInBingo)
                         {
                             teamsLost.Add(t, false);
-                            if (!BingoHooks.GlobalBoard.CheckWin(t, true)) teamsLost[t] = true;
+                            if (!BingoHooks.GlobalBoard.CheckLose(t)) teamsLost[t] = true;
                         }
 
                         foreach (int t in teamsInBingo)
                         {
                             // Bingo wins
-                            if (BingoHooks.GlobalBoard.CheckWin(t, false))
+                            if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
                                 Plugin.logger.LogMessage($"Team {t} won!");
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
@@ -360,18 +369,39 @@ namespace BingoMode.BingoHUD
                         {
                             return new BingoCompleteInfo(tieTeams, "We have a tie!", addText, BingoCompleteReason.Tie);
                         }
+
+                        foreach (int t in teamsInBingo)
+                        {
+                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && (BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLine(t) == grid.GetLength(0) - 1 || completedForTeam[t] > majorityMargin - 3))
+                            {
+                                BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
+                                BingoSaveFile.Save();
+                            }
+                        }
                         break;
                     case BingoData.BingoGameMode.Blackout:
                         foreach (int t in teamsInBingo)
                         {
                             bool won = true;
+                            int squareCount = 0;
                             foreach (var ch in ExpeditionData.challengeList)
                             {
                                 BingoChallenge challenge = ch as BingoChallenge;
-                                if (challenge.TeamsCompleted[t]) continue;
+                                if (challenge.TeamsCompleted[t])
+                                {
+                                    squareCount++;
+
+                                    if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && squareCount > (grid.GetLength(0) * grid.GetLength(0) - 2))
+                                    {
+                                        BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                                        BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
+                                        BingoSaveFile.Save();
+                                    }
+                                    continue;
+                                }
 
                                 won = false;
-                                break;
                             }
 
                             if (won)
@@ -385,7 +415,7 @@ namespace BingoMode.BingoHUD
             }
             else // Singleplayer only has a one bingo win condition
             {
-                if (BingoHooks.GlobalBoard.CheckWin(SteamTest.team, false))
+                if (BingoHooks.GlobalBoard.CheckWin(SteamTest.team))
                 {
                     Plugin.logger.LogMessage($"Team {SteamTest.team} won!");
                     return new BingoCompleteInfo([SteamTest.team], "You won!", addText, BingoCompleteReason.Bingo);
@@ -444,7 +474,7 @@ namespace BingoMode.BingoHUD
                 foreach (int t in teamsInBingo)
                 {
                     // Bingo wins
-                    if (BingoHooks.GlobalBoard.CheckWin(t, false))
+                    if (BingoHooks.GlobalBoard.CheckWin(t))
                     {
                         Plugin.logger.LogMessage($"Team {t} won!");
                         //Custom.rainWorld.processManager.RequestMainProcessSwitch(BingoEnums.BingoWinScreen);
@@ -535,7 +565,6 @@ namespace BingoMode.BingoHUD
                     if (p.input[0].mp && !p.input[1].mp)
                     {
                         Toggled = !Toggled;
-                        Cursor.visible = Toggled;
                     }
                 }
                 else if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen || hud.owner.GetOwnerType() == HUD.HUD.OwnerType.DeathScreen)
@@ -760,7 +789,7 @@ namespace BingoMode.BingoHUD
 
             Vector2 random = Custom.RNV() * textShake * 7f;
             bingoCompleteTitle.SetPosition(new Vector2(hud.rainWorld.screenSize.x * 0.5f, hud.rainWorld.screenSize.y * 0.93f) + Custom.RNV() * textShake * 8f);
-            bingoCompleteInfo.SetPosition(new Vector2(hud.rainWorld.screenSize.x * 0.5f, hud.rainWorld.screenSize.y * 0.84f) + Custom.RNV() * textShake * 6f);
+            bingoCompleteInfo.SetPosition(new Vector2(hud.rainWorld.screenSize.x * 0.5f + 0.01f, hud.rainWorld.screenSize.y * 0.84f + 0.01f) + Custom.RNV() * textShake * 6f);
             bingoCompleteInfoShadow.SetPosition(bingoCompleteInfo.GetPosition() + new Vector2(2f, 2f));
             bingoCompleteInfo.color = Color.Lerp(Color.white, colorToFadeTo, Mathf.Abs(Mathf.Sin(sinCounter * Mathf.PI)));
 
@@ -1084,29 +1113,34 @@ namespace BingoMode.BingoHUD
                 if (!g2 && challenge.revealed)
                 {
                     borderColors = [baseBorderColor, BingoPage.TEAM_COLOR[SteamTest.team]];
-                    borderColorIndex1 = 0;
-                    borderColorIndex2 = 1;
+                }
+                if (g2)
+                {
+                    borderColors.Remove(BingoPage.TEAM_COLOR[SteamTest.team]);
+                    borderColors.Insert(1, BingoPage.TEAM_COLOR[SteamTest.team]);
                 }
                 if (g && SteamTest.team == 8) borderColors.Remove(baseBorderColor);
                 showBG = !g;
-                sinCounter = Random.value;
+                borderColorIndex1 = 0;
+                borderColorIndex2 = 1;
+                sinCounter = 1f;
             }
 
             public void ShiftBorderColors()
             {
                 bool skipSecond = borderColorIndex1 == borderColorIndex2;
 
-                borderColorIndex2 += 1;
-                if (borderColorIndex2 >= borderColors.Count)
-                {
-                    borderColorIndex2 = 0;
-                }
-
-                if (skipSecond) return;
                 borderColorIndex1 += 1;
                 if (borderColorIndex1 >= borderColors.Count)
                 {
                     borderColorIndex1 = 0;
+                }
+
+                if (skipSecond) return;
+                borderColorIndex2 += 1;
+                if (borderColorIndex2 >= borderColors.Count)
+                {
+                    borderColorIndex2 = 0;
                 }
             }
 
@@ -1437,12 +1471,18 @@ namespace BingoMode.BingoHUD
                                 //{
                                 //    p.room.AddObject(new CollectToken.TokenSpark(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (30f + 10f * Random.value), BingoPage.TEAM_COLOR[teamResponsible], false));
                                 //}
-                                if (!(challenge as BingoChallenge).TeamsCompleted[SteamTest.team]) continue;
+                                if (!(challenge as BingoChallenge).TeamsCompleted[SteamTest.team] || teamResponsible != SteamTest.team) continue;
                                 for (int e = 0; e < Random.Range(7, 15) + (context == AnimationContext.BingoLast ? 10 : 0); e++)
                                 {
                                     p.room.AddObject(new Confetti(pos + cam.CamPos(cam.currentCameraPosition) + new Vector2(18f, 18f), Custom.RNV() * (15f + 10f * Random.value + (context == AnimationContext.BingoLast ? 8f : 0f)), BingoPage.TEAM_COLOR[SteamTest.team], BingoPage.TEAM_COLOR[SteamTest.team]));
                                 }
                             }
+                        }
+
+                        if (Plugin.PluginInstance.BingoConfig.PlayEndingSong.Value && context == AnimationContext.BingoLast && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null)
+                        {
+                            Custom.rainWorld.processManager.musicPlayer.FadeOutAllSongs(10f);
+                            BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Blithely Beached");
                         }
                     }
                 }

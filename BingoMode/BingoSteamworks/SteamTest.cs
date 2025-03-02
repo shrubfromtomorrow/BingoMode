@@ -124,6 +124,20 @@ namespace BingoMode.BingoSteamworks
             Plugin.logger.LogMessage("Accepted session with " + callback.m_identityRemote.GetSteamID64());
         }
 
+        private static string ActiveModsToString()
+        {
+            string text = "";
+
+            foreach (var mod in ModManager.ActiveMods)
+            {
+                text += mod.id += "|" + mod.name + "<bMd>";
+            }
+
+            if (!string.IsNullOrEmpty(text)) text = text.Substring(0, text.Length - 5);
+            Plugin.logger.LogWarning("ACTIVE MODS: " + text);
+            return text;
+        }
+
         public static void OnLobbyCreated(LobbyCreated_t result, bool bIOFailure)
         {
             if (bIOFailure) { Plugin.logger.LogError("OnLobbyCreated bIOfailure"); return; }
@@ -150,7 +164,7 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
             SteamMatchmaking.SetLobbyData(lobbyID, "gamemode", ((int)BingoData.globalSettings.gamemode).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "friendsOnly", BingoData.globalSettings.friendsOnly ? "1" : "0");
-            SteamMatchmaking.SetLobbyData(lobbyID, "banCheats", BingoData.globalSettings.banMods ? "1" : "0");
+            SteamMatchmaking.SetLobbyData(lobbyID, "hostMods", BingoData.globalSettings.hostMods ? ActiveModsToString() : "none");
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());

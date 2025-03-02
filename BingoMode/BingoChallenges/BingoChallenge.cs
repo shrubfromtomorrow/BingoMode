@@ -193,7 +193,7 @@ namespace BingoMode.BingoChallenges
                     }
                 }
             }
-            if (this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
+            if (team == SteamTest.team && this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
 
             BingoSaveFile.Save();
         }

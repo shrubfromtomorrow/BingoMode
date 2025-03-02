@@ -1473,8 +1473,6 @@ namespace BingoMode.BingoChallenges
                 x => x.MatchLdsfld("ModManager", "Expedition")
                 ))
             {
-                Plugin.logger.LogMessage(c.Prev);
-
                 c.Emit(OpCodes.Ldarg_0);
                 c.Emit(OpCodes.Ldloc, 23);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
@@ -1566,7 +1564,6 @@ namespace BingoMode.BingoChallenges
             else Plugin.logger.LogError("Room_LoadedHalcyon 2 FAILURE " + il);
         }
 
-        // Register food for the eat food challenge if its on
         public static void Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
         {
             orig.Invoke(self, edible);

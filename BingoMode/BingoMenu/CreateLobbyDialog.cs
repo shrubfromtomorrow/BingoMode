@@ -24,7 +24,7 @@ namespace BingoMode.BingoMenu
         SimpleButton createButton;
         CheckBox[] gamemode;
         CheckBox friendsOnly;
-        CheckBox banCheats;
+        CheckBox hostMods;
         CheckBox[] perks;
         CheckBox[] burdens;
         FLabel[] labels;
@@ -69,10 +69,10 @@ namespace BingoMode.BingoMenu
             friendsOnly.label.label.alignment = FLabelAlignment.Right;
             friendsOnly.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(friendsOnly);
-            banCheats = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Ban cheat mods: ", "CHEATS");
-            banCheats.label.label.alignment = FLabelAlignment.Right;
-            banCheats.buttonBehav.greyedOut = inLobby && !host;
-            pages[0].subObjects.Add(banCheats);
+            hostMods = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Require host's mods: ", "HOSTMODS");
+            hostMods.label.label.alignment = FLabelAlignment.Right;
+            hostMods.buttonBehav.greyedOut = inLobby && !host;
+            pages[0].subObjects.Add(hostMods);
 
             menuTabWrapper = new MenuTabWrapper(this, pages[0]);
             pages[0].subObjects.Add(menuTabWrapper);
@@ -188,7 +188,7 @@ namespace BingoMode.BingoMenu
             float xPos = 670f;
             float yTop = 528f;
             friendsOnly.pos = new Vector2(xPos, yTop + 30f);
-            banCheats.pos = new Vector2(xPos, yTop);
+            hostMods.pos = new Vector2(xPos, yTop);
             maxPlayers.pos = new Vector2(xPos, yTop - 35f);
 
             for (int i = 0; i < 3; i++)
@@ -283,8 +283,8 @@ namespace BingoMode.BingoMenu
             {
                 case "FRIENDS":
                     return BingoData.globalSettings.friendsOnly;
-                case "CHEATS":
-                    return BingoData.globalSettings.banMods;
+                case "HOSTMODS":
+                    return BingoData.globalSettings.hostMods;
             }
             return false;
         }
@@ -345,8 +345,8 @@ namespace BingoMode.BingoMenu
                 case "FRIENDS":
                     BingoData.globalSettings.friendsOnly = c;
                     break;
-                case "CHEATS":
-                    BingoData.globalSettings.banMods = c;
+                case "HOSTMODS":
+                    BingoData.globalSettings.hostMods = c;
                     break;
             }
         }

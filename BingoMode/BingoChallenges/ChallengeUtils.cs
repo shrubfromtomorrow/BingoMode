@@ -76,23 +76,46 @@ namespace BingoMode.BingoChallenges
 
         public static string ItemOrCreatureIconName(string thing)
         {
-            string elementName = ItemSymbol.SpriteNameForItem(new(thing, false), 0);
+            int data = GetIconIntData(thing);
+            thing = GetIconType(thing);
+            string elementName = ItemSymbol.SpriteNameForItem(new(thing, false), data);
             if (elementName == "Futile_White")
             {
-                elementName = CreatureSymbol.SpriteNameOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, 0));
+                elementName = CreatureSymbol.SpriteNameOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, data));
             }
             return elementName;
         }
 
         public static Color ItemOrCreatureIconColor(string thing)
         {
-            Color color = ItemSymbol.ColorForItem(new(thing, false), 0);
+            int data = GetIconIntData(thing);
+            thing = GetIconType(thing);
+            Color color = ItemSymbol.ColorForItem(new(thing, false), data);
             if (color == Menu.Menu.MenuRGB(Menu.Menu.MenuColors.MediumGrey))
             {
-                color = CreatureSymbol.ColorOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, 0));
+                color = CreatureSymbol.ColorOfCreature(new IconSymbol.IconSymbolData(new CreatureType(thing, false), ItemType.Creature, data));
             }
             return color;
         }
+
+        private static int GetIconIntData(string thing) => thing switch
+        {
+            "Centipede" => 2,
+            "BigCentipede" => 3,
+            "FireSpear" => 1,
+            "ElectricSpear" => 2,
+            "HellSpear" => 3,
+            _ => 0
+        };
+
+        private static string GetIconType(string thing) => thing switch
+        {
+            "BigCentipede" => "Centipede",
+            "FireSpear" => "Spear",
+            "ElectricSpear" => "Spear",
+            "HellSpear" => "Spear",
+            _ => thing
+        };
 
         public static string[] GetCorrectListForChallenge(string listName)
         {
@@ -177,6 +200,7 @@ namespace BingoMode.BingoChallenges
             creatureNames[(int)CreatureType.VultureGrub] = ChallengeTools.IGT.Translate("Vulture Grubs");
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
             creatureNames[(int)CreatureType.Salamander] = ChallengeTools.IGT.Translate("Salamanders");
+            creatureNames[(int)CreatureType.Spider] = ChallengeTools.IGT.Translate("Coalescipedes");
             if (ModManager.MSC) creatureNames[(int)MoreSlugcatsEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
         }
 

@@ -247,7 +247,7 @@ namespace BingoMode.BingoSteamworks
                 }
                 if (b) break;
             }
-            InnerWorkings.SendMessage($"{(failed ? "^" : "#")}{x};{y};{SteamTest.team};{SteamTest.selfIdentity.GetSteamID64()}", GetHost());
+            InnerWorkings.SendMessage($"{(failed ? "^" : "#")}{x};{y};{SteamTest.team}", GetHost()); //;{SteamTest.selfIdentity.GetSteamID64()}
         }
 
         public static void BroadcastCurrentBoardState()

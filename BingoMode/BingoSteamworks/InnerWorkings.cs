@@ -38,7 +38,7 @@ namespace BingoMode.BingoSteamworks
             {
                 // Complete a challenge on the bingo board, based on given int coordinates
                 case '#':
-                    if (data.Length != 4)
+                    if (data.Length != 3)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         break;
@@ -47,19 +47,26 @@ namespace BingoMode.BingoSteamworks
                     int x = int.Parse(data[0], System.Globalization.NumberStyles.Any);
                     int y = int.Parse(data[1], System.Globalization.NumberStyles.Any);
                     int teamCredit = int.Parse(data[2], System.Globalization.NumberStyles.Any);
-                    ulong playerCredit = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
+                    //ulong playerCredit = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
 
                     if (x != -1 && y != -1)
                     {
                         Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
+                        BingoChallenge ch = (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge);
                         if (SteamTest.team != 8 &&
                             BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
-                            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout && 
-                            teamCredit != SteamTest.team)
+                            BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout)
                         {
-                            (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeLockedOut(teamCredit);
+                            if (!ch.TeamsCompleted.Any(x => x == true)) 
+                            {
+                                if (teamCredit != SteamTest.team)
+                                {
+                                    ch.OnChallengeLockedOut(teamCredit);
+                                }
+                                else ch.OnChallengeCompleted(teamCredit);
+                            }
                         }
-                        else (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).OnChallengeCompleted(teamCredit);
+                        else ch.OnChallengeCompleted(teamCredit);
 
                         SteamFinal.BroadcastCurrentBoardState();
                         break;
@@ -72,7 +79,7 @@ namespace BingoMode.BingoSteamworks
 
                 // Fail a challenge on the bingo board, based on given int coordinates
                 case '^':
-                    if (data.Length != 4)
+                    if (data.Length != 3)
                     {
                         Plugin.logger.LogError("INVALID LENGTH OF REQUESTED MESSAGE: " + message);
                         break;
@@ -81,7 +88,7 @@ namespace BingoMode.BingoSteamworks
                     int xx = int.Parse(data[0], System.Globalization.NumberStyles.Any);
                     int yy = int.Parse(data[1], System.Globalization.NumberStyles.Any);
                     int teamCredit2 = int.Parse(data[2], System.Globalization.NumberStyles.Any);
-                    ulong playerCredit2 = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
+                    //ulong playerCredit2 = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
                     if (xx != -1 && yy != -1)
                     {
                         Plugin.logger.LogMessage($"Failing online challenge at {xx}, {yy}");

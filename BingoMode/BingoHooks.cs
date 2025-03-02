@@ -17,6 +17,7 @@ namespace BingoMode
     using BingoChallenges;
     using BingoHUD;
     using BingoMenu;
+    using Music;
 
     public class BingoHooks
     {
@@ -175,9 +176,7 @@ namespace BingoMode
             On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
 
             // Saving and loaading shit
-            //IL.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToStringIL;
             On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
-            On.Player.checkInput += Player_checkInput;
 
             // Preventing expedition antics
             IL.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
@@ -225,11 +224,42 @@ namespace BingoMode
 
             // Same starting seed for everyone
             On.RainWorldGame.ctor += RainWorldGame_ctor;
+
+            // Music shit (hell yeah)
+            On.Menu.ExpeditionMenu.Update += ExpeditionMenu_Update;
         }
 
-        private static void Player_checkInput(On.Player.orig_checkInput orig, Player self)
+        public static void RequestBingoSong(MusicPlayer self, string songName)
         {
-            if (BingoData.BingoMode && self.room != null )
+            if (self.song != null && self.song is BingoSong)
+            {
+                return;
+            }
+            if (self.nextSong != null && self.nextSong is BingoSong)
+            {
+                return;
+            }
+            if (!self.manager.rainWorld.setup.playMusic)
+            {
+                return;
+            }
+            Song song = new BingoSong(self, songName);
+            if (self.song == null)
+            {
+                self.song = song;
+                self.song.playWhenReady = true;
+                return;
+            }
+            self.nextSong = song;
+            self.nextSong.playWhenReady = false;
+        }
+
+        private static void ExpeditionMenu_Update(On.Menu.ExpeditionMenu.orig_Update orig, ExpeditionMenu self)
+        {
+            if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && self.currentPage == 4 && self.manager.musicPlayer.song == null)
+            {
+                self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 0f);
+            }
 
             orig.Invoke(self);
         }
@@ -323,7 +353,6 @@ namespace BingoMode
                 spear.RealizeInRoom();
                 spear.realizedObject.firstChunk.HardSetPosition(self.firstChunk.pos);
                 BingoData.CreateKarmaFlower = false;
-
                 return;
             }
             Plugin.logger.LogMessage("Creating karma flow");
@@ -867,7 +896,6 @@ namespace BingoMode
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     self.UpdatePage(4);
-                    Plugin.logger.LogMessage("regenerating here at ExpeditionMenu_Singal");
                     GlobalBoard.GenerateBoard(GlobalBoard.size);
                     if (page.grid != null)
                     {
@@ -878,6 +906,11 @@ namespace BingoMode
                     page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                     page.subObjects.Add(page.grid);
                     self.MovePage(new Vector2(1500f, 0f));
+
+                    if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && !self.muted)
+                    {
+                        self.manager.musicPlayer.FadeOutAllSongs(60f);
+                    }
                 }
             }
             if (message == "LOADBINGO")

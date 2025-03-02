@@ -25,7 +25,7 @@ namespace BingoMode.BingoChallenges
             int iconAmount = words.Count;
             Vector2[] positiones = new Vector2[iconAmount];
             int distToNewLine = newLines.Length == 0 ? (iconAmount - 1) : (newLines[0] - 1);
-            Vector2 startPos = centerPos + new Vector2(distToNewLine * 0.5f * -horizontalDist, newLines.Length * 0.5f * verticalDist);
+            Vector2 startPos = centerPos + new Vector2(distToNewLine * 0.5f * -horizontalDist, newLines.Length * 0.5f * verticalDist) + new Vector2(0.01f, 0.01f);
             float carryOver = 0f;
             for (int i = 0; i < iconAmount; i++)
             {
