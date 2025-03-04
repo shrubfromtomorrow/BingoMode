@@ -10,6 +10,7 @@ using UnityEngine;
 using Steamworks;
 using MoreSlugcats;
 using RWCustom;
+using System.IO;
 
 namespace BingoMode
 {
@@ -227,7 +228,31 @@ namespace BingoMode
 
             // Music shit (hell yeah)
             On.Menu.ExpeditionMenu.Update += ExpeditionMenu_Update;
+            if (!ModManager.ActiveMods.Any(x => x.id == "crs"))
+            {
+                Plugin.logger.LogMessage("No CRS. Applying async audio loading");
+                IL.Music.MusicPiece.SubTrack.Update += SubTrack_Update;
+            }
         }
+
+        // Credit to CRS for this code
+        private static void SubTrack_Update(ILContext il)
+        {
+            var c = new ILCursor(il);
+            while (c.TryGotoNext(MoveType.AfterLabel,
+                x => x.MatchCall<AssetManager>(nameof(AssetManager.SafeWWWAudioClip))
+                ))
+            {
+                c.Remove();
+                c.EmitDelegate(AsyncLoad);
+            }
+        }
+        public static AudioClip AsyncLoad(string path, bool threeD, bool stream, AudioType audioType)
+        {
+            WWW www = new WWW(path);
+            return www.GetAudioClip(false, true, AudioType.OGGVORBIS);
+        }
+        //
 
         public static void RequestBingoSong(MusicPlayer self, string songName)
         {
@@ -774,7 +799,7 @@ namespace BingoMode
                     pag.unlocksButton.Reset();
                 }
 
-                if (!BingoData.MultiplayerGame || SteamTest.LobbyMembers.Count == 0 || SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) != SteamTest.selfIdentity.GetSteamID()) return;
+                if (!BingoData.MultiplayerGame || SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) != SteamTest.selfIdentity.GetSteamID()) return;
                 if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited)
                 {
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));

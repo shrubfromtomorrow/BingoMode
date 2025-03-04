@@ -114,10 +114,10 @@ namespace BingoMode.BingoSteamworks
                     SteamTest.team = t;
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "playerTeam", data[0]);
 
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
-                    {
-                        page33.ResetPlayerLobby();
-                    }
+                    //if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page33) && page33.inLobby)
+                    //{
+                    //    page33.ResetPlayerLobby();
+                    //}
                     break;
 
                 // Kick behavior

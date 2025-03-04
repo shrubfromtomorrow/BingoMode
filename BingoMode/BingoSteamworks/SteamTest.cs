@@ -14,7 +14,6 @@ namespace BingoMode.BingoSteamworks
 
     internal class SteamTest
     {
-        public static List<SteamNetworkingIdentity> LobbyMembers = new ();
         public static int team = 0;
         public static CSteamID CurrentLobby;
         public static LobbyFilters CurrentFilters;
@@ -51,7 +50,6 @@ namespace BingoMode.BingoSteamworks
 
         public static void CreateLobby(int maxPlayers)
         {
-            LobbyMembers.Clear();
             SteamAPICall_t call = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, maxPlayers);
             lobbyCreated.Set(call, OnLobbyCreated);
             BingoData.MultiplayerGame = true;
@@ -77,7 +75,6 @@ namespace BingoMode.BingoSteamworks
             }
             Plugin.logger.LogMessage("Left lobby " + CurrentLobby);
             CurrentLobby = default;
-            LobbyMembers.Clear();
             BingoData.MultiplayerGame = false;
         }
 
@@ -167,12 +164,12 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.SetLobbyData(lobbyID, "hostMods", BingoData.globalSettings.hostMods ? ActiveModsToString() : "none");
             SteamMatchmaking.SetLobbyData(lobbyID, "perks", ((int)BingoData.globalSettings.perks).ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "burdens", ((int)BingoData.globalSettings.burdens).ToString());
-            SteamMatchmaking.SetLobbyData(lobbyID, "nextTeam", (team + 1).ToString());
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "perkList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("unl-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "burdenList", Expedition.Expedition.coreFile.ActiveUnlocksString(ExpeditionGame.activeUnlocks.Where(x => x.StartsWith("bur-")).ToList()));
             SteamMatchmaking.SetLobbyData(lobbyID, "lobbyVersion", Plugin.VERSION);
             SteamMatchmaking.SetLobbyData(lobbyID, "randomSeed", UnityEngine.Random.Range(1000, 10000).ToString());
+            SteamMatchmaking.SetLobbyData(lobbyID, "nextPlayerIndex", "1");
             // other settings idk
             UpdateOnlineBingo();
             SteamMatchmaking.SetLobbyJoinable(lobbyID, true);
@@ -192,7 +189,6 @@ namespace BingoMode.BingoSteamworks
                 return;
             }
             if (selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
-            LobbyMembers.Clear();
             CSteamID lobbyID = (CSteamID)callback.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
             Plugin.logger.LogMessage("Entered lobby " + callback.m_ulSteamIDLobby + "! ");
@@ -214,11 +210,12 @@ namespace BingoMode.BingoSteamworks
             }
 
             FetchLobbySettings();
-            Plugin.logger.LogMessage($"Parsing next team from {SteamMatchmaking.GetLobbyData(CurrentLobby, "nextTeam")}");
-            team = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "nextTeam"), NumberStyles.Any);
+
+            team = 0;
 
             Plugin.logger.LogMessage("HOST TEAM IS " + SteamMatchmaking.GetLobbyMemberData(lobbyID, SteamMatchmaking.GetLobbyOwner(lobbyID), "playerTeam"));
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
+            SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerIndex", SteamMatchmaking.GetLobbyData(CurrentLobby, "nextPlayerIndex"));
             Plugin.logger.LogMessage("Set team number to " + team);
 
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");
@@ -231,18 +228,6 @@ namespace BingoMode.BingoSteamworks
                 Plugin.logger.LogError(e + "\nFAILED TO RECREATE BINGO BOARD FROM STRING FROM LOBBY: " + challenjes);
                 LeaveLobby();
                 return;
-            }
-            SteamNetworkingIdentity ownere = new SteamNetworkingIdentity();
-            ownere.SetSteamID(SteamMatchmaking.GetLobbyOwner(lobbyID));
-            LobbyMembers.Add(ownere);
-            int members = SteamMatchmaking.GetNumLobbyMembers(lobbyID);
-            BingoData.MultiplayerGame = true;
-            for (int i = 0; i < members; i++)
-            {
-                SteamNetworkingIdentity member = new SteamNetworkingIdentity();
-                member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(lobbyID, i));
-                if (!LobbyMembers.Contains(member) && member.GetSteamID64() != selfIdentity.GetSteamID64()) { LobbyMembers.Add(member); }
-                InnerWorkings.SendMessage($"Jello im {SteamFriends.GetPersonaName()} and i joined loby!", member);
             }
 
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
@@ -304,12 +289,11 @@ namespace BingoMode.BingoSteamworks
                     Plugin.logger.LogMessage($"1User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
                     SteamNetworkingIdentity newMember = new SteamNetworkingIdentity();
                     newMember.SetSteamID((CSteamID)callback.m_ulSteamIDUserChanged);
-                    if (!LobbyMembers.Contains(newMember) && newMember.GetSteamID64() != selfIdentity.GetSteamID64()) { LobbyMembers.Add(newMember); }
+
                     if (SteamMatchmaking.GetLobbyOwner(CurrentLobby) == selfIdentity.GetSteamID())
                     {
-                        int tim = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "nextTeam"), NumberStyles.Any) + 1;
-                        if (tim >= 8) tim = 0;
-                        SteamMatchmaking.SetLobbyData(CurrentLobby, "nextTeam", tim.ToString());
+                        int tim = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "nextPlayerIndex"), NumberStyles.Any) + 1;
+                        SteamMatchmaking.SetLobbyData(CurrentLobby, "nextPlayerIndex", tim.ToString());
                     }
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
@@ -323,14 +307,12 @@ namespace BingoMode.BingoSteamworks
                 case 0x0004:
                 case 0x0008:
                 case 0x0010:
-                    Plugin.logger.LogMessage($"HERE");
                     text = "left";
                     Plugin.logger.LogMessage($"2User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
-                    LobbyMembers.RemoveAll(x => x.GetSteamID64() == callback.m_ulSteamIDUserChanged);
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
                     if (SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame") != "") break;
-                    if (LobbyMembers.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
                     {
                         page3.ResetPlayerLobby();
                     }
@@ -338,19 +320,14 @@ namespace BingoMode.BingoSteamworks
                     break;
             }
             Plugin.logger.LogMessage($"User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
-
-            Plugin.logger.LogMessage("Current lobby members");
-            foreach (var member in LobbyMembers)
-            {
-                Plugin.logger.LogMessage(member.GetSteamID64());
-            }
         }
 
         public static void OnLobbyDataUpdate(LobbyDataUpdate_t callback)
         {
             if (callback.m_bSuccess == 0 || CurrentLobby == (CSteamID)0 || callback.m_ulSteamIDLobby == 0) return;
-            if (callback.m_ulSteamIDLobby == callback.m_ulSteamIDMember && selfIdentity.GetSteamID() != SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby))
+            if (callback.m_ulSteamIDLobby == callback.m_ulSteamIDMember)
             {
+                if (selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
                 string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
                 if (den != "")
                 {

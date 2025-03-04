@@ -32,52 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="..\lib\Assembly-CSharp-firstpass.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\Assembly-CSharp-nstrip.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\BepInEx.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\com.rlabrecque.steamworks.net.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\DevConsole.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\Fisobs.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\HOOKS-Assembly-CSharp.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\Mono.Cecil.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\MonoMod.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\MonoMod.RuntimeDetour.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\MonoMod.Utils.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\Rewired_Core.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\Unity.Mathematics.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\UnityEngine.CoreModule.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\UnityEngine.dll">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="..\lib\UnityEngine.InputLegacyModule.dll">
+    <Reference Include="../lib/*.dll">
       <Private>false</Private>
     </Reference>
     <Reference Include="System" />
