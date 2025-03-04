@@ -377,3 +377,5 @@ FodyWeavers.xsd
 /lib/UnityEngine.CoreModule.dll
 /lib/UnityEngine.dll
 /lib/UnityEngine.InputLegacyModule.dll
+/lib/UnityEngine.AudioModule.dll
+/lib/UnityEngine.UnityWebRequestWWWModule.dll
