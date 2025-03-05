@@ -155,7 +155,9 @@ namespace BingoMode.BingoChallenges
 
         public static bool Scavenger_GrabTrade(On.Scavenger.orig_Grab orig, Scavenger self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
         {
-            if (obj != null && self.room != null && playerTradeItems.TryGetValue(self.room, out var items))
+            if (obj != null && self.room != null && self.abstractCreature.abstractAI is ScavengerAbstractAI ai && ai.squad != null &&
+                self.room.abstractRoom.scavengerTrader &&
+                ai.squad.missionType == ScavengerAbstractAI.ScavengerSquad.MissionID.Trade && playerTradeItems.TryGetValue(self.room, out var items))
             {
                 if (items.Any(x => obj.abstractPhysicalObject.ID == x))
                 {

@@ -41,6 +41,7 @@ namespace BingoMode.BingoHUD
         public bool cheatsEnabled;
         public bool cheatingRnAtThisMoment;
         public int cantClickCounter;
+        public BingoHUDButton exitHUDButton;
 
         // Bingo complete business
         public enum BingoCompleteReason
@@ -78,6 +79,7 @@ namespace BingoMode.BingoHUD
         public float textShake;
         public float sinCounter;
         public Color colorToFadeTo;
+        public int fadeOutCounter;
         //public bool mouseOverCompleteText
         //{
         //    get
@@ -99,7 +101,7 @@ namespace BingoMode.BingoHUD
             hints = []; 
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
-                cheatsEnabled = SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
+                cheatsEnabled = true;// SteamTest.team == 8 && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost;
             }
             GenerateBingoGrid();
             if (hud.owner.GetOwnerType() == HUD.HUD.OwnerType.SleepScreen)
@@ -132,21 +134,19 @@ namespace BingoMode.BingoHUD
             addCompleteAlpha = false;
             colorToFadeTo = Color.white;
 
-            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && !BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin)
             {
                 BingoCompleteInfo? potentialEndGame = CheckWinLose();
                 if (potentialEndGame.HasValue)
                 {
-                    DoComplete(potentialEndGame.Value, BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin);
-                    if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin)
-                    {
-                        ShowWinText();
-                        textShake = 0f;
-                    }
+                    DoComplete(potentialEndGame.Value, false);
                 }
             }
 
             cursor = new BingoHUDCursor(hud.fContainers[1], new Vector2(-100f, -100f));
+
+            Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f, hud.rainWorld.screenSize.y * 0.5f - 35f) : new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
+            exitHUDButton = new BingoHUDButton(this, center + new Vector2(0f, -(BingoData.SpectatorMode ? 475f : 420f)), "End Session", ExitGame);
         }
 
         public void ShowWinText()
@@ -154,10 +154,11 @@ namespace BingoMode.BingoHUD
             addCompleteAlpha = true;
             textShake = 1f;
             sinCounter = 0.5f;
-            ReadyForLeave = true;
+            fadeOutCounter = 3000;
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer))
             {
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin = true;
+                BingoSaveFile.Save();
             }
         }
 
@@ -238,7 +239,10 @@ namespace BingoMode.BingoHUD
 
         public BingoCompleteInfo? CheckWinLose()
         {
-            string addText = "Exit the game to end the bingo session.";
+            if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
+                BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin) return null;
+
+            string addText = "Press the button in the bingo HUD or abandon the save to end the bingo session.";
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
             bool doDangerMusic = Plugin.PluginInstance.BingoConfig.PlayDangerSong.Value;
@@ -248,10 +252,11 @@ namespace BingoMode.BingoHUD
                 bool songAlreadyPlayed = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed;
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                 {
-                    addText = "Exit the game or wait for host to end the session.";
+                    addText = "Exit the game and abandon the save or wait for host to end the session.";
                 }
-                else addText = "Exit the game to end the bingo session for everyone.";
+                else addText = "Press the button in the bingo HUD to end the bingo session for everyone.";
 
+                Plugin.logger.LogWarning("TEAMS IN BINGO: " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
                 List<int> teamsInBingo = BingoData.TeamsStringToList(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
                 Dictionary<int, int> completedForTeam = [];
 
@@ -260,6 +265,7 @@ namespace BingoMode.BingoHUD
                     case BingoData.BingoGameMode.Bingo:
                         foreach (int t in teamsInBingo)
                         {
+
                             if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
                                 Plugin.logger.LogMessage($"Team {t} won!");
@@ -473,6 +479,7 @@ namespace BingoMode.BingoHUD
 
                 foreach (int t in teamsInBingo)
                 {
+                    Plugin.logger.LogMessage($"Team {t}!");
                     // Bingo wins
                     if (BingoHooks.GlobalBoard.CheckWin(t))
                     {
@@ -535,6 +542,7 @@ namespace BingoMode.BingoHUD
             queue.Clear();
             completeQueue.Clear();
             cursor.RemoveSprites();
+            exitHUDButton.Remove();
 
             foreach (var hint in hints)
             {
@@ -642,8 +650,17 @@ namespace BingoMode.BingoHUD
             lastAlpha = alpha;
             alpha = BingoData.SpectatorMode ? 1f : Mathf.Clamp01(alpha + 0.1f * (Toggled ? 1f : -1f));
 
+            if (fadeOutCounter > 0)
+            {
+                fadeOutCounter--;
+                if (fadeOutCounter == 0)
+                {
+                    addCompleteAlpha = false;
+                }
+            }
+
             lastCompleteAlpha = completeAlpha;
-            if (addCompleteAlpha) completeAlpha = Mathf.Clamp01(completeAlpha + 0.15f);
+            completeAlpha = Mathf.Clamp01(completeAlpha + 0.15f * (addCompleteAlpha ? 1f : -0.1f));
 
             textShake = Mathf.Max(0f, textShake - 0.034f);
 
@@ -654,6 +671,7 @@ namespace BingoMode.BingoHUD
             }
 
             cursor.Update();
+            exitHUDButton.Update();
 
             // Hints
             if (hud.owner is Player player && SteamTest.team != 8)
@@ -795,6 +813,9 @@ namespace BingoMode.BingoHUD
 
             cursor.GrafUpdate(timeStacker);
 
+            exitHUDButton.alpha = alpha;
+            exitHUDButton.Draw(timeStacker);
+
             if (hud.owner is Player player)
             {
                 foreach (var hint in hints)
@@ -802,6 +823,11 @@ namespace BingoMode.BingoHUD
                     hint.Draw(timeStacker, player.abstractCreature.world.game.cameras[0].pos);
                 }
             }
+        }
+
+        public void ExitGame()
+        {
+            Plugin.logger.LogFatal("LEAVIN");
         }
 
         public class BingoInfo
@@ -1122,25 +1148,25 @@ namespace BingoMode.BingoHUD
                 if (g && SteamTest.team == 8) borderColors.Remove(baseBorderColor);
                 showBG = !g;
                 borderColorIndex1 = 0;
-                borderColorIndex2 = 1;
-                sinCounter = 1f;
+                borderColorIndex2 = borderColors.Count > 1 ? 1 : 0;
+                sinCounter = UnityEngine.Random.value;
             }
 
             public void ShiftBorderColors()
             {
                 bool skipSecond = borderColorIndex1 == borderColorIndex2;
 
-                borderColorIndex1 += 1;
-                if (borderColorIndex1 >= borderColors.Count)
-                {
-                    borderColorIndex1 = 0;
-                }
-
-                if (skipSecond) return;
                 borderColorIndex2 += 1;
                 if (borderColorIndex2 >= borderColors.Count)
                 {
                     borderColorIndex2 = 0;
+                }
+
+                if (skipSecond) return;
+                borderColorIndex1 += 1;
+                if (borderColorIndex1 >= borderColors.Count)
+                {
+                    borderColorIndex1 = 0;
                 }
             }
 
@@ -1481,7 +1507,7 @@ namespace BingoMode.BingoHUD
 
                         if (Plugin.PluginInstance.BingoConfig.PlayEndingSong.Value && context == AnimationContext.BingoLast && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null)
                         {
-                            Custom.rainWorld.processManager.musicPlayer.FadeOutAllSongs(10f);
+                            Custom.rainWorld.processManager.musicPlayer.FadeOutAllSongs(0f);
                             BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Blithely Beached");
                         }
                     }

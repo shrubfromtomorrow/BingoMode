@@ -58,8 +58,6 @@ namespace BingoMode.BingoChallenges
             };
         }
 
-        public override bool RequireSave() => false;
-
         public void Entered(string regionName)
         {
             if (SteamTest.team == 8) return;

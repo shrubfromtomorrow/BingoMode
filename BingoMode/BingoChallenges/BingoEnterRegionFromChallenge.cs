@@ -24,7 +24,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Verse(from.Value), new Icon("keyShiftA", 1f, Color.red, 90), new Verse(to.Value)], []);
+            return new Phrase([new Verse(from.Value), new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 90), new Verse(to.Value)], []);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -50,6 +50,7 @@ namespace BingoMode.BingoChallenges
             if (regions.Contains("CL") && gateName.Contains("SH"))
             {
                 gateName = gateName.Replace("SH", "CL");
+                gateName = gateName.Replace("UW", "SH");
             }
             //if (regions.Contains("RM") && gateName.Contains("SS"))
             //{

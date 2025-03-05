@@ -26,7 +26,6 @@ namespace BingoMode.BingoSteamworks
         public static int UpkeepCounter = MaxUpkeepCounter;
         public static bool ReceivedHostUpKeep;
         public static bool TryToReconnect;
-        //public static Dictionary<ulong, bool> PlayerForSureQuit = [];
 
         public static void ReceiveMessagesUpdate()
         {

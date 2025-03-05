@@ -223,7 +223,6 @@ namespace BingoMode.BingoMenu
                 case "CLOSE":
                     closing = true;
                     targetAlpha = 0f;
-                    if (owner.fromContinueGame) owner.rightPage.Clicked();
                     if (inLobby) SteamTest.UpdateOnlineSettings();
                     break;
                 case "CREATE":

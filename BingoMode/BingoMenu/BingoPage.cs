@@ -3,20 +3,17 @@ using Expedition;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
-using System.Collections.Generic;
-using UnityEngine;
 using RWCustom;
 using Steamworks;
-using MoreSlugcats;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.BingoMenu
 {
     using BingoSteamworks;
-    using System;
-    using static BingoMode.BingoMenu.CustomizerDialog;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -64,7 +61,6 @@ namespace BingoMode.BingoMenu
         public float lobbySlideIn;
         public float lastLobbySlideIn;
         public float slideStep;
-        public bool fromContinueGame;
 
         public static readonly float desaturara = 0.1f;
         public static readonly Color[] TEAM_COLOR =
@@ -239,12 +235,16 @@ namespace BingoMode.BingoMenu
             {
                 expMenu.exitButton.buttonBehav.greyedOut = true;
                 rightPage.buttonBehav.greyedOut = true;
-                startGame.buttonBehav.greyedOut = !create;
-                shelterSetting.greyedOut = !create || fromContinueGame;
-                randomize.buttonBehav.greyedOut = !create || fromContinueGame;
-                plusButton.buttonBehav.greyedOut = !create || fromContinueGame;
-                minusButton.buttonBehav.greyedOut = !create || fromContinueGame;
-                pasteBoard.buttonBehav.greyedOut = !create || fromContinueGame;
+                if (!create)
+                {
+                    startGame.signalText = "GETREADY";
+                    startGame.menuLabel.text = "I'M\nREADY";
+                }
+                shelterSetting.greyedOut = !create;
+                randomize.buttonBehav.greyedOut = !create;
+                plusButton.buttonBehav.greyedOut = !create;
+                minusButton.buttonBehav.greyedOut = !create;
+                pasteBoard.buttonBehav.greyedOut = !create;
                 multiButton.menuLabel.text = "Leave Lobby";
                 multiButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
@@ -257,6 +257,8 @@ namespace BingoMode.BingoMenu
             expMenu.exitButton.buttonBehav.greyedOut = false;
             rightPage.buttonBehav.greyedOut = false;
             startGame.buttonBehav.greyedOut = false;
+            startGame.signalText = "STARTBINGO";
+            startGame.menuLabel.text = "BEGIN";
             randomize.buttonBehav.greyedOut = false;
             plusButton.buttonBehav.greyedOut = false;
             minusButton.buttonBehav.greyedOut = false;
@@ -380,10 +382,15 @@ namespace BingoMode.BingoMenu
                     SpectatorHooks.Hook();
                 }
                 else BingoData.TeamsInBingo = [SteamTest.team];
-                foreach (var playere in lobbyPlayers)
+
+                if (lobbyPlayers != null)
                 {
-                    int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
-                    if (!BingoData.TeamsInBingo.Contains(team) && team != 8) BingoData.TeamsInBingo.Add(team);
+                    foreach (var playere in lobbyPlayers)
+                    {
+                        Plugin.logger.LogMessage("Adding from lobby players team " + SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
+                        int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
+                        if (!BingoData.TeamsInBingo.Contains(team) && team != 8) BingoData.TeamsInBingo.Add(team);
+                    }
                 }
 
                 if (ModManager.JollyCoop && ModManager.CoopAvailable)
@@ -470,12 +477,16 @@ namespace BingoMode.BingoMenu
                     {
                         SteamFinal.ConnectedPlayers.Clear();
                         SteamFinal.ReceivedPlayerUpKeep = [];
-                        foreach (var player in lobbyPlayers)
+                        if (lobbyPlayers != null)
                         {
-                            connectedPlayers += "bPlR" + player.identity.GetSteamID64();
-                            SteamFinal.ConnectedPlayers.Add(player.identity);
-                            SteamFinal.ReceivedPlayerUpKeep[player.identity.GetSteamID64()] = false;
-                            SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
+                            foreach (var player in lobbyPlayers)
+                            {
+                                if (player.identity.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64()) continue;
+                                connectedPlayers += "bPlR" + player.identity.GetSteamID64();
+                                SteamFinal.ConnectedPlayers.Add(player.identity);
+                                SteamFinal.ReceivedPlayerUpKeep[player.identity.GetSteamID64()] = false;
+                                SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
+                            }
                         }
                         connectedPlayers = connectedPlayers.Substring(4);
                         Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
@@ -599,28 +610,37 @@ namespace BingoMode.BingoMenu
                         List<string> modStrings = Regex.Split(hostRequiredMods, "<bMd>").ToList();
                         Plugin.logger.LogWarning("Examining " + modStrings);
                         Dictionary<string, string> requiredMods = [];
+                        string[] skipMods = GetCommonClientMods();
                         foreach (string m in modStrings)
                         {
                             Plugin.logger.LogWarning(m);
                             string[] idAndName = m.Split('|');
+                            if (skipMods.Contains(idAndName[0])) continue;
+
                             requiredMods.Add(idAndName[0], idAndName[1]);
                         }
-                        bool tooManyMods = false;
 
+                        List<string> tooManyMods = [];
                         foreach (var mod in ModManager.ActiveMods)
                         {
+                            if (skipMods.Contains(mod.id)) continue;
+
                             if (requiredMods.Keys.Count == 0)
                             {
-                                tooManyMods = true;
-                                break;
+                                tooManyMods.Add(mod.name);
                             }
 
-                            if (requiredMods.ContainsKey(mod.id)) requiredMods.Remove(mod.id);
+                            if (requiredMods.Count > 0 && requiredMods.ContainsKey(mod.id)) requiredMods.Remove(mod.id);
                         }
 
-                        if (tooManyMods || requiredMods.Count > 0)
+                        if (tooManyMods.Count > 0)
                         {
-                            menu.manager.ShowDialog(new InfoDialog(menu.manager, (tooManyMods ? "TOO MANY" : "TOO LITTLE") + " Please have only these mods enabled if you wish to join this lobby:\n-" + string.Join("\n- ", requiredMods.Values)));
+                            menu.manager.ShowDialog(new InfoDialog(menu.manager, "Please disable these mods if you wish to join this lobby:\n-" + string.Join("\n- ", tooManyMods)));
+                            return;
+                        }
+                        if (requiredMods.Count > 0)
+                        {
+                            menu.manager.ShowDialog(new InfoDialog(menu.manager, "Please have all of these mods enabled if you wish to join this lobby:\n-" + string.Join("\n- ", requiredMods.Values)));
                             return;
                         }
                     }
@@ -662,7 +682,6 @@ namespace BingoMode.BingoMenu
                 SteamNetworkingIdentity kickedPlayer = new SteamNetworkingIdentity();
                 kickedPlayer.SetSteamID64(playerId);
                 InnerWorkings.SendMessage("@", kickedPlayer);
-                //if (playerId == SteamTest.selfIdentity.GetSteamID64()) ResetPlayerLobby();
                 return;
             }
 
@@ -697,6 +716,46 @@ namespace BingoMode.BingoMenu
                 }
                 return;
             }
+
+            if (message == "GETREADY")
+            {
+                SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "1");
+                startGame.signalText = "GETUNREADY";
+                startGame.menuLabel.text = "I'M NOT\nREADY";
+                menu.PlaySound(SoundID.MENU_Start_New_Game);
+            }
+
+            if (message == "GETUNREADY")
+            {
+                SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "0");
+                startGame.signalText = "GETREADY";
+                startGame.menuLabel.text = "I'M\nREADY";
+                menu.PlaySound(SoundID.MENU_Start_New_Game);
+            }
+        }
+
+        public static string[] GetCommonClientMods()
+        {
+            return ["bro.mergefix",
+                "pjb3005.sharpener",
+                "kevadroz.no_mod_update_confirm",
+                "Gamer025.RemixAutoRestart",
+                "willowwisp.audiofix",
+                "rwremix",
+                "dressmyslugcat",
+                "fastrollbutton",
+                "greyscreen",
+                "vigaro.guardian",
+                "healthbars",
+                "improved-input-confirm",
+                "franklygd.killfeed",
+                "lsbjorn52.ModPresets",
+                "notchoc.ModTags",
+                "sabreml.musicannouncements",
+                "SBCameraScroll",
+                "slime-cubed.inputdisplay",
+                "googlyeyes",
+                "rebinddevtools"];
         }
 
         public void ResetPlayerLobby()
@@ -779,6 +838,7 @@ namespace BingoMode.BingoMenu
         public override void Update()
         {
             base.Update();
+            multiButton.buttonBehav.greyedOut = !SteamTest.MultiplayerEnabled;
             if (!BingoData.MultiplayerGame) return;
             if (SteamTest.CurrentLobby == default)
             {
@@ -790,7 +850,25 @@ namespace BingoMode.BingoMenu
             {
                 rightPage.buttonBehav.greyedOut = true;
                 expMenu.exitButton.buttonBehav.greyedOut = true;
-                startGame.buttonBehav.greyedOut = SteamTest.selfIdentity.GetSteamID() != SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby);
+                //bool isHost = SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby);
+                //if (isHost)
+                //{
+                //    bool allReady = true;
+
+                //    if (lobbyPlayers != null)
+                //    {
+                //        foreach (var player in lobbyPlayers)
+                //        {
+                //            allReady &= SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, player.identity.GetSteamID(), "ready") == "1";
+                //        }
+                //    }
+
+                //    startGame.buttonBehav.greyedOut = !allReady;
+                //}
+                //else
+                //{
+                //    startGame.buttonBehav.greyedOut = false;
+                //}
             }
         }
 
@@ -847,30 +925,23 @@ namespace BingoMode.BingoMenu
 
             List<SteamNetworkingIdentity> identities = [];
             int members = SteamMatchmaking.GetNumLobbyMembers(SteamTest.CurrentLobby);
+            bool allReady = true;
+
             BingoData.MultiplayerGame = true;
             for (int i = 0; i < members; i++)
             {
                 SteamNetworkingIdentity member = new SteamNetworkingIdentity();
                 member.SetSteamID(SteamMatchmaking.GetLobbyMemberByIndex(SteamTest.CurrentLobby, i));
                 if (!identities.Contains(member)) identities.Add(member);
+
+                if (member.GetSteamID() != SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby)) allReady &= SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, member.GetSteamID(), "ready") == "1";
             }
+
+            if (isHost) startGame.buttonBehav.greyedOut = !allReady;
 
             foreach (var p in identities)
             {
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
             }
 
             lobbyPlayers = lobbyPlayers.OrderBy(x => x.playerIndex).ToList();
@@ -1170,17 +1241,19 @@ namespace BingoMode.BingoMenu
             public Configurable<string> conf;
             public UIelementWrapper cWrapper;
             public bool disabled;
+            public FSprite readyMark;
 
-            public PlayerInfo(BingoPage page, SteamNetworkingIdentity identity, bool controls)
+            public PlayerInfo(BingoPage page, SteamNetworkingIdentity identity, bool controls, bool ready)
             {
                 this.page = page;
                 this.identity = identity;
-                bool isHost = identity.GetSteamID() == SteamTest.selfIdentity.GetSteamID();
+                bool isSelf = identity.GetSteamID() == SteamTest.selfIdentity.GetSteamID();
+                bool isHost = identity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby);
                 
                 int.TryParse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, identity.GetSteamID(), "playerTeam"), System.Globalization.NumberStyles.Any, null, out team);
                 int.TryParse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, identity.GetSteamID(), "playerIndex"), System.Globalization.NumberStyles.Any, null, out playerIndex);
 
-                nickname = isHost ? SteamFriends.GetPersonaName() : SteamFriends.GetFriendPersonaName(identity.GetSteamID());
+                nickname = isSelf ? SteamFriends.GetPersonaName() : SteamFriends.GetFriendPersonaName(identity.GetSteamID());
                 if (nickname == null) nickname = "???";
                 nickname += " (" + TeamName(team) + ")";
 
@@ -1192,19 +1265,27 @@ namespace BingoMode.BingoMenu
                 };
                 page.Container.AddChild(nameLabel);
 
+                string markAtlas = isHost ? "TinyCrown" : ready ? "TinyCheck" : "TinyX";
+                Color markColor = isHost ? Color.yellow : ready ? Color.green : Color.red;
+                readyMark = new FSprite(markAtlas)
+                {
+                    color = markColor
+                };
+                page.Container.AddChild(readyMark);
+
                 if (controls)
                 {
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_PlayerInfoSelect", TeamName(team), (ConfigAcceptableBase)null);
-                    selectTeam = new OpComboBox(conf, new Vector2(-10000f, -10000f), 90f, ["Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane"]);
+                    selectTeam = new OpComboBox(conf, new Vector2(-10000f, -10000f), 90f, ["Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane", "Board view"]);
                     selectTeam.OnValueChanged += SelectTeam_OnValueChanged;
                     selectTeam.OnListOpen += FocusThing;
                     selectTeam.OnListClose += UnfocusThing;
                     cWrapper = new UIelementWrapper(page.menuTabWrapper, selectTeam);
-                    //if (!isHost)
-                    //{
+                    if (!isSelf)
+                    {
                         kick = new SimpleButton(page.menu, page, "Kick", "KICK-" + identity.GetSteamID64().ToString(), new Vector2(-10000f, -10000f), new Vector2(40f, 16f));
                         page.subObjects.Add(kick);
-                    //}
+                    }
                 }
             }
 
@@ -1225,9 +1306,11 @@ namespace BingoMode.BingoMenu
 
             public void Draw(Vector2 origPos)
             {
-                nameLabel.SetPosition(origPos);
+                nameLabel.SetPosition(origPos + new Vector2(8f, 0f));
+                readyMark.SetPosition(origPos);
                 float a = Mathf.Clamp01(maxAlpha);
                 nameLabel.alpha = a;
+                readyMark.alpha = a;
                 if (selectTeam != null)
                 {
                     selectTeam.myContainer.alpha = disabled ? 0f : a;
@@ -1246,6 +1329,7 @@ namespace BingoMode.BingoMenu
             public void Remove()
             {
                 nameLabel.RemoveFromContainer();
+                readyMark.RemoveFromContainer();
                 if (selectTeam != null)
                 {
                     selectTeam.Hide();

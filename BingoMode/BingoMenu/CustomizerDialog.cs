@@ -155,7 +155,13 @@ namespace BingoMode.BingoMenu
             challengeSettings = [];
             for (int i = 0; i < ch.Settings().Count; i++)
             {
-                ChallengeSetting s = new(this, pages[0], new Vector2(683f - leftAnchor, 449f), i, ch.Settings()[i]);
+
+                Vector2 origPos = new Vector2(683f - leftAnchor, 449f) + pages[0].pos;
+                float dif = 200f / maxItems[1];
+                float sliderDif = dif * (challengeSettings.Count - maxItems[1]);
+                Vector2 settingPos = origPos - new Vector2(0f, dif * i - sliderDif * (1f - (challengeSettings.Count < maxItems[1] ? 1f : sliderF)));
+
+                ChallengeSetting s = new(this, pages[0], settingPos, i, ch.Settings()[i]);
                 challengeSettings.Add(s);
                 pages[0].subObjects.Add(s);
             }

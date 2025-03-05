@@ -59,7 +59,7 @@ namespace BingoMode.BingoChallenges
             {
                 common = new(flag, "Common Pearls", 0),
                 amount = new(UnityEngine.Random.Range(2, 4), "Amount", 1),
-                region = new(text, "In Region", 2, listName: "regions")
+                region = new(text, "In Region", 2, listName: "regionsreal")
             };
         }
 

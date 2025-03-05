@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 namespace BingoMode.BingoSteamworks
 {
     using BingoMenu;
+    using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     internal class InnerWorkings
     {
@@ -217,12 +219,35 @@ namespace BingoMode.BingoSteamworks
 
                 // Host upkeep request
                 case 'H':
+                    string id = message;
+                    //List<ulong> enabledMods = null;
+                    //if (data.Length == 2)
+                    //{
+                    //    id = data[0];
+                    //    enabledMods = [];
+                    //
+                    //    foreach (string stringId in Regex.Split(data[1], "<bMd>"))
+                    //    {
+                    //        Plugin.logger.LogMessage("Workshor id: " + stringId);
+                    //        ulong workshopId;
+                    //        if (ulong.TryParse(stringId.Split('|')[0], System.Globalization.NumberStyles.Any, null, out workshopId))
+                    //        {
+                    //            enabledMods.Add(workshopId);
+                    //        }
+                    //    }
+                    //}
+
                     ulong requesterID = ulong.Parse(message, System.Globalization.NumberStyles.Any);
                     if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                     {
                         SteamNetworkingIdentity requesterIdentity = new SteamNetworkingIdentity();
                         requesterIdentity.SetSteamID64(requesterID);
-                        SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState().Replace('3', '1'), requesterIdentity);
+
+                        //if (enabledMods != null && enabledMods.Count > 0)
+                        //{
+                        //
+                        //}
+
                         var playerwhitelist = SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
                         Plugin.logger.LogMessage("The guy who contacted me: " + requesterID);
                         foreach (var gruh in playerwhitelist)
@@ -237,6 +262,10 @@ namespace BingoMode.BingoSteamworks
                         {
                             Plugin.logger.LogMessage($"Adding player {requesterID} back to the game!");
                             SteamFinal.ConnectedPlayers.Add(requesterIdentity);
+                        }
+                        if (SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID))
+                        {
+                            SendMessage("C" + SteamTest.selfIdentity.GetSteamID64() + ";" + BingoHooks.GlobalBoard.GetBingoState().Replace('3', '1'), requesterIdentity);
                         }
                         SteamFinal.ReceivedPlayerUpKeep[requesterID] = true;
                     }

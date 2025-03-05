@@ -13,7 +13,7 @@ namespace BingoMode
             stopAtGate = false;
             fadeInTime = 50f;
 
-            if (name == "Bingo - Blithely Beached" || name == "Bingo - Scheming") counter = 2800;
+            counter = 2800;
         }
 
         public override void Update()
@@ -25,7 +25,6 @@ namespace BingoMode
                 counter--;
                 if (counter == 0)
                 {
-                    Plugin.logger.LogFatal("FADIN OUT");
                     FadeOut(400f);
                 }
             }

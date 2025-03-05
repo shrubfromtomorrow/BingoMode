@@ -199,7 +199,7 @@ namespace BingoMode
             return won;
         }
 
-        public bool CheckWin(int t, List<IntVector2> overrideArray = null, int? highestCount = null) // Checks whether a team won or cant win
+        public bool CheckWin(int t, List<IntVector2> overrideArray = null) // Checks whether a team won or cant win
         {
             bool won = false;
             currentWinLine = [];

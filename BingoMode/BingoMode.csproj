@@ -47,13 +47,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
+    <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />
     <Compile Include="BingoMenu\BingoButton.cs" />
     <Compile Include="BingoData.cs" />
     <Compile Include="BingoEnums.cs" />
     <Compile Include="BingoMenu\BingoGrid.cs" />
     <Compile Include="BingoHUD\BingoHUDMain.cs" />
     <Compile Include="BingoHooks.cs" />
-    <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />
+    <Compile Include="BingoHUD\BingoHUDButton.cs" />
     <Compile Include="BingoHUD\BingoHUDCursor.cs" />
     <Compile Include="BingoHUD\BingoHUDHint.cs" />
     <Compile Include="BingoModOptions.cs" />

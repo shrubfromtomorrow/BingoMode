@@ -17,6 +17,7 @@ namespace BingoMode.BingoSteamworks
         public static int team = 0;
         public static CSteamID CurrentLobby;
         public static LobbyFilters CurrentFilters;
+        public static bool MultiplayerEnabled;
 
         public static SteamNetworkingIdentity selfIdentity;
 
@@ -40,7 +41,7 @@ namespace BingoMode.BingoSteamworks
                 lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(OnLobbyDataUpdate);
                 lobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinRequested);
                 SteamNetworkingSockets.GetIdentity(out selfIdentity);
-                Plugin.logger.LogMessage(selfIdentity.GetSteamID());
+                MultiplayerEnabled = true;
             }
 
             BingoData.globalSettings.gamemode = BingoData.BingoGameMode.Bingo;
@@ -121,13 +122,13 @@ namespace BingoMode.BingoSteamworks
             Plugin.logger.LogMessage("Accepted session with " + callback.m_identityRemote.GetSteamID64());
         }
 
-        private static string ActiveModsToString()
+        public static string ActiveModsToString()
         {
             string text = "";
 
             foreach (var mod in ModManager.ActiveMods)
             {
-                text += mod.id += "|" + mod.name + "<bMd>";
+                text += mod.id + "|" + mod.name + "<bMd>";
             }
 
             if (!string.IsNullOrEmpty(text)) text = text.Substring(0, text.Length - 5);
@@ -216,6 +217,7 @@ namespace BingoMode.BingoSteamworks
             Plugin.logger.LogMessage("HOST TEAM IS " + SteamMatchmaking.GetLobbyMemberData(lobbyID, SteamMatchmaking.GetLobbyOwner(lobbyID), "playerTeam"));
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerIndex", SteamMatchmaking.GetLobbyData(CurrentLobby, "nextPlayerIndex"));
+            SteamMatchmaking.SetLobbyMemberData(lobbyID, "ready", "0");
             Plugin.logger.LogMessage("Set team number to " + team);
 
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");

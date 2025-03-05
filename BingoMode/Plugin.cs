@@ -19,11 +19,12 @@ namespace BingoMode
     using BingoSteamworks;
     using BingoChallenges;
     using BingoHUD;
+    using System.IO;
 
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.92";
+        public const string VERSION = "0.94";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
@@ -72,6 +73,12 @@ namespace BingoMode
             if (!AppliedAlreadyDontDoItAgainPlease)
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
+
+                if (!File.Exists(AssetManager.ResolveFilePath("decals" + Path.DirectorySeparatorChar + "the_original.png")))
+                {
+                    logger.LogFatal("These modders are PISSING me off...");
+                    return;
+                }
 
                 SteamTest.Apply();
 

@@ -233,6 +233,15 @@ namespace BingoMode
                 Plugin.logger.LogMessage("No CRS. Applying async audio loading");
                 IL.Music.MusicPiece.SubTrack.Update += SubTrack_Update;
             }
+
+            // Fix crash when saved selected slug was removed
+            On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
+        }
+
+        private static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
+        {
+            if (num < 0 || num >= ExpeditionGame.playableCharacters.Count) num = 1;
+            orig.Invoke(self, num);
         }
 
         // Credit to CRS for this code
@@ -934,7 +943,7 @@ namespace BingoMode
 
                     if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && !self.muted)
                     {
-                        self.manager.musicPlayer.FadeOutAllSongs(60f);
+                        self.manager.musicPlayer.FadeOutAllSongs(30f);
                     }
                 }
             }
@@ -966,41 +975,6 @@ namespace BingoMode
                     self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load;
                     self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
                     self.PlaySound(SoundID.MENU_Continue_Game);
-                }
-            }
-            if (message == "TRYREJOIN")
-            {
-                if (bingoPage.TryGetValue(self, out var page))
-                {
-                    page.fromContinueGame = true;
-
-                    SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
-                    SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
-                    SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
-                    SteamTest.lobbyMatchList.Set(call, SteamTest.OnLobbyMatchListFromContinue);
-                }
-            }
-            if (message == "CREATELOB")
-            {
-                if (bingoPage.TryGetValue(self, out var page))
-                {
-                    self.UpdatePage(4);
-                    self.MovePage(new Vector2(1500f, 0f));
-                    LoadBingoNoStart();
-                    if (page.grid != null)
-                    {
-                        page.grid.RemoveSprites();
-                        page.RemoveSubObject(page.grid);
-                        page.grid = null;
-                    }
-                    page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
-                    page.subObjects.Add(page.grid);
-                    page.fromContinueGame = true;
-
-                    page.multiButton.buttonBehav.greyedOut = false;
-                    page.multiButton.Clicked();
-                    page.createLobby.buttonBehav.greyedOut = false;
-                    page.createLobby.Clicked();
                 }
             }
         }
@@ -1043,7 +1017,6 @@ namespace BingoMode
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     self.selectedObject = page.randomize;
-                    page.fromContinueGame = false;
                 }
                 else self.selectedObject = self.characterSelect.slugcatButtons[0];
             }
