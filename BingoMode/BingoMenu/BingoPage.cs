@@ -488,7 +488,7 @@ namespace BingoMode.BingoMenu
                                 SteamFinal.SendUpKeepCounter = SteamFinal.PlayerUpkeepTime;
                             }
                         }
-                        connectedPlayers = connectedPlayers.Substring(4);
+                        if (connectedPlayers.StartsWith("bPlR")) connectedPlayers = connectedPlayers.Substring(4);
                         Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
                     }
                     else if (!isHost)

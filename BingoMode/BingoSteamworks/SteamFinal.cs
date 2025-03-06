@@ -257,5 +257,13 @@ namespace BingoMode.BingoSteamworks
                 InnerWorkings.SendMessage("B" + state.Replace('3', '1'), player);
             }
         }
+
+        public static void BroadcastTallyUpOrder()
+        {
+            foreach (var player in ConnectedPlayers)
+            {
+                InnerWorkings.SendMessage("T", player);
+            }
+        }
     }
 }

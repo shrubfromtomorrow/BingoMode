@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 namespace BingoMode.BingoSteamworks
 {
     using BingoMenu;
+    using BingoMode.BingoHUD;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
@@ -274,6 +275,12 @@ namespace BingoMode.BingoSteamworks
                 // Leave lobby
                 case 'L':
                     SteamTest.LeaveLobby();
+                    break;
+
+                // Tally up
+                case 'T':
+                    Plugin.logger.LogFatal("BINGING");
+                    BingoHUDMain.ForceTallyUp = true;
                     break;
 
                 default:

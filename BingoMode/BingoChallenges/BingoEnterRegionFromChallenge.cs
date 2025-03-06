@@ -37,12 +37,9 @@ namespace BingoMode.BingoChallenges
             return ChallengeTools.IGT.Translate("Entering a region from another region");
         }
 
-        public override Challenge Generate()
+        public string FixSlugSpecificRegions(string gateName)
         {
-            string gateName = ChallengeUtils.AllGates[UnityEngine.Random.Range(0, ChallengeUtils.AllGates.Length)];
             string[] regions = ChallengeUtils.GetCorrectListForChallenge("regionsreal");
-
-            // Fix slug specitic regions
             if (regions.Contains("UG") && gateName.Contains("DS"))
             {
                 gateName = gateName.Replace("DS", "UG");
@@ -60,6 +57,17 @@ namespace BingoMode.BingoChallenges
             {
                 gateName = gateName.Replace("SL", "LM");
             }
+            return gateName;
+        }
+
+        public override Challenge Generate()
+        {
+            List<string> gates = [.. ChallengeUtils.AllGates.ToArray()];
+
+            if (ExpeditionData.slugcatPlayer.value == "Saint") gates.RemoveAll(x => x.Contains("UW"));
+
+            string gateName = gates[UnityEngine.Random.Range(0, gates.Count)];
+            gateName = FixSlugSpecificRegions(gateName);            
 
             string[] regiones = gateName.Split('_');
 
@@ -76,6 +84,7 @@ namespace BingoMode.BingoChallenges
         {
             if (completed || TeamsCompleted[SteamTest.team] || hidden || revealed || TeamsFailed[SteamTest.team]) return;
 
+            gateName = FixSlugSpecificRegions(gateName);
             List<string> worlds = gateName.Split('_').ToList();
             worlds.RemoveAt(0);
             //Plugin.logger.LogMessage($"Testing {gateName} - {worlds[0]}_{worlds[1]}");

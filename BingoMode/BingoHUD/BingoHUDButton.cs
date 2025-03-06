@@ -8,7 +8,6 @@ namespace BingoMode.BingoHUD
     public class BingoHUDButton
     {
         public BingoHUDMain hud;
-        public bool fail;
         public float alpha;
         public float lastAlpha;
         public Vector2 size;
@@ -19,16 +18,16 @@ namespace BingoMode.BingoHUD
         public FSprite background;
         public FLabel text;
         public FSprite[] border;
-        public bool appear;
         public bool lastMouseOver;
         public bool mouseOver;
         public Action callback;
+        public bool active;
 
         public BingoHUDButton(BingoHUDMain hud, Vector2 pos, string text, Action callback)
         {
             this.hud = hud;
             this.callback = callback;
-            size = new Vector2(80f, 40f);
+            size = new Vector2(80f, 30f);
             FContainer container = hud.hud.fContainers[1];
 
             background = new FSprite("pixel") { scaleX = size.x, scaleY = size.y, color = new Color(0.01f, 0.01f, 0.01f), alpha = 0.7f };
@@ -71,15 +70,13 @@ namespace BingoMode.BingoHUD
             mouseOver = hud.mousePosition.x > pos.x - size.x / 2f && hud.mousePosition.y > pos.y - size.y / 2f
                     && hud.mousePosition.x < pos.x + size.x / 2f && hud.mousePosition.y < pos.y + size.y / 2f;
 
-            lastAlpha = alpha;
-            alpha = appear ? Mathf.Min(1f, alpha + 0.08f) : Mathf.Max(0f, alpha - 0.12f);
-
             lastPos = pos;
             pos = ogPos;
-
+            
             if (alpha > 0.5f && mouseOver && hud.MouseLeftDown)
             {
                 callback.Invoke();
+                hud.hud.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
             }
         }
 
@@ -100,7 +97,7 @@ namespace BingoMode.BingoHUD
             border[3].SetPosition(corners[2]);
 
             // Alpha
-            float drawAlpha = Mathf.Lerp(lastAlpha, alpha, timeStacker) * (mouseOver ? 0.8f : 1f);
+            float drawAlpha = Mathf.Lerp(lastAlpha, alpha, timeStacker) * (mouseOver && hud.mouseDown ? 0.3f : mouseOver ? 0.6f : 1f);
             background.alpha = drawAlpha * 0.7f;
             text.alpha = drawAlpha;
             for (int i = 0; i < border.Length; i++)

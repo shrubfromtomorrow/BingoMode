@@ -536,7 +536,8 @@ namespace BingoMode.BingoChallenges
             "BlueLizard",
             "EelLizard",
             "SpitLizard",
-            "ZoopLizard"
+            "ZoopLizard",
+            "RedLizard"
         };
 
         public static readonly string[] CollectablePearls =

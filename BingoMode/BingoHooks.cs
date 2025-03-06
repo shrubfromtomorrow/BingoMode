@@ -265,14 +265,14 @@ namespace BingoMode
 
         public static void RequestBingoSong(MusicPlayer self, string songName)
         {
-            if (self.song != null && self.song is BingoSong)
-            {
-                return;
-            }
-            if (self.nextSong != null && self.nextSong is BingoSong)
-            {
-                return;
-            }
+            //if (self.song != null && self.song is BingoSong s)
+            //{
+            //    return;
+            //}
+            //if (self.nextSong != null && self.nextSong is BingoSong)
+            //{
+            //    return;
+            //}
             if (!self.manager.rainWorld.setup.playMusic)
             {
                 return;
@@ -699,6 +699,7 @@ namespace BingoMode
                 ChallengeHooks.revealInMemory = [];
                 BingoData.CreateKarmaFlower = false;
                 BingoData.RandomStartingSeed = -1;
+                BingoHUDMain.ForceTallyUp = false;
                 if (BingoHUDMain.ReadyForLeave)
                 {
                     if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost)

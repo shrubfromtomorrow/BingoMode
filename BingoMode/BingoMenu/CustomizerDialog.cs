@@ -438,7 +438,7 @@ namespace BingoMode.BingoMenu
 
             public ChallengeSetting(CustomizerDialog menu, MenuObject owner, Vector2 pos, int index, object value) : base(menu, owner, pos)
             {
-                label = new MenuLabel(menu, owner, "", pos - new Vector2(120f, -10f), default, false);
+                label = new MenuLabel(menu, owner, "", pos - new Vector2(5f, -12.5f), default, false);
                 label.label.anchorX = 1f;
                 label.label.anchorY = 0.5f;
                 owner.subObjects.Add(label);
