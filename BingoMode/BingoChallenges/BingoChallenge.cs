@@ -65,14 +65,14 @@ namespace BingoMode.BingoChallenges
 
         public override void CompleteChallenge()
         {
-            //Plugin.logger.LogWarning(Environment.StackTrace);
+            //
             // Singleplayer
             if (SteamFinal.GetHost().GetSteamID64() == default)
             {
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
@@ -98,7 +98,7 @@ namespace BingoMode.BingoChallenges
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
@@ -120,7 +120,7 @@ namespace BingoMode.BingoChallenges
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                    
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
@@ -131,22 +131,22 @@ namespace BingoMode.BingoChallenges
             /*
             if (SteamTest.LobbyMembers.Count > 0 && completeCredit != default)
             {
-                Plugin.logger.LogMessage("complete credit isnt null " + completeCredit);
+                
                 goto compleple;
             }
 
             if (RequireSave() && !revealed) // I forgot what this does (i remembered)
             {
                 revealed = true;
-                Plugin.logger.LogMessage($"Challenge {this} requires saving to complete!");
+                
                 ChallengeAlmostComplete?.Invoke();
                 return;
             }
 
-            //Plugin.logger.LogMessage($"Current lobby member count in the thing: {SteamTest.LobbyMembers.Count}");
+            //
             //foreach (var gg in SteamTest.LobbyMembers)
             //{
-            //    Plugin.logger.LogMessage($"- {gg.GetSteamID64()}");
+            //    
             //}
             if (SteamTest.LobbyMembers.Count > 0)
             {
@@ -171,7 +171,7 @@ namespace BingoMode.BingoChallenges
 
         public void OnChallengeCompleted(int team)
         {
-            Plugin.logger.LogMessage($"Completing challenge for {BingoPage.TeamName(team)}: {this}");
+            
             bool lastCompleted = TeamsCompleted[team];
 
             TeamsCompleted[team] = true;
@@ -223,7 +223,7 @@ namespace BingoMode.BingoChallenges
 
         public void OnChallengeFailed(int team)
         {
-            Plugin.logger.LogMessage($"Failing challenge for {BingoPage.TeamName(team)}: {this}");
+            
 
             if (team == SteamTest.team)
             {

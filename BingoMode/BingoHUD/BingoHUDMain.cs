@@ -151,7 +151,7 @@ namespace BingoMode.BingoHUD
             hudButtons = new BingoHUDButton[2];
 
             hudButtons[0] = new BingoHUDButton(this, default, "Tally up", PressTallyUp) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost || BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID() == default) };
-            hudButtons[1] = new BingoHUDButton(this, default, "End Session", PressExitGame) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin };
+            hudButtons[1] = new BingoHUDButton(this, default, "End Session", PressExitGame) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin };
         }
 
         public void ShowWinText()
@@ -170,7 +170,7 @@ namespace BingoMode.BingoHUD
 
         public void DoComplete(BingoCompleteInfo endGameInfo)
         {
-            Plugin.logger.LogMessage("DOING COMPLETING");
+            
             //if (!fromStart)
             //{
             completeAnimation = 150;
@@ -279,7 +279,7 @@ namespace BingoMode.BingoHUD
                 }
                 else addText = "Press the button in the bingo HUD to end the bingo session for everyone.";
 
-                Plugin.logger.LogWarning("TEAMS IN BINGO: " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
+                
                 List<int> teamsInBingo = BingoData.TeamsStringToList(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
                 Dictionary<int, int> completedForTeam = [];
 
@@ -290,7 +290,7 @@ namespace BingoMode.BingoHUD
                         {
                             if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
-                                Plugin.logger.LogMessage($"Team {t} won!");
+                                
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
                             }
 
@@ -318,7 +318,7 @@ namespace BingoMode.BingoHUD
                             // Bingo wins
                             if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
-                                Plugin.logger.LogMessage($"Team {t} won!");
+                                
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
                             }
 
@@ -343,15 +343,6 @@ namespace BingoMode.BingoHUD
                             }
                         }
 
-                        foreach (var kvp in completedForTeam)
-                        {
-                            Plugin.logger.LogInfo($"Completes for {BingoPage.TeamName(kvp.Key)}: {kvp.Value}");
-                        }
-                        foreach (var kvp in emptyForTeam)
-                        {
-                            Plugin.logger.LogInfo($"Empties for {BingoPage.TeamName(kvp.Key)}: {kvp.Value}");
-                        }
-                        Plugin.logger.LogInfo("------------------------------------");
                         List<int> tieTeams = [];
                         foreach (int t in teamsInBingo)
                         {
@@ -368,13 +359,13 @@ namespace BingoMode.BingoHUD
                             foreach (int o in teamsInBingo)
                             {
                                 if (t == o) continue;
-                                Plugin.logger.LogInfo($"Completes for {BingoPage.TeamName(o)}: {completedForTeam[o]}");
-                                Plugin.logger.LogInfo($"Potential for {BingoPage.TeamName(o)}: {completedForTeam[o] + emptyForTeam[o]}");
+                                
+                                
                                 if (completedForTeam[t] == completedForTeam[o])
                                 {
                                     if (!tieTeams.Contains(t)) tieTeams.Add(t);
                                     if (!tieTeams.Contains(o)) tieTeams.Add(o);
-                                    Plugin.logger.LogMessage($"Team {t} and {o} tied!");
+                                    
                                 }
                                 if (tieTeams.Count > 0) continue;
 
@@ -388,7 +379,7 @@ namespace BingoMode.BingoHUD
 
                             if (canWin)
                             {
-                                Plugin.logger.LogMessage($"Team {t} won through majority!");
+                                
                                 return new BingoCompleteInfo([t], "Team <team_name> won!", addText, BingoCompleteReason.Majority);
                             }
                         }
@@ -434,7 +425,7 @@ namespace BingoMode.BingoHUD
 
                             if (won)
                             {
-                                Plugin.logger.LogMessage($"Team {t} won!");
+                                
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Blackout);
                             }
                         }
@@ -445,7 +436,7 @@ namespace BingoMode.BingoHUD
             {
                 if (BingoHooks.GlobalBoard.CheckWin(SteamTest.team))
                 {
-                    Plugin.logger.LogMessage($"Team {SteamTest.team} won!");
+                    
                     return new BingoCompleteInfo([SteamTest.team], "You won!", addText, BingoCompleteReason.Bingo);
                 }
             }
@@ -463,7 +454,7 @@ namespace BingoMode.BingoHUD
                     if ((BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[team]) all++;
                 }
             }
-            Plugin.logger.LogWarning($"Completed challenges for team {BingoPage.TeamName(team)} - {all}");
+            
             return all;
         }
 
@@ -510,7 +501,7 @@ namespace BingoMode.BingoHUD
 
                 foreach (var kvp in completedForTeam)
                 {
-                    Plugin.logger.LogInfo($"Completes for {BingoPage.TeamName(kvp.Key)}: {kvp.Value}");
+                    
                     addText += "\n" + BingoPage.TeamName(kvp.Key) + " - " + kvp.Value;
                 }
             }

@@ -255,11 +255,11 @@ namespace BingoMode.BingoChallenges
                         string[] gate = actualLine.Split('_');
                         string regionNames = gate[0] + "_" + gate[1];
                         gatesToAdd.Add(regionNames);
-                        //Plugin.logger.LogMessage("Adding " + regionNames);
+                        //
                     }
                     catch
                     {
-                        Plugin.logger.LogMessage("Couldnt read gate " + line);
+                        Plugin.logger.LogError("Couldnt read gate " + line);
                     }
                 }
             }

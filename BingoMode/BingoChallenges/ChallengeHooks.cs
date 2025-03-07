@@ -74,7 +74,7 @@ namespace BingoMode.BingoChallenges
             string[] settings = save.Split('|');
             try
             {
-                //Plugin.logger.LogMessage("Attempting to recreate settingbox from string:");
+                //
                 object bocks = null;
                 //int[] locks = null;
                 string listName = null;
@@ -94,30 +94,30 @@ namespace BingoMode.BingoChallenges
                     case "Int64":
                     case "System.Int32":
                     case "System.Int64":
-                        //Plugin.logger.LogMessage("Generating it as int!");
+                        //
                         bocks = new SettingBox<int>(int.Parse(settings[1]), settings[2], int.Parse(settings[3]), listName);
                         break;
                     case "Boolean":
                     case "System.Boolean":
-                        //Plugin.logger.LogMessage("Generating it as bool!");
+                        //
                         bocks = new SettingBox<bool>(settings[1].ToLowerInvariant() == "true", settings[2], int.Parse(settings[3]), listName);
                         break;
                     case "String":
                     case "System.String":
-                        //Plugin.logger.LogMessage("Generating it as string!");
+                        //
                         bocks = new SettingBox<string>(settings[1], settings[2], int.Parse(settings[3]), listName);
                         break;
                 }
-                //Plugin.logger.LogMessage("Recreation successful!");
-                //Plugin.logger.LogMessage("Final grug: " + bocks.ToString());
+                //
+                //
                 return bocks;
             }
             catch(Exception ex)
             {
-                Plugin.logger.LogMessage("Errored guy:");
+                
                 foreach (var j in settings)
                 {
-                    Plugin.logger.LogMessage(j);
+                    
                 }; 
                 Plugin.logger.LogError("Failed to recreate SettingBox from string!!!" + ex);
                 return null;
@@ -333,7 +333,7 @@ namespace BingoMode.BingoChallenges
                         if (t.traderItems.ContainsKey(obj.abstractPhysicalObject.ID))
                         {
                             string room = self.room.abstractRoom.name;
-                            //Plugin.logger.LogWarning(room + " - yess - " + t.traderItems[obj.abstractPhysicalObject.ID]);
+                            //
                             if (t.traderItems[obj.abstractPhysicalObject.ID].ToLowerInvariant() != room.ToLowerInvariant())
                             {
                                 t.Traded(obj.abstractPhysicalObject.ID, room);
@@ -548,7 +548,7 @@ namespace BingoMode.BingoChallenges
                     startItem.Realize();
                 });
             }
-            else Plugin.logger.LogError("Ass " + il);
+            else Plugin.logger.LogError("Room_LoadedEnergyCell IL FAILURE " + il);
         }
 
         public static void EnergyCell_Use(On.MoreSlugcats.EnergyCell.orig_Use orig, EnergyCell self, bool forced)
@@ -736,7 +736,7 @@ namespace BingoMode.BingoChallenges
                 c.Emit(OpCodes.Ldloc_0);
                 c.EmitDelegate<Action<FlareBomb, int>>((self, i) =>
                 {
-                    Plugin.logger.LogMessage("gruh");
+                    
                     if (BingoData.BingoMode && self.thrownBy != null && self.thrownBy.abstractCreature.creatureTemplate.type == CreatureType.Slugcat && self.room.abstractRoom.creatures[i].realizedCreature is Creature victim)
                     {
                         ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID);
@@ -802,7 +802,7 @@ namespace BingoMode.BingoChallenges
         public static void ReportHit(ItemType weapon, Creature victim, EntityID source, bool report = true)
         {
             if (weapon == null || victim == null) return;
-            Plugin.logger.LogMessage($"Report hit! {weapon} {victim.Template.type} {source}");
+            
 
             if (source != null && report)
             {
@@ -811,7 +811,7 @@ namespace BingoMode.BingoChallenges
                 if (BingoData.blacklist.TryGetValue(victim, out var list) && !list.Contains(source)) list.Add(source);
             }
 
-            Plugin.logger.LogMessage($"Hit {weapon} {victim.Template.type} {source} went through!");
+            
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -822,8 +822,8 @@ namespace BingoMode.BingoChallenges
             }
 
             EntityID id = victim.abstractCreature.ID;
-            if (!BingoData.hitTimeline.ContainsKey(id)) BingoData.hitTimeline.Add(id, []);
-            if (BingoData.hitTimeline.TryGetValue(id, out var gru) && (gru.Count == 0 || gru.Last() != weapon)) { gru.Remove(weapon); gru.Add(weapon); Plugin.logger.LogMessage($"Added {weapon} to id: {id} and creature type: {victim.abstractCreature.creatureTemplate.type}"); }
+            if (!BingoData.hitTimeline.ContainsKey(id)) BingoData.hitTimeline.Add(id, []);  
+            if (BingoData.hitTimeline.TryGetValue(id, out var gru) && (gru.Count == 0 || gru.Last() != weapon)) { gru.Remove(weapon); gru.Add(weapon);  }
         }
 
         public static void Creature_UpdateIL(ILContext il)
@@ -1108,7 +1108,7 @@ namespace BingoMode.BingoChallenges
                     {
                         ignore = heldType;
                         BingoData.heldItemsTime[(int)heldType]++;
-                        //Plugin.logger.LogMessage(BingoData.heldItemsTime[(int)heldType]);
+                        //
                     }
                 }
             }
@@ -1242,7 +1242,7 @@ namespace BingoMode.BingoChallenges
                 c.Emit(OpCodes.Ldarg, 4);
                 c.EmitDelegate<Action<ScavengerAI, PhysicalObject>>((self, item) =>
                 {
-                    Plugin.logger.LogWarning(item.abstractPhysicalObject);
+                    
                     if (item is Spear spear && spear.IsNeedle)
                     {
                         for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
@@ -1281,8 +1281,8 @@ namespace BingoMode.BingoChallenges
                                 EntityID givenItem = self.scavenger.room.socialEventRecognizer.ownedItemsOnGround[i].item.abstractPhysicalObject.ID;
                                 EntityID receivedItem = item.abstractPhysicalObject.ID;
                                 string room = self.creature.Room.name;
-                                Plugin.logger.LogMessage("GAVE " + givenItem);
-                                Plugin.logger.LogMessage("RECEIVED " + receivedItem);
+                                
+                                
 
                                 if (givenItem != receivedItem && !t.traderItems.ContainsKey(givenItem)) t.traderItems.Add(givenItem, room);
                                 //t.Traded(receivedItem, room);
@@ -1312,7 +1312,7 @@ namespace BingoMode.BingoChallenges
                             {
                                 if (ExpeditionData.challengeList[w] is BingoStealChallenge c)
                                 {
-                                    Plugin.logger.LogMessage("Stoled report " + self.outpost.outPostProperty[k].type);
+                                    
                                     c.Stoled(self.outpost.outPostProperty[k], true);
                                     gruh = true;
                                 }
@@ -1397,26 +1397,26 @@ namespace BingoMode.BingoChallenges
                     }
                 });
             }
-            else Plugin.logger.LogMessage("JellyFish_Collide failed! " + il);
+            else Plugin.logger.LogError("JellyFish_Collide failed! " + il);
         }
 
         public static bool MiscProgressionData_GetTokenCollected(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_string_bool orig, PlayerProgression.MiscProgressionData self, string tokenString, bool sandbox)
         {
-            Plugin.logger.LogMessage("Checkunlock " + tokenString);
+            
             if (BingoData.challengeTokens.Contains(tokenString)) return false;
             return orig.Invoke(self, tokenString, sandbox);
         }
 
         public static bool MiscProgressionData_GetTokenCollected_SlugcatUnlockID(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_SlugcatUnlockID orig, PlayerProgression.MiscProgressionData self, MultiplayerUnlocks.SlugcatUnlockID classToken)
         {
-            Plugin.logger.LogMessage("Checkunlock " + classToken.value);
+            
             if (BingoData.challengeTokens.Contains(classToken.value)) return false;
             return orig.Invoke(self, classToken);
         }
 
         public static bool MiscProgressionData_GetTokenCollected_SafariUnlockID(On.PlayerProgression.MiscProgressionData.orig_GetTokenCollected_SafariUnlockID orig, PlayerProgression.MiscProgressionData self, MultiplayerUnlocks.SafariUnlockID safariToken)
         {
-            Plugin.logger.LogMessage("Checkunlock " + safariToken.value + "-safari");
+            
             if (BingoData.challengeTokens.Contains(safariToken.value + "-safari")) return false;
             return orig.Invoke(self, safariToken);
         }
@@ -1511,7 +1511,7 @@ namespace BingoMode.BingoChallenges
                     startItem.Realize();
                 });
             }
-            else Plugin.logger.LogError("Ass " + il);
+            else Plugin.logger.LogError("Room_LoadedGreenNeuron IL ERROR " + il);
         }
         
         public static void Room_LoadedHalcyon(ILContext il)

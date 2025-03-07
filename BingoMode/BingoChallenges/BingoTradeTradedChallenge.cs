@@ -52,10 +52,10 @@ namespace BingoMode.BingoChallenges
 
         public void Traded(EntityID item, string room)
         {
-            Plugin.logger.LogMessage($"Ttraded {item}, {room}, {(traderItems.ContainsKey(item) ? traderItems[item] : "nuhuh")}");
+            
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && traderItems.ContainsKey(item) && traderItems[item].ToLowerInvariant() != room.ToLowerInvariant())
             {
-                Plugin.logger.LogMessage("Suck ces");
+                
                 traderItems.Remove(item);
                 current++;
                 UpdateDescription();

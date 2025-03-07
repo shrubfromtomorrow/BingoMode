@@ -280,7 +280,7 @@ namespace BingoMode.BingoMenu
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
                 ccc.region = ccc.room.Value.Substring(0, 2);
-                Plugin.logger.LogMessage("Vista bs: " + ccc.region + " " + ccc.room.Value);
+                
                 ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
                 BingoVistaChallenge.ModifyVistaCandidates(ccc);
             }
@@ -505,7 +505,7 @@ namespace BingoMode.BingoMenu
 
             public void UpdootString(UIconfig config, string v, string oldV)
             {
-                //Plugin.logger.LogMessage("new value: " + field.value);
+                //
                 (value as SettingBox<string>).Value = field.value;
                 (menu as CustomizerDialog).UpdateChallenge();
             }

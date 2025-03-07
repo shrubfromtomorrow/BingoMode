@@ -31,7 +31,7 @@ namespace BingoMode
 
         public void GenerateBoard(int size, bool changeSize = false)
         {
-            Plugin.logger.LogMessage("Generating board");
+            
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
@@ -218,8 +218,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Vertical win");
-                    break;
+                                        break;
                 }
                 else currentWinLine.Clear();
             }
@@ -239,8 +238,7 @@ namespace BingoMode
                     won = line;
                     if (won)
                     {
-                        Plugin.logger.LogMessage("Horizontal win");
-                        break;
+                                                break;
                     }
                     else currentWinLine.Clear();
                 }
@@ -259,8 +257,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Diagonal 1 win");
-                }
+                                    }
                 else currentWinLine.Clear();
             }
 
@@ -277,8 +274,7 @@ namespace BingoMode
                 won = line;
                 if (won)
                 {
-                    Plugin.logger.LogMessage("Diagnoal 2 win");
-                }
+                                    }
                 else currentWinLine.Clear();
             }
 
@@ -430,11 +426,11 @@ namespace BingoMode
 
         public void RecreateFromList()
         {
-            Plugin.logger.LogMessage("Recreating from list " + (recreateList != null ? recreateList.Count : "SHITS NULL"));
-            Plugin.logger.LogMessage("Size of rec: " + size);
+            
+             
             if (recreateList != null && Mathf.RoundToInt(Mathf.Sqrt(recreateList.Count)) == size)
             {
-                Plugin.logger.LogMessage("Went through");
+                 
                 challengeGrid = new Challenge[size, size];
                 int next = 0;
                 for (int i = 0; i < size; i++)
@@ -448,11 +444,11 @@ namespace BingoMode
                         //else 
                         challengeGrid[i, j] = recreateList[next];
                         //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                        Plugin.logger.LogMessage($"Recreated {recreateList[next]} at: {i}, {j}. Challenge - {challengeGrid[i, j]}");
+                         
                         next++;
                     }
                 }
-                Plugin.logger.LogMessage("Recreated list from thinj yipe");
+                
                 SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
             }
@@ -464,7 +460,7 @@ namespace BingoMode
             try
             {
                 int g1 = index == -1 ? ExpeditionData.challengeList.IndexOf(challengeGrid[x, y]) : index;
-                Plugin.logger.LogMessage("Inserting ch to " + g1);
+                
                 ExpeditionData.challengeList.Remove(challengeGrid[x, y]);
                 challengeGrid[x, y] = newChallenge;
                 ExpeditionData.challengeList.Insert(g1, challengeGrid[x, y]);
@@ -487,7 +483,7 @@ namespace BingoMode
             if (string.IsNullOrEmpty(text) || !text.Contains("bChG") || !text.Contains(';')) return;
             string slug = text.Substring(0, text.IndexOf(';'));
             text = text.Substring(text.IndexOf(";") + 1);
-            Plugin.logger.LogMessage(slug + " Bingo board from string:\n" + text);
+            
             if (slug.ToLowerInvariant() != ExpeditionData.slugcatPlayer.value.ToLowerInvariant())
             {
                 if (BingoData.globalMenu != null) BingoData.globalMenu.manager.ShowDialog(new InfoDialog(BingoData.globalMenu.manager, $"Slugcat mismatch!\n\nSelected slugcat: {ExpeditionData.slugcatPlayer.value}\nProvided Slugcat: {slug}\n\nPlease paste a board from the same slugcat that's currently selected."));
@@ -566,7 +562,7 @@ namespace BingoMode
             if (challengeGrid == null) { Plugin.logger.LogError("CHALLENGE GRID IS NULL!! Returning"); return; }
 
             string[] challenges = Regex.Split(state, "<>");
-            Plugin.logger.LogMessage("All challenges count from interpret bingo state: " + challenges.Length);
+            
 
             int next = 0;
             for (int i = 0; i < size; i++)
@@ -582,7 +578,7 @@ namespace BingoMode
                     string currentTeamsString = ch.TeamsToString();
                     string newTeamsString = challenges[next];
 
-                    //Plugin.logger.LogFatal($"Comparing {currentTeamsString} to {newTeamsString}");
+                    //
                     // All the switch statements to make it 100% clear, obviously can be shortened down
                     if (currentTeamsString != newTeamsString)
                     {

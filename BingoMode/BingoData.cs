@@ -133,7 +133,7 @@ namespace BingoMode
                 if (challenge is BingoUnlockChallenge c && !c.TeamsCompleted[SteamTest.team] && !challengeTokens.Contains(c.unlock.Value))
                 {
                     challengeTokens.Add(c.unlock.Value);
-                    Plugin.logger.LogMessage("Addunlock " + c.unlock.Value);
+                    
                 }
             }
         }
@@ -152,24 +152,24 @@ namespace BingoMode
             foreach (BingoChallenge challenge in from challenge in challenges where challenge is BingoChallenge select challenge)
             {
                 string name = (challenge as Challenge).ChallengeName();
-                //Plugin.logger.LogMessage("Hooking " + name);
+                //
                 if (add && !appliedChallenges.Contains(name))
                 {
                     challenge.AddHooks();
                     appliedChallenges.Add(name);
-                    //Plugin.logger.LogMessage("Adding this one");
+                    //
                 }
                 else if (!add)
                 {
                     challenge.RemoveHooks();
-                    //Plugin.logger.LogMessage("Removing this one");
+                    //
                 }
             }
         }
 
         public static void FillPossibleTokens(SlugcatStats.Name slug)
         {
-            Plugin.logger.LogMessage("Current slug: " + slug);
+            
             possibleTokens[0] = []; // blue
             possibleTokens[1] = []; // gold
             possibleTokens[2] = []; // red
@@ -181,7 +181,7 @@ namespace BingoMode
                     if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE BLUE: " + kvp.Value[n].value);
+                        
                         possibleTokens[0].Add(kvp.Value[n].value);
                     }
                 }
@@ -196,7 +196,7 @@ namespace BingoMode
                     if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                     if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE GOLD: " + kvp.Value[n].value);
+                        //*
                         possibleTokens[1].Add(kvp.Value[n].value);
                     }
                 }
@@ -211,7 +211,7 @@ namespace BingoMode
                 {
                     if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
                     {
-                        Plugin.logger.LogMessage("ACCESSIBLE SAFARI: " + kvp.Value[n].value + "-safari");
+                        //.*
                         possibleTokens[2].Add(kvp.Value[n].value + "-safari");
                     }
                 }
@@ -229,7 +229,7 @@ namespace BingoMode
                             (slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer && kvp.Key.ToLowerInvariant() == "lc") ||
                             (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear && kvp.Key.ToLowerInvariant() == "dm"))
                         {
-                            Plugin.logger.LogMessage("ACCESSIBLE GREEN: " + kvp.Value[n].value);
+                            
                             possibleTokens[3].Add(kvp.Value[n].value);
                         }
                     }

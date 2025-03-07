@@ -60,7 +60,7 @@ namespace BingoMode.BingoChallenges
         public void Fail()
         {
             if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amound.Value)) return;
-            Plugin.logger.LogFatal("Doing hell halang");
+            
             FailChallenge(SteamTest.team);
         }
 

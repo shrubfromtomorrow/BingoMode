@@ -96,7 +96,7 @@ namespace BingoMode.BingoChallenges
 
         //public void CheckAchievementProgress(WinState winState)
         //{
-        //    Plugin.logger.LogWarning($"THIS '{this.ToString()}' WIN STATE - '{winState.ToString()}'");
+        //    
         //    if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden)
         //    {
         //        return;
@@ -104,10 +104,10 @@ namespace BingoMode.BingoChallenges
         //    if (winState != null)
         //    {
         //        WinState.EndgameTracker tracker = winState.GetTracker(new(ID.Value), true);
-        //        Plugin.logger.LogWarning("gruhhed " + tracker.ToString());
+        //        
         //        if (tracker != null && tracker.GoalFullfilled)
         //        {
-        //            Plugin.logger.LogWarning("completado");
+        //            
         //            this.CompleteChallenge();
         //        }
         //    }

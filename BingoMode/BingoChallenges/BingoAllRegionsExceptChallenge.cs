@@ -18,7 +18,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions and never visit " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
+            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions without visiting " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
                 .Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString());
             base.UpdateDescription();
         }
@@ -35,7 +35,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Entering regions while never visiting one");
+            return ChallengeTools.IGT.Translate("Entering regions without visiting one");
         }
 
         public override void Reset()
@@ -60,15 +60,14 @@ namespace BingoMode.BingoChallenges
 
         public void Entered(string regionName)
         {
-            if (SteamTest.team == 8) return;
-            if (region.Value == regionName && !TeamsFailed[SteamTest.team])
+            if (SteamTest.team == 8 || hidden || revealed || completed || TeamsCompleted[SteamTest.team] || TeamsFailed[SteamTest.team]) return;
+            if (region.Value == regionName)
             {
                 FailChallenge(SteamTest.team);
                 return;
             }
-            else if (!TeamsFailed[SteamTest.team] && !completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && regionsToEnter.Contains(regionName))
+            else if (!TeamsFailed[SteamTest.team] && regionsToEnter.Contains(regionName))
             {
-                Plugin.logger.LogMessage("Visited " + regionName);
                 regionsToEnter.Remove(regionName);
 
                 current++;

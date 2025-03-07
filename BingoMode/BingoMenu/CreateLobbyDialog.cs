@@ -138,7 +138,7 @@ namespace BingoMode.BingoMenu
             if (!inLobby) return;
             int players = maxPlayers.GetValueInt();
             SteamMatchmaking.SetLobbyMemberLimit(SteamTest.CurrentLobby, players);
-            Plugin.logger.LogMessage("Set lobby member limit to " + players);
+            
         }
 
         public override void Update()

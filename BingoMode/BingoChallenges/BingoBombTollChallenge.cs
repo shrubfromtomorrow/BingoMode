@@ -59,7 +59,7 @@ namespace BingoMode.BingoChallenges
         {
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden && roomName.Value == room.ToLowerInvariant())
             {
-                Plugin.logger.LogMessage("bombed");
+                
                 if (!pass.Value)
                 {
                     CompleteChallenge();

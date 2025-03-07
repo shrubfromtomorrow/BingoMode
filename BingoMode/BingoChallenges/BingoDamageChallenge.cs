@@ -76,7 +76,7 @@ namespace BingoMode.BingoChallenges
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
-            Plugin.logger.LogMessage("hit " + weaponn.value + " " + weapon.Value);
+            
             bool glug = false;
             bool weaponCheck = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;

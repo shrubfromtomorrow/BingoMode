@@ -19,11 +19,11 @@ namespace BingoMode.BingoSteamworks
         {
             if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID()) return;
             IntPtr ptr = Marshal.StringToHGlobalAuto(data);
-            Plugin.logger.LogMessage("SENDING: " + Marshal.PtrToStringAuto(ptr) + " " + (uint)(data.Length * sizeof(char)));
+            
 
             if (SteamNetworkingMessages.SendMessageToUser(ref receiver, ptr, (uint)(data.Length * sizeof(char)), reliable ? 40 : 32, 0) != EResult.k_EResultOK)
             {
-                Plugin.logger.LogMessage("FAILED TO SEND MESSAGE \"" + data + "\" TO USER " + receiver.GetSteamID());
+                Plugin.logger.LogError("FAILED TO SEND MESSAGE \"" + data + "\" TO USER " + receiver.GetSteamID());
             }
 
             Marshal.FreeHGlobal(ptr);
@@ -54,7 +54,7 @@ namespace BingoMode.BingoSteamworks
 
                     if (x != -1 && y != -1)
                     {
-                        Plugin.logger.LogMessage($"Completing online challenge at {x}, {y}");
+                        
                         BingoChallenge ch = (BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge);
                         if (SteamTest.team != 8 &&
                             BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
@@ -76,7 +76,7 @@ namespace BingoMode.BingoSteamworks
                     }
                     else
                     {
-                        Plugin.logger.LogError("COULDNT: " + message);
+                        Plugin.logger.LogError("COULDNT COMPLETE ONLINE SQUARE: " + message);
                         break;
                     }
 
@@ -94,7 +94,7 @@ namespace BingoMode.BingoSteamworks
                     //ulong playerCredit2 = ulong.Parse(data[3], System.Globalization.NumberStyles.Any);
                     if (xx != -1 && yy != -1)
                     {
-                        Plugin.logger.LogMessage($"Failing online challenge at {xx}, {yy}");
+                        
                         //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).TeamsCompleted[teamCredit2] = false;
                         //(BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).completeCredit = playerCredit2;
                         (BingoHooks.GlobalBoard.challengeGrid[xx, yy] as BingoChallenge).OnChallengeFailed(teamCredit2);
@@ -193,10 +193,10 @@ namespace BingoMode.BingoSteamworks
                     {
                         if (data.Length == 2 && BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64().ToString() == data[0])
                         {
-                            Plugin.logger.LogMessage("Reconnected to host " + data[0] + "!");
+                            
                             SteamFinal.ReceivedHostUpKeep = true;
                             SteamFinal.HostUpkeep = SteamFinal.MaxHostUpKeepTime;
-                            Plugin.logger.LogMessage($"Got new bingo board state!");
+                            
                             BingoHooks.GlobalBoard.InterpretBingoState(data[1]);
                         } 
                         else
@@ -229,7 +229,7 @@ namespace BingoMode.BingoSteamworks
                     //
                     //    foreach (string stringId in Regex.Split(data[1], "<bMd>"))
                     //    {
-                    //        Plugin.logger.LogMessage("Workshor id: " + stringId);
+                    //        
                     //        ulong workshopId;
                     //        if (ulong.TryParse(stringId.Split('|')[0], System.Globalization.NumberStyles.Any, null, out workshopId))
                     //        {
@@ -250,18 +250,10 @@ namespace BingoMode.BingoSteamworks
                         //}
 
                         var playerwhitelist = SteamFinal.PlayersFromString(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
-                        Plugin.logger.LogMessage("The guy who contacted me: " + requesterID);
-                        foreach (var gruh in playerwhitelist)
-                        {
-                            Plugin.logger.LogMessage("Player white list: " + gruh.GetSteamID64());
-                        }
-                        foreach (var gruh in SteamFinal.ConnectedPlayers)
-                        {
-                            Plugin.logger.LogMessage("Connected player: " + gruh.GetSteamID64());
-                        }
+                        
                         if (!SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID) && playerwhitelist.Any(x => x.GetSteamID64() == requesterID))
                         {
-                            Plugin.logger.LogMessage($"Adding player {requesterID} back to the game!");
+                            
                             SteamFinal.ConnectedPlayers.Add(requesterIdentity);
                         }
                         if (SteamFinal.ConnectedPlayers.Any(x => x.GetSteamID64() == requesterID))
@@ -279,12 +271,12 @@ namespace BingoMode.BingoSteamworks
 
                 // Tally up
                 case 'T':
-                    Plugin.logger.LogFatal("BINGING");
+                    
                     BingoHUDMain.ForceTallyUp = true;
                     break;
 
                 default:
-                    Plugin.logger.LogWarning("INVALID MESSAGE: " + message);
+                    Plugin.logger.LogError("INVALID MESSAGE: " + message);
                     break;
             }
         }

@@ -78,15 +78,14 @@ namespace BingoMode.BingoChallenges
             if (crit.Value != "Any Creature")
             {
                 phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
+                n++;
             }
-            n++;
             if (region.Value == "Any Region")
             {
                 phrase.words.Add(new Icon("TravellerA", 1f, Color.white));
             }
             else
             {
-
                 phrase.words.Add(new Verse(region.Value));
             }
             n++;

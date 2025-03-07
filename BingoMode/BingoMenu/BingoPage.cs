@@ -210,7 +210,7 @@ namespace BingoMode.BingoMenu
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
         {
-            Plugin.logger.LogMessage(value);
+            
             string lastDen = BingoData.BingoDen;
             if (value.Trim() == string.Empty)
             {
@@ -218,7 +218,7 @@ namespace BingoMode.BingoMenu
                 return;
             }
             BingoData.BingoDen = value;
-            Plugin.logger.LogMessage($"SETTING BINGO DEN FROM {lastDen} TO {BingoData.BingoDen}");
+            
         }
 
         private void NameFilter_OnValueUpdate(UIconfig config, string value, string oldValue)
@@ -387,7 +387,7 @@ namespace BingoMode.BingoMenu
                 {
                     foreach (var playere in lobbyPlayers)
                     {
-                        Plugin.logger.LogMessage("Adding from lobby players team " + SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
+                        
                         int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
                         if (!BingoData.TeamsInBingo.Contains(team) && team != 8) BingoData.TeamsInBingo.Add(team);
                     }
@@ -435,7 +435,7 @@ namespace BingoMode.BingoMenu
                             if (tries > 200)
                             {
                                 BingoData.BingoDen = "SU_S01";
-                                Plugin.logger.LogWarning("Generation tries past 200, assigning SU_S01");
+                                
                             }
                             if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant())
                             {
@@ -489,7 +489,7 @@ namespace BingoMode.BingoMenu
                             }
                         }
                         if (connectedPlayers.StartsWith("bPlR")) connectedPlayers = connectedPlayers.Substring(4);
-                        Plugin.logger.LogMessage("CONNECTED PLAYERS STRING SAVING: " + connectedPlayers);
+                        
                     }
                     else if (!isHost)
                     {
@@ -504,7 +504,7 @@ namespace BingoMode.BingoMenu
                 else
                 {
                     int newTeam = TeamNumber(Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value);
-                    Plugin.logger.LogWarning("Setting new team to: " + newTeam);
+                    
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
                     SteamTest.team = newTeam;
                 }
@@ -595,10 +595,9 @@ namespace BingoMode.BingoMenu
                 (sender as SimpleButton).buttonBehav.greyedOut = true;
                 if (ulong.TryParse(message.Split('-')[1], out ulong lobid))
                 {
-                    Plugin.logger.LogMessage("Joining" + lobid);
+                    
                     CSteamID lobbid = new CSteamID(lobid);
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobbid, "lobbyVersion");
-                    Plugin.logger.LogError($"Our version: {Plugin.VERSION}. Comparing to: {lobbyVersion}");
                     if (lobbyVersion != Plugin.VERSION)
                     {
                         menu.manager.ShowDialog(new InfoDialog(menu.manager, $"Version mismatch.\nPlease make sure you're using the same Bingo mod version as the lobby.\nYour version: {Plugin.VERSION} Lobby version: {lobbyVersion}"));
@@ -608,12 +607,12 @@ namespace BingoMode.BingoMenu
                     if (hostRequiredMods != "none")
                     {
                         List<string> modStrings = Regex.Split(hostRequiredMods, "<bMd>").ToList();
-                        Plugin.logger.LogWarning("Examining " + modStrings);
+                        
                         Dictionary<string, string> requiredMods = [];
                         string[] skipMods = GetCommonClientMods();
                         foreach (string m in modStrings)
                         {
-                            Plugin.logger.LogWarning(m);
+                            
                             string[] idAndName = m.Split('|');
                             if (skipMods.Contains(idAndName[0])) continue;
 
@@ -803,7 +802,7 @@ namespace BingoMode.BingoMenu
             {
                 line.x = multiMenuBg.pos.x + 365f; 
             }
-            divider.x = multiMenuBg.pos.x + .5f;
+            divider.x = multiMenuBg.pos.x;
             divider.y = 583f;
 
             if (!inLobby)
@@ -942,6 +941,18 @@ namespace BingoMode.BingoMenu
             foreach (var p in identities)
             {
                 lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
+                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
             }
 
             lobbyPlayers = lobbyPlayers.OrderBy(x => x.playerIndex).ToList();
@@ -949,11 +960,11 @@ namespace BingoMode.BingoMenu
             lobbyDividers = new FSprite[lobbyPlayers.Count - 1];
             for (int i = 0; i < lobbyDividers.Length; i++)
             {
-                lobbyDividers[i] = new FSprite("pixel")
+                lobbyDividers[i] = new FSprite("LinearGradient200")
                 {
-                    scaleX = 340f,
-                    scaleY = 1f,
-                    anchorX = 0f
+                    rotation = 90f,
+                    anchorY = 0f,
+                    scaleY = 1.5f
                 };
                 Container.AddChild(lobbyDividers[i]);
             }
@@ -1155,15 +1166,15 @@ namespace BingoMode.BingoMenu
 
             foreach (var lobby in lobbies)
             {
-                Plugin.logger.LogMessage($"Examining lobby - {lobby}");
-                int l = SteamMatchmaking.GetLobbyDataCount(lobby);
-                for (int i = 0; i < l; i++)
-                {
-                    if (SteamMatchmaking.GetLobbyDataByIndex(lobby, i, out string key, 255, out string value, 8192))
-                    {
-                        Plugin.logger.LogMessage($"Data {i} - {key} - {value}");
-                    }
-                }
+                //Plugin.logger.LogMessage($"Examining lobby - {lobby}");
+                //int l = SteamMatchmaking.GetLobbyDataCount(lobby);
+                //for (int i = 0; i < l; i++)
+                //{
+                //    if (SteamMatchmaking.GetLobbyDataByIndex(lobby, i, out string key, 255, out string value, 8192))
+                //    {
+                //        Plugin.logger.LogMessage($"Data {i} - {key} - {value}");
+                //    }
+                //}
                 try
                 {
                     string name = SteamMatchmaking.GetLobbyData(lobby, "name");
@@ -1173,14 +1184,14 @@ namespace BingoMode.BingoMenu
                     bool hostMods = SteamMatchmaking.GetLobbyData(lobby, "hostMods") != "none";
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion");
                     string slugcat = SteamMatchmaking.GetLobbyData(lobby, "slugcat");
-                    Plugin.logger.LogMessage($"Perks: {SteamMatchmaking.GetLobbyData(lobby, "perks").Trim()}");
-                    Plugin.logger.LogMessage($"Burdens: {SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim()}");
+                    
+                    
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                    Plugin.logger.LogMessage($"Adding lobby info: {name}: {currentPlayers}/{maxPlayers}. Gamemode - {gamemode}, Require host mods - {hostMods}, Perks - {perks}, Burdens - {burdens}");
+                    
                     foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, gamemode, hostMods, lobbyVersion, slugcat, perks, burdens));
-                    //Plugin.logger.LogWarning($"Challenges of lobby {lobby} are:\n{SteamMatchmaking.GetLobbyData(lobby, "challenges")}");
+                    //
                 }
                 catch (System.Exception e)
                 {
@@ -1309,20 +1320,23 @@ namespace BingoMode.BingoMenu
                 nameLabel.SetPosition(origPos + new Vector2(8f, 0f));
                 readyMark.SetPosition(origPos);
                 float a = Mathf.Clamp01(maxAlpha);
+                bool unclicky = maxAlpha < 0.25f || disabled;
                 nameLabel.alpha = a;
                 readyMark.alpha = a;
                 if (selectTeam != null)
                 {
                     selectTeam.myContainer.alpha = disabled ? 0f : a;
-                    selectTeam.pos = origPos + new Vector2(250f, -12.5f);
+                    selectTeam.pos = origPos + new Vector2(250f, -10.5f);
                     selectTeam.lastScreenPos = selectTeam.ScreenPos;
-                    selectTeam.greyedOut = maxAlpha < 0.25f;
+                    selectTeam.greyedOut = unclicky;
+                    selectTeam._lastGreyedOut = unclicky;
+                    if (unclicky) selectTeam._mouseDown = false;
                 }
                 if (kick != null)
                 {
                     kick.pos = origPos + new Vector2(210f, -8f);
                     kick.lastPos = kick.pos;
-                    kick.buttonBehav.greyedOut = maxAlpha < 0.25f;
+                    kick.buttonBehav.greyedOut = unclicky;
                 }
             }
 

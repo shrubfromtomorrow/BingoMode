@@ -42,7 +42,7 @@ namespace BingoMode.BingoSteamworks
                     {
                         if (ReceivedHostUpKeep)
                         {
-                            Plugin.logger.LogMessage("Reconnected to host!");
+                            
                             TryToReconnect = false;
                             HostUpkeep = MaxHostUpKeepTime;
                             ReceivedHostUpKeep = true;
@@ -57,7 +57,7 @@ namespace BingoMode.BingoSteamworks
                         }
                         else
                         {
-                            Plugin.logger.LogMessage("Trying to reconnect to host!");
+                            
                             InnerWorkings.SendMessage("H" + SteamTest.selfIdentity.GetSteamID64(), BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID);
                             ReconnectTimer = TryToReconnectTime;
                         }
@@ -71,12 +71,12 @@ namespace BingoMode.BingoSteamworks
                         HostUpkeep = MaxHostUpKeepTime;
                         if (ReceivedHostUpKeep)
                         {
-                            Plugin.logger.LogMessage("Received host upkeep in time :))");
+                            
                             ReceivedHostUpKeep = false;
                         }
                         else
                         {
-                            Plugin.logger.LogMessage("Didnt receive host upkeep in time :(( Disconnecting from host");
+                            
                             // Didnt receve host upkeep, so host is probably disconnected
                             if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
                             rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Lost connection to host."));
@@ -89,24 +89,24 @@ namespace BingoMode.BingoSteamworks
                 SendUpKeepCounter--;
                 if (SendUpKeepCounter <= 0)
                 {
-                    Plugin.logger.LogMessage($"hi");
+                    
                     SendUpKeepCounter = PlayerUpkeepTime;
                     List<ulong> ToRemove = [];
                     List<ulong> ToFalse = [];
                     int allReceived = 0;
                     foreach (var kvp in ReceivedPlayerUpKeep)
                     {
-                        Plugin.logger.LogMessage($"upkp {kvp.Key} + {kvp.Value}");
+                        
                         if (ReceivedPlayerUpKeep[kvp.Key])
                         {
-                            Plugin.logger.LogMessage($"Received upkeep from {kvp.Key} in time!");
+                            
                             RequestPlayerUpKeep(kvp.Key);
                             ToFalse.Add(kvp.Key);
                             allReceived++;
                             continue;
                         }
 
-                        Plugin.logger.LogMessage($"Didnt receive upkeep from {kvp.Key} in time! Considering them disconnected");
+                        
                         // Player didnt send their upkeep, so theyre considered dead to the host
                         ConnectedPlayers.RemoveAll(x => x.GetSteamID64() == kvp.Key);
                         ToRemove.Add(kvp.Key);
@@ -122,7 +122,7 @@ namespace BingoMode.BingoSteamworks
                     {
                         foreach (var r in ToRemove)
                         {
-                            Plugin.logger.LogMessage($"Removing {r} from upkeep list");
+                            
                             ReceivedPlayerUpKeep.Remove(r);
                             ToRemove.Remove(r);
                             goto gobabk;
@@ -133,7 +133,7 @@ namespace BingoMode.BingoSteamworks
                     {
                         foreach (var r in ToFalse)
                         {
-                            Plugin.logger.LogMessage($"Settin {r} to false");
+                            
                             ReceivedPlayerUpKeep[r] = false;
                         }
                     }
@@ -150,7 +150,7 @@ namespace BingoMode.BingoSteamworks
                         {
                             if (!ReceivedPlayerUpKeep[kvp.Key])
                             {
-                                Plugin.logger.LogMessage("Didnt receive upkeep yet, midway check for " + kvp.Key);
+                                
                                 RequestPlayerUpKeep(kvp.Key);
                                 //ToFalse.Add(kvp.Key);
                             }
@@ -160,7 +160,7 @@ namespace BingoMode.BingoSteamworks
                         //{
                         //    foreach (var r in ToFalse)
                         //    {
-                        //        Plugin.logger.LogMessage($"Settin {r} to false");
+                        //        
                         //        ReceivedPlayerUpKeep[r] = false;
                         //    }
                         //}
@@ -182,14 +182,14 @@ namespace BingoMode.BingoSteamworks
 
                     SteamNetworkingMessage_t netMessage = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messges[i]);
 
-                    Plugin.logger.LogMessage("RECEIVED MESSAG???");
+                    
 
                     byte[] data = new byte[netMessage.m_cbSize];
                     Marshal.Copy(netMessage.m_pData, data, 0, data.Length);
                     char[] chars = new char[data.Length / sizeof(char)];
                     Buffer.BlockCopy(data, 0, chars, 0, data.Length);
                     string message = new string(chars, 0, chars.Length);
-                    Plugin.logger.LogMessage(message);
+                    
                     InnerWorkings.MessageReceived(message);
                 }
             }
@@ -204,7 +204,7 @@ namespace BingoMode.BingoSteamworks
 
         public static bool IsSaveMultiplayer(BingoData.BingoSaveData saveData)
         {
-            //Plugin.logger.LogMessage($"TEST BINGOSAVES HOST ID: {saveData.hostID.GetSteamID64()} is default? {saveData.hostID.GetSteamID64() == default}");
+            //
             return saveData.hostID.GetSteamID64() != default;
         }
 
@@ -228,7 +228,7 @@ namespace BingoMode.BingoSteamworks
 
         public static void ChallengeStateChangeToHost(Challenge ch, bool failed)
         {
-            Plugin.logger.LogMessage("CHALLENGE STATE CHANGE TO HOST. Failed? " + failed + " - " + ch);
+            
             int x = -1;
             int y = -1;
             for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)

@@ -86,7 +86,7 @@ namespace BingoMode
                 {
                     if (GlobalBoard != null && ExpeditionData.slugcatPlayer == slug)
                     {
-                        //Plugin.logger.LogMessage("Adding " + ExpeditionData.allChallengeLists[slug].Last());
+                        //
                         GlobalBoard.recreateList.Add(ExpeditionData.allChallengeLists[slug].Last());
                     }
                 });
@@ -107,7 +107,7 @@ namespace BingoMode
                         Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == t).GetType()) as Challenge).Generate();
                         if (challenge != null)
                         {
-                            Plugin.logger.LogInfo("Regenerating broken challenge " + challenge);
+                            
                             if (!ExpeditionData.allChallengeLists.ContainsKey(name))
                             {
                                 ExpeditionData.allChallengeLists.Add(name, new List<Challenge>());
@@ -123,7 +123,7 @@ namespace BingoMode
                         //challenge.FromString(array11[1]);
                         if (challenge != null)
                         {
-                            Plugin.logger.LogInfo("Regenerating broken challenge");
+                            
                             if (!ExpeditionData.allChallengeLists.ContainsKey(name))
                             {
                                 ExpeditionData.allChallengeLists.Add(name, []);
@@ -317,7 +317,7 @@ namespace BingoMode
             orig.Invoke(self, manager);
 
             if (BingoData.RandomStartingSeed == -1 || !BingoData.BingoMode || !BingoData.MultiplayerGame) return;
-            Plugin.logger.LogMessage("SETTING STARTING RANDOM SEED TO " + BingoData.RandomStartingSeed);
+            
             self.nextIssuedId = BingoData.RandomStartingSeed;
             BingoData.RandomStartingSeed = -1;
         }
@@ -381,7 +381,7 @@ namespace BingoMode
             if (!BingoData.CreateKarmaFlower || !self.room.abstractRoom.shelter) return;
             if (ExpeditionData.slugcatPlayer.value == "Saint")
             {
-                Plugin.logger.LogMessage("Creating evil fucked up spear");
+                
                 AbstractSpear spear = new AbstractSpear(world, null, self.room.GetWorldCoordinate(self.mainBodyChunk.pos), self.room.game.GetNewID(), false, Mathf.Lerp(0.35f, 0.6f, Custom.ClampedRandomVariation(0.5f, 0.5f, 2f)));
                 self.room.abstractRoom.entities.Add(spear);
                 spear.RealizeInRoom();
@@ -389,7 +389,7 @@ namespace BingoMode
                 BingoData.CreateKarmaFlower = false;
                 return;
             }
-            Plugin.logger.LogMessage("Creating karma flow");
+            
             AbstractConsumable karmaflow = new(world, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, null, self.room.GetWorldCoordinate(self.mainBodyChunk.pos), self.room.game.GetNewID(), -1, -1, null);
             self.room.abstractRoom.entities.Add(karmaflow);
             karmaflow.RealizeInRoom();
@@ -509,7 +509,7 @@ namespace BingoMode
 
                 if (data.hostID.GetSteamID64() == default)
                 {
-                    Plugin.logger.LogMessage("Saving game and completing reverse challenges singleplayer");
+                    
                     foreach (Challenge challenge in ExpeditionData.challengeList)
                     {
                         if (!challenge.completed && challenge is BingoChallenge b && !b.TeamsFailed[SteamTest.team] && b.ReverseChallenge())
@@ -523,11 +523,11 @@ namespace BingoMode
                     Expedition.Expedition.coreFile.Save(false);
                     return;
                 }
-                Plugin.logger.LogFatal(data.hostID.GetSteamID64());
-                Plugin.logger.LogFatal(SteamTest.selfIdentity.GetSteamID64());
+                
+                
                 if (data.hostID.GetSteamID64() == SteamTest.selfIdentity.GetSteamID64())
                 {
-                    Plugin.logger.LogMessage("Saving game and completing reverse challenges multiplayer host");
+                    
                     foreach (Challenge challenge in ExpeditionData.challengeList)
                     {
                         if (!challenge.completed && challenge is BingoChallenge b && b.ReverseChallenge())
@@ -550,7 +550,7 @@ namespace BingoMode
                 {
                     self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
                 }
-                Plugin.logger.LogMessage("Saving game and completing reverse challenges multiplayer client");
+                
                 Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);
                 Custom.rainWorld.progression.currentSaveState.denPosition = self.room.abstractRoom.name;
                 Custom.rainWorld.progression.SaveWorldStateAndProgression(false);
@@ -635,7 +635,7 @@ namespace BingoMode
             //    b.Index--;
             //    b.EmitDelegate<Func<int, int>>((orig) =>
             //    {
-            //        Plugin.logger.LogFatal("hewwo " + orig);
+            //        
             //        if (ModManager.Expedition && Custom.rainWorld.ExpeditionMode) return orig - 1;
             //        return orig;
             //    });
@@ -769,7 +769,7 @@ namespace BingoMode
                     return orig;
                 });
             }
-            else Plugin.logger.LogMessage("RainWorldGame_GoToDeathScreen IL failed!!!! " + il);
+            else Plugin.logger.LogError("RainWorldGame_GoToDeathScreen IL failed!!!! " + il);
         }
 
         private static void SleepAndDeathScreen_ctor(On.Menu.SleepAndDeathScreen.orig_ctor orig, SleepAndDeathScreen self, ProcessManager manager, ProcessManager.ProcessID ID)
@@ -917,7 +917,7 @@ namespace BingoMode
             bingoPage.TryGetValue(self, out var page);
             self.pages[4].subObjects.Add(page);
             self.pages[4].pos.x -= 1500f;
-           // Plugin.logger.LogMessage("Initialized bingo menu page " + self.pages[4] + " " + page);
+           // 
         }
 
         public static void ExpeditionMenu_Singal(On.Menu.ExpeditionMenu.orig_Singal orig, ExpeditionMenu self, MenuObject sender, string message)
@@ -988,7 +988,7 @@ namespace BingoMode
                 SteamFinal.TryToReconnect = true;
                 SteamFinal.HostUpkeep = 0;
             }
-            Plugin.logger.LogMessage("Loading bingo no start. Player white list: " + BingoData.BingoSaves[ExpeditionData.slugcatPlayer].playerWhiteList);
+            
             int size = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].size;
             GlobalBoard.size = size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
@@ -1037,7 +1037,7 @@ namespace BingoMode
                 bool isSpectator = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team == 8;
                 if (saveGameData == null)
                 {
-                    Plugin.logger.LogMessage("save game data null for " + ExpeditionData.slugcatPlayer);
+                    
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                     goto invok;
                 }

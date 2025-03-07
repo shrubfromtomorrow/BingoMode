@@ -86,19 +86,19 @@ namespace BingoMode.BingoChallenges
                 if ((rr == from.Value || from.Value == "Any Region") && !origins.Contains(c.abstractCreature.ID))
                 {
                     origins.Add(c.abstractCreature.ID);
-                    Plugin.logger.LogMessage($"Added {crit} with id {c.abstractCreature.ID}!");
+                    
                 }
             }
         }
 
         public void Gated(string regionName)
         {
-            Plugin.logger.LogMessage(regionName + " " + ValueConverter.ConvertToString(crit.Value));
-            Plugin.logger.LogMessage(from);
-            Plugin.logger.LogMessage(to);
-            Plugin.logger.LogMessage("---------");
+            
+            
+            
+            
             if (regionName != to.Value && to.Value != "Any Region") return;
-            Plugin.logger.LogMessage("went thru");
+            
             bool g = false;
             for (int i = 0; i < game.Players.Count; i++)
             {
@@ -109,14 +109,14 @@ namespace BingoMode.BingoChallenges
                         if (cc is Creature crib && crib.Template.type.value == crit.Value && origins.Contains(crib.abstractCreature.ID))
                         {
                             g = true;
-                            Plugin.logger.LogMessage("WIN");
+                            
                             break;
                         }
                     }
                     if (!g && player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value && origins.Contains(stomacreature.ID))
                     {
                         g = true;
-                        Plugin.logger.LogMessage("STOMACH WIN");
+                        
                     }
                     if (g) break;
                 }

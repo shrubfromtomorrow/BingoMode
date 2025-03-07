@@ -54,7 +54,7 @@ namespace BingoMode.BingoChallenges
         public void Traded(int pnts, EntityID ID)
         {
             if (completed || TeamsCompleted[SteamTest.team] || revealed || hidden) return;
-            Plugin.logger.LogMessage("Traded " + pnts);
+            
             if (!bannedIDs.Contains(ID))
             {
                 current += pnts;

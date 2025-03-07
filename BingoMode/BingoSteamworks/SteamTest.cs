@@ -58,7 +58,7 @@ namespace BingoMode.BingoSteamworks
 
         public static void GetJoinableLobbies()
         {
-            Plugin.logger.LogMessage("Getting lobby list! Friends only? " + CurrentFilters.friendsOnly);
+            
 
             SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
             if (CurrentFilters.text != "") SteamMatchmaking.AddRequestLobbyListStringFilter("name", CurrentFilters.text, ELobbyComparison.k_ELobbyComparisonEqualToOrGreaterThan);
@@ -74,7 +74,7 @@ namespace BingoMode.BingoSteamworks
             {
                 page.Switch(false, false);
             }
-            Plugin.logger.LogMessage("Left lobby " + CurrentLobby);
+            
             CurrentLobby = default;
             BingoData.MultiplayerGame = false;
         }
@@ -119,7 +119,7 @@ namespace BingoMode.BingoSteamworks
         public static void OnSessionRequested(SteamNetworkingMessagesSessionRequest_t callback)
         {
             SteamNetworkingMessages.AcceptSessionWithUser(ref callback.m_identityRemote);
-            Plugin.logger.LogMessage("Accepted session with " + callback.m_identityRemote.GetSteamID64());
+            
         }
 
         public static string ActiveModsToString()
@@ -132,7 +132,7 @@ namespace BingoMode.BingoSteamworks
             }
 
             if (!string.IsNullOrEmpty(text)) text = text.Substring(0, text.Length - 5);
-            Plugin.logger.LogWarning("ACTIVE MODS: " + text);
+            
             return text;
         }
 
@@ -145,13 +145,13 @@ namespace BingoMode.BingoSteamworks
                 return;
             }
 
-            Plugin.logger.LogMessage("Resetting activated perks and burdens");
+            
             if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
             if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
             team = 0;
-            Plugin.logger.LogMessage("Set team number to " + team);
+            
 
-            Plugin.logger.LogMessage("Lobby created with ID " + result.m_ulSteamIDLobby + "! Setting lobby data");
+            
             CSteamID lobbyID = (CSteamID)result.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
             string hostName = SteamFriends.GetPersonaName();
@@ -192,7 +192,7 @@ namespace BingoMode.BingoSteamworks
             if (selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby)) return;
             CSteamID lobbyID = (CSteamID)callback.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
-            Plugin.logger.LogMessage("Entered lobby " + callback.m_ulSteamIDLobby + "! ");
+            
             if (BingoData.globalMenu != null)
             {
                 string slug = SteamMatchmaking.GetLobbyData(lobbyID, "slugcat");
@@ -214,11 +214,11 @@ namespace BingoMode.BingoSteamworks
 
             team = 0;
 
-            Plugin.logger.LogMessage("HOST TEAM IS " + SteamMatchmaking.GetLobbyMemberData(lobbyID, SteamMatchmaking.GetLobbyOwner(lobbyID), "playerTeam"));
+            
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerTeam", team.ToString());
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "playerIndex", SteamMatchmaking.GetLobbyData(CurrentLobby, "nextPlayerIndex"));
             SteamMatchmaking.SetLobbyMemberData(lobbyID, "ready", "0");
-            Plugin.logger.LogMessage("Set team number to " + team);
+            
 
             string challenjes = SteamMatchmaking.GetLobbyData(lobbyID, "challenges");
             try
@@ -240,21 +240,21 @@ namespace BingoMode.BingoSteamworks
 
         public static void FetchLobbySettings()
         {
-            Plugin.logger.LogMessage("Setting lobby settings");
-            Plugin.logger.LogMessage($"Parsing gamemodes from {SteamMatchmaking.GetLobbyData(CurrentLobby, "gamemode")}");
+            
+            
             int gamjs = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "gamemode").Trim(), NumberStyles.Any);
             BingoData.globalSettings.gamemode = (BingoData.BingoGameMode)gamjs;
 
-            Plugin.logger.LogMessage("- setting perks burdens");
-            Plugin.logger.LogMessage($"Parsing perks from {SteamMatchmaking.GetLobbyData(CurrentLobby, "perks")}");
+            
+            
             int perjs = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "perks").Trim(), NumberStyles.Any);
-            Plugin.logger.LogMessage($"Parsing burdens from {SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens")}");
+            
             int burjens = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens").Trim(), NumberStyles.Any);
             BingoData.globalSettings.perks = (LobbySettings.AllowUnlocks)perjs;
             BingoData.globalSettings.burdens = (LobbySettings.AllowUnlocks)burjens;
-            Plugin.logger.LogMessage("Success!");
+            
 
-            Plugin.logger.LogMessage("Adjusting own perks to the lobby perks");
+            
             if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any)
             {
                 ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
@@ -275,20 +275,20 @@ namespace BingoMode.BingoSteamworks
         {
             foreach (string unlock in unlockables)
             {
-                Plugin.logger.LogMessage($"Adding {unlock} to active expedition unlocks");
+                
                 ExpeditionGame.activeUnlocks.Add(unlock);
             }
         }
 
         public static void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
         {
-            Plugin.logger.LogMessage($"Lobby chat update " + callback.m_rgfChatMemberStateChange);
+            
             string text = "";
             switch (callback.m_rgfChatMemberStateChange)
             {
                 case 0x0001:
                     text = "entered";
-                    Plugin.logger.LogMessage($"1User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
+                    
                     SteamNetworkingIdentity newMember = new SteamNetworkingIdentity();
                     newMember.SetSteamID((CSteamID)callback.m_ulSteamIDUserChanged);
 
@@ -310,7 +310,7 @@ namespace BingoMode.BingoSteamworks
                 case 0x0008:
                 case 0x0010:
                     text = "left";
-                    Plugin.logger.LogMessage($"2User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
+                    
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
                     if (SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame") != "") break;
@@ -321,7 +321,7 @@ namespace BingoMode.BingoSteamworks
 
                     break;
             }
-            Plugin.logger.LogMessage($"User {callback.m_ulSteamIDUserChanged} {text} {callback.m_ulSteamIDLobby}");
+            
         }
 
         public static void OnLobbyDataUpdate(LobbyDataUpdate_t callback)
@@ -333,10 +333,10 @@ namespace BingoMode.BingoSteamworks
                 string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
                 if (den != "")
                 {
-                    Plugin.logger.LogMessage("TRYING TO START GAME BECAUSE HOST STARTED - " + den);
+                    
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
-                        Plugin.logger.LogMessage("ACTUALLY STARTING GAME BECAUSE HOST STARTED");
+                        
                         BingoData.BingoDen = den;
                         page.Singal(null, "STARTBINGO");
                     }
@@ -371,10 +371,10 @@ namespace BingoMode.BingoSteamworks
             if (bIOFailure) { Plugin.logger.LogError("OnLobbyMatchList bIOfailure"); return; }
             if (result.m_nLobbiesMatching < 1)
             {
-                Plugin.logger.LogWarning("FOUND ZERO LOBBIES!!!");
+                
                 return;
             }
-            Plugin.logger.LogMessage("Found " + result.m_nLobbiesMatching + " lobbies.");
+            
             List<CSteamID> frens = [];
             int frenCount = SteamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
             if (frenCount != -1)
@@ -393,7 +393,7 @@ namespace BingoMode.BingoSteamworks
                 if (SteamMatchmaking.GetLobbyData(lobbyID, "friendsOnly") == "1" || CurrentFilters.friendsOnly)
                 {
                     CSteamID owner = (CSteamID)ulong.Parse(SteamMatchmaking.GetLobbyData(lobbyID, "hostID"), NumberStyles.Any);
-                    //Plugin.logger.LogMessage($"Relationship to owner: {SteamFriends.GetFriendRelationship(owner) != EFriendRelationship.k_EFriendRelationshipFriend} - {SteamFriends.GetFriendRelationship(owner)}");
+                    //
                     if (frens.Count > 0 && !frens.Contains(owner))
                     {
                         continue;
@@ -401,19 +401,10 @@ namespace BingoMode.BingoSteamworks
                 }
                 if (ExpeditionGame.playableCharacters.IndexOf(new(SteamMatchmaking.GetLobbyData(lobbyID, "slugcat"))) == -1) continue;
                 JoinableLobbies.Add(lobbyID);
-                //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);
+                //
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);
                 //lobbyEntered.Set(call, OnLobbyEntered);
             }
-            if (JoinableLobbies.Count > 0)
-            {
-                Plugin.logger.LogMessage("All available lobbies:");
-                foreach (var lob in JoinableLobbies)
-                {
-                    Plugin.logger.LogMessage(lob);
-                }
-            }
-
             if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
                 page.AddLobbies(JoinableLobbies);
@@ -422,7 +413,7 @@ namespace BingoMode.BingoSteamworks
 
         public static void OnLobbyMatchListFromContinue(LobbyMatchList_t result, bool bIOFailure)
         {
-            Plugin.logger.LogMessage("Lobby search from conitnue game. Searching for host's game");
+            
             if (bIOFailure) { Plugin.logger.LogError("OnLobbyMatchList bIOfailure"); return; }
             if (result.m_nLobbiesMatching < 1)
             {
@@ -435,19 +426,10 @@ namespace BingoMode.BingoSteamworks
                 var lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
                 if (SteamMatchmaking.GetLobbyData(lobbyID, "mode") != "BingoMode") continue;
                 JoinableLobbies.Add(lobbyID);
-                //Plugin.logger.LogMessage("Found and joining lobby with ID " + lobbyID);
+                //
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);
                 //lobbyEntered.Set(call, OnLobbyEntered);
             }
-            if (JoinableLobbies.Count > 0)
-            {
-                Plugin.logger.LogMessage("All available lobbies:");
-                foreach (var lob in JoinableLobbies)
-                {
-                    Plugin.logger.LogMessage(lob);
-                }
-            }
-
             if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
                 page.AddLobbies(JoinableLobbies);
@@ -461,14 +443,14 @@ namespace BingoMode.BingoSteamworks
             try
             {
                 string asfgas = BingoHooks.GlobalBoard.ToString();
-                Plugin.logger.LogMessage("SETTING " + asfgas);
+                
                 SteamMatchmaking.SetLobbyData(CurrentLobby, "challenges", asfgas);
             }
             catch (Exception e)
             {
                 Plugin.logger.LogError(e + "\nFAILED TO UPDATE ONLINE BINGO BOARD");
             }
-            Plugin.logger.LogWarning(SteamMatchmaking.GetLobbyData(CurrentLobby, "challenges"));
+            
         }
 
         public static void UpdateOnlineSettings()

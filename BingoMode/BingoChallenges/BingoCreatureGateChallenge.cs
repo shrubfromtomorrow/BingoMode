@@ -91,12 +91,12 @@ namespace BingoMode.BingoChallenges
                 EntityID id = gateCrit.ID;
                 if (!creatureGates.ContainsKey(id))
                 {
-                   // Plugin.logger.LogMessage($"Adding {crit.Value} of ID {id} to the dictionary. Room name: {roomName}");
+                   // 
                     creatureGates.Add(id, [roomName]);
                 }
                 else
                 {
-                    //Plugin.logger.LogMessage($"{crit.Value} of ID {id} already in dictionary. Room name: {roomName}");
+                    //
                     if (!creatureGates[id].Contains(roomName))
                     {
                         creatureGates[id].Add(roomName);

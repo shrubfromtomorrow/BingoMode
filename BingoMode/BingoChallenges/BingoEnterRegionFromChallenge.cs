@@ -24,7 +24,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Verse(from.Value), new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 90), new Verse(to.Value)], []);
+            return new Phrase([new Verse(from.Value), new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 180f), new Verse(to.Value)], [1,2]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -87,11 +87,11 @@ namespace BingoMode.BingoChallenges
             gateName = FixSlugSpecificRegions(gateName);
             List<string> worlds = gateName.Split('_').ToList();
             worlds.RemoveAt(0);
-            //Plugin.logger.LogMessage($"Testing {gateName} - {worlds[0]}_{worlds[1]}");
+            //
             //if ((worlds[0] != from.Value || worlds[1] != from.Value) && (worlds[0] != to.Value || worlds[1] != to.Value)) return;
-            // Plugin.logger.LogMessage($"PASSED");
+            // 
             string prevWorld = worlds[worlds.IndexOf(newWorld) == 0 ? 1 : 0];
-            //Plugin.logger.LogMessage($"New-old {newWorld}-{prevWorld}");
+            //
 
             bool prevCheck = prevWorld == from.Value.ToUpperInvariant();
             bool newCheck = newWorld == to.Value.ToUpperInvariant();

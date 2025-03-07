@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
 
         public void Maul(string type)
         {
-            Plugin.logger.LogMessage($"Mauling {type}");
+            
             if (completed || revealed || hidden || TeamsCompleted[SteamTest.team] || doneTypes.Contains(type)) return;
             doneTypes.Add(type);
             current++;

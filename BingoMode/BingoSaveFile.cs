@@ -137,7 +137,6 @@ namespace BingoMode
             if (array.Length == 0) return;
             for (int i = 0; i < array.Length; i++)
             {
-                Plugin.logger.LogMessage(array[i]);
                 string[] array2 = array[i].Split('#');
                 SlugcatStats.Name slug = new(array2[0]);
                 int size = int.Parse(array2[1], NumberStyles.Any, CultureInfo.InvariantCulture);
@@ -156,7 +155,7 @@ namespace BingoMode
                         string teamsInBingo = array2[10];
                         bool songPlayed = array2[11] == "1";
 
-                        Plugin.logger.LogMessage($"Loading multiplayer bingo save from string: Slugcat-{slug}, Team-{team}, Host-{hostIdentity.GetSteamID()}, IsHost-{isHost}, Connected players-{array2[5]}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}, TeamsInBingo={teamsInBingo}, SongPlayed={songPlayed}");
+                        
 
                         BingoData.BingoSaves.Add(slug, new(size, team, hostIdentity, isHost, array2[5], gamemode, showedWin, firstCycleSaved, passageUsed, teamsInBingo, songPlayed));
                     }
@@ -171,14 +170,14 @@ namespace BingoMode
                         firstCycleSaved = array2[4] == "1";
                         passageUsed = array2[5] == "1";
 
-                        Plugin.logger.LogMessage($"Loading singleplayer bingo save from string: Team-{team}, ShowedWin-{showedWin}, FirstCycleSaved-{firstCycleSaved}, PassageUsed={passageUsed}");
+                        
 
                         BingoData.BingoSaves.Add(slug, new(size, showedWin, team, firstCycleSaved, passageUsed));
                     }
                     string teamString = array2[array2.Length - 1];
                     string[] teams = teamString.Split('|');
                     int next = 0;
-                    Plugin.logger.LogFatal(ExpeditionData.allChallengeLists[slug].Count);
+                    
                     for (int x = 0; x < size; x++)
                     {
                         for (int y = 0; y < size; y++)
@@ -190,7 +189,7 @@ namespace BingoMode
                 }
                 catch (System.Exception e)
                 {
-                    Plugin.logger.LogWarning("Failed to load save " + e);
+                    Plugin.logger.LogError($"Failed to load save for {slug} - {array[i]} " + e);
                     BingoData.BingoSaves[new(array2[0])] = new(size, false, 0, false, false);
                 }
             }
