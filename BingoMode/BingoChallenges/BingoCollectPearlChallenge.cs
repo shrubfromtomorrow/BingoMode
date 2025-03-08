@@ -38,14 +38,14 @@ namespace BingoMode.BingoChallenges
         {
             if (specific.Value)
             {
-                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))), new Counter(current, 1)], [1]);
+                return new Phrase([new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))) { background = new FSprite("radialgradient") }, new Counter(current, 1)], [1]);
             }
             return new Phrase([new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Counter(current, amount.Value)], [1]);
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCollectPearlChallenge c || c.specific.Value != specific.Value;
+            return challenge is not BingoCollectPearlChallenge c || (c.specific.Value == true && specific.Value == true) || c.specific.Value != specific.Value;
         }
 
         public override string ChallengeName()

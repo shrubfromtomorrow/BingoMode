@@ -227,12 +227,45 @@ namespace BingoMode.BingoMenu
             SteamTest.GetJoinableLobbies();
         }
 
+        public void UpdateLobbyHost(bool isHost)
+        {
+            shelterSetting.greyedOut = !isHost;
+            randomize.buttonBehav.greyedOut = !isHost;
+            plusButton.buttonBehav.greyedOut = !isHost;
+            minusButton.buttonBehav.greyedOut = !isHost;
+            pasteBoard.buttonBehav.greyedOut = !isHost;
+            grid.Switch(!isHost);
+
+            if (isHost)
+            {
+                startGame.signalText = "STARTBINGO";
+                startGame.menuLabel.text = "BEGIN";
+                lobbySettingsInfo.UpdateSymbol("settingscog");
+                lobbySettingsInfo.signalText = "CHANGE_SETTINGS";
+
+                return;
+            }
+            startGame.signalText = "GETREADY";
+            startGame.menuLabel.text = "I'M\nREADY";
+            lobbySettingsInfo.UpdateSymbol("Menu_InfoI");
+            lobbySettingsInfo.signalText = "INFO_SETTINGS";
+        }
+
         public void Switch(bool toInLobby, bool create) // (nintendo reference
         {
             if (inLobby == toInLobby) return;
             inLobby = toInLobby;
             if (toInLobby)
             {
+                if (BingoData.globalSettings.perks == AllowUnlocks.None)
+                {
+                    ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+                }
+                if (BingoData.globalSettings.burdens == AllowUnlocks.None)
+                {
+                    ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
+                }
+
                 expMenu.exitButton.buttonBehav.greyedOut = true;
                 rightPage.buttonBehav.greyedOut = true;
                 if (!create)
@@ -253,6 +286,9 @@ namespace BingoMode.BingoMenu
                 GrafUpdate(menu.myTimeStacker);
                 return;
             }
+
+            ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+            ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
 
             expMenu.exitButton.buttonBehav.greyedOut = false;
             rightPage.buttonBehav.greyedOut = false;
@@ -551,10 +587,6 @@ namespace BingoMode.BingoMenu
 
             if (message == "LEAVE_LOBBY")
             {
-                foreach (var player in lobbyPlayers)
-                {
-                    InnerWorkings.SendMessage("g" + SteamTest.selfIdentity.GetSteamID64(), player.identity);
-                }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
                 return;
@@ -941,18 +973,6 @@ namespace BingoMode.BingoMenu
             foreach (var p in identities)
             {
                 lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
-                lobbyPlayers.Add(new PlayerInfo(this, p, isHost, SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, p.GetSteamID(), "ready") == "1"));
             }
 
             lobbyPlayers = lobbyPlayers.OrderBy(x => x.playerIndex).ToList();
@@ -1077,9 +1097,23 @@ namespace BingoMode.BingoMenu
                     bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.burdens == AllowUnlocks.Inherited && !isHost);
                 }
             }
+            string[] bannedBurdens = ["bur-doomed"];
+            string[] bannedPerks = ["unl-passage", "unl-karma"];
             foreach (var bur in unlockDialog.burdenButtons)
             {
-                if (bur.signalText == "bur-doomed") bur.buttonBehav.greyedOut = true;
+                if (bannedBurdens.Contains(bur.signalText))
+                {
+                    bur.buttonBehav.greyedOut = true;
+                    if (ExpeditionGame.activeUnlocks.Contains(bur.signalText)) unlockDialog.ToggleBurden(bur.signalText);
+                }
+            }
+            foreach (var per in unlockDialog.perkButtons)
+            {
+                if (bannedPerks.Contains(per.signalText))
+                {
+                    per.buttonBehav.greyedOut = true;
+                    if (ExpeditionGame.activeUnlocks.Contains(per.signalText)) unlockDialog.ToggleBurden(per.signalText);
+                }
             }
             menu.manager.ShowDialog(unlockDialog);
         }
@@ -1337,6 +1371,11 @@ namespace BingoMode.BingoMenu
                     kick.pos = origPos + new Vector2(210f, -8f);
                     kick.lastPos = kick.pos;
                     kick.buttonBehav.greyedOut = unclicky;
+                    foreach (var sprite in kick.roundedRect.sprites)
+                    {
+                        sprite.alpha = disabled ? 0f : a;
+                    }
+                    kick.menuLabel.label.alpha = disabled ? 0f : a;
                 }
             }
 

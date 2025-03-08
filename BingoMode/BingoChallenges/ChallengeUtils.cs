@@ -22,6 +22,7 @@ namespace BingoMode.BingoChallenges
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
             On.Menu.ExpeditionMenu.ExpeditionSetup += ExpeditionMenu_ExpeditionSetup;
             FetchGatesFromFile();
+            FetchAllEnterableRegions();
         }
 
         private static void ExpeditionMenu_ExpeditionSetup(On.Menu.ExpeditionMenu.orig_ExpeditionSetup orig, Menu.ExpeditionMenu self)
@@ -235,6 +236,15 @@ namespace BingoMode.BingoChallenges
             return r;
         }
 
+        private static void FetchAllEnterableRegions()
+        {
+            string path = AssetManager.ResolveFilePath(Path.Combine("world", "regions.txt"));
+            if (File.Exists(path)) 
+            {
+                AllEnterableRegions = File.ReadAllLines(path);
+            } 
+        }
+
         private static void FetchGatesFromFile()
         {
             List<string> gatesToAdd = [];
@@ -267,6 +277,7 @@ namespace BingoMode.BingoChallenges
         }
 
         public static string[] AllGates = [];
+        public static string[] AllEnterableRegions = [];
 
         public static readonly string[] Depthable = 
         {

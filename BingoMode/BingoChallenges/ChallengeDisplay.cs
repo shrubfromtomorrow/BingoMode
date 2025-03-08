@@ -51,12 +51,14 @@ namespace BingoMode.BingoChallenges
                     carryOver += horizontalDist;
                     if (resetCarry) carryOver = 0f;
                     words[i].display.SetPosition(positiones[i]);
+                    if (words[i].background != null) words[i].background.SetPosition(positiones[i]);
                     if (applyScale) words[i].display.scale = scale;
                     continue;
                 }
                 positiones[i] += new Vector2(carryOver, 0f);
                 carryOver += horizontalDist;
                 words[i].display.SetPosition(positiones[i]);
+                if (words[i].background != null) words[i].background.SetPosition(positiones[i]);
                 if (applyScale) words[i].display.scale = scale;
             }
         }
@@ -65,6 +67,7 @@ namespace BingoMode.BingoChallenges
         {
             foreach (Word word in words)
             {
+                if (word.background != null) container.AddChild(word.background);
                 container.AddChild(word.display);
             }
         }
@@ -73,6 +76,7 @@ namespace BingoMode.BingoChallenges
         {
             foreach (Word word in words)
             {
+                word.background?.RemoveFromContainer();
                 word.display.RemoveFromContainer();
             }
         }
@@ -81,6 +85,7 @@ namespace BingoMode.BingoChallenges
         {
             foreach (Word word in words)
             {
+                if (word.background != null) word.background.alpha = alpha;
                 word.display.alpha = alpha;
             }
         }
@@ -94,6 +99,7 @@ namespace BingoMode.BingoChallenges
     public abstract class Word
     {
         public FNode display;
+        public FNode background;
 
         public Word()
         {

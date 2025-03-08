@@ -53,7 +53,7 @@ namespace BingoMode.BingoChallenges
             return new BingoAllRegionsExcept
             {
                 region = new(regionn, "Region", 0, listName: "regionsreal"),
-                regionsToEnter = regiones,
+                regionsToEnter = ChallengeUtils.AllEnterableRegions.ToList(),
                 required = new(req, "Amount", 1)
             };
         }
@@ -66,7 +66,7 @@ namespace BingoMode.BingoChallenges
                 FailChallenge(SteamTest.team);
                 return;
             }
-            else if (!TeamsFailed[SteamTest.team] && regionsToEnter.Contains(regionName))
+            else if (!TeamsFailed[SteamTest.team] && regionsToEnter.Contains(regionName.ToUpperInvariant()))
             {
                 regionsToEnter.Remove(regionName);
 

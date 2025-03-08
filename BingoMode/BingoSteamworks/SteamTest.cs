@@ -144,14 +144,11 @@ namespace BingoMode.BingoSteamworks
                 Plugin.logger.LogError("Failed to create the lobby!!");
                 return;
             }
-
-            
+                        
             if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
             if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
             team = 0;
-            
-
-            
+                        
             CSteamID lobbyID = (CSteamID)result.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
             string hostName = SteamFriends.GetPersonaName();
@@ -240,21 +237,15 @@ namespace BingoMode.BingoSteamworks
 
         public static void FetchLobbySettings()
         {
-            
-            
             int gamjs = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "gamemode").Trim(), NumberStyles.Any);
             BingoData.globalSettings.gamemode = (BingoData.BingoGameMode)gamjs;
 
-            
-            
             int perjs = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "perks").Trim(), NumberStyles.Any);
             
             int burjens = int.Parse(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdens").Trim(), NumberStyles.Any);
             BingoData.globalSettings.perks = (LobbySettings.AllowUnlocks)perjs;
             BingoData.globalSettings.burdens = (LobbySettings.AllowUnlocks)burjens;
-            
-
-            
+                        
             if (BingoData.globalSettings.perks != LobbySettings.AllowUnlocks.Any)
             {
                 ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
@@ -269,13 +260,15 @@ namespace BingoMode.BingoSteamworks
                 string[] burdens = Regex.Split(SteamMatchmaking.GetLobbyData(CurrentLobby, "burdenList"), "><");
                 FetchUnlocks(burdens);
             }
+
+            BingoData.globalSettings.hostMods = SteamMatchmaking.GetLobbyData(CurrentLobby, "hostMods") != "none";
+            BingoData.globalSettings.friendsOnly = SteamMatchmaking.GetLobbyData(CurrentLobby, "friendsOnly") == "1";
         }
 
         public static void FetchUnlocks(string[] unlockables)
         {
             foreach (string unlock in unlockables)
             {
-                
                 ExpeditionGame.activeUnlocks.Add(unlock);
             }
         }
@@ -299,9 +292,19 @@ namespace BingoMode.BingoSteamworks
                     }
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
+
+                    bool isHost = SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby) == selfIdentity.GetSteamID();
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
                     {
+                        page2.UpdateLobbyHost(isHost);
                         page2.ResetPlayerLobby();
+                    }
+                    if (isHost)
+                    {
+                        string hostName = SteamFriends.GetPersonaName();
+                        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "isHost", hostName);
+                        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "hostID", selfIdentity.GetSteamID64().ToString()); ;
+                        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "hostMods", BingoData.globalSettings.hostMods ? ActiveModsToString() : "none");
                     }
 
                     break;
@@ -333,7 +336,11 @@ namespace BingoMode.BingoSteamworks
                 string den = SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame");
                 if (den != "")
                 {
-                    
+                    if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game || Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.Game)
+                    {
+                        return;
+                    }
+
                     if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
                     {
                         
@@ -359,9 +366,18 @@ namespace BingoMode.BingoSteamworks
             }
             else
             {
+                bool isHost = SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby) == selfIdentity.GetSteamID();
                 if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
                 {
+                    page2.UpdateLobbyHost(isHost); 
                     page2.ResetPlayerLobby();
+                }
+                if (isHost)
+                {
+                    string hostName = SteamFriends.GetPersonaName();
+                    SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "isHost", hostName);
+                    SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "hostID", selfIdentity.GetSteamID64().ToString()); ;
+                    SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "hostMods", BingoData.globalSettings.hostMods ? ActiveModsToString() : "none");
                 }
             }
         }
@@ -400,31 +416,6 @@ namespace BingoMode.BingoSteamworks
                     }
                 }
                 if (ExpeditionGame.playableCharacters.IndexOf(new(SteamMatchmaking.GetLobbyData(lobbyID, "slugcat"))) == -1) continue;
-                JoinableLobbies.Add(lobbyID);
-                //
-                //var call = SteamMatchmaking.JoinLobby(lobbyID);
-                //lobbyEntered.Set(call, OnLobbyEntered);
-            }
-            if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
-            {
-                page.AddLobbies(JoinableLobbies);
-            }
-        }
-
-        public static void OnLobbyMatchListFromContinue(LobbyMatchList_t result, bool bIOFailure)
-        {
-            
-            if (bIOFailure) { Plugin.logger.LogError("OnLobbyMatchList bIOfailure"); return; }
-            if (result.m_nLobbiesMatching < 1)
-            {
-                Plugin.logger.LogError("FOUND ZERO LOBBIES!!!");
-                return;
-            }
-            List<CSteamID> JoinableLobbies = new();
-            for (int i = 0; i < result.m_nLobbiesMatching; i++)
-            {
-                var lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
-                if (SteamMatchmaking.GetLobbyData(lobbyID, "mode") != "BingoMode") continue;
                 JoinableLobbies.Add(lobbyID);
                 //
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);

@@ -19,7 +19,8 @@ namespace BingoMode.BingoSteamworks
         {
             if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID()) return;
             IntPtr ptr = Marshal.StringToHGlobalAuto(data);
-            
+
+            //Plugin.logger.LogMessage("SENDING MESSAGE " + data);
 
             if (SteamNetworkingMessages.SendMessageToUser(ref receiver, ptr, (uint)(data.Length * sizeof(char)), reliable ? 40 : 32, 0) != EResult.k_EResultOK)
             {
@@ -34,6 +35,7 @@ namespace BingoMode.BingoSteamworks
         // the rest - the actual data we want, separated with semicolons if needed
         public static void MessageReceived(string message)
         {
+            //Plugin.logger.LogMessage("RECEIVED MESSAGE " + message);
             char type = message[0];
             message = message.Substring(1);
             string[] data = message.Split(';');
@@ -221,20 +223,15 @@ namespace BingoMode.BingoSteamworks
                 // Host upkeep request
                 case 'H':
                     string id = message;
-                    //List<ulong> enabledMods = null;
+                    //List<string> clientMods = null; // The feature of checking for client's mods during reconnecting is unnecessary imo
                     //if (data.Length == 2)
                     //{
                     //    id = data[0];
-                    //    enabledMods = [];
+                    //    clientMods = [];
                     //
                     //    foreach (string stringId in Regex.Split(data[1], "<bMd>"))
                     //    {
-                    //        
-                    //        ulong workshopId;
-                    //        if (ulong.TryParse(stringId.Split('|')[0], System.Globalization.NumberStyles.Any, null, out workshopId))
-                    //        {
-                    //            enabledMods.Add(workshopId);
-                    //        }
+                    //        clientMods.Add(stringId.Split('|')[0]);
                     //    }
                     //}
 

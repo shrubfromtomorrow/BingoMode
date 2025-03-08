@@ -9,6 +9,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace BingoMode.BingoMenu
 {
@@ -129,6 +130,7 @@ namespace BingoMode.BingoMenu
                 testLabels[i] = new TypeButton(this, pages[0], new Vector2(360f, 20f), testList[i]);
                 pages[0].subObjects.Add(testLabels[i]);
             }
+            testLabels = testLabels.ToList().OrderBy(x => x.text.text).ToArray();
             wrapper = new MenuTabWrapper(this, pages[0]);
             pages[0].subObjects.Add(wrapper);
 

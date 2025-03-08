@@ -2,22 +2,21 @@
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MoreSlugcats;
+using RWCustom;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using Steamworks;
-using MoreSlugcats;
-using RWCustom;
-using System.IO;
 
 namespace BingoMode
 {
-    using BingoSteamworks;
     using BingoChallenges;
     using BingoHUD;
     using BingoMenu;
+    using BingoSteamworks;
     using Music;
 
     public class BingoHooks
@@ -236,6 +235,35 @@ namespace BingoMode
 
             // Fix crash when saved selected slug was removed
             On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
+
+            // Fix duplicated starting perk objects
+            IL.Room.Loaded += Room_LoadedIL;
+        }
+
+        private static void Room_LoadedIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(
+                x => x.MatchLdsfld("ModManager", "Expedition")
+                ) && c.TryGotoNext(
+                x => x.MatchLdsfld("ModManager", "Expedition")
+                ) && c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld("ModManager", "Expedition")
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<bool, Room, bool>>((orig, self) =>
+                {
+                    if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && data.firstCycleSaved)
+                    {
+                        orig = false;
+                    }
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("BingoHooks Room_LoadedIL FAIULRE " + il);
         }
 
         private static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
@@ -941,6 +969,11 @@ namespace BingoMode
                     page.grid = new BingoGrid(self, page, new(self.manager.rainWorld.screenSize.x / 2f, self.manager.rainWorld.screenSize.y / 2f), 500f);
                     page.subObjects.Add(page.grid);
                     self.MovePage(new Vector2(1500f, 0f));
+
+
+                    string[] bannedBurdens = ["bur-doomed"];
+                    string[] bannedPerks = ["unl-passage", "unl-karma"];
+                    ExpeditionGame.activeUnlocks.RemoveAll(x => bannedBurdens.Contains(x) || bannedPerks.Contains(x));
 
                     if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && !self.muted)
                     {
