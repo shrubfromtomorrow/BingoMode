@@ -31,7 +31,7 @@ namespace BingoMode.BingoChallenges
 
             for (int i = 0; i < this.game.Players.Count; i++)
             {
-                if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == this.room.Value && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
+                if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == ActualRoomName(room.Value) && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
                 {
                     this.CompleteChallenge();
                     return;
@@ -41,7 +41,7 @@ namespace BingoMode.BingoChallenges
             {
                 for (int j = 0; j < this.game.world.activeRooms.Count; j++)
                 {
-                    if (this.game.world.activeRooms[j].abstractRoom.name == this.room.Value)
+                    if (this.game.world.activeRooms[j].abstractRoom.name == ActualRoomName(room.Value))
                     {
                         for (int k = 0; k < this.game.world.activeRooms[j].updateList.Count; k++)
                         {
@@ -98,31 +98,38 @@ namespace BingoMode.BingoChallenges
                 room = new(item2, "Room", 0, listName: "vista"),
                 location = vector
             };
-            ModifyVistaCandidates(vistaChallenge);
+            ModifyVistaPositions(vistaChallenge);
             return vistaChallenge;
         }
 
-        public static void ModifyVistaCandidates(BingoVistaChallenge input)
+        public static void ModifyVistaPositions(BingoVistaChallenge input)
         {
-            if (input.room.Value == "GW_E02" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
-            {
-                input.room.Value = "GW_E02_PAST";
-                return;
-            }
-            if (input.room.Value == "GW_D01" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
-            {
-                input.room.Value = "GW_D01_PAST";
-                return;
-            }
             if (input.room.Value == "UW_C02" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
             {
-                input.room.Value = "UW_C02RIV";
                 input.location = new Vector2(450f, 1170f);
             }
-            if (input.room.Value == "UW_D05" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+        }
+
+        private string ActualRoomName(string roomName)
+        {
+            if (roomName == "GW_E02" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
             {
-                input.room.Value = "UW_D05RIV";
+                return "GW_E02_PAST";
             }
+            if (roomName == "GW_D01" && ModManager.MSC && (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear))
+            {
+                return "GW_D01_PAST";
+            }
+            if (roomName == "UW_C02" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+            {
+                return "UW_C02RIV";
+            }
+            if (roomName == "UW_D05" && ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+            {
+                return "UW_D05RIV";
+            }
+
+            return roomName;
         }
 
         public override int Points()
@@ -168,6 +175,7 @@ namespace BingoMode.BingoChallenges
                 this.completed = (array[4] == "1");
                 this.revealed = (array[5] == "1");
                 this.UpdateDescription();
+                ModifyVistaPositions(this);
             }
             catch (Exception ex)
             {

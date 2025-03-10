@@ -24,29 +24,29 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "0.9999";
+        public const string VERSION = "1.02";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
         public BingoModOptions BingoConfig => _bingoConfig;
-
+        5
         public static Plugin PluginInstance;
 
         public void OnEnable()
         {
             PluginInstance = this;
             _bingoConfig = new BingoModOptions(this);
-            new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
+            //new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
         }
 
-        public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)
-        {
-            return "[" + DateTime.Now.Hour + ":" + (DateTime.Now.Minute < 10 ? "0" : "") + DateTime.Now.Minute + ":" + (DateTime.Now.Second < 10 ? "0" : "") + DateTime.Now.Second + "]" + orig.Invoke(self);
-        }
+        //public static string AddTimeToLog(Func<LogEventArgs, string> orig, LogEventArgs self)
+        //{
+        //    return "[" + DateTime.Now.Hour + ":" + (DateTime.Now.Minute < 10 ? "0" : "") + DateTime.Now.Minute + ":" + (DateTime.Now.Second < 10 ? "0" : "") + DateTime.Now.Second + "]" + orig.Invoke(self);
+        //}
 
         public void OnDisable()
         {

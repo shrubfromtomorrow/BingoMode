@@ -284,7 +284,7 @@ namespace BingoMode.BingoMenu
                 ccc.region = ccc.room.Value.Substring(0, 2);
                 
                 ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
-                BingoVistaChallenge.ModifyVistaCandidates(ccc);
+                BingoVistaChallenge.ModifyVistaPositions(ccc);
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();

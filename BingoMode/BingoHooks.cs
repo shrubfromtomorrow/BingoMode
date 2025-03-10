@@ -209,9 +209,6 @@ namespace BingoMode
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
             On.Menu.FastTravelScreen.Singal += FastTravelScreen_Singal;
 
-            // Shortcut
-            On.Menu.CharacterSelectPage.Update += CharacterSelectPage_Update;
-
             // Stop void win from happening
             On.Expedition.DepthsFinishScript.Update += DepthsFinishScript_Update;
             On.Player.ctor += Player_ctor;
@@ -238,6 +235,19 @@ namespace BingoMode
 
             // Fix duplicated starting perk objects
             IL.Room.Loaded += Room_LoadedIL;
+
+            // Credits
+            On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
+        }
+
+        private static void ProcessManager_PostSwitchMainProcess(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
+        {
+            if (ID == BingoEnums.BingoCredits)
+            {
+                self.currentMainLoop = new BingoCredits(self);
+            }
+
+            orig.Invoke(self, ID);
         }
 
         private static void Room_LoadedIL(ILContext il)
@@ -318,9 +328,9 @@ namespace BingoMode
 
         private static void ExpeditionMenu_Update(On.Menu.ExpeditionMenu.orig_Update orig, ExpeditionMenu self)
         {
-            if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && self.currentPage == 4 && self.manager.musicPlayer.song == null)
+            if (!self.muted && Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && self.currentPage == 4 && (self.manager.musicPlayer.song == null || self.manager.musicPlayer.song.name == ExpeditionData.menuSong))
             {
-                self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 0f);
+                self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 1f);
             }
 
             orig.Invoke(self);
@@ -466,16 +476,6 @@ namespace BingoMode
                 return;
             }
             orig.Invoke(self, eu);
-        }
-
-        private static void CharacterSelectPage_Update(On.Menu.CharacterSelectPage.orig_Update orig, CharacterSelectPage self)
-        {
-            orig.Invoke(self);
-
-            if (Input.GetKey(KeyCode.K))
-            {
-                self.AbandonButton_OnPressDone(null);
-            }
         }
 
         private static void FastTravelScreen_Update(ILContext il)
@@ -953,6 +953,13 @@ namespace BingoMode
             orig.Invoke(self, sender, message);
 
             if (self.pagesMoving) return;
+            if (message == "BINGOCREDITS")
+            {
+                self.manager.musicPlayer?.FadeOutAllSongs(1f);
+                self.manager.RequestMainProcessSwitch(BingoEnums.BingoCredits);
+                self.PlaySound(SoundID.MENU_Switch_Page_In);
+                return;
+            }
             if (message == "NEWBINGO")
             {
                 SteamTest.team = 0;
@@ -979,6 +986,9 @@ namespace BingoMode
                     {
                         self.manager.musicPlayer.FadeOutAllSongs(30f);
                     }
+
+                    self.manualButton.signalText = "BINGOCREDITS";
+                    self.manualButton.menuLabel.text = self.Translate("CREDITS");
                 }
             }
             if (message == "LOADBINGO")

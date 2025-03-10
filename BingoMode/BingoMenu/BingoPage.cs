@@ -278,6 +278,7 @@ namespace BingoMode.BingoMenu
                 plusButton.buttonBehav.greyedOut = !create;
                 minusButton.buttonBehav.greyedOut = !create;
                 pasteBoard.buttonBehav.greyedOut = !create;
+                expMenu.manualButton.buttonBehav.greyedOut = true;
                 multiButton.menuLabel.text = "Leave Lobby";
                 multiButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
@@ -299,6 +300,7 @@ namespace BingoMode.BingoMenu
             plusButton.buttonBehav.greyedOut = false;
             minusButton.buttonBehav.greyedOut = false;
             pasteBoard.buttonBehav.greyedOut = false;
+            expMenu.manualButton.buttonBehav.greyedOut = false;
             multiButton.menuLabel.text = "Multiplayer";
             multiButton.signalText = "SWITCH_MULTIPLAYER";
             grid.Switch(false);
@@ -402,6 +404,8 @@ namespace BingoMode.BingoMenu
                 {
                     line.alpha = 0f;
                 }
+                expMenu.manualButton.signalText = "MANUAL";
+                expMenu.manualButton.menuLabel.text = expMenu.Translate("MANUAL");
                 expMenu.UpdatePage(1);
                 expMenu.MovePage(new Vector2(-1500f, 0f));
                 if (Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && expMenu.manager.musicPlayer != null) expMenu.manager.musicPlayer.FadeOutAllSongs(50f);

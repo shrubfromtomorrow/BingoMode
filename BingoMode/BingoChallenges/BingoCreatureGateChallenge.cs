@@ -54,6 +54,7 @@ namespace BingoMode.BingoChallenges
         {
             List<string> crits = [.. ChallengeUtils.Transportable];
             if (ExpeditionData.slugcatPlayer.value != "Red") crits.Remove("JetFish");
+            else crits.Remove("Yeek");
             return new BingoCreatureGateChallenge
             {
                 amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),

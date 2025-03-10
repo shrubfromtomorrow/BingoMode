@@ -328,18 +328,6 @@ namespace BingoMode.BingoHUD
                             {
                                 BingoChallenge challenge = ch as BingoChallenge;
                                 if (challenge.TeamsCompleted[t]) completedForTeam[t]++;
-                                else
-                                {
-                                    bool empty = true;
-                                    for (int i = 0; i < 8; i++)
-                                    {
-                                        if (challenge.TeamsCompleted[i] && !challenge.TeamsFailed[i])
-                                        {
-                                            empty = false;
-                                            break;
-                                        }
-                                    }
-                                }
                             }
                         }
 

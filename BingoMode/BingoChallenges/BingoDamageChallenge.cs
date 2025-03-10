@@ -75,7 +75,7 @@ namespace BingoMode.BingoChallenges
 
         public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
         {
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || (victim.Value == "Any Creature" && victimm.Template.smallCreature)) return;
             
             bool glug = false;
             bool weaponCheck = false;
