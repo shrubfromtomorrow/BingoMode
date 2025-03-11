@@ -141,6 +141,7 @@ namespace BingoMode.BingoChallenges
             // For damage and kill challenges, i put them here since theres so many and both challenges would have to do the same hooks
             On.Spear.HitSomething += Spear_HitSomething;
             On.Rock.HitSomething += Rock_HitSomething;
+            On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
             On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
             IL.Explosion.Update += Explosion_Update;
             IL.SporeCloud.Update += SporeCloud_Update;
@@ -924,6 +925,16 @@ namespace BingoMode.BingoChallenges
         }
 
         public static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck self, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
+            {
+                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, false);
+            }
+
+            return orig.Invoke(self, result, eu);
+        }
+
+        private static bool ScavengerBomb_HitSomething(On.ScavengerBomb.orig_HitSomething orig, ScavengerBomb self, SharedPhysics.CollisionResult result, bool eu)
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {

@@ -238,6 +238,17 @@ namespace BingoMode
 
             // Credits
             On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
+
+            // Flabberghasted this never got unloaded
+            On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
+        }
+
+        private static void Menu_ShutDownProcess(On.Menu.Menu.orig_ShutDownProcess orig, Menu.Menu self)
+        {
+            orig.Invoke(self);
+
+            if (self is not Menu.ExpeditionMenu) return;
+            BingoData.globalMenu = null;
         }
 
         private static void ProcessManager_PostSwitchMainProcess(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)

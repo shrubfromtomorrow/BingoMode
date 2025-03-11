@@ -289,6 +289,7 @@ namespace BingoMode.BingoMenu
             owner.challenge.UpdateDescription();
             owner.UpdateText();
             description.text = owner.challenge.description.WrapText(false, 380f);
+            GrafUpdate(owner.menu.myTimeStacker);
         }
 
         public override void Singal(MenuObject sender, string message)

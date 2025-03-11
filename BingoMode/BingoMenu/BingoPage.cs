@@ -14,6 +14,7 @@ using UnityEngine;
 namespace BingoMode.BingoMenu
 {
     using BingoSteamworks;
+    using System;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject

@@ -129,25 +129,25 @@ namespace BingoMode.BingoChallenges
             //}
             switch (ln)
             {
-                case "transport": return Transportable;
-                case "pin": return ["Any Creature", ..Pinnable];
-                case "tolls": return BombableOutposts;
-                case "food": return FoodTypes;
-                case "weapons": return Weapons;
+                case "transport": return Transportable.SortArray();
+                case "pin": return ["Any Creature", ..Pinnable.SortArray()];
+                case "tolls": return BombableOutposts.SortArray();
+                case "food": return FoodTypes.SortArray();
+                case "weapons": return Weapons.SortArray();
                 case "weaponsnojelly": return Weapons.Where(x => x != "JellyFish").ToArray();
-                case "theft": return [.. StealableStolable, "DataPearl"];
-                case "ban": return Bannable;
-                case "friend": return Befriendable;
-                case "pearls": return CollectablePearls;
-                case "craft": return CraftableItems;
+                case "theft": return [.. StealableStolable.SortArray(), "DataPearl"];
+                case "ban": return Bannable.SortArray();
+                case "friend": return Befriendable.SortArray();
+                case "pearls": return CollectablePearls.SortArray();
+                case "craft": return CraftableItems.SortArray();
                 case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), ..SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
-                case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
-                case "depths": return Depthable;
-                case "banitem": return [.. FoodTypes, .. Bannable];
-                case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
-                case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
+                case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x)).ToArray().SortArray()];
+                case "depths": return Depthable.SortArray();
+                case "banitem": return [.. FoodTypes.SortArray(), .. Bannable.SortArray()];
+                case "unlocks": return [.. BingoData.possibleTokens[0].ToArray().SortArray(), .. BingoData.possibleTokens[1].ToArray().SortArray(), .. BingoData.possibleTokens[2].ToArray().SortArray(), .. BingoData.possibleTokens[3].ToArray().SortArray()];
+                case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand").ToArray().SortArray()];
                 case "expobject": return ["FirecrackerPlant", "SporePlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask"];
                 case "vista": // hate
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
@@ -170,6 +170,13 @@ namespace BingoMode.BingoChallenges
                 case "subregions": return ["Any Subregion", ..(ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint ? SaintSubregions : AllSubregions)];
             }
             return ["Whoops something went wrong"];
+        }
+
+        private static string[] SortArray(this string[] array)
+        {
+            List<string> list = array.ToList();
+            list.Sort();
+            return list.ToArray();
         }
 
         public static string ChallengeTools_ItemName(On.Expedition.ChallengeTools.orig_ItemName orig, ItemType type)

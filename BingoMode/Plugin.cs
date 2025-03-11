@@ -24,12 +24,11 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "1.02";
+        public const string VERSION = "1.03";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
         public BingoModOptions BingoConfig => _bingoConfig;
-        5
         public static Plugin PluginInstance;
 
         public void OnEnable()
