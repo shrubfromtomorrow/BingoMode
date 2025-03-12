@@ -116,7 +116,6 @@
     <Compile Include="BingoMenu\CreateLobbyDialog.cs" />
     <Compile Include="BingoMenu\CustomizerDialog.cs" />
     <Compile Include="BingoMenu\InfoDialog.cs" />
-    <Compile Include="Console.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpectatorHooks.cs" />

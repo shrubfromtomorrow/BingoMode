@@ -93,9 +93,6 @@ namespace BingoMode
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
                 MachineConnector.SetRegisteredOI("nacu.bingomode", PluginInstance.BingoConfig);
-                
-                try { Console.RegisterCommands(); }
-                catch { }
             }
         }
 
