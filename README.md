@@ -20,10 +20,10 @@ just that I would've done a loot of things very differently if I was making this
 This mod allowed me to grow as a developer and programmer, which I appreciate greatly... its just that the mod's turned out way more messy than i wanted because of the learning haha.
 
 ## How to build
-### Make sure your c# language version is set to `latest` in your .csproj file (for the release configuration)
+### Make sure your c# language version is set to `13.0` in your .csproj file (for the release configuration). The code uses some of the modern c# version features in a lot of places so this is necessary.
 ### Change your post build event destination to your bingo mod plugins folder
 ### Place the required dependencies in the lib folder, these include:
-- Assembly-CSharp-nstrip.dll: A stripped and publicized version of the Assembly-CSharp found in `Rain World\RainWorld_Data\Managed` using NStrip (https://github.com/bbepis/NStrip). This was necessary due to some menu issues (PUBLIC-Assembly-CSharp doesn't work as far as i know)
+- Assembly-CSharp-nstrip.dll: A stripped and publicized (important to use the `-p` flag when running the nstrip command) version of the Assembly-CSharp found in `Rain World\RainWorld_Data\Managed` using NStrip (https://github.com/bbepis/NStrip). This was necessary due to some menu issues (PUBLIC-Assembly-CSharp doesn't work as far as i know)
 - HOOKS-Assembly-CSharp.dll from `Rain World\BepInEx\plugins`
 
 Found in `Rain World\RainWorld_Data\Managed`:
