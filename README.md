@@ -10,6 +10,7 @@ If you're interested, I'd recommend starting with adding a new challenge, you ca
 
 I personally won't be adding anything else to the mod, I'll only fix major bugs and make it work for the new versions, I might not even be the owner of this repo later! Who knows.
 Either way I want to give anyone interested an option to expand or improve this mod, cause that's cool i think :)) And there are always many ideas left on the cutting room floor that someone might pick up.
+When you do work on a build, make sure to change your VERSION in `Plugin.cs` to be unique to avoid stuff breaking when playing multiplayer.
 
 I'd love to see your part in this mess! Oh right...
 
