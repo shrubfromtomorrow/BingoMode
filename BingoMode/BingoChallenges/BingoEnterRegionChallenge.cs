@@ -36,7 +36,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] regiones = ChallengeUtils.GetCorrectListForChallenge("regionsreal");
+            string[] regiones = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal");
 
             BingoEnterRegionChallenge ch = new BingoEnterRegionChallenge
             {

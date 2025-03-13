@@ -41,12 +41,12 @@ namespace BingoMode.BingoChallenges
         public override void Reset()
         {
             base.Reset();
-            regionsToEnter = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
+            regionsToEnter = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
         }
 
         public override Challenge Generate()
         {
-            List<string> regiones = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
+            List<string> regiones = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
             int req = UnityEngine.Random.Range(3, regiones.Count);
 

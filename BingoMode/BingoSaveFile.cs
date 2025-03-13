@@ -155,8 +155,6 @@ namespace BingoMode
                         string teamsInBingo = array2[10];
                         bool songPlayed = array2[11] == "1";
 
-                        
-
                         BingoData.BingoSaves.Add(slug, new(size, team, hostIdentity, isHost, array2[5], gamemode, showedWin, firstCycleSaved, passageUsed, teamsInBingo, songPlayed));
                     }
                     else
@@ -169,8 +167,6 @@ namespace BingoMode
                         team = int.Parse(array2[3], NumberStyles.Any, CultureInfo.InvariantCulture);
                         firstCycleSaved = array2[4] == "1";
                         passageUsed = array2[5] == "1";
-
-                        
 
                         BingoData.BingoSaves.Add(slug, new(size, showedWin, team, firstCycleSaved, passageUsed));
                     }

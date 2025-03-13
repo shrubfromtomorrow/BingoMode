@@ -209,7 +209,7 @@ namespace BingoMode
                 if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
-                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
+                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
                     {
                         //.*
                         possibleTokens[2].Add(kvp.Value[n].value + "-safari");

@@ -47,7 +47,7 @@ namespace BingoMode.BingoChallenges
 
             if (BingoData.pinnableCreatureRegions == null || tries > 10)
             {
-                regions = ChallengeUtils.GetCorrectListForChallenge("regionsreal").ToList();
+                regions = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
             }
             else
             {

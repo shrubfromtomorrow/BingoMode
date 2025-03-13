@@ -39,7 +39,7 @@ namespace BingoMode.BingoChallenges
 
         public string FixSlugSpecificRegions(string gateName)
         {
-            string[] regions = ChallengeUtils.GetCorrectListForChallenge("regionsreal");
+            string[] regions = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal");
             if (regions.Contains("UG") && gateName.Contains("DS"))
             {
                 gateName = gateName.Replace("DS", "UG");

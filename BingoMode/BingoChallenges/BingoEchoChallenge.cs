@@ -69,7 +69,7 @@ namespace BingoMode.BingoChallenges
             List<string> list = [];
             for (int i = 0; i < ExtEnum<GhostWorldPresence.GhostID>.values.entries.Count; i++)
             {
-                if (ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] != "NoGhost" && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "MS")) && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "SL") || !(ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint)) && ChallengeUtils.GetCorrectListForChallenge("regionsreal").Contains(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]))
+                if (ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] != "NoGhost" && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "MS")) && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "SL") || !(ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint)) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]))
                 {
                     list.Add(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]);
                 }

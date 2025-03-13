@@ -115,7 +115,7 @@ namespace BingoMode.BingoMenu
             targetAlpha = 1f;
             onSettings = true;
 
-            slider = new VerticalSlider(this, pages[0], "", new Vector2(843f - leftAnchor, 294f), new Vector2(30f, 160f), BingoEnums.CustomizerSlider, true) { floatValue = 1f };
+            slider = new VerticalSlider(this, pages[0], "", new Vector2(847f - leftAnchor, 294f), new Vector2(30f, 160f), BingoEnums.CustomizerSlider, true) { floatValue = 1f };
             foreach (var line in slider.lineSprites)
             {
                 line.alpha = 0f;
@@ -157,7 +157,6 @@ namespace BingoMode.BingoMenu
             challengeSettings = [];
             for (int i = 0; i < ch.Settings().Count; i++)
             {
-
                 Vector2 origPos = new Vector2(683f - leftAnchor, 449f) + pages[0].pos;
                 float dif = 200f / maxItems[1];
                 float sliderDif = dif * (challengeSettings.Count - maxItems[1]);
@@ -314,6 +313,13 @@ namespace BingoMode.BingoMenu
                     sliderF = 1f;
                     break;
             }
+
+            if (message.StartsWith("RANDOMIZE_LIST_SETTING;"))
+            {
+                ChallengeSetting s = challengeSettings[int.Parse(message.Split(';')[1])];
+                ListItem[] list = (s.field as OpComboBox)._itemList;
+                (s.field as OpComboBox).value = list[UnityEngine.Random.Range(0, list.Length)].name;
+            }
         }
 
         public override void Update()
@@ -438,6 +444,7 @@ namespace BingoMode.BingoMenu
             public float lastAlpha;
             public Vector2 offSet;
             public bool setAlpha;
+            public SymbolButton randomize;
 
             public ChallengeSetting(CustomizerDialog menu, MenuObject owner, Vector2 pos, int index, object value) : base(menu, owner, pos)
             {
@@ -458,12 +465,16 @@ namespace BingoMode.BingoMenu
                 {
                     this.value = s;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting", s.Value, (ConfigAcceptableBase)null);
-                    field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName) : ["Whoops errore"]);
+                    field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetSortedCorrectListForChallenge(s.listName) : ["Whoops errore"]);
                     field.OnValueUpdate += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
                     (field as OpComboBox).OnListClose += UnfocusThing;
                     label.text = s.name;
                     offSet = new Vector2(5f, 0f);
+                    randomize = new SymbolButton(menu, owner, "tinydice", "RANDOMIZE_LIST_SETTING;"+index, pos);
+                    //randomize.symbolSprite.scale = 0.6f;
+                    randomize.roundedRect.size = new Vector2(24f, 24f);
+                    owner.subObjects.Add(randomize);
                 }
                 else if (value is SettingBox<bool> b)
                 {
@@ -479,14 +490,6 @@ namespace BingoMode.BingoMenu
                     throw new Exception("Invalid type for ChallengeSetting!!");
                 }
                 label.text += ":";
-                //if (MenuModList.ModButton.RainWorldDummy.config.configurables.TryGetValue("_ChallengeSetting" + index, out var gruh))
-                //{
-                //    c = gruh;
-                //}
-                //menu.tab.AddItems(new UIelement[]
-                //{
-                //    field
-                //});
                 cWrapper = new UIelementWrapper(menu.wrapper, field);
             }
 
@@ -508,7 +511,6 @@ namespace BingoMode.BingoMenu
 
             public void UpdootString(UIconfig config, string v, string oldV)
             {
-                //
                 (value as SettingBox<string>).Value = field.value;
                 (menu as CustomizerDialog).UpdateChallenge();
             }
@@ -527,6 +529,15 @@ namespace BingoMode.BingoMenu
                 if (field != null)
                 {
                     field.pos = positio + offSet;
+                }
+                if (randomize != null)
+                {
+                    randomize.pos = positio + offSet + new Vector2(143f, 0f);
+                    foreach (var grug in randomize.roundedRect.sprites)
+                    {
+                        grug.alpha = alpharad;
+                    }
+                    randomize.symbolSprite.alpha = alpharad;
                 }
                 label.pos = positio - new Vector2(5f, -12.5f);
 
@@ -548,6 +559,7 @@ namespace BingoMode.BingoMenu
                 //MenuModList.ModButton.RainWorldDummy.config.configurables.Remove("_ChallengeSetting");
                 label.RemoveSprites();
                 owner.RemoveSubObject(label);
+                if (randomize != null)
                 field.Hide();
                 //(menu as CustomizerDialog).tab._RemoveItem(field);
                 field.Unload();

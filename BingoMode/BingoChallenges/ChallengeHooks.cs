@@ -812,8 +812,6 @@ namespace BingoMode.BingoChallenges
                 if (BingoData.blacklist.TryGetValue(victim, out var list) && !list.Contains(source)) list.Add(source);
             }
 
-            
-
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoDamageChallenge c)
@@ -938,7 +936,7 @@ namespace BingoMode.BingoChallenges
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, false);
+                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, true);
             }
 
             return orig.Invoke(self, result, eu);

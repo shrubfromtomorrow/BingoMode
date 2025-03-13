@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] liste = ChallengeUtils.GetCorrectListForChallenge("expobject");
+            string[] liste = ChallengeUtils.GetSortedCorrectListForChallenge("expobject");
             return new BingoItemHoardChallenge
             {
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 1),
