@@ -10,6 +10,7 @@ If you're interested, I'd recommend starting with adding a new challenge, you ca
 
 I personally won't be adding anything else to the mod, I'll only fix major bugs and make it work for the new versions, I might not even be the owner of this repo later! Who knows.
 Either way I want to give anyone interested an option to expand or improve this mod, cause that's cool i think :)) And there are always many ideas left on the cutting room floor that someone might pick up.
+When you do work on a build, make sure to change your VERSION in `Plugin.cs` to be unique to avoid stuff breaking when playing multiplayer.
 
 I'd love to see your part in this mess! Oh right...
 
@@ -20,10 +21,10 @@ just that I would've done a loot of things very differently if I was making this
 This mod allowed me to grow as a developer and programmer, which I appreciate greatly... its just that the mod's turned out way more messy than i wanted because of the learning haha.
 
 ## How to build
-### Make sure your c# language version is set to `latest` in your .csproj file (for the release configuration)
+### Make sure your c# language version is set to `13.0` in your .csproj file (for the release configuration). The code uses some of the modern c# version features in a lot of places so this is necessary.
 ### Change your post build event destination to your bingo mod plugins folder
 ### Place the required dependencies in the lib folder, these include:
-- Assembly-CSharp-nstrip.dll: A stripped and publicized version of the Assembly-CSharp found in `Rain World\RainWorld_Data\Managed` using NStrip (https://github.com/bbepis/NStrip). This was necessary due to some menu issues (PUBLIC-Assembly-CSharp doesn't work as far as i know)
+- Assembly-CSharp-nstrip.dll: A stripped and publicized (important to use the `-p` flag when running the nstrip command) version of the Assembly-CSharp found in `Rain World\RainWorld_Data\Managed` using NStrip (https://github.com/bbepis/NStrip). This was necessary due to some menu issues (PUBLIC-Assembly-CSharp doesn't work as far as i know)
 - HOOKS-Assembly-CSharp.dll from `Rain World\BepInEx\plugins`
 
 Found in `Rain World\RainWorld_Data\Managed`:
