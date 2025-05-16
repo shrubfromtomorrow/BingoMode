@@ -2,6 +2,7 @@
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
+using DLCItemType = DLCSharedEnums.AbstractObjectType;
 using System.Collections.Generic;
 using MoreSlugcats;
 using System.Linq;
@@ -198,10 +199,10 @@ namespace BingoMode.BingoChallenges
             if (type == ItemType.WaterNut) return translator.Translate("Bubble Fruit");
             if (type == ItemType.SlimeMold) return translator.Translate("Slime Mold");
             if (type == ItemType.BubbleGrass) return translator.Translate("Bubble Grass");
-            if (type == MSCItemType.GlowWeed) return translator.Translate("Glow Weed");
-            if (type == MSCItemType.DandelionPeach) return translator.Translate("Dandelion Peaches");
-            if (type == MSCItemType.LillyPuck) return translator.Translate("Lillypucks");
-            if (type == MSCItemType.GooieDuck) return translator.Translate("Gooieducks");
+            if (type == DLCItemType.GlowWeed) return translator.Translate("Glow Weed");
+            if (type == DLCItemType.DandelionPeach) return translator.Translate("Dandelion Peaches");
+            if (type == DLCItemType.LillyPuck) return translator.Translate("Lillypucks");
+            if (type == DLCItemType.GooieDuck) return translator.Translate("Gooieducks");
 
             return orig.Invoke(type);
         }
@@ -214,7 +215,7 @@ namespace BingoMode.BingoChallenges
             creatureNames[(int)CreatureType.Hazer] = ChallengeTools.IGT.Translate("Hazers");
             creatureNames[(int)CreatureType.Salamander] = ChallengeTools.IGT.Translate("Salamanders");
             creatureNames[(int)CreatureType.Spider] = ChallengeTools.IGT.Translate("Coalescipedes");
-            if (ModManager.MSC) creatureNames[(int)MoreSlugcatsEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
+            if (ModManager.MSC) creatureNames[(int)DLCSharedEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
         }
 
         public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)

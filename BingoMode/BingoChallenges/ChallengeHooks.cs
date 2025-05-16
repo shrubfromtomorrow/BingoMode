@@ -15,6 +15,7 @@ using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
+using DLCItemType = DLCSharedEnums.AbstractObjectType;
 
 namespace BingoMode.BingoChallenges
 {
@@ -195,9 +196,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void Room_ctor(On.Room.orig_ctor orig, Room self, RainWorldGame game, World world, AbstractRoom abstractRoom)
+        public static void Room_ctor(On.Room.orig_ctor orig, Room self, RainWorldGame game, World world, AbstractRoom abstractRoom, bool devUI)
         {
-            orig.Invoke(self, game, world, abstractRoom);
+            orig.Invoke(self, game, world, abstractRoom, devUI);
 
             if (!abstractRoom.scavengerTrader) return;
 
@@ -211,7 +212,7 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void KarmaLadder_ctor(On.Menu.KarmaLadder.orig_ctor orig, KarmaLadder self, Menu.Menu menu, MenuObject owner, Vector2 pos, HUD.HUD hud, IntVector2 displayKarma, bool reinforced)
+        public static void KarmaLadder_ctor(On.Menu.KarmaLadder.orig_ctor_Menu_MenuObject_Vector2_HUD_IntVector2_bool orig, KarmaLadder self, Menu.Menu menu, MenuObject owner, Vector2 pos, HUD.HUD hud, IntVector2 displayKarma, bool reinforced)
         {
             orig.Invoke(self, menu, owner, pos, hud, displayKarma, reinforced);
 
@@ -377,7 +378,7 @@ namespace BingoMode.BingoChallenges
                 x => x.MatchLdfld<AbstractSpear>("needle")
                 ))
             {
-                c.Emit(OpCodes.Ldloc, 8);
+                c.Emit(OpCodes.Ldloc, 10);
                 c.EmitDelegate<Func<bool, AbstractSpear, bool>>((orig, spear) =>
                 {
                     if (ExpeditionData.challengeList.Any(x => x is BingoTradeTradedChallenge c && c.traderItems.Keys.Count > 0 && c.traderItems.Keys.Contains(spear.ID)))
@@ -535,7 +536,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 72);
+                b.Emit(OpCodes.Ldloc, 144);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.EnergyCell);
@@ -1181,7 +1182,7 @@ namespace BingoMode.BingoChallenges
             ILCursor c = new(il);
 
             if (c.TryGotoNext(
-                x => x.MatchLdsfld<ModManager>("MSC")
+                x => x.MatchCallOrCallvirt<ModManager>("get_DLCShared")
                 ))
             {
                 c.Emit(OpCodes.Ldarg_1);
@@ -1485,7 +1486,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 c.Emit(OpCodes.Ldarg_0);
-                c.Emit(OpCodes.Ldloc, 23);
+                c.Emit(OpCodes.Ldloc, 27);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     if (self.roomSettings.placedObjects[i].data is CollectToken.CollectTokenData c && BingoData.challengeTokens.Contains(c.tokenString + (c.isRed ? "-safari" : ""))) orig = false;
@@ -1506,7 +1507,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 72);
+                b.Emit(OpCodes.Ldloc, 140);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == ItemType.NSHSwarmer);
@@ -1527,13 +1528,13 @@ namespace BingoMode.BingoChallenges
         {
             ILCursor c = new(il);
             if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdloc(43), // 3696
+                x => x.MatchLdloc(95), // 4fa1
                 x => x.MatchCallOrCallvirt(typeof(List<PlacedObject>).GetMethod("get_Item")),
                 x => x.MatchLdfld<PlacedObject>("active")
                 ))
             {
                 c.Emit(OpCodes.Ldarg_0);
-                c.Emit(OpCodes.Ldloc, 43);
+                c.Emit(OpCodes.Ldloc, 95);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     PlacedObject obj = self.roomSettings.placedObjects[i];
@@ -1558,7 +1559,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 72);
+                b.Emit(OpCodes.Ldloc, 144);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.HalcyonPearl);
@@ -1592,7 +1593,7 @@ namespace BingoMode.BingoChallenges
         {
             orig.Invoke(self, edible);
 
-            if (edible is not PhysicalObject p || p.abstractPhysicalObject.type != MSCItemType.Seed) return;
+            if (edible is not PhysicalObject p || p.abstractPhysicalObject.type != DLCItemType.Seed) return;
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoSaintPopcornChallenge c)

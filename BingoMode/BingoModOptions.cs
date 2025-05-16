@@ -60,7 +60,7 @@ namespace BingoMode
                 new OpKeyBinder(HUDKeybindC4, new Vector2(170f, 345f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller4),
 
                 new OpLabel(10f, 193f, "Singleplayer team color:") {alignment = FLabelAlignment.Left, description = "Which team's color to use in singleplayer"},
-                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 190f), 140f, ["Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane"]) {description = "Which team's color to use in singleplayer"},
+                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 190f), 140f, new string[] {"Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane" }) {description = "Which team's color to use in singleplayer"},
 
                 new OpLabel(430f, 512f, "Use map input instead:") {alignment = FLabelAlignment.Left},
                 new OpCheckBox(UseMapInput, 560f, 509f),

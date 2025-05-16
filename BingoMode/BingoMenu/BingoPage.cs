@@ -1326,7 +1326,7 @@ namespace BingoMode.BingoMenu
                 if (controls)
                 {
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_PlayerInfoSelect", TeamName(team), (ConfigAcceptableBase)null);
-                    selectTeam = new OpComboBox(conf, new Vector2(-10000f, -10000f), 90f, ["Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane", "Board view"]);
+                    selectTeam = new OpComboBox(conf, new Vector2(-10000f, -10000f), 90f, new string[] { "Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane", "Board view" });
                     selectTeam.OnValueChanged += SelectTeam_OnValueChanged;
                     selectTeam.OnListOpen += FocusThing;
                     selectTeam.OnListClose += UnfocusThing;
