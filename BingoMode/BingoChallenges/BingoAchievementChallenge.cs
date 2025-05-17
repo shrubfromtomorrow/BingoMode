@@ -147,14 +147,14 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             //IL.WinState.CycleCompleted += WinState_CycleCompleted;
-            On.Menu.KarmaLadder.ctor += KarmaLadder_ctor;
+            On.Menu.KarmaLadder.ctor_Menu_MenuObject_Vector2_HUD_IntVector2_bool += KarmaLadder_ctor;
         }
 
         public override void RemoveHooks()
         {
 
             //IL.WinState.CycleCompleted -= WinState_CycleCompleted;
-            On.Menu.KarmaLadder.ctor -= KarmaLadder_ctor;
+            On.Menu.KarmaLadder.ctor_Menu_MenuObject_Vector2_HUD_IntVector2_bool -= KarmaLadder_ctor;
         }
 
         public override List<object> Settings() => [ID];

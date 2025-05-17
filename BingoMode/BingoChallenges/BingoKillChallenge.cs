@@ -125,7 +125,7 @@ namespace BingoMode.BingoChallenges
                 expeditionCreature.creature == CreatureType.Centiwing ||
                 expeditionCreature.creature == CreatureType.SmallCentipede ||
                 expeditionCreature.creature == CreatureType.RedCentipede ||
-                expeditionCreature.creature == MoreSlugcatsEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = "PuffBall";
+                expeditionCreature.creature == DLCSharedEnums.CreatureTemplateType.AquaCenti) && UnityEngine.Random.value < 0.3f) weapo = "PuffBall";
             return new BingoKillChallenge
             {
                 crit = new(doCreature ? expeditionCreature.creature.value : "Any Creature", "Creature Type", 0, listName: "creatures"),
