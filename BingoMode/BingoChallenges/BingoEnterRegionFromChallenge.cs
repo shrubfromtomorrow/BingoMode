@@ -159,12 +159,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.RegionGate.NewWorldLoaded += RegionGate_NewWorldLoaded3;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded3;
         }
 
         public override void RemoveHooks()
         {
-            On.RegionGate.NewWorldLoaded -= RegionGate_NewWorldLoaded3;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded3;
         }
 
         public override List<object> Settings() => [from, to];
