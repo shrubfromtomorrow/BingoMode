@@ -560,6 +560,9 @@ namespace BingoMode.BingoMenu
                 label.RemoveSprites();
                 owner.RemoveSubObject(label);
                 if (randomize != null)
+                {
+                    randomize.RemoveSprites();
+                }
                 field.Hide();
                 //(menu as CustomizerDialog).tab._RemoveItem(field);
                 field.Unload();
