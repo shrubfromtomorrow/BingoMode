@@ -536,7 +536,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 144);
+                b.Emit(OpCodes.Ldloc, 140);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.EnergyCell);
@@ -884,9 +884,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void RegionGate_NewWorldLoaded3(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        public static void RegionGate_NewWorldLoaded3(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
         {
-            orig.Invoke(self);
+            orig.Invoke(self, newRoom);
         
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -897,9 +897,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        public static void RegionGate_NewWorldLoaded2(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
         {
-            orig.Invoke(self);
+            orig.Invoke(self, newRoom);
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -910,9 +910,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void RegionGate_NewWorldLoaded1(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
+        public static void RegionGate_NewWorldLoaded1(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
         {
-            orig.Invoke(self);
+            orig.Invoke(self, newRoom);
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -1064,9 +1064,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void WorldLoaderNoRegion1(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        public static void WorldLoaderNoRegion1(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition , bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
@@ -1077,10 +1077,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void WorldLoaderNoRegion2(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        public static void WorldLoaderNoRegion2(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
-
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept r)
@@ -1090,10 +1089,9 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void WorldLoaderYesRegion1(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        public static void WorldLoaderYesRegion1(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
-
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge r)
@@ -1559,7 +1557,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 144);
+                b.Emit(OpCodes.Ldloc, 140);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.HalcyonPearl);
