@@ -982,7 +982,14 @@ namespace BingoMode.BingoMenu
 
             lobbyPlayers = lobbyPlayers.OrderBy(x => x.playerIndex).ToList();
 
-            lobbyDividers = new FSprite[lobbyPlayers.Count - 1];
+            if (lobbyPlayers.Count == 0)
+            {
+                Plugin.logger.LogMessage("No people in the lobby");
+            }
+            
+            //lobbyDividers = new FSprite[lobbyPlayers.Count - 1];
+            // This could be negative and I think caused and OverflowException so rewritten.
+            lobbyDividers = new FSprite[Math.Max(0, lobbyPlayers.Count - 1)];
             for (int i = 0; i < lobbyDividers.Length; i++)
             {
                 lobbyDividers[i] = new FSprite("LinearGradient200")

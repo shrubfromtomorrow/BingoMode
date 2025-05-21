@@ -620,16 +620,20 @@ namespace BingoMode
 
             if (!BingoData.BingoMode) return;
 
+            
             if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data))
             {
+                // Temp logs for suspected NRE
+                if (self.expPassage == null) Plugin.logger.LogMessage("expPassage is null");
+                if (self.expPassage?.buttonBehav == null) Plugin.logger.LogMessage("buttonBehav is null");
                 self.expPassage.buttonBehav.greyedOut = data.passageUsed;
             }
 
             if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
             HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUDMain);
-            if (binguHUD is BingoHUDMain hude)
+            if (binguHUD is BingoHUDMain hud)
             {
-                self.killsDisplay.pos.x = self.LeftHandButtonsPosXAdd + 420f * hude.alpha;
+                self.killsDisplay.pos.x = self.LeftHandButtonsPosXAdd + 420f * hud.alpha;
             }
         }
 

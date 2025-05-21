@@ -109,6 +109,10 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.slugcatPlayer.value == "Saint") goto gibacj;
             }
+            if (unl.ToLowerInvariant().StartsWith("oe"))
+            {
+                if (ExpeditionData.slugcatPlayer.value != "Gourmand" || ExpeditionData.slugcatPlayer.value != "White" || ExpeditionData.slugcatPlayer.value != "Yellow") goto gibacj;
+            }
 
             if (unl == "ERROR") return null;
 
