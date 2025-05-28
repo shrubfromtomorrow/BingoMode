@@ -92,16 +92,16 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
+            On.SaveState.ctor += SaveState_ctorHalcyon;
             On.MoreSlugcats.CLOracleBehavior.Update += CLOracleBehavior_Update;
             IL.Room.Loaded += Room_LoadedHalcyon;
-            On.SaveState.ctor += SaveState_ctorHalcyon;
         }
 
         public override void RemoveHooks()
         {
+            On.SaveState.ctor -= SaveState_ctorHalcyon;
             On.MoreSlugcats.CLOracleBehavior.Update -= CLOracleBehavior_Update;
             IL.Room.Loaded -= Room_LoadedHalcyon;
-            On.SaveState.ctor -= SaveState_ctorHalcyon;
         }
 
         public override List<object> Settings() => [];
