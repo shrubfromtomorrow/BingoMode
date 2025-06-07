@@ -178,19 +178,20 @@ namespace BingoMode.BingoChallenges
         public bool CritInLocation(Creature crit)
         {
             //                room.Value != "" ? room.Value : 
-            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "boowomp";
-            AbstractRoom rom = crit.room.abstractRoom;
+            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? region.Value : "boowomp";
+            AbstractRoom room = crit.room.abstractRoom;
             /*if (location == room.Value)
             {
                 return rom.name == location;
             }
-            else*/ if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
+            else*/
+            if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
             {
-                return rom.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || rom.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();
+                return room.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || room.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();
             }
             else if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
             {
-                return rom.world.region.name.ToLowerInvariant() == location.ToLowerInvariant();
+                return room.world.region.name.ToLowerInvariant() == location.ToLowerInvariant();
             }
             else return true;
         }
