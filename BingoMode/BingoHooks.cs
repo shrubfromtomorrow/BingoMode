@@ -173,7 +173,7 @@ namespace BingoMode
             On.Menu.UnlockDialog.Update += UnlockDialog_Update;
 
             // Passage butone
-            On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
+            On.Menu.SleepAndDeathScreen.AddSubObjects += SleepAndDeathScreen_AddSubObjects;
 
             // Saving and loaading shit
             On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
@@ -531,6 +531,7 @@ namespace BingoMode
                 MenuLabel menuLabel = new MenuLabel(self, self.pages[0], self.Translate("AVAILABLE: ") + (available ? "1" : "0"), new Vector2(self.expPassage.pos.x + self.expPassage.size.x / 2f, self.expPassage.pos.y + 45f), default(Vector2), false, null);
                 menuLabel.label.color = new Color(0.7f, 0.7f, 0.7f);
                 self.pages[0].subObjects.Add(menuLabel);
+
                 return;
             }
             orig.Invoke(self);
@@ -622,14 +623,17 @@ namespace BingoMode
 
             if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data))
             {
+                // Temp logs for suspected NRE
+                if (self.expPassage == null) Plugin.logger.LogMessage("expPassage is null");
+                if (self.expPassage?.buttonBehav == null) Plugin.logger.LogMessage("buttonBehav is null");
                 self.expPassage.buttonBehav.greyedOut = data.passageUsed;
             }
 
             if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
             HUD.HudPart binguHUD = self.hud.parts.FirstOrDefault(x => x is BingoHUDMain);
-            if (binguHUD is BingoHUDMain hude)
+            if (binguHUD is BingoHUDMain hud)
             {
-                self.killsDisplay.pos.x = self.LeftHandButtonsPosXAdd + 420f * hude.alpha;
+                self.killsDisplay.pos.x = self.LeftHandButtonsPosXAdd + 420f * hud.alpha;
             }
         }
 
@@ -811,9 +815,9 @@ namespace BingoMode
             else Plugin.logger.LogError("RainWorldGame_GoToDeathScreen IL failed!!!! " + il);
         }
 
-        private static void SleepAndDeathScreen_ctor(On.Menu.SleepAndDeathScreen.orig_ctor orig, SleepAndDeathScreen self, ProcessManager manager, ProcessManager.ProcessID ID)
+        private static void SleepAndDeathScreen_AddSubObjects(On.Menu.SleepAndDeathScreen.orig_AddSubObjects orig, SleepAndDeathScreen self)
         {
-            orig.Invoke(self, manager, ID);
+            orig.Invoke(self);
 
             if (BingoData.BingoMode)
             {

@@ -61,12 +61,12 @@ namespace BingoMode.BingoChallenges
             //    data.unlockIconColor = new Color(0.9019608f, 0.05490196f, 0.05490196f);
             //    data.iconColor = RainWorld.AntiGold.rgb;
             //}
-            //else if (unlockName == "Pearl")
-            //{
-            //    data.unlockIconName = "Symbol_Pearl";
-            //    data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
-            //    data.iconColor = RainWorld.AntiGold.rgb;
-            //}
+            else if (unlockName == "Pearl")
+            {
+                data.unlockIconName = "Symbol_Pearl";
+                data.unlockIconColor = new Color(0.7f, 0.7f, 0.7f);
+                data.iconColor = RainWorld.AntiGold.rgb;
+            }
             //else if (unlockName == "BigCentipede")
             //{
             //    data.unlockIconName = "Kill_Centipede3";
@@ -108,6 +108,14 @@ namespace BingoMode.BingoChallenges
             if (unl.ToLowerInvariant().StartsWith("ds"))
             {
                 if (ExpeditionData.slugcatPlayer.value == "Saint") goto gibacj;
+            }
+            if (unl.ToLowerInvariant().StartsWith("oe"))
+            {
+                if (ExpeditionData.slugcatPlayer.value != "Gourmand" || ExpeditionData.slugcatPlayer.value != "White" || ExpeditionData.slugcatPlayer.value != "Yellow") goto gibacj;
+            }
+            if (unl.ToLowerInvariant().Equals("kingvulture"))
+            {
+                if (ExpeditionData.slugcatPlayer.value != "Red" || ExpeditionData.slugcatPlayer.value != "Gourmand" || ExpeditionData.slugcatPlayer.value != "Artificer") goto gibacj;
             }
 
             if (unl == "ERROR") return null;

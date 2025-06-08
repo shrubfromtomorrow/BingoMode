@@ -70,7 +70,7 @@ namespace BingoMode.BingoChallenges
                 amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 1)
             };
         }
-    
+
         public override bool CombatRequired()
         {
             return false;

@@ -1526,13 +1526,13 @@ namespace BingoMode.BingoChallenges
         {
             ILCursor c = new(il);
             if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdloc(95), // 4fa1
+                x => x.MatchLdloc(91),
                 x => x.MatchCallOrCallvirt(typeof(List<PlacedObject>).GetMethod("get_Item")),
                 x => x.MatchLdfld<PlacedObject>("active")
                 ))
             {
                 c.Emit(OpCodes.Ldarg_0);
-                c.Emit(OpCodes.Ldloc, 95);
+                c.Emit(OpCodes.Ldloc, 91);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     PlacedObject obj = self.roomSettings.placedObjects[i];
@@ -1542,7 +1542,6 @@ namespace BingoMode.BingoChallenges
                     {
                         return false;
                     }
-
                     return orig;
                 });
             }

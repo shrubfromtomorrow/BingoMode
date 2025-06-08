@@ -92,11 +92,7 @@ namespace BingoMode.BingoChallenges
         }
 
         public void Gated(string regionName)
-        {
-            
-            
-            
-            
+        { 
             if (regionName != to.Value && to.Value != "Any Region") return;
             
             bool g = false;
