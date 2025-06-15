@@ -1656,13 +1656,6 @@ namespace BingoMode.BingoChallenges
             Plugin.logger.LogInfo("Cloak after invoke!" + self.miscWorldSaveData.moonGivenRobe);
         }
 
-        //public static void MiscProgressionData_moonCloak(On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition orig, PlayerProgression.MiscProgressionData self, SlugcatStats.Timeline slugcat)
-        //{
-        //    self.cloakTimelinePosition = null;
-        //    orig.Invoke(self, null);
-
-        //}
-
         public static void Room_LoadedMoonCloak(ILContext il)
         {
             ILCursor b = new(il);
@@ -1690,6 +1683,7 @@ namespace BingoMode.BingoChallenges
             }
             else Plugin.logger.LogError("Room_MoonCloak IL FAILURE " + il);
         }
+
         public static void SLOracleBehavior_GrabCloak(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
         {
             orig.Invoke(self);
