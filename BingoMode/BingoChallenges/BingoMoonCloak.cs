@@ -83,8 +83,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            //return (slugcat == SlugcatStats.Name.Red || slugcat == MoreSlugcatsEnums.SlugcatStatsName.Gourmand) || slugcat == SlugcatStats.Name.White || slugcat == SlugcatStats.Name.Yellow;
-            return slugcat != MoreSlugcatsEnums.SlugcatStatsName.Spear || slugcat != MoreSlugcatsEnums.SlugcatStatsName.Artificer;
+            return (slugcat == SlugcatStats.Name.Red || slugcat == MoreSlugcatsEnums.SlugcatStatsName.Gourmand) || slugcat == SlugcatStats.Name.White || slugcat == SlugcatStats.Name.Yellow;
         }
 
         public override string ToString()
@@ -120,7 +119,6 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            //IL.Player.GrabUpdate += Player_GrabUpdateCloak;
             On.Player.SlugcatGrab += Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += SLOracleBehavior_GrabCloak;
             if (!retreive.Value) IL.Room.Loaded += Room_LoadedMoonCloak;
@@ -129,7 +127,6 @@ namespace BingoMode.BingoChallenges
 
         public override void RemoveHooks()
         {
-            //IL.Player.GrabUpdate -= Player_GrabUpdateCloak;
             On.Player.SlugcatGrab -= Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents -= SLOracleBehavior_GrabCloak;
             if (!retreive.Value) IL.Room.Loaded -= Room_LoadedMoonCloak;

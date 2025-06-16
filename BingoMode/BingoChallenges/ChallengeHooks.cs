@@ -1643,18 +1643,19 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void SaveState_ctorCloak(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
-        {
-            Plugin.logger.LogInfo("Original Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
-            progression.miscProgressionData.cloakTimelinePosition = null;
+        //For debugging moonCloak and Timeline, make sure to uncomment the BingoMoonCloak hooks so its used
+        //public static void SaveState_ctorCloak(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
+        //{
+        //    Plugin.logger.LogInfo("Original Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
+        //    progression.miscProgressionData.cloakTimelinePosition = null;
 
-            orig.Invoke(self, saveStateNumber, progression);
+        //    orig.Invoke(self, saveStateNumber, progression);
 
-            self.miscWorldSaveData.moonGivenRobe = false;
+        //    self.miscWorldSaveData.moonGivenRobe = false;
 
-            Plugin.logger.LogInfo("Modified Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
-            Plugin.logger.LogInfo("Cloak after invoke!" + self.miscWorldSaveData.moonGivenRobe);
-        }
+        //    Plugin.logger.LogInfo("Modified Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
+        //    Plugin.logger.LogInfo("Cloak after invoke!" + self.miscWorldSaveData.moonGivenRobe);
+        //}
 
         public static void Room_LoadedMoonCloak(ILContext il)
         {
@@ -1667,7 +1668,7 @@ namespace BingoMode.BingoChallenges
                 ))
             {
                 b.Emit(OpCodes.Ldarg_0);
-                b.Emit(OpCodes.Ldloc, 72);
+                b.Emit(OpCodes.Ldloc, 140);
                 b.EmitDelegate<Action<Room, WorldCoordinate>>((room, pos) =>
                 {
                     AbstractWorldEntity existingFucker = room.abstractRoom.entities.FirstOrDefault(x => x is AbstractPhysicalObject o && o.type == MSCItemType.MoonCloak);
