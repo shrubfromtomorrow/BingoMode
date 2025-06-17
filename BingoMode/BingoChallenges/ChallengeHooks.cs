@@ -1635,7 +1635,7 @@ namespace BingoMode.BingoChallenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoMoonCloak c && c.retreive.Value)
+                    if (ExpeditionData.challengeList[j] is BingoMoonCloak c && !c.deliver.Value)
                     {
                         c.Cloak();
                     }
@@ -1693,7 +1693,7 @@ namespace BingoMode.BingoChallenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoMoonCloak c && !c.retreive.Value)
+                    if (ExpeditionData.challengeList[j] is BingoMoonCloak c && c.deliver.Value)
                     {
                         c.Delivered();
                     }

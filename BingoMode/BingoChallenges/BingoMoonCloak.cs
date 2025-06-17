@@ -11,17 +11,17 @@ namespace BingoMode.BingoChallenges
     using static ChallengeHooks;
     public class BingoMoonCloak : BingoChallenge
     {
-        public SettingBox<bool> retreive;
+        public SettingBox<bool> deliver;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate(retreive.Value ? "Obtain Moon's Cloak" : "Deliver the Cloak to Moon");
+            description = ChallengeTools.IGT.Translate(!deliver.Value ? "Grab Moon's Cloak" : "Deliver the Cloak to Moon");
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            if (retreive.Value)
+            if (!deliver.Value)
             {
                 return new Phrase([new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f))], []);
             }
@@ -37,7 +37,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoMoonCloak c || (c.retreive.Value != retreive.Value);
+            return challenge is not BingoMoonCloak c || (c.deliver.Value != deliver.Value);
         }
 
         public override string ChallengeName()
@@ -49,7 +49,7 @@ namespace BingoMode.BingoChallenges
         {
             BingoMoonCloak ch = new BingoMoonCloak
             {
-                retreive = new(UnityEngine.Random.value < 0.5f, "retreive", 0)
+                deliver = new(UnityEngine.Random.value < 0.5f, "Deliver", 0)
             };
 
             return ch;
@@ -57,7 +57,7 @@ namespace BingoMode.BingoChallenges
 
         public void Delivered()
         {
-            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden && !retreive.Value)
+            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden && deliver.Value)
             {
                 CompleteChallenge();
             }
@@ -65,7 +65,7 @@ namespace BingoMode.BingoChallenges
 
         public void Cloak()
         {
-            if (!completed || !revealed || !TeamsCompleted[SteamTest.team] || !hidden || retreive.Value)
+            if (!completed || !revealed || !TeamsCompleted[SteamTest.team] || !hidden || !deliver.Value)
             {
                 CompleteChallenge();
             }
@@ -92,7 +92,7 @@ namespace BingoMode.BingoChallenges
             {
                 "BingoMoonCloak",
                 "~",
-                retreive.ToString(),
+                deliver.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -105,7 +105,7 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                retreive = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                deliver = SettingBoxFromString(array[0]) as SettingBox<bool>;
                 completed = (array[1] == "1");
                 revealed = (array[2] == "1");
                 UpdateDescription();
@@ -121,7 +121,7 @@ namespace BingoMode.BingoChallenges
         {
             On.Player.SlugcatGrab += Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += SLOracleBehavior_GrabCloak;
-            if (!retreive.Value) IL.Room.Loaded += Room_LoadedMoonCloak;
+            if (deliver.Value) IL.Room.Loaded += Room_LoadedMoonCloak;
             //On.SaveState.ctor += SaveState_ctorCloak;
         }
 
@@ -129,10 +129,10 @@ namespace BingoMode.BingoChallenges
         {
             On.Player.SlugcatGrab -= Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents -= SLOracleBehavior_GrabCloak;
-            if (!retreive.Value) IL.Room.Loaded -= Room_LoadedMoonCloak;
+            if (deliver.Value) IL.Room.Loaded -= Room_LoadedMoonCloak;
             //On.SaveState.ctor -= SaveState_ctorCloak;
         }
 
-        public override List<object> Settings() => [retreive];
+        public override List<object> Settings() => [deliver];
     }
 }
