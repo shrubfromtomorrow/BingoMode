@@ -6,7 +6,9 @@ using UnityEngine;
 
 namespace BingoMode
 {
+    using System.Runtime.CompilerServices;
     using BingoHUD;
+    using Rewired.ControllerExtensions;
 
     public static class SpectatorHooks
     {
@@ -17,7 +19,7 @@ namespace BingoMode
             On.SoundLoader.ShouldSoundPlay += SoundLoader_ShouldSoundPlay;
             On.Player.checkInput += Player_checkInput;
             On.RainCycle.Update += RainCycle_Update;
-            IL.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues;
+            IL.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues;
             On.Player.Die += Player_Die;
         }
 
@@ -32,11 +34,11 @@ namespace BingoMode
             On.SoundLoader.ShouldSoundPlay -= SoundLoader_ShouldSoundPlay;
             On.Player.checkInput -= Player_checkInput;
             On.RainCycle.Update -= RainCycle_Update;
-            IL.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues -= WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues;
+            IL.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues;
             On.Player.Die -= Player_Die;
         }
 
-        private static void WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues(ILContext il)
+        private static void WorldLoader_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues(ILContext il)
         {
             ILCursor c = new(il);
 
@@ -87,7 +89,7 @@ namespace BingoMode
         private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
             orig.Invoke(self, cam);
-            
+
             for (int i = 0; i < cam.SpriteLayers.Length - 2; i++)
             {
                 cam.SpriteLayers[i].RemoveAllChildren();
@@ -117,5 +119,6 @@ namespace BingoMode
                 cam.virtualMicrophone.ambientSoundPlayers[j].Destroy();
             }
         }
+
     }
 }

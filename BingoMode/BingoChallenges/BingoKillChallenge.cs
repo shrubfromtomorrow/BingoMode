@@ -158,7 +158,11 @@ namespace BingoMode.BingoChallenges
             if (c.Template.smallCreature || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
             if (starve.Value && !p.Malnourished) return;
             string type = c.abstractCreature.creatureTemplate.type.value;
-            bool flag = crit == null || type == crit.Value;
+            bool flag = crit != null && (
+                crit.Value == "Any Creature" ||
+                type == crit.Value ||
+                (crit.Value == "DaddyLongLegs" && type == "CreatureType.BrotherLongLegs" && c is DaddyLongLegs dll && dll.colorClass)
+            );
             if (!flag && crit.Value == "DaddyLongLegs" && type == "CreatureType.BrotherLongLegs" && (c as DaddyLongLegs).colorClass)
             {
                 flag = true;
