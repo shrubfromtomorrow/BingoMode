@@ -15,6 +15,7 @@ namespace BingoMode.BingoMenu
 {
     using BingoSteamworks;
     using System;
+    using System.Reflection.Emit;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -32,6 +33,10 @@ namespace BingoMode.BingoMenu
         public MenuTabWrapper menuTabWrapper;
         public SymbolButton plusButton;
         public SymbolButton minusButton;
+        public OpUpdown passageSetting;
+        public ConfigurableBase passageSettingConf;
+        public UIelementWrapper passageSettingWrapper;
+        public MenuLabel passageLabel;
         public OpTextBox shelterSetting;
         public ConfigurableBase shelterSettingConf;
         public UIelementWrapper shelterSettingWrapper;
@@ -159,6 +164,15 @@ namespace BingoMode.BingoMenu
             plusButton.roundedRect.size = plusButton.size;
             subObjects.Add(plusButton);
 
+            passageSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_PassageSettingBingo", 1, new ConfigAcceptableRange<int>(0, 99));
+            passageSetting = new OpUpdown(true, passageSettingConf as Configurable<int>, new Vector2(683f, 640f), 50f);
+            passageSetting.description = "Number of Passages players start with.";
+            passageSetting.OnValueChanged += PassageSetting_OnValueChanged;
+            passageSettingWrapper = new UIelementWrapper(menuTabWrapper, passageSetting);
+
+            passageLabel = new MenuLabel(menu, this, "Passages: ", new Vector2(651f, 657f), default, false);
+            subObjects.Add(passageLabel);
+
             shelterSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ShelterSettingBingo", "_", (ConfigAcceptableBase)null);
             shelterSetting = new OpTextBox(shelterSettingConf as Configurable<string>, new Vector2(xx + 48, yy + 56), 100f);
             shelterSetting.alignment = FLabelAlignment.Center;
@@ -208,7 +222,15 @@ namespace BingoMode.BingoMenu
                 subObjects.Add(eggButton);
             }
         }
-
+        private void PassageSetting_OnValueChanged(UIconfig config, string value, string oldValue)
+        {
+            if (value.Trim() == string.Empty)
+            {
+                BingoData.passageNumStart = 1;
+                return;
+            }
+            BingoData.passageNumStart = Int32.Parse(value);
+        }
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
         {
             
@@ -230,6 +252,7 @@ namespace BingoMode.BingoMenu
 
         public void UpdateLobbyHost(bool isHost)
         {
+            passageSetting.greyedOut = !isHost;
             shelterSetting.greyedOut = !isHost;
             randomize.buttonBehav.greyedOut = !isHost;
             plusButton.buttonBehav.greyedOut = !isHost;
@@ -274,6 +297,7 @@ namespace BingoMode.BingoMenu
                     startGame.signalText = "GETREADY";
                     startGame.menuLabel.text = "I'M\nREADY";
                 }
+                passageSetting.greyedOut = !create;
                 shelterSetting.greyedOut = !create;
                 randomize.buttonBehav.greyedOut = !create;
                 plusButton.buttonBehav.greyedOut = !create;
@@ -539,14 +563,14 @@ namespace BingoMode.BingoMenu
                         InnerWorkings.SendMessage("C" + SteamTest.selfIdentity.GetSteamID64(), hostIdentity);
                     }
 
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.gamemode, false, false, false, BingoData.TeamsListToString(BingoData.TeamsInBingo), false);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, SteamTest.team, hostIdentity, isHost, connectedPlayers, BingoData.globalSettings.gamemode, false, false, BingoData.passageNumStart, 0, 0, BingoData.TeamsListToString(BingoData.TeamsInBingo), false);
                     BingoData.RandomStartingSeed = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "randomSeed"), System.Globalization.NumberStyles.Any);
                 }
                 else
                 {
                     int newTeam = TeamNumber(Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value);
                     
-                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
+                    BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, BingoData.passageNumStart, 0, 0);
                     SteamTest.team = newTeam;
                 }
                 Expedition.Expedition.coreFile.Save(false);
@@ -913,15 +937,20 @@ namespace BingoMode.BingoMenu
             base.RemoveSprites();
             pageTitle.RemoveFromContainer();
             unlocksButton.Hide();
+            passageSetting.Hide();
             shelterSetting.Hide();
             unlocksButton.Unload();
+            passageSetting.Unload();
             shelterSetting.Unload();
+            passageSetting.OnValueChanged -= PassageSetting_OnValueChanged;
             shelterSetting.OnValueUpdate -= ShelterSetting_OnValueUpdate;
             nameFilter.OnValueUpdate -= NameFilter_OnValueUpdate;
             menuTabWrapper.wrappers.Remove(unlocksButton);
+            menuTabWrapper.wrappers.Remove(passageSetting);
             menuTabWrapper.wrappers.Remove(shelterSetting);
             menuTabWrapper.wrappers.Remove(nameFilter);
             menuTabWrapper.subObjects.Remove(unlockWrapper);
+            menuTabWrapper.subObjects.Remove(passageSettingWrapper);
             menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
             menuTabWrapper.subObjects.Remove(nameFilterWrapper);
             if (inLobby) RemoveLobbyPage();

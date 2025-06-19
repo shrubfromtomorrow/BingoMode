@@ -353,9 +353,9 @@ namespace BingoMode
 
             if (message == "HOLD TO START")
             {
-                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && (data.passageNumStart + data.passageNumBonus - data.passageNumUsed > 0))
                 {
-                    data.passageUsed = true;
+                    data.passageNumUsed++;
                     BingoSaveFile.Save();
                 }
             }
@@ -520,15 +520,15 @@ namespace BingoMode
             if (BingoData.BingoMode)
             {
                 bool available = false;
-                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && !data.passageUsed)
+                if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && (data.passageNumStart + data.passageNumBonus - data.passageNumUsed > 0))
                 {
-                    available = true;
+                    ExpeditionData.earnedPassages = data.passageNumStart + data.passageNumBonus - data.passageNumUsed;
                 }
 
                 self.expPassage = new SimpleButton(self, self.pages[0], self.Translate("PASSAGE"), "EXPPASSAGE", new Vector2(self.LeftHandButtonsPosXAdd + self.manager.rainWorld.options.SafeScreenOffset.x, Mathf.Max(self.manager.rainWorld.options.SafeScreenOffset.y, 15f)), new Vector2(110f, 30f));
                 self.pages[0].subObjects.Add(self.expPassage);
                 self.expPassage.lastPos = self.expPassage.pos;
-                MenuLabel menuLabel = new MenuLabel(self, self.pages[0], self.Translate("AVAILABLE: ") + (available ? "1" : "0"), new Vector2(self.expPassage.pos.x + self.expPassage.size.x / 2f, self.expPassage.pos.y + 45f), default(Vector2), false, null);
+                MenuLabel menuLabel = new MenuLabel(self, self.pages[0], self.Translate("AVAILABLE: ") + (data.passageNumStart + data.passageNumBonus - data.passageNumUsed), new Vector2(self.expPassage.pos.x + self.expPassage.size.x / 2f, self.expPassage.pos.y + 45f), default(Vector2), false, null);
                 menuLabel.label.color = new Color(0.7f, 0.7f, 0.7f);
                 self.pages[0].subObjects.Add(menuLabel);
 
@@ -626,7 +626,7 @@ namespace BingoMode
                 // Temp logs for suspected NRE
                 if (self.expPassage == null) Plugin.logger.LogMessage("expPassage is null");
                 if (self.expPassage?.buttonBehav == null) Plugin.logger.LogMessage("buttonBehav is null");
-                self.expPassage.buttonBehav.greyedOut = data.passageUsed;
+                self.expPassage.buttonBehav.greyedOut = (data.passageNumStart + data.passageNumBonus - data.passageNumUsed == 0);
             }
 
             if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
@@ -936,6 +936,7 @@ namespace BingoMode
             self.pages.Add(new Page(self, null, "BINGO", 4));
             BingoData.globalMenu = self;
             BingoData.MultiplayerGame = false;
+            BingoData.passageNumStart = 1;
             SteamTest.team = 0;
             BingoData.BingoDen = "random";
             SteamFinal.ConnectedPlayers.Clear();

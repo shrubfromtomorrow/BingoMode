@@ -122,7 +122,7 @@ namespace BingoMode.BingoChallenges
             On.Player.SlugcatGrab += Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += SLOracleBehavior_GrabCloak;
             if (deliver.Value) IL.Room.Loaded += Room_LoadedMoonCloak;
-            //On.SaveState.ctor += SaveState_ctorCloak;
+            On.SaveState.ctor += SaveState_ctorCloak;
         }
 
         public override void RemoveHooks()
@@ -130,7 +130,7 @@ namespace BingoMode.BingoChallenges
             On.Player.SlugcatGrab -= Player_SlugcatGrabCloak;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents -= SLOracleBehavior_GrabCloak;
             if (deliver.Value) IL.Room.Loaded -= Room_LoadedMoonCloak;
-            //On.SaveState.ctor -= SaveState_ctorCloak;
+            On.SaveState.ctor -= SaveState_ctorCloak;
         }
 
         public override List<object> Settings() => [deliver];
