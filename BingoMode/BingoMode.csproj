@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
-    <Compile Include="BingoChallenges\BingoMoonCloak.cs" />
+    <Compile Include="BingoChallenges\BingoMoonCloakChallenge.cs" />
     <Compile Include="BingoMenu\BingoCredits.cs" />
     <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />
     <Compile Include="BingoMenu\BingoButton.cs" />

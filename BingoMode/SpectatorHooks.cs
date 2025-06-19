@@ -90,11 +90,6 @@ namespace BingoMode
         {
             orig.Invoke(self, cam);
 
-            for (int i = 0; i < cam.SpriteLayers.Length - 2; i++)
-            {
-                cam.SpriteLayers[i].RemoveAllChildren();
-                cam.SpriteLayers[i].RemoveFromContainer();
-            }
             if (cam.preLoadedTexture != null)
             {
                 cam.preLoadedTexture = new byte[0];
@@ -118,7 +113,33 @@ namespace BingoMode
             {
                 cam.virtualMicrophone.ambientSoundPlayers[j].Destroy();
             }
+            cam.room.AddObject(new BlackScreen());
         }
 
+    }
+
+    public class BlackScreen : UpdatableAndDeletable, IDrawable
+    {
+        public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            sLeaser.sprites = new FSprite[1];
+            sLeaser.sprites[0] = new FSprite("Futile_White", true);
+            sLeaser.sprites[0].scaleX = (rCam.room.RoomRect.right - rCam.room.RoomRect.left) / 8f;
+            sLeaser.sprites[0].scaleY = (rCam.room.RoomRect.top - rCam.room.RoomRect.bottom) / 8f;
+            sLeaser.sprites[0].x = rCam.room.RoomRect.Center.x;
+            sLeaser.sprites[0].y = rCam.room.RoomRect.Center.y;
+            sLeaser.sprites[0].alpha = 1f;
+            this.AddToContainer(sLeaser, rCam, null);
+        }
+        public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+        }
+        public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera cam, RoomPalette pal) => sLeaser.sprites[0].color = UnityEngine.Color.black;
+        public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        {
+            newContatiner = rCam.ReturnFContainer("Bloom");
+            sLeaser.sprites[0].RemoveFromContainer();
+            newContatiner.AddChild(sLeaser.sprites[0]);
+        }
     }
 }
