@@ -28,6 +28,7 @@ namespace BingoMode
         public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
         public static ExpeditionMenu globalMenu;
         public static LobbySettings globalSettings = new LobbySettings();
+        public static int passageNumStart;
         public static string BingoDen = "random";
         public static List<int> TeamsInBingo = [0];
         public static bool SpectatorMode = false;
@@ -54,20 +55,24 @@ namespace BingoMode
             public BingoGameMode gamemode;
             public bool showedWin;
             public bool firstCycleSaved;
-            public bool passageUsed;
+            public int passageNumStart;
+            public int passageNumUsed;
+            public int passageNumBonus;
             public string teamsInBingo;
             public bool songPlayed;
 
-            public BingoSaveData(int size, bool showedWin, int team, bool firstCycleSaved, bool passageUsed)
+            public BingoSaveData(int size, bool showedWin, int team, bool firstCycleSaved, int passageNumStart, int passageNumUsed, int passageNumBonus)
             {
                 this.size = size;
                 this.showedWin = showedWin;
                 this.team = team;
                 this.firstCycleSaved = firstCycleSaved;
-                this.passageUsed = passageUsed;
+                this.passageNumStart = passageNumStart;
+                this.passageNumUsed = passageNumUsed;
+                this.passageNumBonus = passageNumBonus;
             }
 
-            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, BingoGameMode gamemode, bool showedWin, bool firstCycleSaved, bool passageUsed, string teamsInBingo, bool songPlayed)
+            public BingoSaveData(int size, int team, SteamNetworkingIdentity hostID, bool isHost, string playerWhiteList, BingoGameMode gamemode, bool showedWin, bool firstCycleSaved, int passageNumStart, int passageNumUsed, int passageNumBonus, string teamsInBingo, bool songPlayed)
             {
                 this.size = size;
                 this.team = team;
@@ -77,7 +82,9 @@ namespace BingoMode
                 this.gamemode = gamemode;
                 this.showedWin = showedWin;
                 this.firstCycleSaved = firstCycleSaved;
-                this.passageUsed = passageUsed;
+                this.passageNumStart = passageNumStart;
+                this.passageNumUsed = passageNumUsed;
+                this.passageNumBonus = passageNumBonus;
                 this.teamsInBingo = teamsInBingo;
                 this.songPlayed = songPlayed;
             }
