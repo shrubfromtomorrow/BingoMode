@@ -228,7 +228,6 @@ namespace BingoMode.BingoSteamworks
 
         public static void ChallengeStateChangeToHost(Challenge ch, bool failed)
         {
-            
             int x = -1;
             int y = -1;
             for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
@@ -246,6 +245,7 @@ namespace BingoMode.BingoSteamworks
                 }
                 if (b) break;
             }
+            Plugin.logger.LogInfo("ChallengeStateChangeToHost message being send to host: " + $"{(failed ? "^" : "#")}{x};{y};{SteamTest.team}" + " for challenge " + ch.ToString());
             InnerWorkings.SendMessage($"{(failed ? "^" : "#")}{x};{y};{SteamTest.team}", GetHost()); //;{SteamTest.selfIdentity.GetSteamID64()}
         }
 

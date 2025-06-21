@@ -43,36 +43,36 @@ namespace BingoMode.BingoChallenges
                     BingoVistaLocations[text] = new Dictionary<string, Vector2>();
                 }
                 string path = AssetManager.ResolveFilePath(Path.Combine("world", text, "bingovistas.txt"));
-                if (File.Exists(path))
-                {
-                    string[] lines = File.ReadAllLines(path);
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        string text2 = lines[i];
-                        if (string.IsNullOrEmpty(text2.Trim())) continue;
-                        if (text2.StartsWith("(MSC)"))
-                        {
-                            if (!ModManager.MSC) continue;
-                            text2 = text2.Substring(5);
-                        }
+                //if (File.Exists(path))
+                //{
+                //    string[] lines = File.ReadAllLines(path);
+                //    for (int i = 0; i < lines.Length; i++)
+                //    {
+                //        string text2 = lines[i];
+                //        if (string.IsNullOrEmpty(text2.Trim())) continue;
+                //        if (text2.StartsWith("(MSC)"))
+                //        {
+                //            if (!ModManager.MSC) continue;
+                //            text2 = text2.Substring(5);
+                //        }
 
-                        string[] array2 = text2.Split(',');
-                        if (array2.Length >= 3)
-                        {
-                            string text3 = array2[0];
-                            int num;
-                            int num2;
-                            if (string.IsNullOrEmpty(text3) || !int.TryParse(array2[1], out num) || !int.TryParse(array2[2], out num2))
-                            {
-                                Custom.LogWarning("Failed to parse bingo vista " + text2);
-                            }
-                            else
-                            {
-                                BingoVistaLocations[text][text3] = new Vector2((float)num, (float)num2);
-                            }
-                        }
-                    }
-                }
+                //        string[] array2 = text2.Split(',');
+                //        if (array2.Length >= 3)
+                //        {
+                //            string text3 = array2[0];
+                //            int num;
+                //            int num2;
+                //            if (string.IsNullOrEmpty(text3) || !int.TryParse(array2[1], out num) || !int.TryParse(array2[2], out num2))
+                //            {
+                //                Custom.LogWarning("Failed to parse bingo vista " + text2);
+                //            }
+                //            else
+                //            {
+                //                BingoVistaLocations[text][text3] = new Vector2((float)num, (float)num2);
+                //            }
+                //        }
+                //    }
+                //}
             }
         }
 
