@@ -1,6 +1,7 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
+using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -88,16 +89,16 @@ namespace BingoMode.BingoChallenges
 
         public override string ToString()
         {
-            return string.Concat(new string[]
-            {
-                "BingoMoonCloak",
+            return string.Concat(
+            [
+                "BingoMoonCloakChallenge",
                 "~",
                 deliver.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
-            });
+            ]);
         }
 
         public override void FromString(string args)
@@ -112,7 +113,7 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoMoonCloak FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoMoonCloakChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
