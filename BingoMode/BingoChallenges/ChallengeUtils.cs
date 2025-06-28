@@ -148,6 +148,7 @@ namespace BingoMode.BingoChallenges
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
+                case "chatlogs": return [.. BingoData.possibleTokens[4]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
                 case "expobject": return ["FirecrackerPlant", "SporePlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask", "DangleFruit", "SlimeMold"];
                 case "vista": // hate
@@ -501,7 +502,7 @@ namespace BingoMode.BingoChallenges
             "Mushroom",
 
             // MSC
-            "GooieDuck", 
+            "GooieDuck",
             "LillyPuck",
             "DandelionPeach",
             "GlowWeed",

@@ -1429,34 +1429,67 @@ namespace BingoMode.BingoChallenges
             return orig.Invoke(self, safariToken);
         }
 
+        public static bool MiscProgressionData_GetBroadcastListened(On.PlayerProgression.MiscProgressionData.orig_GetBroadcastListened orig, PlayerProgression.MiscProgressionData self, ChatlogData.ChatlogID chatlog)
+        {
+            if (BingoData.challengeTokens.Contains(chatlog.value)) return false;
+            return orig.Invoke(self, chatlog);
+        }
+
         public static void CollectToken_Pop(On.CollectToken.orig_Pop orig, CollectToken self, Player player)
         {
             if (self.expand > 0f)
             {
                 return;
             }
-            if (self.placedObj.data is CollectToken.CollectTokenData d && BingoData.challengeTokens.Contains(d.tokenString + (d.isRed ? "-safari" : "")) && ExpeditionData.challengeList.Any(x => x is BingoUnlockChallenge b && b.unlock.Value == d.tokenString + (d.isRed ? "-safari" : "")))
+
+            if (self.placedObj.data is CollectToken.CollectTokenData d)
             {
-                foreach (Challenge ch in ExpeditionData.challengeList)
+                string tokenId = d.tokenString + (d.isRed ? "-safari" : "");
+
+                if (BingoData.challengeTokens.Contains(tokenId) &&
+                    ExpeditionData.challengeList.Any(x =>
+                        (x is BingoUnlockChallenge b1 && b1.unlock.Value == tokenId) ||
+                            (x is BingoBroadcastChallenge b2 && b2.chatlog.Value == tokenId)))
                 {
-                    if (ch is BingoUnlockChallenge b && !b.completed && !b.TeamsCompleted[SteamTest.team] && !b.revealed && !b.hidden && b.unlock.Value == (d.tokenString + (d.isRed ? "-safari" : "")))
+                    foreach (Challenge ch in ExpeditionData.challengeList)
                     {
-                        ch.CompleteChallenge();
+                        if (ch is BingoUnlockChallenge b &&
+                            !b.completed &&
+                            !b.TeamsCompleted[SteamTest.team] &&
+                            !b.revealed &&
+                            !b.hidden &&
+                            b.unlock.Value == tokenId)
+                        {
+                            ch.CompleteChallenge();
+                        }
+                        else if (ch is BingoBroadcastChallenge br &&
+                                 !br.completed &&
+                                 !br.TeamsCompleted[SteamTest.team] &&
+                                 !br.revealed &&
+                                 !br.hidden &&
+                                 br.chatlog.Value == tokenId)
+                        {
+                            ch.CompleteChallenge();
+                        }
                     }
-                }
+                    self.expandAroundPlayer = player;
+                    self.expand = 0.01f;
+                    self.room.PlaySound(SoundID.Token_Collect, self.pos);
 
-                self.expandAroundPlayer = player;
-                self.expand = 0.01f;
-                self.room.PlaySound(SoundID.Token_Collect, self.pos);
+                    for (int i = 0; i < 10; i++)
+                    {
+                        self.room.AddObject(new CollectToken.TokenSpark(
+                            self.pos + Custom.RNV() * 2f,
+                            Custom.RNV() * 11f * UnityEngine.Random.value + Custom.DirVec(player.mainBodyChunk.pos, self.pos) * 5f * UnityEngine.Random.value,
+                            self.GoldCol(self.glitch),
+                            self.underWaterMode));
+                    }
 
-                int num = 0;
-                while ((float)num < 10f)
-                {
-                    self.room.AddObject(new CollectToken.TokenSpark(self.pos + Custom.RNV() * 2f, Custom.RNV() * 11f * UnityEngine.Random.value + Custom.DirVec(player.mainBodyChunk.pos, self.pos) * 5f * UnityEngine.Random.value, self.GoldCol(self.glitch), self.underWaterMode));
-                    num++;
+                    return;
                 }
             }
-            else orig.Invoke(self, player);
+
+            orig.Invoke(self, player);
         }
 
         public delegate Color orig_TokenColor(CollectToken self);
@@ -1478,7 +1511,7 @@ namespace BingoMode.BingoChallenges
             ILCursor c = new(il);
             if (c.TryGotoNext(
                 x => x.MatchLdfld("PlacedObject", "active")
-                ) && 
+                ) &&
                 c.TryGotoNext(MoveType.After,
                 x => x.MatchLdsfld("ModManager", "Expedition")
                 ))

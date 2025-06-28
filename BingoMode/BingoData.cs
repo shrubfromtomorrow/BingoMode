@@ -19,8 +19,8 @@ namespace BingoMode
         public static bool MultiplayerGame;
         public static Dictionary<SlugcatStats.Name, BingoSaveData> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
-        public static List<string> challengeTokens = [];
-        public static List<string>[] possibleTokens = new List<string>[4];
+        public static HashSet<string> challengeTokens = [];
+        public static List<string>[] possibleTokens = new List<string>[5];
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
         // This prevents the same creatures being hit by the same sources multiple times
@@ -130,10 +130,17 @@ namespace BingoMode
             challengeTokens.Clear();
             foreach (Challenge challenge in ExpeditionData.challengeList)
             {
-                if (challenge is BingoUnlockChallenge c && !c.TeamsCompleted[SteamTest.team] && !challengeTokens.Contains(c.unlock.Value))
+                if ((challenge is BingoUnlockChallenge c1 &&
+                        !c1.TeamsCompleted[SteamTest.team] &&
+                        !challengeTokens.Contains(c1.unlock.Value)))
                 {
-                    challengeTokens.Add(c.unlock.Value);
-                    
+                    challengeTokens.Add(c1.unlock.Value);
+                }
+                if ((challenge is BingoBroadcastChallenge d1 &&
+                        !d1.TeamsCompleted[SteamTest.team] &&
+                        !challengeTokens.Contains(d1.chatlog.Value)))
+                {
+                    challengeTokens.Add(d1.chatlog.Value);
                 }
             }
         }
@@ -167,6 +174,8 @@ namespace BingoMode
             }
         }
 
+
+
         public static void FillPossibleTokens(SlugcatStats.Name slug)
         {
             
@@ -174,6 +183,7 @@ namespace BingoMode
             possibleTokens[1] = []; // gold
             possibleTokens[2] = []; // red
             possibleTokens[3] = []; // green
+            possibleTokens[4] = []; // white
             foreach (var kvp in Custom.rainWorld.regionBlueTokens)
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
@@ -231,6 +241,19 @@ namespace BingoMode
                         {
                             
                             possibleTokens[3].Add(kvp.Value[n].value);
+                        }
+                    }
+                }
+            }
+
+            if (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear)
+            {
+                foreach (var kvp in Custom.rainWorld.regionGreyTokens)
+                {
+                    for (int n = 0; n < kvp.Value.Count; n++)
+                    {
+                        if (!kvp.Value[n].value.ToLowerInvariant().Contains("broadcast")) {
+                            possibleTokens[4].Add(kvp.Value[n].value);
                         }
                     }
                 }

@@ -5,7 +5,9 @@ using System.Collections.Generic;
 
 namespace BingoMode.BingoChallenges
 {
+    using System.Linq;
     using BingoMenu;
+    using IL.Watcher;
 
     public abstract class BingoChallenge : Challenge
     {
@@ -199,7 +201,14 @@ namespace BingoMode.BingoChallenges
                     }
                 }
             }
-            if (team == SteamTest.team && this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Remove(uch.unlock.Value);
+            if (team == SteamTest.team && this is BingoUnlockChallenge uch && BingoData.challengeTokens.Contains(uch.unlock.Value))
+            {
+                BingoData.challengeTokens.Remove(uch.unlock.Value);
+            }
+            if (team == SteamTest.team && this is BingoBroadcastChallenge brd)
+            {
+                BingoData.challengeTokens.Remove(brd.chatlog.Value);
+            }
 
             BingoSaveFile.Save();
         }
@@ -259,7 +268,15 @@ namespace BingoMode.BingoChallenges
             bool lastCompleted = TeamsCompleted[team];
             TeamsCompleted[team] = false;
             if (team == SteamTest.team) completed = false;
-            if (this is BingoUnlockChallenge uch && !BingoData.challengeTokens.Contains(uch.unlock.Value)) BingoData.challengeTokens.Add(uch.unlock.Value);
+            if (team == SteamTest.team && this is BingoUnlockChallenge uch && !BingoData.challengeTokens.Contains(uch.unlock.Value))
+            {
+                BingoData.challengeTokens.Add(uch.unlock.Value);
+            }
+            if (team == SteamTest.team && this is BingoBroadcastChallenge brd && !BingoData.challengeTokens.Contains(brd.chatlog.Value))
+            {
+                BingoData.challengeTokens.Add(brd.chatlog.Value);
+            }
+
             if (hidden && team != SteamTest.team) hidden = false;
             if (lastCompleted)
             {
