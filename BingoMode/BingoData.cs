@@ -19,7 +19,7 @@ namespace BingoMode
         public static bool MultiplayerGame;
         public static Dictionary<SlugcatStats.Name, BingoSaveData> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
-        public static HashSet<string> challengeTokens = [];
+        public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[5];
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];

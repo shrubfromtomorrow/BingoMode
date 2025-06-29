@@ -205,7 +205,7 @@ namespace BingoMode.BingoChallenges
             {
                 BingoData.challengeTokens.Remove(uch.unlock.Value);
             }
-            if (team == SteamTest.team && this is BingoBroadcastChallenge brd)
+            if (team == SteamTest.team && this is BingoBroadcastChallenge brd && BingoData.challengeTokens.Contains(brd.chatlog.Value))
             {
                 BingoData.challengeTokens.Remove(brd.chatlog.Value);
             }

@@ -3,6 +3,7 @@ using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
@@ -20,7 +21,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("arenaunlock", 1f, CollectToken.WhiteColor.rgb), new Verse(chatlog.Value)], [1]);
+            return new Phrase([new Icon("Symbol_Satellite", 1f, Color.white), new Verse(chatlog.Value)], [1]);
         }
 
         public override bool Duplicable(Challenge challenge)

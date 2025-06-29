@@ -13,6 +13,7 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> crit;
 
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Befriend a <crit>")
