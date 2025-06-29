@@ -209,13 +209,13 @@ namespace BingoMode.BingoChallenges
                 string[] array = Regex.Split(args, "><");
                 weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
                 victim = SettingBoxFromString(array[1]) as SettingBox<string>;
+                inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
                 current = (inOneCycle.Value && !completed) ? 0 :  int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                sub = SettingBoxFromString(array[5]) as SettingBox<string>;
-                completed = (array[6] == "1");
-                revealed = (array[7] == "1");
-                inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                region = SettingBoxFromString(array[5]) as SettingBox<string>;
+                sub = SettingBoxFromString(array[6]) as SettingBox<string>;
+                completed = (array[7] == "1");
+                revealed = (array[8] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

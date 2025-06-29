@@ -1,10 +1,12 @@
 ﻿using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
+using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using System.Globalization;
 
 namespace BingoMode.BingoChallenges
 {
@@ -12,42 +14,73 @@ namespace BingoMode.BingoChallenges
     public class BingoTameChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
+        public List<string> tamed = [];
+        public int current;
+        public SettingBox<int> amount;
+        public SettingBox<bool> specific;
 
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Befriend a <crit>")
-                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'));
+            this.description = specific.Value ? ChallengeTools.IGT.Translate("Befriend a <crit>")
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'))
+                : ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] unique creatures")
+                .Replace("<current>", ValueConverter.ConvertToString(current))
+                .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("FriendB", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))], []);
+        public override Phrase ConstructPhrase()
+        {
+            if (specific.Value)
+            {
+                return new Phrase([new Icon("FriendB", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))], []);
+            }
+            return new Phrase([new Icon("FriendB", 1f, Color.white), new Counter(current, amount.Value)], [1]);
+        }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTameChallenge c || c.crit.Value != crit.Value;
+            return challenge is not BingoCollectPearlChallenge c || (c.specific.Value == true && specific.Value == true) || c.specific.Value != specific.Value;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Befriending a creature");
+            return ChallengeTools.IGT.Translate("Befriending creatures");
         }
 
         public override Challenge Generate()
         {
+            bool specific = UnityEngine.Random.value < 0.5f;
             var crug = ChallengeUtils.Befriendable[UnityEngine.Random.Range(0, ChallengeUtils.Befriendable.Length - (ModManager.MSC ? (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint ? 2 : 1) : 4))];
 
             return new BingoTameChallenge
             {
-                crit = new(crug, "Creature Type", 0, listName: "friend")
+                specific = new SettingBox<bool>(specific, "Specific Creature Type", 0),
+                tamed = [],
+                crit = new(crug, "Creature Type", 0, listName: "friend"),
+                amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3)
             };
         }
 
         public void Fren(CreatureTemplate.Type friend)
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && friend.value == crit.Value)
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (specific.Value)
             {
+                if (friend.value != crit.Value) return;
+                current = 1;
+                UpdateDescription();
                 CompleteChallenge();
+            }
+            else
+            {
+                if (tamed.Contains(friend.value)) return;
+                current++;
+                tamed.Add(friend.value);
+                UpdateDescription();
+                if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
         }
 
@@ -66,17 +99,32 @@ namespace BingoMode.BingoChallenges
             return true;
         }
 
+        public override void Reset()
+        {
+            base.Reset();
+            current = 0;
+            tamed = [];
+        }
+
         public override string ToString()
         {
             return string.Concat(new string[]
             {
                 "BingoTameChallenge",
                 "~",
+                specific.ToString(),
+                "><",
                 crit.ToString(),
+                "><",
+                current.ToString(),
+                "><",
+                amount.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
+                "><",
+                string.Join("cLtD", tamed),
             });
         }
 
@@ -85,9 +133,14 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                crit = SettingBoxFromString(array[0]) as SettingBox<string>;
-                completed = (array[1] == "1");
-                revealed = (array[2] == "1");
+                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                crit = SettingBoxFromString(array[1]) as SettingBox<string>;
+                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                completed = (array[4] == "1");
+                revealed = (array[5] == "1");
+                string[] arr = Regex.Split(array[6], "cLtD");
+                tamed = [.. arr];
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -107,6 +160,6 @@ namespace BingoMode.BingoChallenges
             On.FriendTracker.Update -= FriendTracker_Update;
         }
 
-        public override List<object> Settings() => [crit];
+        public override List<object> Settings() => [crit, amount, specific];
     }
 }
