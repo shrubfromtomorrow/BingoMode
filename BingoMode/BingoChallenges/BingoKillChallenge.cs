@@ -181,14 +181,8 @@ namespace BingoMode.BingoChallenges
 
         public bool CritInLocation(Creature crit)
         {
-            //                room.Value != "" ? room.Value : 
             string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? region.Value : "boowomp";
             AbstractRoom room = crit.room.abstractRoom;
-            /*if (location == room.Value)
-            {
-                return rom.name == location;
-            }
-            else*/
             if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
             {
                 return room.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || room.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();

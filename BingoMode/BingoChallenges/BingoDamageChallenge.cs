@@ -207,15 +207,31 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
-                victim = SettingBoxFromString(array[1]) as SettingBox<string>;
-                inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                current = (inOneCycle.Value && !completed) ? 0 :  int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                region = SettingBoxFromString(array[5]) as SettingBox<string>;
-                sub = SettingBoxFromString(array[6]) as SettingBox<string>;
-                completed = (array[7] == "1");
-                revealed = (array[8] == "1");
+                if (array.Length == 9)
+                {
+                    weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    victim = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                    current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    region = SettingBoxFromString(array[5]) as SettingBox<string>;
+                    sub = SettingBoxFromString(array[6]) as SettingBox<string>;
+                    completed = (array[7] == "1");
+                    revealed = (array[8] == "1");
+                }
+                // Legacy board damage challenge compatibility
+                else if (array.Length == 6)
+                {
+                    weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    victim = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    inOneCycle = SettingBoxFromString("System.Boolean|false|In One Cycle|0|NULL") as SettingBox<bool>;
+                    region = SettingBoxFromString("System.String|Any Region|Region|5|regions") as SettingBox<string>;
+                    sub = SettingBoxFromString("System.String|Any Subregion|Subregion|4|subregions") as SettingBox<string>;
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

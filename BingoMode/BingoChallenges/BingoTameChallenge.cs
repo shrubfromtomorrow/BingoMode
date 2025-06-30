@@ -133,14 +133,30 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                crit = SettingBoxFromString(array[1]) as SettingBox<string>;
-                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                completed = (array[4] == "1");
-                revealed = (array[5] == "1");
-                string[] arr = Regex.Split(array[6], "cLtD");
-                tamed = [.. arr];
+                if (array.Length == 7)
+                {
+                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    crit = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    string[] arr = Regex.Split(array[6], "cLtD");
+                    tamed = [.. arr];
+                }
+                // Legacy board tame challenge compatibility
+                else if (array.Length == 3)
+                {
+                    Plugin.logger.LogInfo("length 3");
+                    crit = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    completed = (array[1] == "1");
+                    revealed = (array[2] == "1");
+                    specific = SettingBoxFromString("System.Boolean|true|Specific Creature Type|0|NULL") as SettingBox<bool>;
+                    current = 0;
+                    amount = SettingBoxFromString("System.Int32|3|Amount|3|NULL") as SettingBox<int>;
+                    tamed = [];
+                }
+                
                 UpdateDescription();
             }
             catch (Exception ex)
