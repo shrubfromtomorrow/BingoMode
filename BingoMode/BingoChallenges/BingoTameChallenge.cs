@@ -57,9 +57,9 @@ namespace BingoMode.BingoChallenges
             return new BingoTameChallenge
             {
                 specific = new SettingBox<bool>(specific, "Specific Creature Type", 0),
-                tamed = [],
-                crit = new(crug, "Creature Type", 0, listName: "friend"),
-                amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3)
+                crit = new(crug, "Creature Type", 1, listName: "friend"),
+                amount = new(UnityEngine.Random.Range(2, 7), "Amount", 2),
+                tamed = []
             };
         }
 
@@ -153,7 +153,7 @@ namespace BingoMode.BingoChallenges
                     revealed = (array[2] == "1");
                     specific = SettingBoxFromString("System.Boolean|true|Specific Creature Type|0|NULL") as SettingBox<bool>;
                     current = 0;
-                    amount = SettingBoxFromString("System.Int32|3|Amount|3|NULL") as SettingBox<int>;
+                    amount = SettingBoxFromString("System.Int32|3|Amount|2|NULL") as SettingBox<int>;
                     tamed = [];
                 }
                 

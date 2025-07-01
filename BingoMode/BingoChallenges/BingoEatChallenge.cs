@@ -60,6 +60,10 @@ namespace BingoMode.BingoChallenges
                 if (!ModManager.MSC) foob.RemoveRange(ChallengeUtils.FoodTypes.IndexOf("GooieDuck"), 4);
                 else if (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet ||
                          ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint) foob.Remove("GlowWeed");
+                if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
+                {
+                    foob.Remove("EggBugEgg");
+                }
                 randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
             }
 

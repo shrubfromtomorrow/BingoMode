@@ -98,7 +98,7 @@ namespace BingoMode.BingoChallenges
                 weapon = new(wep, "Weapon", 0, listName: "weapons"),
                 victim = new(crit, "Creature Type", 1, listName: "creatures"),
                 amount = new(amound, "Amount", 2),
-                inOneCycle = new(oneCycle, "In One Cycle", 0),
+                inOneCycle = new(oneCycle, "In One Cycle", 3),
                 sub = new("Any Subregion", "Subregion", 4, listName: "subregions"),
                 region = new("Any Region", "Region", 5, listName: "regions"),
             };
@@ -151,7 +151,7 @@ namespace BingoMode.BingoChallenges
             if (revealed || completed) return;
             if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
-                if (this.current != 0)
+                if (this.current != 0 && this.inOneCycle.Value)
                 {
                     this.current = 0;
                     this.UpdateDescription();
@@ -228,7 +228,7 @@ namespace BingoMode.BingoChallenges
                     amount = SettingBoxFromString(array[3]) as SettingBox<int>;
                     completed = (array[4] == "1");
                     revealed = (array[5] == "1");
-                    inOneCycle = SettingBoxFromString("System.Boolean|false|In One Cycle|0|NULL") as SettingBox<bool>;
+                    inOneCycle = SettingBoxFromString("System.Boolean|false|In One Cycle|3|NULL") as SettingBox<bool>;
                     region = SettingBoxFromString("System.String|Any Region|Region|5|regions") as SettingBox<string>;
                     sub = SettingBoxFromString("System.String|Any Subregion|Subregion|4|subregions") as SettingBox<string>;
                 }
