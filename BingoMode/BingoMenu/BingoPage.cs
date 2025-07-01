@@ -472,17 +472,17 @@ namespace BingoMode.BingoMenu
                     {
                         foreach (var banned in bannedRegions)
                         {
-                            if (banned == null || banned == "") continue;
-                            if (tries > 200)
+                            if (bannedRegions.Count == ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)
                             {
                                 BingoData.BingoDen = "SU_S01";
-                                
-                            }
-                            if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant())
+                                ExpeditionData.startingDen = "SU_S01";
+                            } 
+                            else if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant())
                             {
                                 tries++;
                                 goto reset;
                             }
+                            if (banned == null || banned == "") continue;
                         }
                     }
                 }
