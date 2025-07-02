@@ -96,7 +96,6 @@ namespace BingoMode.BingoChallenges
                             {
                                 
                                 string id = p.abstractPhysicalObject.ID.ToString();
-                                Plugin.logger.LogInfo("ID: " + id);
                                 if (!stored.Contains(id))
                                 {
                                     stored.Add(id);
@@ -113,6 +112,7 @@ namespace BingoMode.BingoChallenges
                             else
                             {
                                 count++;
+                                UpdateDescription();
                                 if (count >= amount.Value)
                                 {
                                     current = count;

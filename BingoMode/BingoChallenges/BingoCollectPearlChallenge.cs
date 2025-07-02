@@ -138,7 +138,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return slugcat != MoreSlugcatsEnums.SlugcatStatsName.Saint;
+            return true;
         }
 
         public override string ToString()
