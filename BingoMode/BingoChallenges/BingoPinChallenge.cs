@@ -138,7 +138,7 @@ namespace BingoMode.BingoChallenges
                 if ((region.Value == "Any Region" || rr == region.Value) && !pinRegions.Contains(rr) && this.spearList[k].stuckInObject != null && this.spearList[k].stuckInObject is Creature c && (crit.Value == "Any Creature" || c.Template.type.value == crit.Value) && this.spearList[k].stuckInWall != null /*&& !this.pinList.Contains(c)*/)
                 {
                     // For excluding the same creature in two regions
-                    //this.pinList.Add(c);
+                    this.pinList.Add(c);
                     this.current++;
                     if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
