@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Menu.Remix;
+using System.Globalization;
 
 namespace BingoMode.BingoChallenges
 {
@@ -15,16 +17,25 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> ghost; //GhostWorldPresence.GhostID
         public SettingBox<bool> starve;
+        public SettingBox<bool> specific;
+        public int current;
+        public SettingBox<int> amount;
+        public List<string> visited = [];
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Visit the <echo_location> Echo" + (starve.Value ? " while starving" : "")).Replace("<echo_location>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(ghost.Value, ExpeditionData.slugcatPlayer)));
+            this.description = specific.Value ? 
+                ChallengeTools.IGT.Translate("Visit the <echo_location> Echo" + (starve.Value ? " while starving" : ""))
+                .Replace("<echo_location>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(ghost.Value, ExpeditionData.slugcatPlayer)))
+                :
+                ChallengeTools.IGT.Translate("Visit the <amount> Echos" + (starve.Value ? " while starving" : ""))
+                .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([new Icon("echo_icon", 1f, Color.white), new Verse(ghost.Value)], []);
+            Phrase phrase = new Phrase([new Icon("echo_icon", 1f, Color.white), specific.Value ? new Verse(ghost.Value) : new Counter(current, amount.Value)], []);
             if (starve.Value)
             {
                 phrase.words.Add(new Icon("Multiplayer_Death", 1f, Color.white));
@@ -35,8 +46,22 @@ namespace BingoMode.BingoChallenges
 
         public void SeeGhost(string spectre)
         {
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || spectre != ghost.Value) return;
-            CompleteChallenge();
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (specific.Value)
+            {
+                if (spectre != ghost.Value) return;
+                UpdateDescription();
+                CompleteChallenge();
+            }
+            else
+            {
+                if (visited.Contains(spectre)) return;
+                current++;
+                visited.Add(spectre);
+                UpdateDescription();
+                if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
+            }
         }
 
         public override void Update()
@@ -76,8 +101,10 @@ namespace BingoMode.BingoChallenges
             }
             return new BingoEchoChallenge
             {
-                ghost = new(list[Random.Range(0, list.Count)], "Region", 0, listName: "echoes"),
-                starve = new(Random.value < 0.1f, "While Starving", 1),
+                specific = new SettingBox<bool>(Random.value < 0.5f, "Specific Echo", 0),
+                ghost = new(list[Random.Range(0, list.Count)], "Region", 1, listName: "echoes"),
+                amount = new(Random.Range(2, 7), "Amount", 2),
+                starve = new(Random.value < 0.1f, "While Starving", 3)
             };
         }
 
@@ -104,13 +131,20 @@ namespace BingoMode.BingoChallenges
             [
                 "BingoEchoChallenge",
                 "~",
+                specific.ToString(),
+                "><",
                 ghost.ToString(),
                 "><",
                 starve.ToString(),
                 "><",
+                current.ToString(),
+                "><",
+                amount.ToString(),
+                "><",
                 completed ? "1" : "0",
                 "><",
-                revealed ? "1" : "0"
+                revealed ? "1" : "0",
+                string.Join("|", visited),
             ]);
         }
 
@@ -119,10 +153,29 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                ghost = SettingBoxFromString(array[0]) as SettingBox<string>;
-                starve = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
+                if (array.Length == 7)
+                {
+                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    ghost = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    starve = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                    completed = (array[5] == "1");
+                    revealed = (array[6] == "1");
+                    string[] arr = Regex.Split(array[7], "|");
+                    visited = [.. arr];
+                }
+                else if (array.Length == 4)
+                {
+                    ghost = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    starve = SettingBoxFromString(array[1]) as SettingBox<bool>;
+                    completed = (array[2] == "1");
+                    revealed = (array[3] == "1");
+                    specific = SettingBoxFromString("System.Boolean|true|Specific Echo|0|NULL") as SettingBox<bool>;
+                    current = 0;
+                    amount = SettingBoxFromString("System.Int32|2|Amount|1|NULL") as SettingBox<int>;
+                    visited = [];
+                }
                 UpdateDescription();
             }
             catch (System.Exception ex)
@@ -143,6 +196,6 @@ namespace BingoMode.BingoChallenges
             On.Ghost.StartConversation -= Ghost_StartConversation;
         }
 
-        public override List<object> Settings() => [ghost, starve];
+        public override List<object> Settings() => [ghost, specific, amount, starve];
     }
 }
