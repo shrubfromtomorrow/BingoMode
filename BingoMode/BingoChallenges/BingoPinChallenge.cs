@@ -24,26 +24,11 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            string template;
-            if (region.Value == "Any Region")
-            {
-                template = "Pin <crit> to walls or floors in [<current_pin>/<pin_amount>] different regions";
-            }
-            else
-            {
-                template = "Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>";
-            }
-
-            description = template
+            description = ChallengeTools.IGT.Translate("Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>")
                 .Replace("<current_pin>", current.ToString())
                 .Replace("<pin_amount>", target.Value.ToString())
-                .Replace("<crit>", crit.Value != "Any Creature"
-                    ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index]
-                    : "creatures")
-                .Replace("<region>", !string.IsNullOrEmpty(region.Value) && region.Value != "Any Region"
-                    ? " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)
-                    : "");
-
+                .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : "creatures")
+                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
     
@@ -135,7 +120,7 @@ namespace BingoMode.BingoChallenges
                     break;
                 }
                 string rr = spearList[k].room.world.region.name;
-                if ((region.Value == "Any Region" || rr == region.Value) && !pinRegions.Contains(rr) && this.spearList[k].stuckInObject != null && this.spearList[k].stuckInObject is Creature c && (crit.Value == "Any Creature" || c.Template.type.value == crit.Value) && this.spearList[k].stuckInWall != null /*&& !this.pinList.Contains(c)*/)
+                if ((region.Value == "Any Region" || rr == region.Value) && !pinRegions.Contains(rr) && this.spearList[k].stuckInObject != null && this.spearList[k].stuckInObject is Creature c && (crit.Value == "Any Creature" || c.Template.type.value == crit.Value) && this.spearList[k].stuckInWall != null && !this.pinList.Contains(c))
                 {
                     this.pinList.Add(c);
                     this.current++;
@@ -177,7 +162,7 @@ namespace BingoMode.BingoChallenges
     
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Pinning creatures");
+            return ChallengeTools.IGT.Translate("Pinning creatures to walls");
         }
     
         public override string ToString()
