@@ -63,6 +63,7 @@ namespace BingoMode.BingoChallenges
                 if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
                 {
                     foob.Remove("EggBugEgg");
+                    foob.Remove("DandelionPeach");
                 }
                 randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
             }

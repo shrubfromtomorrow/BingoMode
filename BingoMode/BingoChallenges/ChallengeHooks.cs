@@ -298,12 +298,25 @@ namespace BingoMode.BingoChallenges
         {
             orig.Invoke(self, eu);
 
-            if (!self.FocusedOnHalcyon) return;
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            if (self.hasNoticedPlayer)
             {
-                if (ExpeditionData.challengeList[j] is BingoSaintDeliveryChallenge c)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    c.Delivered();
+                    if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                    {
+                        c.MeetPebbles();
+                    }
+                }
+            }
+
+            if (self.FocusedOnHalcyon)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoSaintDeliveryChallenge c)
+                    {
+                        c.Delivered();
+                    }
                 }
             }
         }
@@ -1763,6 +1776,31 @@ namespace BingoMode.BingoChallenges
                 });
             }
             else Plugin.logger.LogError("Player_SlugslamIL FAILURE " + il);
+        }
+
+        public static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                {
+                    c.MeetPebbles();
+                }
+            }
+        }
+        public static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && c.moon.Value)
+                {
+                    c.MeetMoon();
+                }
+            }
         }
     }
 }

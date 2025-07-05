@@ -98,6 +98,7 @@
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoChallenges\BingoBroadcastChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGourmandCrushChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoIteratorChallenge.cs" />
     <Compile Include="BingoChallenges\BingoMoonCloakChallenge.cs" />
     <Compile Include="BingoMenu\BingoCredits.cs" />
     <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />
