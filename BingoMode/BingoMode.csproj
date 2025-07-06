@@ -33,9 +33,6 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="../lib/*.dll">
-      <Private>false</Private>
-    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\lib\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
@@ -97,6 +94,8 @@
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoChallenges\BingoBroadcastChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoGourmandCrushChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoIteratorChallenge.cs" />
     <Compile Include="BingoChallenges\BingoMoonCloakChallenge.cs" />
     <Compile Include="BingoMenu\BingoCredits.cs" />
     <Compile Include="BingoHUD\BingoHUDCheatButton.cs" />

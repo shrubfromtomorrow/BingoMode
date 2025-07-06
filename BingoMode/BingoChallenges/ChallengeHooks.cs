@@ -298,12 +298,25 @@ namespace BingoMode.BingoChallenges
         {
             orig.Invoke(self, eu);
 
-            if (!self.FocusedOnHalcyon) return;
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            if (self.hasNoticedPlayer)
             {
-                if (ExpeditionData.challengeList[j] is BingoSaintDeliveryChallenge c)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    c.Delivered();
+                    if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                    {
+                        c.MeetPebbles();
+                    }
+                }
+            }
+
+            if (self.FocusedOnHalcyon)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoSaintDeliveryChallenge c)
+                    {
+                        c.Delivered();
+                    }
                 }
             }
         }
@@ -1730,6 +1743,62 @@ namespace BingoMode.BingoChallenges
                     {
                         c.Delivered();
                     }
+                }
+            }
+        }
+
+        public static void Player_SlugslamIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                        x => x.MatchLdcI4(9),
+                        x => x.MatchLdloca(out _),
+                        x => x.MatchCall(typeof(float).GetMethod("ToString", Type.EmptyTypes)),
+                        x => x.MatchStelemRef(),
+                        x => x.MatchCall(typeof(RWCustom.Custom).GetMethod("Log", new[] { typeof(string[]) }))
+                ))
+            {
+                c.Emit(OpCodes.Ldloc, 7);
+                c.Emit(OpCodes.Ldarg, 1);
+                c.EmitDelegate<Action<float, PhysicalObject>>((num, crit) =>
+                {
+                    if (num > 0.25f)
+                    {
+                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                        {
+                            if (ExpeditionData.challengeList[j] is BingoGourmandCrushChallenge c)
+                            {
+                                c.Crush((crit as Creature).Template.type.value);
+                            }
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Player_SlugslamIL FAILURE " + il);
+        }
+
+        public static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                {
+                    c.MeetPebbles();
+                }
+            }
+        }
+        public static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && c.moon.Value)
+                {
+                    c.MeetMoon();
                 }
             }
         }

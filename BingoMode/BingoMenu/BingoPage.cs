@@ -211,7 +211,7 @@ namespace BingoMode.BingoMenu
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
         {
-            
+
             string lastDen = BingoData.BingoDen;
             if (value.Trim() == string.Empty)
             {
@@ -219,7 +219,7 @@ namespace BingoMode.BingoMenu
                 return;
             }
             BingoData.BingoDen = value;
-            
+
         }
 
         private void NameFilter_OnValueUpdate(UIconfig config, string value, string oldValue)
@@ -428,7 +428,7 @@ namespace BingoMode.BingoMenu
                 {
                     foreach (var playere in lobbyPlayers)
                     {
-                        
+
                         int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
                         if (!BingoData.TeamsInBingo.Contains(team) && team != 8) BingoData.TeamsInBingo.Add(team);
                     }
@@ -476,7 +476,7 @@ namespace BingoMode.BingoMenu
                             {
                                 BingoData.BingoDen = "SU_S01";
                                 ExpeditionData.startingDen = "SU_S01";
-                            } 
+                            }
                             else if (ExpeditionData.startingDen.Substring(0, 2).ToLowerInvariant() == banned.ToLowerInvariant())
                             {
                                 tries++;
@@ -530,7 +530,7 @@ namespace BingoMode.BingoMenu
                             }
                         }
                         if (connectedPlayers.StartsWith("bPlR")) connectedPlayers = connectedPlayers.Substring(4);
-                        
+
                     }
                     else if (!isHost)
                     {
@@ -545,7 +545,7 @@ namespace BingoMode.BingoMenu
                 else
                 {
                     int newTeam = TeamNumber(Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value);
-                    
+
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
                     SteamTest.team = newTeam;
                 }
@@ -632,7 +632,7 @@ namespace BingoMode.BingoMenu
                 (sender as SimpleButton).buttonBehav.greyedOut = true;
                 if (ulong.TryParse(message.Split('-')[1], out ulong lobid))
                 {
-                    
+
                     CSteamID lobbid = new CSteamID(lobid);
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobbid, "lobbyVersion");
                     if (lobbyVersion != Plugin.VERSION)
@@ -644,12 +644,12 @@ namespace BingoMode.BingoMenu
                     if (hostRequiredMods != "none")
                     {
                         List<string> modStrings = Regex.Split(hostRequiredMods, "<bMd>").ToList();
-                        
+
                         Dictionary<string, string> requiredMods = [];
                         string[] skipMods = GetCommonClientMods();
                         foreach (string m in modStrings)
                         {
-                            
+
                             string[] idAndName = m.Split('|');
                             if (skipMods.Contains(idAndName[0])) continue;
 
@@ -834,10 +834,10 @@ namespace BingoMode.BingoMenu
             multiMenuBg.pos = Vector2.Lerp(multiButton.lastPos, multiButton.pos, timeStacker) - new Vector2(25f, 625f) + Vector2.left * (1f - Custom.LerpExpEaseInOut(0f, 1f, slide)) * 1000f;
             lastLobbySlideIn = lobbySlideIn;
             lobbySlideIn = Mathf.Clamp01(lobbySlideIn + slideStep * 0.05f);
-            slider.pos.x = multiMenuBg.pos.x + 350f;            
+            slider.pos.x = multiMenuBg.pos.x + 350f;
             foreach (var line in slider.lineSprites)
             {
-                line.x = multiMenuBg.pos.x + 365f; 
+                line.x = multiMenuBg.pos.x + 365f;
             }
             divider.x = multiMenuBg.pos.x;
             divider.y = 583f;
@@ -986,7 +986,7 @@ namespace BingoMode.BingoMenu
             {
                 Plugin.logger.LogMessage("No people in the lobby");
             }
-            
+
             //lobbyDividers = new FSprite[lobbyPlayers.Count - 1];
             // This could be negative and I think caused and OverflowException so rewritten.
             lobbyDividers = new FSprite[Math.Max(0, lobbyPlayers.Count - 1)];
@@ -1230,12 +1230,12 @@ namespace BingoMode.BingoMenu
                     bool hostMods = SteamMatchmaking.GetLobbyData(lobby, "hostMods") != "none";
                     string lobbyVersion = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion");
                     string slugcat = SteamMatchmaking.GetLobbyData(lobby, "slugcat");
-                    
-                    
+
+
                     AllowUnlocks perks = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), System.Globalization.NumberStyles.Any));
                     AllowUnlocks burdens = (AllowUnlocks)(int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), System.Globalization.NumberStyles.Any));
                     int maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                    
+
                     foundLobbies.Add(new LobbyInfo(this, lobby, name, maxPlayers, currentPlayers, gamemode, hostMods, lobbyVersion, slugcat, perks, burdens));
                     //
                 }
@@ -1306,7 +1306,7 @@ namespace BingoMode.BingoMenu
                 this.identity = identity;
                 bool isSelf = identity.GetSteamID() == SteamTest.selfIdentity.GetSteamID();
                 bool isHost = identity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby);
-                
+
                 int.TryParse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, identity.GetSteamID(), "playerTeam"), System.Globalization.NumberStyles.Any, null, out team);
                 int.TryParse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, identity.GetSteamID(), "playerIndex"), System.Globalization.NumberStyles.Any, null, out playerIndex);
 
