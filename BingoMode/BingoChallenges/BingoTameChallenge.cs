@@ -24,7 +24,7 @@ namespace BingoMode.BingoChallenges
         {
             this.description = specific.Value ? ChallengeTools.IGT.Translate("Befriend a <crit>")
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'))
-                : ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] unique creatures")
+                : ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] unique creature types")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
