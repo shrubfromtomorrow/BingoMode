@@ -27,6 +27,7 @@ namespace BingoMode.BingoMenu
         public SymbolButton rightPage;
         public HoldButton startGame;
         public SymbolButton randomize;
+        public SymbolButton shuffle;
         public OpHoldButton unlocksButton;
         public UIelementWrapper unlockWrapper;
         public MenuTabWrapper menuTabWrapper;
@@ -137,6 +138,11 @@ namespace BingoMode.BingoMenu
             randomize.roundedRect.size = randomize.size;
             subObjects.Add(randomize);
 
+            shuffle = new SymbolButton(menu, this, "Menu_Symbol_Shuffle", "SHUFFLE", new Vector2(530f, 690f));
+            shuffle.size = new Vector2(30f, 30f);
+            shuffle.roundedRect.size = shuffle.size;
+            subObjects.Add(shuffle);
+
             float xx = menu.manager.rainWorld.screenSize.x * 0.79f;
             float yy = 85f;
             startGame = new HoldButton(menu, this, "BEGIN", "STARTBINGO",
@@ -232,6 +238,7 @@ namespace BingoMode.BingoMenu
         {
             shelterSetting.greyedOut = !isHost;
             randomize.buttonBehav.greyedOut = !isHost;
+            shuffle.buttonBehav.greyedOut = !isHost;
             plusButton.buttonBehav.greyedOut = !isHost;
             minusButton.buttonBehav.greyedOut = !isHost;
             pasteBoard.buttonBehav.greyedOut = !isHost;
@@ -276,6 +283,7 @@ namespace BingoMode.BingoMenu
                 }
                 shelterSetting.greyedOut = !create;
                 randomize.buttonBehav.greyedOut = !create;
+                shuffle.buttonBehav.greyedOut = !create;
                 plusButton.buttonBehav.greyedOut = !create;
                 minusButton.buttonBehav.greyedOut = !create;
                 pasteBoard.buttonBehav.greyedOut = !create;
@@ -298,6 +306,7 @@ namespace BingoMode.BingoMenu
             startGame.signalText = "STARTBINGO";
             startGame.menuLabel.text = "BEGIN";
             randomize.buttonBehav.greyedOut = false;
+            shuffle.buttonBehav.greyedOut = false;
             plusButton.buttonBehav.greyedOut = false;
             minusButton.buttonBehav.greyedOut = false;
             pasteBoard.buttonBehav.greyedOut = false;
@@ -568,6 +577,12 @@ namespace BingoMode.BingoMenu
                 return;
             }
 
+            if (message == "SHUFFLE")
+            {
+                Shuffle();
+                return;
+            }
+
             if (message == "ADDSIZE")
             {
                 int lastSize = BingoHooks.GlobalBoard.size;
@@ -811,6 +826,12 @@ namespace BingoMode.BingoMenu
             //}
             //grid = new BingoGrid(menu, page, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
             //subObjects.Add(grid);
+            menu.PlaySound(SoundID.MENU_Next_Slugcat);
+        }
+
+        public void Shuffle()
+        {
+            BingoHooks.GlobalBoard.ShuffleBoard();
             menu.PlaySound(SoundID.MENU_Next_Slugcat);
         }
 

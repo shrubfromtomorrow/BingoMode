@@ -64,6 +64,41 @@ namespace BingoMode
             UpdateChallenges();
         }
 
+        public void ShuffleBoard()
+        {
+            int rows = challengeGrid.GetLength(0);
+            int cols = challengeGrid.GetLength(1);
+
+            List<Challenge> flatList = new List<Challenge>();
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    flatList.Add(challengeGrid[i, j]);
+                }
+            }
+
+            for (int i = 0; i < flatList.Count; i++)
+            {
+                int randomIndex = UnityEngine.Random.Range(i, flatList.Count);
+                                                                   
+                Challenge temp = flatList[i];
+                flatList[i] = flatList[randomIndex];
+                flatList[randomIndex] = temp;
+            }
+
+            int index = 0;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    challengeGrid[i, j] = flatList[index++];
+                }
+            }
+            SteamTest.UpdateOnlineBingo();
+            UpdateChallenges();
+        }
+
         public void UpdateChallenges()
         {
             foreach (Challenge c in ExpeditionData.challengeList)
