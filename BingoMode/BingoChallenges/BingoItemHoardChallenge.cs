@@ -25,7 +25,8 @@ namespace BingoMode.BingoChallenges
         public override void UpdateDescription()
         {
             string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
-            this.description = ChallengeTools.IGT.Translate("Store [<current>/<amount>] <target_item> in <shelter_type> shelter <location>")
+            this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> in <shelter_type> shelter <location>")
+                .Replace("<action>", anyShelter.value ? "Bring" : "Store")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
                 .Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)))
@@ -36,12 +37,16 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([anyShelter.Value ? new Icon("doubleshelter", 1f, Color.white) : new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Counter(current, amount.Value)], [2]);
+            Phrase phrase = anyShelter.Value ?
+                new Phrase([new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Icon("singlearrow", 1f, Color.white), new Icon("doubleshelter", 1f, Color.white)], [3]):
+                new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value))], [2]);
+            int region_index = anyShelter.Value ? 3 : 2;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
-                phrase.words.Insert(2, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
-                phrase.newLines = [3];
+                phrase.words.Add(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
+                phrase.newLines.Add(newLines[0] + 1);
             }
+            phrase.words.Add(new Counter(current, amount.Value));
             return phrase;
         }
 
