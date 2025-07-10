@@ -141,6 +141,7 @@ namespace BingoMode.BingoChallenges
                         }
                     }
                 }
+
             }
         }
 
