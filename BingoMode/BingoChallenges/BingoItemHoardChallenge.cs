@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
                 phrase.words.Add(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
-                phrase.newLines.Add(1);
+                phrase.newLines.Add(newLines[0] + 1);
             }
             phrase.words.Add(new Counter(current, amount.Value));
             return phrase;
