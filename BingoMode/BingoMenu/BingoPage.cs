@@ -133,12 +133,12 @@ namespace BingoMode.BingoMenu
             rightPage.roundedRect.size = rightPage.size;
             subObjects.Add(rightPage);
 
-            randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "RANDOMIZE", new Vector2(563f, 690f));
+            randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "RANDOMIZE", new Vector2(530f, 690f));
             randomize.size = new Vector2(30f, 30f);
             randomize.roundedRect.size = randomize.size;
             subObjects.Add(randomize);
 
-            shuffle = new SymbolButton(menu, this, "Menu_Symbol_Shuffle", "SHUFFLE", new Vector2(530f, 690f));
+            shuffle = new SymbolButton(menu, this, "Menu_Symbol_Shuffle", "SHUFFLE", new Vector2(563f, 690f));
             shuffle.size = new Vector2(30f, 30f);
             shuffle.roundedRect.size = shuffle.size;
             subObjects.Add(shuffle);

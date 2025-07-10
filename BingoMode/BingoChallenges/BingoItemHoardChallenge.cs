@@ -26,7 +26,7 @@ namespace BingoMode.BingoChallenges
         {
             string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> in <shelter_type> shelter <location>")
-                .Replace("<action>", anyShelter.value ? "Bring" : "Store")
+                .Replace("<action>", anyShelter.Value ? "Bring" : "Store")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
                 .Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)))
@@ -43,8 +43,7 @@ namespace BingoMode.BingoChallenges
             int region_index = anyShelter.Value ? 3 : 2;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
-                phrase.words.Add(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
-                phrase.newLines.Add(newLines[0] + 1);
+                phrase.words.Insert(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
             }
             phrase.words.Add(new Counter(current, amount.Value));
             return phrase;
