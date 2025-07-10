@@ -37,12 +37,16 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([anyShelter.Value ? new Icon("doubleshelter", 1f, Color.white) : new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Counter(current, amount.Value)], [2]);
+            Phrase phrase = anyShelter.Value ?
+                new Phrase([new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Icon("singlearrow", 1f, Color.white), new Icon("doubleshelter", 1f, Color.white)], [3]):
+                new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value))], [2]);
+            int region_index = anyShelter.Value ? 3 : 2;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
-                phrase.words.Insert(2, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
-                phrase.newLines = [3];
+                phrase.words.Add(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
+                phrase.newLines.Add(1);
             }
+            phrase.words.Add(new Counter(current, amount.Value));
             return phrase;
         }
 
