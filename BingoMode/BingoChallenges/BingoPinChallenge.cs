@@ -31,7 +31,18 @@ namespace BingoMode.BingoChallenges
                 .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
-    
+
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new(
+                [[new Icon("pin_creature")],
+                [new Counter(current, target.Value)]]);
+            if (crit.Value != "Any Creature") phrase.InsertWord(Icon.FromEntityName(crit.Value));
+            if (region.Value == "Any Region") phrase.InsertWord(new Icon("TravellerA"));
+            else phrase.InsertWord(new Verse(region.Value));
+            return phrase;
+        }
+
         public override int Points()
         {
             return 20;
@@ -69,29 +80,6 @@ namespace BingoMode.BingoChallenges
                 crit = new(c, "Creature Type", 1, listName: "creatures"),
                 region = new(r, "Region", 2, listName: "regions"),
             };
-        }
-
-        public override Phrase ConstructPhrase()
-        {
-            Phrase phrase = new Phrase([new Icon("pin_creature", 1f, Color.white)], []);
-            int n = 1;
-            if (crit.Value != "Any Creature")
-            {
-                phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
-                n++;
-            }
-            if (region.Value == "Any Region")
-            {
-                phrase.words.Add(new Icon("TravellerA", 1f, Color.white));
-            }
-            else
-            {
-                phrase.words.Add(new Verse(region.Value));
-            }
-            n++;
-            phrase.words.Add(new Counter(current, target.Value));
-            phrase.newLines = [n];
-            return phrase;
         }
 
         public override void Update()

@@ -22,7 +22,12 @@ namespace BingoMode.BingoChallenges
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold), new Counter(current, amound.Value)], [2]);
+        public override Phrase ConstructPhrase()
+        {
+            return new(
+                [[new Icon("foodSymbol"), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold)],
+                [new Counter(current, amound.Value)]]);
+        }
 
         public override bool Duplicable(Challenge challenge)
         {

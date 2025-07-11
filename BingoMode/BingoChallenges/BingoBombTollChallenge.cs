@@ -25,12 +25,10 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([new Icon("Symbol_StunBomb", 1f, new Color(0.9019608f, 0.05490196f, 0.05490196f)), new Icon("scavtoll", 0.8f, Color.white)], [pass.Value ? 3 : 2]);
-            if (pass.Value)
-            {
-                phrase.words.Add(new Icon("singlearrow", 1f, Color.white));
-            }
-            phrase.words.Add(new Verse(roomName.Value.ToUpperInvariant()));
+            Phrase phrase = new(
+                [[Icon.FromEntityName("ScavengerBomb"), Icon.SCAV_TOLL],
+                [new Verse(roomName.Value.ToUpperInvariant())]]);
+            if (pass.Value) phrase.InsertWord(new Icon("singlearrow"));
             return phrase;
         }
 

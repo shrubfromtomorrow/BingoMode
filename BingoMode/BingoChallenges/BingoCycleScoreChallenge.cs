@@ -24,7 +24,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("Multiplayer_Star", 1f, Color.white), new Icon("cycle_limit", 1f, Color.white), new Counter(score, target.Value)], [2]);
+            return new Phrase(
+                [[new Icon("Multiplayer_Star"), new Icon("cycle_limit")],
+                [new Counter(score, target.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

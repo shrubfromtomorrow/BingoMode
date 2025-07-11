@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
@@ -24,11 +25,9 @@ namespace BingoMode.BingoChallenges
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([
-            new Icon("completechallenge", 1f, UnityEngine.Color.white), 
-            new Counter(current, amound.Value),
-            new Icon("buttonCrossA", 1f, UnityEngine.Color.red),
-            new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)], [2]);
+        public override Phrase ConstructPhrase() => new(
+            [[new Icon("completechallenge"), new Counter(current, amound.Value)],
+            [new Icon("buttonCrossA", 1f, Color.red), new Icon("Multiplayer_Death")]]);
 
         public override bool Duplicable(Challenge challenge)
         {

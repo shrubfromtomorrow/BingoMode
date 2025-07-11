@@ -1320,7 +1320,7 @@ namespace BingoMode.BingoHUD
                     phrase.scale = size / 84f * scale;
                     if (shakeLock > 0f)
                     {
-                        phrase.words[0].display.rotation = Mathf.LerpAngle(-30f, 30f, UnityEngine.Random.value) * shakeLock;
+                        phrase.WordsFlat[0].display.rotation = Mathf.LerpAngle(-30f, 30f, UnityEngine.Random.value) * shakeLock;
                     }
                     phrase.Draw();
                 }
@@ -1461,7 +1461,7 @@ namespace BingoMode.BingoHUD
                 }
                 catch
                 {
-                    phrase = new Phrase([new Icon("Sandbox_QuestionMark", 1f, Color.white)], []);
+                    phrase = new Phrase([[new Icon("Sandbox_QuestionMark")]]);
                 }
                 if (context == AnimationContext.Lockout) shakeLock = 1f;
                 if (phrase != null)

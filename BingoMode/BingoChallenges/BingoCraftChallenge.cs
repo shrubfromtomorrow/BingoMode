@@ -25,7 +25,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("crafticon", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(craftee.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(craftee.Value)), new Counter(current, amount.Value)], [2]);
+            return new Phrase(
+                [[new Icon("crafticon"), Icon.FromEntityName(craftee.Value)],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

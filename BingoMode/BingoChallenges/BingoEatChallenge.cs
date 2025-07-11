@@ -18,7 +18,6 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amountRequired;
         public int currentEated;
         public bool isCreature;
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(foodType.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(foodType.Value)), new Counter(currentEated, amountRequired.Value)], [2]);
 
         public override void UpdateDescription()
         {
@@ -32,17 +31,24 @@ namespace BingoMode.BingoChallenges
                 .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureType(foodType.Value).Index]) : ChallengeTools.ItemName(new(foodType.Value)));
             base.UpdateDescription();
         }
-    
+
+        public override Phrase ConstructPhrase()
+        {
+            return new(
+                [[new Icon("foodSymbol"), Icon.FromEntityName(foodType.Value)],
+                [new Counter(currentEated, amountRequired.Value)]]);
+        }
+
         public override string ChallengeName()
         {
             return ChallengeTools.IGT.Translate("Eating specific food");
         }
-    
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoEatChallenge c || c.foodType.Value != foodType.Value;
         }
-    
+
         public override Challenge Generate()
         {
             bool c = UnityEngine.Random.value < 0.5f;

@@ -33,11 +33,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([
-                new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)),
-                new Icon("singlearrow", 1f, UnityEngine.Color.white),
-                new Icon("ShortcutGate", 1f, UnityEngine.Color.white),
-                new Counter(current, amount.Value)], [3]);
+            return new Phrase(
+                [[Icon.FromEntityName(crit.Value), new Icon("singlearrow"), new Icon("ShortcutGate")],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

@@ -20,7 +20,9 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             UnlockIconData data = IconDataForUnlock(unlock.Value);
-            return new Phrase([new Icon("arenaunlock", 1f, data.iconColor), (data.unlockIconName == "" ? new Verse(unlock.Value) : new Icon(data.unlockIconName, 1f, data.unlockIconColor))], [1]);
+            return new Phrase(
+                [[new Icon("arenaunlock", 1f, data.iconColor)],
+                [(data.unlockIconName == "" ? new Verse(unlock.Value) : new Icon(data.unlockIconName, 1f, data.unlockIconColor))]]);
         }
 
         public struct UnlockIconData

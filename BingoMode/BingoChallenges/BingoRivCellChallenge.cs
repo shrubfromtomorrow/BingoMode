@@ -19,7 +19,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("Symbol_EnergyCell", 1f, Color.white), new Icon("Kill_BigEel", 1f, ChallengeUtils.ItemOrCreatureIconColor("BigEel"))], []);
+            return new Phrase([[new Icon("Symbol_EnergyCell"), new Icon("Kill_BigEel", 1f, ChallengeUtils.ItemOrCreatureIconColor("BigEel"))]]);
         }
 
         public override bool Duplicable(Challenge challenge)
