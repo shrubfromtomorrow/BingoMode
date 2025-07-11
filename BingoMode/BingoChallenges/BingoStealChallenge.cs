@@ -30,7 +30,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("steal_item"), Icon.FromEntityName(subject.Value), toll.Value ? new Icon("scavtoll", 0.8f) : new Icon("Kill_Scavenger", 1f, ChallengeUtils.ItemOrCreatureIconColor("Scavenger"))],
+                [[new Icon("steal_item"), Icon.FromEntityName(subject.Value), toll.Value ? Icon.SCAV_TOLL : Icon.FromEntityName("Scavenger")],
                 [new Counter(current, amount.Value)]]);
         }
 

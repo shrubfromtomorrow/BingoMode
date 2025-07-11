@@ -25,9 +25,9 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Verse(region.Value), new Icon("Symbol_Pearl", 1f, new Color(0.7f, 0.7f, 0.7f))],
+                [[new Verse(region.Value), Icon.DATA_PEARL],
                 [new Icon("singlearrow", 1f, Color.white, 90f)],
-                [new Icon(ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer ? "nomscpebble" : "GuidanceMoon", 1f, ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer ? new Color(0.44705883f, 0.9019608f, 0.76862746f) : new Color(1f, 0.8f, 0.3f))]]);
+                [ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer ? Icon.PEBBLES : Icon.MOON]]);
         }
 
         public override void Update()

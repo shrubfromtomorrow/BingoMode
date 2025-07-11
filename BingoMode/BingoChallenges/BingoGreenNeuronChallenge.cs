@@ -20,7 +20,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([[new Icon("GuidanceNeuron", 1f, new Color(0f, 1f, 0.3f)), new Icon("singlearrow"), new Icon(moon.Value ? "GuidanceMoon" : "nomscpebble", 1f, moon.Value ? new Color(1f, 0.8f, 0.3f) : new Color(0.44705883f, 0.9019608f, 0.76862746f))]]);
+            return new Phrase([[new Icon("GuidanceNeuron", 1f, new Color(0f, 1f, 0.3f)), new Icon("singlearrow"), moon.Value ? Icon.MOON : Icon.PEBBLES]]);
         }
 
         public override bool Duplicable(Challenge challenge)

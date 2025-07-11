@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
                     [new Counter(current, 1)]]);
             }
             return new Phrase(
-                [[new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f))],
+                [[Icon.PEARL_HOARD_COLOR],
                 [new Counter(current, amount.Value)]]);
         }
 

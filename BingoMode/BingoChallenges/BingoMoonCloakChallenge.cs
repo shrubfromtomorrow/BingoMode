@@ -26,7 +26,7 @@ namespace BingoMode.BingoChallenges
             if (deliver.Value)
             {
                 phrase.InsertWord(new Icon("singlearrow"));
-                phrase.InsertWord(new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)));
+                phrase.InsertWord(Icon.MOON);
             }
             return phrase;
         }
