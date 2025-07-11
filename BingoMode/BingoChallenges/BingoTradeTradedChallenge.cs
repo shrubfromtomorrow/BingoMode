@@ -28,7 +28,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("scav_merchant", 1f, Color.white), new Icon("Menu_Symbol_Shuffle", 1f, Color.white), new Icon("scav_merchant", 1f, Color.white), new Counter(current, amount.Value)], [3]);
+            return new Phrase(
+                [[new Icon("scav_merchant", 1f, Color.white), new Icon("Menu_Symbol_Shuffle", 1f, Color.white), new Icon("scav_merchant", 1f, Color.white)],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

@@ -23,7 +23,12 @@ namespace BingoMode.BingoChallenges
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("artimaulcrit", 1f, UnityEngine.Color.white), new Counter(current, amound.Value)], [1]);
+        public override Phrase ConstructPhrase()
+        {
+            return new(
+                [[new Icon("artimaulcrit", 1f, UnityEngine.Color.white)],
+                [new Counter(current, amound.Value)]]);
+        }
 
         public override bool Duplicable(Challenge challenge)
         {

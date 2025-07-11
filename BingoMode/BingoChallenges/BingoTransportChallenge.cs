@@ -33,17 +33,11 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([[new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))]]);
-            if (from.Value != "Any Region")
-            {
-                phrase.InsertWord(new Verse(from.Value), 1);
-            }
-            phrase.InsertWord(new Icon("singlearrow", 1f, Color.white), 1);
-            if (to.Value != "Any Region")
-            {
-                phrase.InsertWord(new Verse(to.Value), 1);
-            }
-
+            Phrase phrase = new(
+                [[new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value))],
+                [new Icon("singlearrow", 1f, Color.white)]]);
+            if (from.Value != "Any Region") phrase.InsertWord(new Verse(from.Value), 1, 0);
+            if (to.Value != "Any Region") phrase.InsertWord(new Verse(to.Value), 1);
             return phrase;
         }
 

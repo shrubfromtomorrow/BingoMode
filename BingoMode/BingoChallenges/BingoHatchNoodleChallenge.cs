@@ -25,9 +25,10 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))]]);
+            Phrase phrase = new(
+                [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))],
+                [new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value)]]);
             if (atOnce.Value) phrase.InsertWord(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
-            phrase.InsertWord(new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value), 1);
             return phrase;
         }
 

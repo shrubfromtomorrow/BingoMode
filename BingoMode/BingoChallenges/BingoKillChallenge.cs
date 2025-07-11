@@ -26,36 +26,6 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
 
-        public override Phrase ConstructPhrase()
-        {
-            Phrase phrase = new Phrase([[]]);
-            if (weapon.Value != "Any Weapon" || deathPit.Value)
-            {
-                phrase.InsertWord(new Icon(deathPit.Value ? "deathpiticon" : ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, deathPit.Value ? Color.white : ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)));
-            }
-            phrase.InsertWord(new Icon("Multiplayer_Bones", 1f, Color.white));
-            if (crit.Value != "Any Creature")
-            {
-                phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
-            }
-            int lastLine = 1;
-            if (sub.Value != "Any Subregion" || region.Value != "Any Region")
-            {
-                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
-                lastLine = 2;
-            }
-            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
-            if (starve.Value)
-            {
-                phrase.InsertWord(new Icon("Multiplayer_Death", 1f, Color.white), lastLine);
-            }
-            if (oneCycle.Value)
-            {
-                phrase.InsertWord(new Icon("cycle_limit", 1f, Color.white), lastLine);
-            }
-            return phrase;
-        }
-
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)
@@ -86,6 +56,35 @@ namespace BingoMode.BingoChallenges
                 .Replace("<starving>", starve.Value ? " while starving" : "")
                 .Replace("<onecycle>", oneCycle.Value ? " in one cycle" : "");
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            Phrase phrase = new([[new Icon("Multiplayer_Bones", 1f, Color.white)]]);
+            if (weapon.Value != "Any Weapon" || deathPit.Value)
+            {
+                phrase.InsertWord(new Icon(deathPit.Value ? "deathpiticon" : ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, deathPit.Value ? Color.white : ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)), 0, 0);
+            }
+            if (crit.Value != "Any Creature")
+            {
+                phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
+            }
+            int lastLine = 1;
+            if (sub.Value != "Any Subregion" || region.Value != "Any Region")
+            {
+                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
+                lastLine = 2;
+            }
+            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
+            if (starve.Value)
+            {
+                phrase.InsertWord(new Icon("Multiplayer_Death", 1f, Color.white), lastLine);
+            }
+            if (oneCycle.Value)
+            {
+                phrase.InsertWord(new Icon("cycle_limit", 1f, Color.white), lastLine);
+            }
+            return phrase;
         }
 
         public override Challenge Generate()

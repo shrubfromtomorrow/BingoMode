@@ -27,7 +27,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(common.Value ? "pearlhoard_normal" : "pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Verse(region.Value), new Counter(completed ? amount.Value : 0, amount.Value)], [3]);
+            return new Phrase(
+                [[new Icon("ShelterMarker", 1f, Color.white), new Icon(common.Value ? "pearlhoard_normal" : "pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f)), new Verse(region.Value)],
+                [new Counter(completed ? amount.Value : 0, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

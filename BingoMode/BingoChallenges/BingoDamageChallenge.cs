@@ -39,7 +39,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new([[new Icon("bingoimpact", 1f, UnityEngine.Color.white)]]);
+            Phrase phrase = new([[new Icon("bingoimpact", 1f, Color.white)]]);
             if (weapon.Value != "Any Weapon")
             {
                 phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)), 0, 0);
@@ -57,7 +57,7 @@ namespace BingoMode.BingoChallenges
             phrase.InsertWord(new Counter(current, amount.Value), lastLine);
             if (inOneCycle.Value)
             {
-                phrase.InsertWord(new Icon("cycle_limit", 1f, UnityEngine.Color.white), lastLine);
+                phrase.InsertWord(new Icon("cycle_limit", 1f, Color.white), lastLine);
             }
             return phrase;
         }

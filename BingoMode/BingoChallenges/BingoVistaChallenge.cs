@@ -19,9 +19,17 @@ namespace BingoMode.BingoChallenges
         public string region;
         public Vector2 location;
 
+        public override void UpdateDescription()
+        {
+            this.description = ChallengeTools.IGT.Translate("Reach the vista point in <region_name>").Replace("<region_name>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)));
+            base.UpdateDescription();
+        }
+
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("vistaicon", 1f, Color.white), new Verse(room.Value.Substring(0, 2))], [1]);
+            return new Phrase(
+                [[new Icon("vistaicon", 1f, Color.white)],
+                [new Verse(room.Value.Substring(0, 2))]]);
         }
 
         public override void Update()
@@ -61,12 +69,6 @@ namespace BingoMode.BingoChallenges
         public override string ChallengeName()
         {
             return ChallengeTools.IGT.Translate("Visiting vistas");
-        }
-
-        public override void UpdateDescription()
-        {
-            this.description = ChallengeTools.IGT.Translate("Reach the vista point in <region_name>").Replace("<region_name>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)));
-            base.UpdateDescription();
         }
 
         public override bool Duplicable(Challenge challenge)

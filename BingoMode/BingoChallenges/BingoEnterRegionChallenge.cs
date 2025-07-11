@@ -20,7 +20,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("keyShiftA", 1f, Color.green, 90), new Verse(region.Value)], []);
+            return new Phrase([[new Icon("keyShiftA", 1f, Color.green, 90), new Verse(region.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

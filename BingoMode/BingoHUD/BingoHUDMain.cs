@@ -1461,7 +1461,7 @@ namespace BingoMode.BingoHUD
                 }
                 catch
                 {
-                    phrase = new Phrase([new Icon("Sandbox_QuestionMark", 1f, Color.white)], []);
+                    phrase = new Phrase([[new Icon("Sandbox_QuestionMark", 1f, Color.white)]]);
                 }
                 if (context == AnimationContext.Lockout) shakeLock = 1f;
                 if (phrase != null)

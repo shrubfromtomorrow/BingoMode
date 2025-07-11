@@ -18,10 +18,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("spearneedle", 1f, Color.white), 
-                               new Icon("commerce", 1f, Color.white), 
-                               new Icon("Kill_Scavenger", 1f, Color.white),
-                               new Icon("buttonCrossA", 1f, Color.red)], [3]);
+            return new Phrase(
+                [[new Icon("spearneedle", 1f, Color.white), new Icon("commerce", 1f, Color.white), new Icon("Kill_Scavenger", 1f, Color.white)],
+                [new Icon("buttonCrossA", 1f, Color.red)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

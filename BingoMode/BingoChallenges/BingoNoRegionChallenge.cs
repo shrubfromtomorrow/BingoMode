@@ -21,7 +21,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value)], []);
+            return new Phrase([[new Icon("buttonCrossA", 1f, Color.red), new Verse(region.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

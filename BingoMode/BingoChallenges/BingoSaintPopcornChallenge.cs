@@ -22,7 +22,9 @@ namespace BingoMode.BingoChallenges
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("Symbol_Seed", 1f, Menu.Menu.MenuRGB(Menu.Menu.MenuColors.MediumGrey)), new Counter(current, amound.Value)], [2]);
+        public override Phrase ConstructPhrase() => new(
+            [[new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("Symbol_Seed", 1f, Menu.Menu.MenuRGB(Menu.Menu.MenuColors.MediumGrey))],
+            [new Counter(current, amound.Value)]]);
 
         public override bool Duplicable(Challenge challenge)
         {

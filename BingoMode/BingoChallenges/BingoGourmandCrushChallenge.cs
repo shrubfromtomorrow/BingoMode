@@ -18,7 +18,9 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([new Icon("gourmcrush", 1f, Color.white), new Counter(current, amount.Value)], [1]);
+            return new Phrase(
+                [[new Icon("gourmcrush", 1f, Color.white)],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override void UpdateDescription()

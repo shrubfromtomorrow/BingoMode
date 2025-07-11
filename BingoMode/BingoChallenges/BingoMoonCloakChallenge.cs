@@ -22,18 +22,13 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            if (!deliver.Value)
+            Phrase phrase = new([[new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f))]]);
+            if (deliver.Value)
             {
-                return new Phrase([new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f))], []);
+                phrase.InsertWord(new Icon("singlearrow", 1f, Color.white));
+                phrase.InsertWord(new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)));
             }
-            else
-            {
-                return new Phrase([
-                new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f)),
-                new Icon("singlearrow", 1f, Color.white),
-                new Icon("GuidanceMoon" , 1f, new Color(1f, 0.8f, 0.3f))
-                ], []);
-            }
+            return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)

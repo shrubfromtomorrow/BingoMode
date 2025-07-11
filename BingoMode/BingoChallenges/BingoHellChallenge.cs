@@ -24,11 +24,9 @@ namespace BingoMode.BingoChallenges
             base.UpdateDescription();
         }
 
-        public override Phrase ConstructPhrase() => new Phrase([
-            new Icon("completechallenge", 1f, UnityEngine.Color.white), 
-            new Counter(current, amound.Value),
-            new Icon("buttonCrossA", 1f, UnityEngine.Color.red),
-            new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)], [2]);
+        public override Phrase ConstructPhrase() => new(
+            [[new Icon("completechallenge", 1f, UnityEngine.Color.white), new Counter(current, amound.Value)],
+            [new Icon("buttonCrossA", 1f, UnityEngine.Color.red), new Icon("Multiplayer_Death", 1f, UnityEngine.Color.white)]]);
 
         public override bool Duplicable(Challenge challenge)
         {
