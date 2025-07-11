@@ -25,7 +25,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new(
-                [[new Icon("artimaul", 1f, UnityEngine.Color.white)],
+                [[new Icon("artimaul")],
                 [new Counter(current, amound.Value)]]);
         }
 

@@ -43,7 +43,9 @@ namespace BingoMode.BingoChallenges
                     [new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))) { background = new FSprite("radialgradient") }],
                     [new Counter(current, 1)]]);
             }
-            return new Phrase([[new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f))], [new Counter(current, amount.Value)]]);
+            return new Phrase(
+                [[new Icon("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f))],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

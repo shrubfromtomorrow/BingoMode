@@ -35,7 +35,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new(
-                [[new Icon("foodSymbol", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(foodType.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(foodType.Value))],
+                [[new Icon("foodSymbol"), Icon.FromEntityName(foodType.Value)],
                 [new Counter(currentEated, amountRequired.Value)]]);
         }
 

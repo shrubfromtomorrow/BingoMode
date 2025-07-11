@@ -29,7 +29,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("scav_merchant", 1f, Color.white), new Icon("Menu_Symbol_Shuffle", 1f, Color.white), new Icon("scav_merchant", 1f, Color.white)],
+                [[new Icon("scav_merchant"), new Icon("Menu_Symbol_Shuffle"), new Icon("scav_merchant")],
                 [new Counter(current, amount.Value)]]);
         }
 

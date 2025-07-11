@@ -25,7 +25,7 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = new([[new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f))]]);
             if (deliver.Value)
             {
-                phrase.InsertWord(new Icon("singlearrow", 1f, Color.white));
+                phrase.InsertWord(new Icon("singlearrow"));
                 phrase.InsertWord(new Icon("GuidanceMoon", 1f, new Color(1f, 0.8f, 0.3f)));
             }
             return phrase;

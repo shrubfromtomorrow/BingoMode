@@ -16,19 +16,19 @@ namespace BingoMode.BingoChallenges
         public int current;
         public SettingBox<int> amount;
 
-        public override Phrase ConstructPhrase()
-        {
-            return new Phrase(
-                [[new Icon("gourmcrush", 1f, Color.white)],
-                [new Counter(current, amount.Value)]]);
-        }
-
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Crush [<current>/<amount>] unique creatures by falling")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
+        }
+
+        public override Phrase ConstructPhrase()
+        {
+            return new Phrase(
+                [[new Icon("gourmcrush")],
+                [new Counter(current, amount.Value)]]);
         }
 
         public override Challenge Generate()

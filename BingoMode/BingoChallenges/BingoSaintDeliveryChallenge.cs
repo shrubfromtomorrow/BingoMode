@@ -19,7 +19,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([[new Icon("memoriespearl", 1f, Color.white), new Icon("singlearrow", 1f, Color.white), new Icon("nomscpebble", 1f, new Color(0.44705883f, 0.9019608f, 0.76862746f))]]);
+            return new Phrase([[new Icon("memoriespearl"), new Icon("singlearrow"), new Icon("nomscpebble", 1f, new Color(0.44705883f, 0.9019608f, 0.76862746f))]]);
         }
 
         public override bool Duplicable(Challenge challenge)

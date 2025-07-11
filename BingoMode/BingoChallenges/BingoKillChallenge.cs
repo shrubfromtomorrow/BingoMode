@@ -60,30 +60,21 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new([[new Icon("Multiplayer_Bones", 1f, Color.white)]]);
-            if (weapon.Value != "Any Weapon" || deathPit.Value)
-            {
-                phrase.InsertWord(new Icon(deathPit.Value ? "deathpiticon" : ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, deathPit.Value ? Color.white : ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)), 0, 0);
-            }
-            if (crit.Value != "Any Creature")
-            {
-                phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
-            }
+            Phrase phrase = new([[new Icon("Multiplayer_Bones")]]);
+            if (deathPit.Value) phrase.InsertWord(new Icon("deathpiticon"), 0, 0);
+            else if (weapon.Value != "Any Weapon") phrase.InsertWord(Icon.FromEntityName(weapon.Value), 0, 0);
+            if (crit.Value != "Any Creature") phrase.InsertWord(Icon.FromEntityName(crit.Value));
+
             int lastLine = 1;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
                 phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
                 lastLine = 2;
             }
+
             phrase.InsertWord(new Counter(current, amount.Value), lastLine);
-            if (starve.Value)
-            {
-                phrase.InsertWord(new Icon("Multiplayer_Death", 1f, Color.white), lastLine);
-            }
-            if (oneCycle.Value)
-            {
-                phrase.InsertWord(new Icon("cycle_limit", 1f, Color.white), lastLine);
-            }
+            if (starve.Value) phrase.InsertWord(new Icon("Multiplayer_Death"), lastLine);
+            if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), lastLine);
             return phrase;
         }
 

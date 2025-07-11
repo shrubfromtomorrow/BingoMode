@@ -25,7 +25,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new(
-                [[new Icon("foodSymbol", 1f, UnityEngine.Color.white), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold)],
+                [[new Icon("foodSymbol"), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold)],
                 [new Counter(current, amound.Value)]]);
         }
 

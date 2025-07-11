@@ -28,7 +28,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("vistaicon", 1f, Color.white)],
+                [[new Icon("vistaicon")],
                 [new Verse(room.Value.Substring(0, 2))]]);
         }
 

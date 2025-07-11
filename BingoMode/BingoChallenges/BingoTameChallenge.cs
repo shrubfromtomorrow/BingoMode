@@ -32,8 +32,8 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new([[new Icon("FriendB", 1f, Color.white)]]);
-            if (specific.Value) phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)));
+            Phrase phrase = new([[new Icon("FriendB")]]);
+            if (specific.Value) phrase.InsertWord(Icon.FromEntityName(crit.Value));
             else phrase.InsertWord(new Counter(current, amount.Value), 1);
             return phrase;
         }

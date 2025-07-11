@@ -22,7 +22,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("Symbol_Satellite", 1f, Color.white)],
+                [[new Icon("Symbol_Satellite")],
                 [new Verse(chatlog.Value)]]);
         }
 

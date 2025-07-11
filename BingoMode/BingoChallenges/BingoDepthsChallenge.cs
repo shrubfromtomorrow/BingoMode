@@ -26,7 +26,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon(ChallengeUtils.ItemOrCreatureIconName(crit.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(crit.Value)), new Icon("deathpiticon", 1f, UnityEngine.Color.white)],
+                [[Icon.FromEntityName(crit.Value), new Icon("deathpiticon")],
                 [new Verse("SB_D06")]]);
         }
 

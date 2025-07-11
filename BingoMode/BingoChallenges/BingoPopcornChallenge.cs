@@ -25,7 +25,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new(
-                [[new Icon("Symbol_Spear", 1f, UnityEngine.Color.white), new Icon("popcorn_plant", 1f, new UnityEngine.Color(0.41f, 0.16f, 0.23f))],
+                [[new Icon("Symbol_Spear"), new Icon("popcorn_plant", 1f, new UnityEngine.Color(0.41f, 0.16f, 0.23f))],
                 [new Counter(current, amound.Value)]]);
         }
 

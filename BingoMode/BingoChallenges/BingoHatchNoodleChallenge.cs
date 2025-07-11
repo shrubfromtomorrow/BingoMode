@@ -28,7 +28,7 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = new(
                 [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))],
                 [new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value)]]);
-            if (atOnce.Value) phrase.InsertWord(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
+            if (atOnce.Value) phrase.InsertWord(new Icon("cycle_limit"));
             return phrase;
         }
 
