@@ -7,7 +7,7 @@ namespace BingoMode.BingoChallenges
 {
     public class Phrase
     {
-        private const float Spacing = 27.5f;
+        private const float SPACING = 27.5f;
         private List<List<Word>> _words;
         public List<Word> WordsFlat => [.. _words.SelectMany(word => word)];
 
@@ -34,7 +34,7 @@ namespace BingoMode.BingoChallenges
 
         public void Draw()
         {
-            float scaledSpacing = Spacing * scale;
+            float scaledSpacing = SPACING * scale;
             Vector2 cursor = centerPos + new Vector2(0f, (_words.Count - 1) * scaledSpacing * 0.5f); //set cursor on first line
             foreach (List<Word> wordLine in _words)
             {
@@ -126,14 +126,30 @@ namespace BingoMode.BingoChallenges
 
     public class Icon : Word
     {
-        public Icon(string element, float scale, Color color, float rotation = 0f) : base()
+        public Icon(string element, float scale = 1f, Color? color = null, float rotation = 0f) : base()
         {
+            color ??= Color.white;
             display = new FSprite(element)
             {
                 scale = scale,
-                color = color,
+                color = (Color)color,
                 rotation = rotation
             };
+        }
+
+        /// <summary>
+        /// Creates and return an icon from a name using <c>ChallengeUtils.ItemOrCreatureIconName()</c>.<br/>
+        /// If unspecified, color will be defined using <c>ChallengeUtils.ItemOrCreatureIconColor()</c>.
+        /// </summary>
+        /// <param name="name">The name of the item or creature to get the icon of</param>
+        /// <param name="scale">The scale factor of this icon</param>
+        /// <param name="color">The color of this icon. Leave empty to use <c>ChallengeUtils.ItemOrCreatureIconName()</c></param>
+        /// <param name="rotation">The rotation of this icon, in degrees</param>
+        /// <returns></returns>
+        public static Icon FromEntityName(string name, float scale = 1f, Color? color = null, float rotation = 0f)
+        {
+            color ??= ChallengeUtils.ItemOrCreatureIconColor(name);
+            return new(ChallengeUtils.ItemOrCreatureIconName(name), scale, color, rotation);
         }
     }
 }
