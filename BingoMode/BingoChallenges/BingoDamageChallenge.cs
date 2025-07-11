@@ -39,32 +39,26 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            int newLine = 1;
-            List<int> newLines = [];
-            Phrase phrase = new Phrase([new Icon("bingoimpact", 1f, UnityEngine.Color.white)], []);
+            Phrase phrase = new([[new Icon("bingoimpact", 1f, UnityEngine.Color.white)]]);
             if (weapon.Value != "Any Weapon")
             {
-                phrase.words.Insert(0, new Icon(ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)));
-                newLine++;
+                phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(weapon.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(weapon.Value)), 0, 0);
             }
-
-            if (victim.Value != "Any Creature") {
-                phrase.words.Add(new Icon(ChallengeUtils.ItemOrCreatureIconName(victim.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(victim.Value)));
-                newLine++;
+            if (victim.Value != "Any Creature")
+            {
+                phrase.InsertWord(new Icon(ChallengeUtils.ItemOrCreatureIconName(victim.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(victim.Value)));
             }
-            newLines.Add(newLine);
+            int lastLine = 1;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
-                phrase.words.Add(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
-                newLine++;
-                newLines.Add(newLine);
+                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
+                lastLine = 2;
             }
-            phrase.words.Add(new Counter(current, amount.Value));
+            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
             if (inOneCycle.Value)
             {
-                phrase.words.Add(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
+                phrase.InsertWord(new Icon("cycle_limit", 1f, UnityEngine.Color.white), lastLine);
             }
-            phrase.newLines = newLines.ToArray();
             return phrase;
         }
 

@@ -41,11 +41,13 @@ namespace BingoMode.BingoChallenges
                 new Phrase([new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value)), new Icon("singlearrow", 1f, Color.white), new Icon("doubleshelter", 1f, Color.white)], [3]):
                 new Phrase([new Icon("ShelterMarker", 1f, Color.white), new Icon(ChallengeUtils.ItemOrCreatureIconName(target.Value), 1f, ChallengeUtils.ItemOrCreatureIconColor(target.Value))], [2]);
             int region_index = anyShelter.Value ? 3 : 2;
+            int lastLine = 1;
             if (sub.Value != "Any Subregion" || region.Value != "Any Region")
             {
-                phrase.words.Insert(region_index, new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value));
+                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
+                lastLine = 2;
             }
-            phrase.words.Add(new Counter(current, amount.Value));
+            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
             return phrase;
         }
 

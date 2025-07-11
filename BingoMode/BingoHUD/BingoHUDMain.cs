@@ -1320,7 +1320,7 @@ namespace BingoMode.BingoHUD
                     phrase.scale = size / 84f * scale;
                     if (shakeLock > 0f)
                     {
-                        phrase.words[0].display.rotation = Mathf.LerpAngle(-30f, 30f, UnityEngine.Random.value) * shakeLock;
+                        phrase.WordsFlat[0].display.rotation = Mathf.LerpAngle(-30f, 30f, UnityEngine.Random.value) * shakeLock;
                     }
                     phrase.Draw();
                 }

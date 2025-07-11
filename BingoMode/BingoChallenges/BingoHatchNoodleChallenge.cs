@@ -25,10 +25,10 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase p = new Phrase([new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))], [atOnce.Value ? 3 : 2]);
-            if (atOnce.Value) p.words.Add(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
-            p.words.Add(new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value));
-            return p;
+            Phrase phrase = new Phrase([[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))]]);
+            if (atOnce.Value) phrase.InsertWord(new Icon("cycle_limit", 1f, UnityEngine.Color.white));
+            phrase.InsertWord(new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value), 1);
+            return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)

@@ -1,71 +1,73 @@
 ﻿using UnityEngine;
 using RWCustom;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BingoMode.BingoChallenges
 {
     public class Phrase
     {
-        public List<Word> words;
+        private const float Spacing = 27.5f;
+        private List<List<Word>> _words;
+        public List<Word> WordsFlat => [.. _words.SelectMany(word => word)];
+
         public Vector2 centerPos;
         public float scale;
-        public int[] newLines;
         public bool applyScale;
 
         public Phrase(List<Word> words, int[] newLines)
         {
-            this.words = words;
-            this.newLines = newLines;
+            _words = [];
+            int solIndex = 0;
+            foreach (int eolIndex in newLines)
+            {
+                _words.Add(words.GetRange(solIndex, eolIndex - solIndex));
+                solIndex = eolIndex;
+            }
+            _words.Add(words.GetRange(solIndex, words.Count - solIndex));
+        }
+
+        public Phrase(List<List<Word>> words)
+        {
+            _words = words;
         }
 
         public void Draw()
         {
-            float horizontalDist = 27.5f * scale;
-            float verticalDist = 27.5f * scale;
-            int iconAmount = words.Count;
-            Vector2[] positiones = new Vector2[iconAmount];
-            int distToNewLine = newLines.Length == 0 ? (iconAmount - 1) : (newLines[0] - 1);
-            Vector2 startPos = centerPos + new Vector2(distToNewLine * 0.5f * -horizontalDist, newLines.Length * 0.5f * verticalDist) + new Vector2(0.01f, 0.01f);
-            float carryOver = 0f;
-            for (int i = 0; i < iconAmount; i++)
+            float scaledSpacing = Spacing * scale;
+            Vector2 cursor = centerPos + new Vector2(0f, (_words.Count - 1) * scaledSpacing * 0.5f); //set cursor on first line
+            foreach (List<Word> wordLine in _words)
             {
-                positiones[i] = startPos;
-                if (newLines.Length > 0)
+                cursor.x = centerPos.x - ((wordLine.Count - 1) * scaledSpacing * 0.5f); //set cursor at beginning of line
+                foreach (Word word in wordLine)
                 {
-                    bool resetCarry = false;
-                    for (int n = 0; n < newLines.Length; n++)
-                    {
-                        if (i >= newLines[n])
-                        {
-                            Vector2 downThingIdk = new Vector2(0f, verticalDist);
-                            positiones[i] -= downThingIdk;
-                        }
-                        if (i + 1 == newLines[n])
-                        {
-                            int gruh = (n + 1) > (newLines.Length - 1) ? (iconAmount - newLines[n] - 1) : (newLines[n + 1] - newLines[n] - 1);
-                            startPos = centerPos + new Vector2(gruh * 0.5f * -horizontalDist, newLines.Length * 0.5f * verticalDist);
-                            resetCarry = true;
-                        }
-                    }
-                    positiones[i] += new Vector2(carryOver, 0f);
-                    carryOver += horizontalDist;
-                    if (resetCarry) carryOver = 0f;
-                    words[i].display.SetPosition(positiones[i]);
-                    if (words[i].background != null) words[i].background.SetPosition(positiones[i]);
-                    if (applyScale) words[i].display.scale = scale;
-                    continue;
+                    word.display.SetPosition(cursor);
+                    word.background?.SetPosition(cursor);
+                    if (applyScale) word.display.scale = scale;
+                    cursor.x += scaledSpacing;
                 }
-                positiones[i] += new Vector2(carryOver, 0f);
-                carryOver += horizontalDist;
-                words[i].display.SetPosition(positiones[i]);
-                if (words[i].background != null) words[i].background.SetPosition(positiones[i]);
-                if (applyScale) words[i].display.scale = scale;
+                cursor.y -= scaledSpacing;
             }
+        }
+
+        /// <summary>
+        /// Inserts a <c>word</c> in this Phrase on a given <c>line</c> at a given <c>index</c>.<br/>
+        /// Can generate missing lines.<br/>
+        /// Defaults to first line (top) and end of line (right).
+        /// </summary>
+        /// <param name="word">The word to add to this Phrase</param>
+        /// <param name="line">The line on which the word is to be added</param>
+        /// <param name="index">The position within the line where the word is to be added. -1 adds to end.</param>
+        public void InsertWord(Word word, int line = 0, int index = -1)
+        {
+            for (int i = _words.Count; i <= line; i++) _words.Add([]);
+            if (index < 0) _words[line].Add(word);
+            else _words[line].Insert(index, word);
         }
 
         public void AddAll(FContainer container)
         {
-            foreach (Word word in words)
+            foreach (Word word in WordsFlat)
             {
                 if (word.background != null) container.AddChild(word.background);
                 container.AddChild(word.display);
@@ -74,7 +76,7 @@ namespace BingoMode.BingoChallenges
 
         public void ClearAll()
         {
-            foreach (Word word in words)
+            foreach (Word word in WordsFlat)
             {
                 word.background?.RemoveFromContainer();
                 word.display.RemoveFromContainer();
@@ -83,16 +85,16 @@ namespace BingoMode.BingoChallenges
 
         public void SetAlpha(float alpha)
         {
-            foreach (Word word in words)
+            foreach (Word word in WordsFlat)
             {
-                if (word.background != null) word.background.alpha = alpha;
+                word.background?.alpha = alpha;
                 word.display.alpha = alpha;
             }
         }
 
         public static Phrase LockPhrase()
         {
-            return new Phrase([new Icon("bingolock", 1f, new Color(0.01f, 0.01f, 0.01f))], []);
+            return new Phrase([[new Icon("bingolock", 1f, new Color(0.01f, 0.01f, 0.01f))]]);
         }
     }
 

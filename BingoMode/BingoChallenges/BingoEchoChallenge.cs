@@ -38,8 +38,7 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = new Phrase([new Icon("echo_icon", 1f, Color.white), specific.Value ? new Verse(ghost.Value) : new Counter(current, amount.Value)], []);
             if (starve.Value)
             {
-                phrase.words.Add(new Icon("Multiplayer_Death", 1f, Color.white));
-                phrase.newLines = [2];
+                phrase.InsertWord(new Icon("Multiplayer_Death", 1f, Color.white), 1);
             }
             return phrase;
         }
