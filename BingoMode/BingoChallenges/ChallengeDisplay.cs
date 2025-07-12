@@ -87,7 +87,7 @@ namespace BingoMode.BingoChallenges
         {
             foreach (Word word in WordsFlat)
             {
-                word.background?.alpha = alpha;
+                if (word.background != null) word.background.alpha = alpha;
                 word.display.alpha = alpha;
             }
         }

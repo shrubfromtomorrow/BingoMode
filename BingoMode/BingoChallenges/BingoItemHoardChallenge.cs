@@ -25,12 +25,12 @@ namespace BingoMode.BingoChallenges
         public override void UpdateDescription()
         {
             string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
-            this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> in <shelter_type> shelter <location>")
+            this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>")
                 .Replace("<action>", anyShelter.Value ? "Bring" : "Store")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
                 .Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)))
-                .Replace("<shelter_type>", anyShelter.Value ? "any" : "the same")
+                .Replace("<shelter_type>", anyShelter.Value ? "to any" : "in the same")
                 .Replace("<location>", location != "" ? "in " + location : "");
             base.UpdateDescription();
         }

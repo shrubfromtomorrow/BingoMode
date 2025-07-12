@@ -140,6 +140,7 @@ namespace BingoMode.BingoChallenges
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
+                "><",
                 string.Join("|", visited),
             ]);
         }

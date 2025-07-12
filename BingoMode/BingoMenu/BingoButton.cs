@@ -18,6 +18,7 @@ namespace BingoMode.BingoMenu
         public string singalText; // singal.
         public int x;
         public int y;
+        public IntVector2 boardPos;
         public Phrase phrase;
         public FSprite[] boxSprites;
         public FLabel infoLabel;
@@ -26,11 +27,18 @@ namespace BingoMode.BingoMenu
         public bool lastMouseOver;
         public bool resetPhrase;
 
+        public bool mouseRightDown;
+        public bool lastMouseRightDown;
+        public bool MouseRightDown => mouseRightDown && !lastMouseRightDown && cantClickCounter == 0;
+        public int cantClickCounter;
+
         public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
         {
             this.singalText = singalText;
             x = xCoord;
             y = yCoord;
+            boardPos.x = xCoord;
+            boardPos.y = yCoord;
             challenge = BingoHooks.GlobalBoard.challengeGrid[x, y];
 
             labelColor = Menu.Menu.MenuColor(Menu.Menu.MenuColors.MediumGrey);
@@ -130,6 +138,11 @@ namespace BingoMode.BingoMenu
         // Stolen from SimpleButton
         public override void Update()
         {
+
+            lastMouseRightDown = mouseRightDown;
+            mouseRightDown = Input.GetMouseButton(1);
+            cantClickCounter = Mathf.Max(0, cantClickCounter - 1);
+
             lastMouseOver = mouseOver;
             mouseOver = IsMouseOverMe;
             base.Update();
@@ -146,6 +159,26 @@ namespace BingoMode.BingoMenu
                     boxSprites[i].MoveToFront();
                 }
                 infoLabel.MoveToFront();
+            }
+            if (boxVisible && MouseRightDown)
+            {
+                cantClickCounter = 10;
+                Singal(this, "SWITCH");
+                Plugin.logger.LogInfo("Switch1: " + (BingoHooks.GlobalBoard.switch1 != null ? BingoHooks.GlobalBoard.switch1.ChallengeName() : "null"));
+                Plugin.logger.LogInfo("Switch2: " + (BingoHooks.GlobalBoard.switch2 != null ? BingoHooks.GlobalBoard.switch2.ChallengeName() : "null"));
+                lastMouseRightDown = mouseRightDown;
+            }
+            if (BingoHooks.GlobalBoard.switch1 == this.challenge && BingoHooks.GlobalBoard.switch1Pos == boardPos)
+            {
+                bkgRect.borderColor = new HSLColor(0.3f, 1.0f, 0.5f);
+            }
+            else if (BingoHooks.GlobalBoard.switch2 == this.challenge && BingoHooks.GlobalBoard.switch2Pos == boardPos)
+            {
+                bkgRect.borderColor = new HSLColor(0f, 1.0f, 0.5f);
+            }
+            else
+            {
+                bkgRect.borderColor = new HSLColor(1.0f, 1.0f, 1.0f);
             }
         }
 

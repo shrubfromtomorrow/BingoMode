@@ -15,6 +15,7 @@ namespace BingoMode.BingoMenu
 {
     using BingoSteamworks;
     using System;
+    using System.CodeDom;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -40,6 +41,7 @@ namespace BingoMode.BingoMenu
         public SimpleButton copyBoard;
         public SimpleButton pasteBoard;
         public SymbolButton eggButton;
+
 
         // Multiplayer
         public SimpleButton multiButton;
@@ -583,6 +585,12 @@ namespace BingoMode.BingoMenu
                 return;
             }
 
+            if (message == "SWITCH")
+            {
+                SwitchChals(sender);
+                return;
+            }
+
             if (message == "ADDSIZE")
             {
                 int lastSize = BingoHooks.GlobalBoard.size;
@@ -833,6 +841,12 @@ namespace BingoMode.BingoMenu
         {
             BingoHooks.GlobalBoard.ShuffleBoard();
             menu.PlaySound(SoundID.MENU_Next_Slugcat);
+        }
+
+        public void SwitchChals(MenuObject sender)
+        {
+            BingoButton chal = sender as BingoButton;
+            BingoHooks.GlobalBoard.SwitchChals(chal.challenge, chal.x, chal.y);
         }
 
         public override void GrafUpdate(float timeStacker)

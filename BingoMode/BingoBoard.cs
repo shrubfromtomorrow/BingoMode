@@ -22,6 +22,12 @@ namespace BingoMode
         public int size;
         public List<Challenge> recreateList;
 
+        public Challenge switch1;
+        public IntVector2 switch1Pos;
+        public Challenge switch2;
+        public IntVector2 switch2Pos;
+
+
         public BingoBoard()
         {
             size = 5;
@@ -97,6 +103,29 @@ namespace BingoMode
             }
             SteamTest.UpdateOnlineBingo();
             UpdateChallenges();
+        }
+
+        public void SwitchChals(Challenge chal, int x, int y)
+        {
+            if (switch1 == null)
+            {
+                switch1 = chal;
+                switch1Pos = new IntVector2(x, y);
+                return;
+            }
+            else if (switch2 == null)
+            {
+                switch2 = chal;
+                switch2Pos = new IntVector2(x, y);
+
+                challengeGrid[switch1Pos.x, switch1Pos.y] = switch2;
+                challengeGrid[switch2Pos.x, switch2Pos.y] = switch1;
+
+                switch1 = null;
+                switch2 = null;
+                SteamTest.UpdateOnlineBingo();
+                UpdateChallenges();
+            }
         }
 
         public void UpdateChallenges()
