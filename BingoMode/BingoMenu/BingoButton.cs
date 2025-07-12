@@ -28,9 +28,9 @@ namespace BingoMode.BingoMenu
         public bool resetPhrase;
 
         public bool mouseRightDown;
-        public bool lastMouseRightDown;
-        public bool MouseRightDown => mouseRightDown && !lastMouseRightDown && cantClickCounter == 0;
-        public int cantClickCounter;
+        public static int cantClickCounter;
+        public HSLColor white;
+        public HSLColor highlight;
 
         public BingoButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, string singalText, int xCoord, int yCoord) : base(menu, owner, pos, size)
         {
@@ -42,6 +42,8 @@ namespace BingoMode.BingoMenu
             challenge = BingoHooks.GlobalBoard.challengeGrid[x, y];
 
             labelColor = Menu.Menu.MenuColor(Menu.Menu.MenuColors.MediumGrey);
+            white = Menu.Menu.MenuColor(Menu.Menu.MenuColors.White);
+            highlight = Menu.Menu.MenuColor(Menu.Menu.MenuColors.SaturatedGold);
 
             bkgRect = new RoundedRect(menu, owner, pos, size, true);
             subObjects.Add(bkgRect);
@@ -138,10 +140,8 @@ namespace BingoMode.BingoMenu
         // Stolen from SimpleButton
         public override void Update()
         {
-
-            lastMouseRightDown = mouseRightDown;
-            mouseRightDown = Input.GetMouseButton(1);
             cantClickCounter = Mathf.Max(0, cantClickCounter - 1);
+            mouseRightDown = Input.GetMouseButton(1);
 
             lastMouseOver = mouseOver;
             mouseOver = IsMouseOverMe;
@@ -160,25 +160,19 @@ namespace BingoMode.BingoMenu
                 }
                 infoLabel.MoveToFront();
             }
-            if (boxVisible && MouseRightDown)
+            if (boxVisible && mouseRightDown && cantClickCounter == 0)
             {
-                cantClickCounter = 10;
                 Singal(this, "SWITCH");
-                Plugin.logger.LogInfo("Switch1: " + (BingoHooks.GlobalBoard.switch1 != null ? BingoHooks.GlobalBoard.switch1.ChallengeName() : "null"));
-                Plugin.logger.LogInfo("Switch2: " + (BingoHooks.GlobalBoard.switch2 != null ? BingoHooks.GlobalBoard.switch2.ChallengeName() : "null"));
-                lastMouseRightDown = mouseRightDown;
+                // Good lord this is jank but whatever. 40tps, quarter of a second cooldown on clicks, since cantClickCounter decrements per goal, need to multiply it by goal count
+                cantClickCounter = BingoHooks.GlobalBoard.challengeGrid.GetLength(0) * BingoHooks.GlobalBoard.challengeGrid.GetLength(1) * 10;
             }
             if (BingoHooks.GlobalBoard.switch1 == this.challenge && BingoHooks.GlobalBoard.switch1Pos == boardPos)
             {
-                bkgRect.borderColor = new HSLColor(0.3f, 1.0f, 0.5f);
-            }
-            else if (BingoHooks.GlobalBoard.switch2 == this.challenge && BingoHooks.GlobalBoard.switch2Pos == boardPos)
-            {
-                bkgRect.borderColor = new HSLColor(0f, 1.0f, 0.5f);
+                bkgRect.borderColor = highlight;
             }
             else
             {
-                bkgRect.borderColor = new HSLColor(1.0f, 1.0f, 1.0f);
+                bkgRect.borderColor = white;
             }
         }
 
