@@ -146,7 +146,6 @@ namespace BingoMode.BingoChallenges
                 // Legacy board tame challenge compatibility
                 else if (array.Length == 3)
                 {
-                    Plugin.logger.LogInfo("length 3");
                     crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                     completed = (array[1] == "1");
                     revealed = (array[2] == "1");

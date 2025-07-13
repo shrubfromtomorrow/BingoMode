@@ -150,7 +150,7 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 7)
+                if (array.Length == 8)
                 {
                     specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
                     ghost = SettingBoxFromString(array[1]) as SettingBox<string>;
@@ -162,6 +162,7 @@ namespace BingoMode.BingoChallenges
                     string[] arr = Regex.Split(array[7], "|");
                     visited = [.. arr];
                 }
+                // Legacy board echo challenge compatibility
                 else if (array.Length == 4)
                 {
                     ghost = SettingBoxFromString(array[0]) as SettingBox<string>;

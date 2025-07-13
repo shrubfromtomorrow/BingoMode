@@ -18,7 +18,6 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> inOneCycle;
         public SettingBox<string> region;
-        public SettingBox<string> sub;
         public int current;
 
         public override void UpdateDescription()
@@ -27,7 +26,7 @@ namespace BingoMode.BingoChallenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
+            string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times<location>" + (inOneCycle.Value ? " in one cycle" : ""))
                 .Replace("<crit>", victim.Value == "Any Creature" ? "creatures" : ChallengeTools.creatureNames[new CreatureType(victim.Value, false).Index])
                 .Replace("<location>", location != "" ? " in " + location : "")
@@ -44,9 +43,9 @@ namespace BingoMode.BingoChallenges
             if (victim.Value != "Any Creature") phrase.InsertWord(Icon.FromEntityName(victim.Value));
 
             int lastLine = 1;
-            if (sub.Value != "Any Subregion" || region.Value != "Any Region")
+            if (region.Value != "Any Region")
             {
-                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
+                phrase.InsertWord(new Verse(region.Value), 1);
                 lastLine = 2;
             }
 
@@ -86,7 +85,6 @@ namespace BingoMode.BingoChallenges
                 victim = new(crit, "Creature Type", 1, listName: "creatures"),
                 amount = new(amound, "Amount", 2),
                 inOneCycle = new(oneCycle, "In One Cycle", 3),
-                sub = new("Any Subregion", "Subregion", 4, listName: "subregions"),
                 region = new("Any Region", "Region", 5, listName: "regions"),
             };
         }
@@ -94,18 +92,14 @@ namespace BingoMode.BingoChallenges
         public bool CritInLocation(Creature crit)
         {
             //                room.Value != "" ? room.Value : 
-            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? region.Value : "boowomp";
+            string location = region.Value != "Any Region" ? region.Value : "boowomp";
             AbstractRoom room = crit.room.abstractRoom;
             /*if (location == room.Value)
             {
                 return rom.name == location;
             }
             else*/
-            if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
-            {
-                return room.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || room.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();
-            }
-            else if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
+            if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
             {
                 return room.world.region.name.ToLowerInvariant() == location.ToLowerInvariant();
             }
@@ -181,8 +175,6 @@ namespace BingoMode.BingoChallenges
                 "><",
                 region.ToString(),
                 "><",
-                sub.ToString(),
-                "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
@@ -194,7 +186,7 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 9)
+                if (array.Length == 8)
                 {
                     weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
                     victim = SettingBoxFromString(array[1]) as SettingBox<string>;
@@ -202,9 +194,8 @@ namespace BingoMode.BingoChallenges
                     current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                     amount = SettingBoxFromString(array[3]) as SettingBox<int>;
                     region = SettingBoxFromString(array[5]) as SettingBox<string>;
-                    sub = SettingBoxFromString(array[6]) as SettingBox<string>;
-                    completed = (array[7] == "1");
-                    revealed = (array[8] == "1");
+                    completed = (array[6] == "1");
+                    revealed = (array[7] == "1");
                 }
                 // Legacy board damage challenge compatibility
                 else if (array.Length == 6)
@@ -217,7 +208,6 @@ namespace BingoMode.BingoChallenges
                     revealed = (array[5] == "1");
                     inOneCycle = SettingBoxFromString("System.Boolean|false|In One Cycle|3|NULL") as SettingBox<bool>;
                     region = SettingBoxFromString("System.String|Any Region|Region|5|regions") as SettingBox<string>;
-                    sub = SettingBoxFromString("System.String|Any Subregion|Subregion|4|subregions") as SettingBox<string>;
                 }
                 UpdateDescription();
             }
@@ -242,6 +232,6 @@ namespace BingoMode.BingoChallenges
         {
         }
 
-        public override List<object> Settings() => [weapon, victim, amount, inOneCycle, region, sub,];
+        public override List<object> Settings() => [weapon, victim, amount, inOneCycle, region];
     }
 }

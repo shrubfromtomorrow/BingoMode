@@ -19,12 +19,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> anyShelter;
         public SettingBox<string> region;
-        public SettingBox<string> sub;
         public List<string> stored = [];
 
         public override void UpdateDescription()
         {
-            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
+            string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>")
                 .Replace("<action>", anyShelter.Value ? "Bring" : "Store")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
@@ -41,9 +40,9 @@ namespace BingoMode.BingoChallenges
                 new Phrase([[Icon.FromEntityName(target.Value), new Icon("singlearrow"), new Icon("doubleshelter")]]):
                 new Phrase([[new Icon("ShelterMarker"), Icon.FromEntityName(target.Value)]]);
             int lastLine = 1;
-            if (sub.Value != "Any Subregion" || region.Value != "Any Region")
+            if (region.Value != "Any Region")
             {
-                phrase.InsertWord(new Verse(sub.Value != "Any Subregion" ? sub.Value : region.Value), 1);
+                phrase.InsertWord(new Verse(region.Value), 1);
                 lastLine = 2;
             }
             phrase.InsertWord(new Counter(current, amount.Value), lastLine);
@@ -76,7 +75,6 @@ namespace BingoMode.BingoChallenges
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 0),
                 target = new(liste[UnityEngine.Random.Range(0, liste.Length)], "Item", 1, listName: "expobject"),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
-                sub = new("Any Subregion", "Subregion", 3, listName: "subregions"),
                 region = new("Any Region", "Region", 4, listName: "regions"),
             };
         }
@@ -152,13 +150,9 @@ namespace BingoMode.BingoChallenges
 
         public bool ItemInLocation(AbstractPhysicalObject apo)
         {
-            string location = sub.Value != "Any Subregion" ? sub.Value : region.Value != "Any Region" ? region.Value : "boowomp";
+            string location = region.Value != "Any Region" ? region.Value : "boowomp";
             AbstractRoom room = apo.Room;
-            if (location.ToLowerInvariant() == sub.Value.ToLowerInvariant())
-            {
-                return room.subregionName.ToLowerInvariant() == location.ToLowerInvariant() || room.altSubregionName.ToLowerInvariant() == location.ToLowerInvariant();
-            }
-            else if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
+            if (location.ToLowerInvariant() == region.Value.ToLowerInvariant())
             {
                 return room.world.region.name.ToLowerInvariant() == location.ToLowerInvariant();
             }
@@ -187,8 +181,6 @@ namespace BingoMode.BingoChallenges
                 "><",
                 region.ToString(),
                 "><",
-                sub.ToString(),
-                "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
@@ -202,19 +194,19 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 9)
+                if (array.Length == 8)
                 {
                     anyShelter = SettingBoxFromString(array[0]) as SettingBox<bool>;
                     current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                     amount = SettingBoxFromString(array[2]) as SettingBox<int>;
                     target = SettingBoxFromString(array[3]) as SettingBox<string>;
                     region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                    sub = SettingBoxFromString(array[5]) as SettingBox<string>;
-                    completed = (array[6] == "1");
-                    revealed = (array[7] == "1");
-                    string[] arr = Regex.Split(array[8], "cLtD");
+                    completed = (array[5] == "1");
+                    revealed = (array[6] == "1");
+                    string[] arr = Regex.Split(array[7], "cLtD");
                     stored = [.. arr];
                 }
+                // Legacy board hoard challenge compatibility
                 else if (array.Length == 4)
                 {
                     amount = SettingBoxFromString(array[0]) as SettingBox<int>;
@@ -225,7 +217,6 @@ namespace BingoMode.BingoChallenges
                     current = 0;
                     stored = [];
                     region = SettingBoxFromString("System.String|Any Region|Region|3|regions") as SettingBox<string>;
-                    sub = SettingBoxFromString("System.String|Any Subregion|Subregion|4|subregions") as SettingBox<string>;
                 }
                 UpdateDescription();
             }
@@ -244,7 +235,7 @@ namespace BingoMode.BingoChallenges
         {
         }
 
-        public override List<object> Settings() => [target, amount, anyShelter, region, sub];
+        public override List<object> Settings() => [target, amount, anyShelter, region];
 
     }
 }
