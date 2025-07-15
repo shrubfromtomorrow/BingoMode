@@ -14,7 +14,7 @@ namespace BingoMode.BingoChallenges
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Collect the <chatlog> broadcast")
-                .Replace("<chatlog>", ValueConverter.ConvertToString(chatlog.Value));
+                .Replace("<chatlog>", ValueConverter.ConvertToString(chatlog.Value.Substring(8)));
 
             base.UpdateDescription();
         }
@@ -22,8 +22,8 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("Symbol_Satellite")],
-                [new Verse(chatlog.Value)]]);
+                [[new Icon("arenaunlock", 1f, CollectToken.WhiteColor.rgb)],
+                [new Verse(chatlog.Value.Substring(8)), new Icon("Symbol_Satellite")]]);
         }
 
         public override bool Duplicable(Challenge challenge)
