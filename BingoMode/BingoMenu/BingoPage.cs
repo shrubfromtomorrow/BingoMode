@@ -839,7 +839,17 @@ namespace BingoMode.BingoMenu
 
         public void Shuffle()
         {
+            Plugin.logger.LogInfo("Pre shuffle");
+            foreach (Challenge chal in ExpeditionData.challengeList)
+            {
+                Plugin.logger.LogInfo(chal.ToString());
+            }
             BingoHooks.GlobalBoard.ShuffleBoard();
+            Plugin.logger.LogInfo("Post shuffle");
+            foreach (Challenge chal in ExpeditionData.challengeList)
+            {
+                Plugin.logger.LogInfo(chal.ToString());
+            }
             menu.PlaySound(SoundID.MENU_Next_Slugcat);
         }
 

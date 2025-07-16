@@ -86,20 +86,27 @@ namespace BingoMode
             for (int i = 0; i < flatList.Count; i++)
             {
                 int randomIndex = UnityEngine.Random.Range(i, flatList.Count);
-                                                                   
                 Challenge temp = flatList[i];
                 flatList[i] = flatList[randomIndex];
                 flatList[randomIndex] = temp;
             }
 
+            ExpeditionData.ClearActiveChallengeList();
             int index = 0;
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    challengeGrid[i, j] = flatList[index++];
+                    Challenge shuffledChallenge = flatList[index++];
+                    challengeGrid[i, j] = shuffledChallenge;
+
+                    if (!ExpeditionData.challengeList.Contains(shuffledChallenge))
+                    {
+                        ExpeditionData.challengeList.Add(shuffledChallenge);
+                    }
                 }
             }
+
             SteamTest.UpdateOnlineBingo();
             UpdateChallenges();
         }
@@ -120,14 +127,33 @@ namespace BingoMode
                     switch2 = null;
                     return;
                 }
+
                 switch2 = chal;
                 switch2Pos = new IntVector2(x, y);
 
                 challengeGrid[switch1Pos.x, switch1Pos.y] = switch2;
                 challengeGrid[switch2Pos.x, switch2Pos.y] = switch1;
 
+                ExpeditionData.ClearActiveChallengeList();
+                int rows = challengeGrid.GetLength(0);
+                int cols = challengeGrid.GetLength(1);
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Challenge c = challengeGrid[i, j];
+                        if (c != null && !ExpeditionData.challengeList.Contains(c))
+                        {
+                            ExpeditionData.challengeList.Add(c);
+                        }
+                    }
+                }
+
                 SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
+
+                switch1 = null;
+                switch2 = null;
             }
         }
 
@@ -529,7 +555,7 @@ namespace BingoMode
             try
             {
                 int g1 = index == -1 ? ExpeditionData.challengeList.IndexOf(challengeGrid[x, y]) : index;
-                
+
                 ExpeditionData.challengeList.Remove(challengeGrid[x, y]);
                 challengeGrid[x, y] = newChallenge;
                 ExpeditionData.challengeList.Insert(g1, challengeGrid[x, y]);
