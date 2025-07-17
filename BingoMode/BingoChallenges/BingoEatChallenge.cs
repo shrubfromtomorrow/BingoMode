@@ -70,6 +70,7 @@ namespace BingoMode.BingoChallenges
                 {
                     foob.Remove("EggBugEgg");
                     foob.Remove("DandelionPeach");
+                    foob.Remove("SSOracleSwarmer");
                 }
                 randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
             }

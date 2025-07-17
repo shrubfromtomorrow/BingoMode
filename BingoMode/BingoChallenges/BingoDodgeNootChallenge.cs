@@ -32,8 +32,10 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new(
-                [[new Icon("Kill_NeedleWorm")],
-                [new Counter(current, amount.Value)]]);
+                [
+                [Icon.FromEntityName("BigNeedleWorm"), new Icon("slugtarget")],
+                [new Counter(current, amount.Value)]
+                ]);
         }
 
         public override string ChallengeName()

@@ -410,6 +410,7 @@ namespace BingoMode.BingoChallenges
             "SlimeMold",
             "JellyFish",
             "Mushroom",
+            "SSOracleSwarmer",
 
             // MSC
             "GooieDuck",
