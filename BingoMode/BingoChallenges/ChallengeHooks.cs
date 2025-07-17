@@ -1802,5 +1802,26 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
+
+        public static void BigNeedleWorm_Swish(On.BigNeedleWorm.orig_Swish orig,  BigNeedleWorm self)
+        {
+            orig.Invoke(self);
+            Plugin.logger.LogInfo("Swish");
+
+            if (self.impaleChunk != null && self.impaleChunk.owner is Player)
+            {
+                return;
+            }
+            if (self.BigAI.focusCreature.representedCreature.realizedCreature is Player p && self.swishCounter == 0f)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoDodgeNootChallenge c)
+                    {
+                        c.Dodged();
+                    }
+                }
+            }
+        }
     }
 }

@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoChallenges\BingoBroadcastChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoDodgeNootChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDontKillChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGourmandCrushChallenge.cs" />
     <Compile Include="BingoChallenges\BingoIteratorChallenge.cs" />
