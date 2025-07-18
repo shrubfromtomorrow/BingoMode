@@ -279,7 +279,7 @@ namespace BingoMode.BingoHUD
                 }
                 else addText = "Press the button in the bingo HUD to end the bingo session for everyone.";
 
-                
+
                 List<int> teamsInBingo = BingoData.TeamsStringToList(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
                 Dictionary<int, int> completedForTeam = [];
 
@@ -294,7 +294,7 @@ namespace BingoMode.BingoHUD
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
                             }
 
-                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLine(t) == grid.GetLength(0) - 1)
+                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(t, false) == grid.GetLength(0) - 1)
                             {
                                 BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
                                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
@@ -318,7 +318,6 @@ namespace BingoMode.BingoHUD
                             // Bingo wins
                             if (BingoHooks.GlobalBoard.CheckWin(t))
                             {
-                                
                                 return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
                             }
 
@@ -328,6 +327,19 @@ namespace BingoMode.BingoHUD
                             {
                                 BingoChallenge challenge = ch as BingoChallenge;
                                 if (challenge.TeamsCompleted[t]) completedForTeam[t]++;
+                                else
+                                {
+                                    bool addEmpty = true;
+                                    foreach (int o in teamsInBingo)
+                                    {
+                                        if (o != t && challenge.TeamsCompleted[o])
+                                        {
+                                            addEmpty = false;
+                                            break;
+                                        }
+                                    }
+                                    if (addEmpty) emptyForTeam[t]++;
+                                }
                             }
                         }
 
@@ -347,7 +359,6 @@ namespace BingoMode.BingoHUD
                             foreach (int o in teamsInBingo)
                             {
                                 if (t == o) continue;
-                                
                                 
                                 if (completedForTeam[t] == completedForTeam[o])
                                 {
@@ -379,7 +390,7 @@ namespace BingoMode.BingoHUD
 
                         foreach (int t in teamsInBingo)
                         {
-                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && (BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLine(t) == grid.GetLength(0) - 1 || completedForTeam[t] > majorityMargin - 3))
+                            if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && (BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(t, true, teamsInBingo) == grid.GetLength(0) - 1 || completedForTeam[t] > majorityMargin - 3))
                             {
                                 BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
                                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;

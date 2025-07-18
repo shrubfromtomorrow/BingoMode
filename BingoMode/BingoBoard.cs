@@ -384,7 +384,7 @@ namespace BingoMode
             return won;
         }
 
-        public int CheckMaxTeamSquaresInLine(int t) // wonderful name
+        public int CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(int t, bool lockout, List<int> teamsInBingo = null) // wonderful name (wonderfuler name)
         {
             int squares = 0;
 
@@ -392,12 +392,26 @@ namespace BingoMode
             for (int i = 0; i < size; i++)
             {
                 int tempSquaresV = 0;
+                bool fuckThisShitImOut = false;
                 for (int j = 0; j < size; j++)
                 {
-                    var ch = challengeGrid[i, j];
-                    if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresV++;
+                    var ch = challengeGrid[i, j] as BingoChallenge;
+                    if (ch.TeamsCompleted[t]) tempSquaresV++;
+                    else if (lockout)
+                    {
+                        foreach (int o in teamsInBingo)
+                        {
+                            if (o != t && ch.TeamsCompleted[o])
+                            {
+                                fuckThisShitImOut = true;
+                            }
+                            if (fuckThisShitImOut) break;
+                        }
+                        if (fuckThisShitImOut) break;
+                    }
                 }
 
+                if (fuckThisShitImOut) break;
                 if (tempSquaresV > squares) squares = tempSquaresV;
             }
 
@@ -405,12 +419,26 @@ namespace BingoMode
             for (int i = 0; i < size; i++)
             {
                 int tempSquaresH = 0;
+                bool fuckThisShitImOut = false;
                 for (int j = 0; j < size; j++)
                 {
-                    var ch = challengeGrid[j, i];
-                    if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresH++;
+                    var ch = challengeGrid[j, i] as BingoChallenge;
+                    if (ch.TeamsCompleted[t]) tempSquaresH++;
+                    else if (lockout)
+                    {
+                        foreach (int o in teamsInBingo)
+                        {
+                            if (o != t && ch.TeamsCompleted[o])
+                            {
+                                fuckThisShitImOut = true;
+                            }
+                            if (fuckThisShitImOut) break;
+                        }
+                        if (fuckThisShitImOut) break;
+                    }
                 }
 
+                if (fuckThisShitImOut) break;
                 if (tempSquaresH > squares) squares = tempSquaresH;
             }
 
@@ -418,17 +446,38 @@ namespace BingoMode
             int tempSquaresD1 = 0;
             for (int i = 0; i < size; i++)
             {
-                var ch = challengeGrid[i, i];
-                if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresD1++;
+                var ch = challengeGrid[i, i] as BingoChallenge;
+                if (ch.TeamsCompleted[t]) tempSquaresD1++;
+                else if (lockout)
+                {
+                    foreach (int o in teamsInBingo)
+                    {
+                        if (o != t && ch.TeamsCompleted[o])
+                        {
+                            goto theOutInQuestion;
+                        }
+                    }
+                }
             }
             if (tempSquaresD1 > squares) squares = tempSquaresD1;
 
+            theOutInQuestion:
             // Diagonal line 2
             int tempSquaresD2 = 0;
             for (int i = 0; i < size; i++)
             {
-                var ch = challengeGrid[size - 1 - i, i];
-                if ((ch as BingoChallenge).TeamsCompleted[t]) tempSquaresD2++;
+                var ch = challengeGrid[size - 1 - i, i] as BingoChallenge;
+                if (ch.TeamsCompleted[t]) tempSquaresD2++;
+                else if (lockout)
+                {
+                    foreach (int o in teamsInBingo)
+                    {
+                        if (o != t && ch.TeamsCompleted[o])
+                        {
+                            return squares;
+                        }
+                    }
+                }
             }
             if (tempSquaresD2 > squares) squares = tempSquaresD2;
 
