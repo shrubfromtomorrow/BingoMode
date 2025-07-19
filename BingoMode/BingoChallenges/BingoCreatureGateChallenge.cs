@@ -1,16 +1,49 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using CreatureType = CreatureTemplate.Type;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoCreatureGateRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<int> amount;
+        public Randomizer<string> crit;
+
+        public override Challenge Random()
+        {
+            BingoCreatureGateChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            challenge.crit.Value = crit.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "CreatureGate").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            amount = Randomizer<int>.InitDeserialize(matches[0].ToString());
+            crit = Randomizer<string>.InitDeserialize(matches[1].ToString());
+        }
+    }
+
     public class BingoCreatureGateChallenge : BingoChallenge
     {
         public SettingBox<int> amount;

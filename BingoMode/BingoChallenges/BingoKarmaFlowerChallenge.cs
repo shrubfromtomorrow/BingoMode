@@ -1,14 +1,43 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoKarmaFlowerRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoKarmaFlowerChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "KarmaFlower").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            amount = Randomizer<int>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoKarmaFlowerChallenge : BingoChallenge
     {
         public int current;

@@ -1,16 +1,53 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
-using MoreSlugcats;
 using Menu.Remix;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using System.Globalization;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoTameRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> crit;
+        public Randomizer<int> amount;
+        public Randomizer<bool> specific;
+
+        public override Challenge Random()
+        {
+            BingoTameChallenge challenge = new();
+            challenge.crit.Value = crit.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.specific.Value = specific.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}specific-{specific.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Tame").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            crit = Randomizer<string>.InitDeserialize(matches[0].ToString());
+            amount = Randomizer<int>.InitDeserialize(matches[1].ToString());
+            specific = Randomizer<bool>.InitDeserialize(matches[2].ToString());
+        }
+    }
+
     public class BingoTameChallenge : BingoChallenge
     {
         public SettingBox<string> crit;

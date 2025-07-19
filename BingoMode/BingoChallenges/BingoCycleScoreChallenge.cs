@@ -1,15 +1,44 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoCycleScoreRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<int> target;
+
+        public override Challenge Random()
+        {
+            BingoCycleScoreChallenge challenge = new();
+            challenge.target.Value = target.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "CycleScore").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            target = Randomizer<int>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoCycleScoreChallenge : BingoChallenge
     {
         public SettingBox<int> target;

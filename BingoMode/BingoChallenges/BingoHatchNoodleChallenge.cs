@@ -1,14 +1,47 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoHatchNoodleRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<int> amount;
+        public Randomizer<bool> atOnce;
+
+        public override Challenge Random()
+        {
+            BingoHatchNoodleChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            challenge.atOnce.Value = atOnce.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}atOnce-{atOnce.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "HatchNoodle").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            amount = Randomizer<int>.InitDeserialize(matches[0].ToString());
+            atOnce = Randomizer<bool>.InitDeserialize(matches[1].ToString());
+        }
+    }
+
     public class BingoHatchNoodleChallenge : BingoChallenge
     {
         public SettingBox<int> amount;

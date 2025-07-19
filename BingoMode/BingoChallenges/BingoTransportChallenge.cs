@@ -1,9 +1,11 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -11,6 +13,41 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoTransportRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> from;
+        public Randomizer<string> to;
+        public Randomizer<string> crit;
+
+        public override Challenge Random()
+        {
+            BingoTransportChallenge challenge = new();
+            challenge.from.Value = from.Random();
+            challenge.to.Value = to.Random();
+            challenge.crit.Value = crit.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}from-{from.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}to-{to.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Transport").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            from = Randomizer<string>.InitDeserialize(matches[0].ToString());
+            to = Randomizer<string>.InitDeserialize(matches[1].ToString());
+            crit = Randomizer<string>.InitDeserialize(matches[2].ToString());
+        }
+    }
+
     public class BingoTransportChallenge : BingoChallenge
     {
         public SettingBox<string> from;

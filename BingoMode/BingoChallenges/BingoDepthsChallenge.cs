@@ -1,13 +1,42 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using CreatureType = CreatureTemplate.Type;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoDepthsRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> crit;
+
+        public override Challenge Random()
+        {
+            BingoDepthsChallenge challenge = new();
+            challenge.crit.Value = crit.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Depths").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            crit = Randomizer<string>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoDepthsChallenge : BingoChallenge
     {
         public SettingBox<string> crit;

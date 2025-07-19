@@ -1,4 +1,5 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
@@ -7,12 +8,40 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoVistaRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> room;
+
+        public override Challenge Random()
+        {
+            BingoVistaChallenge challenge = new();
+            challenge.room.Value = room.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}room-{room.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Vista").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            room = Randomizer<string>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoVistaChallenge : BingoChallenge
     {
         public SettingBox<string> room;

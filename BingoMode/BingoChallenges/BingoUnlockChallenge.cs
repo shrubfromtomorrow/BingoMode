@@ -1,12 +1,42 @@
-﻿using Expedition;
+﻿using BingoMode.BingoRandomizer;
+using Expedition;
 using System;
 using System.Collections.Generic;
+using System.Security.Policy;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoUnlockRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> unlock;
+
+        public override Challenge Random()
+        {
+            BingoUnlockChallenge challenge = new();
+            challenge.unlock.Value = unlock.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}unlock-{unlock.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Unlock").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            unlock = Randomizer<string>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoUnlockChallenge : BingoChallenge
     {
         public SettingBox<string> unlock;

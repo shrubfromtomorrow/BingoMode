@@ -1,17 +1,46 @@
-﻿using Expedition;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using UnityEngine;
+using System.Text;
 using System.Text.RegularExpressions;
-using BingoMode.BingoSteamworks;
+using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoTradeTradedRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoTradeTradedChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "TradeTraded").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            amount = Randomizer<int>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoTradeTradedChallenge : BingoChallenge
     {
         public SettingBox<int> amount;

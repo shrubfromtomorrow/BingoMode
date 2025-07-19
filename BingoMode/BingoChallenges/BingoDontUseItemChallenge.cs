@@ -1,13 +1,42 @@
-﻿using Expedition;
-using System;
-using UnityEngine;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
+using Expedition;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoDontUseItemRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> item;
+
+        public override Challenge Random()
+        {
+            BingoDontUseItemChallenge challenge = new();
+            challenge.item.Value = item.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}item-{item.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "DontUseItem").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            item = Randomizer<string>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     //Using counts as either throwing an item, or holding it for more than 5 seconds
     public class BingoDontUseItemChallenge : BingoChallenge
     {

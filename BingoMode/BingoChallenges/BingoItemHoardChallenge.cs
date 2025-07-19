@@ -1,4 +1,5 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
@@ -6,12 +7,52 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoItemHoardRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> target;
+        public Randomizer<int> amount;
+        public Randomizer<bool> anyShelter;
+        public Randomizer<string> region;
+
+        public override Challenge Random()
+        {
+            BingoItemHoardChallenge challenge = new();
+            challenge.target.Value = target.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.anyShelter.Value = anyShelter.Random();
+            challenge.region.Value = region.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}anyShelter-{anyShelter.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "ItemHoard").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            target = Randomizer<string>.InitDeserialize(matches[0].ToString());
+            amount = Randomizer<int>.InitDeserialize(matches[1].ToString());
+            anyShelter = Randomizer<bool>.InitDeserialize(matches[2].ToString());
+            region = Randomizer<string>.InitDeserialize(matches[3].ToString());
+        }
+    }
+
     public class BingoItemHoardChallenge : BingoChallenge
     {
         public int current;

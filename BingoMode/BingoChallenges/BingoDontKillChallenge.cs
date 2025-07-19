@@ -1,7 +1,9 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -10,6 +12,33 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoDontKillRandomizer : Randomizer<Challenge>
+    {
+        public Randomizer<string> victim;
+
+        public override Challenge Random()
+        {
+            BingoDontKillChallenge challenge = new();
+            challenge.victim.Value = victim.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}victim-{victim.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "DontKill").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            victim = Randomizer<string>.InitDeserialize(matches[0].ToString());
+        }
+    }
+
     public class BingoDontKillChallenge : BingoChallenge
     {
         public SettingBox<string> victim;
