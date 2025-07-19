@@ -22,6 +22,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public List<string> visited = [];
 
+        public BingoEchoChallenge()
+        {
+            specific = new(false, "Specific Echo", 0);
+            ghost = new("", "Region", 1, listName: "echoes");
+            amount = new(0, "Amount", 2);
+            starve = new(false, "While Starving", 3);
+        }
+
         public override void UpdateDescription()
         {
             this.description = specific.Value ? 

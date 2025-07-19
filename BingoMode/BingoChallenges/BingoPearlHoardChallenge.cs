@@ -18,6 +18,13 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public SettingBox<int> amount;
 
+        public BingoPearlHoardChallenge()
+        {
+            common = new(false, "Common Pearls", 0);
+            amount = new(0, "Amount", 1);
+            region = new("", "In Region", 2, listName: "regionsreal");
+        }
+
         public override void UpdateDescription()
         {
             string newValue = this.common.Value ? ChallengeTools.IGT.Translate("common pearls") : ChallengeTools.IGT.Translate("colored pearls");

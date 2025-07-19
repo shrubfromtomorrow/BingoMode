@@ -18,6 +18,12 @@ namespace BingoMode.BingoChallenges
         public int current;
         public Dictionary<EntityID, string> traderItems; // Key - item, Value - room (Save this later) (i think i saved this thanks me)
 
+        public BingoTradeTradedChallenge()
+        {
+            amount = new(UnityEngine.Random.Range(1, 4), "Amount of Items", 0);
+            traderItems = [];
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] " + (amount.Value == 1 ? "item" : "items") + " from Scavenger Merchants to other Scavenger Merchants")

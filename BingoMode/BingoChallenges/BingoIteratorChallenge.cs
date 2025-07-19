@@ -12,6 +12,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<bool> moon;
 
+        public BingoIteratorChallenge()
+        {
+            moon = new(false, "Looks to the Moon", 0);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Visit <iterator>")

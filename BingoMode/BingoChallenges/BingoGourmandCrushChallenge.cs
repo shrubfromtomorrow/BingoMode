@@ -16,6 +16,11 @@ namespace BingoMode.BingoChallenges
         public int current;
         public SettingBox<int> amount;
 
+        public BingoGourmandCrushChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Crush [<current>/<amount>] unique creatures by falling")

@@ -19,6 +19,12 @@ namespace BingoMode.BingoChallenges
         public string region;
         public Vector2 location;
 
+        public BingoVistaChallenge()
+        {
+            room = new("", "Room", 0, listName: "vista");
+            location = new();
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Reach the vista point in <region_name>").Replace("<region_name>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)));

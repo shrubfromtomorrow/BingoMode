@@ -17,6 +17,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public int current;
 
+        public BingoDodgeNootChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

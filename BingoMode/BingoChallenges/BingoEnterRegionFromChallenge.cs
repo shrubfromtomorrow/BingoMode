@@ -14,6 +14,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> from;
         public SettingBox<string> to;
 
+        public BingoEnterRegionFromChallenge()
+        {
+            from = new("", "From", 0, listName: "regionsreal");
+            to = new("", "To", 0, listName: "regionsreal");
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("First time entering <to> must be from <from>")

@@ -20,6 +20,15 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public int current;
 
+        public BingoDamageChallenge()
+        {
+            weapon = new("", "Weapon", 0, listName: "weapons");
+            victim = new("", "Creature Type", 1, listName: "creatures");
+            amount = new(0, "Amount", 2);
+            inOneCycle = new(false, "In One Cycle", 3);
+            region = new("", "Region", 4, listName: "regions");
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null && victim != null)

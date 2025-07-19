@@ -16,6 +16,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public int current;
 
+        public BingoCraftChallenge()
+        {
+            craftee = new("", "Item to Craft", 0, listName: "craft");
+            amount = new(0, "Amount", 1);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate($"Craft [{current}/{amount.Value}] <item>")

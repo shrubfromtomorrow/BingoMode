@@ -18,6 +18,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> subject;
         public List<EntityID> checkedIDs;
 
+        public BingoStealChallenge()
+        {
+            checkedIDs = [];
+            toll = new(false, "From Scavenger Toll", 0);
+            subject = new("", "Item", 1, listName: "theft");
+            amount = new(0, "Amount", 2);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Steal [<current>/<amount>] <item> from " + (toll.Value ? "a Scavenger toll" : "Scavengers"))

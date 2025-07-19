@@ -19,6 +19,12 @@ namespace BingoMode.BingoChallenges
         public int currentEated;
         public bool isCreature;
 
+        public BingoEatChallenge()
+        {
+            foodType = new("", "Food type", 0, "food");
+            amountRequired = new(0, "Amount", 1);
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

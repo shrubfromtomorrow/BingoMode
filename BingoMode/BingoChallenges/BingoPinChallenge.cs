@@ -22,6 +22,13 @@ namespace BingoMode.BingoChallenges
         public List<string> pinRegions = [];
         public SettingBox<string> crit;
 
+        public BingoPinChallenge()
+        {
+            target = new(0, "Amount", 0);
+            crit = new("", "Creature Type", 1, listName: "creatures");
+            region = new("", "Region", 2, listName: "regions");
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>")

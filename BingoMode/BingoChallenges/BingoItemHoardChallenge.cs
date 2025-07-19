@@ -21,6 +21,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public List<string> stored = [];
 
+        public BingoItemHoardChallenge()
+        {
+            amount = new(0, "Amount", 0);
+            target = new("", "Item", 1, listName: "expobject");
+            anyShelter = new(false, "Any Shelter", 2);
+            region = new("", "Region", 3, listName: "regions");
+        }
+
         public override void UpdateDescription()
         {
             string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";

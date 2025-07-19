@@ -19,6 +19,13 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
 
+        public BingoTameChallenge()
+        {
+            specific = new(false, "Specific Creature Type", 0);
+            crit = new("", "Creature Type", 1, listName: "friend");
+            amount = new(0, "Amount", 2);
+            tamed = [];
+        }
 
         public override void UpdateDescription()
         {

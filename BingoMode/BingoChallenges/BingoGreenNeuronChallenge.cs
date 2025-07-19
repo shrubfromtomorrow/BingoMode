@@ -12,6 +12,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<bool> moon;
 
+        public BingoGreenNeuronChallenge()
+        {
+            moon = new(false, "Looks to the Moon", 0);
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate(moon.Value ? "Reactivate Looks to the Moon" : "Deliver the green neuron to Five Pebbles");

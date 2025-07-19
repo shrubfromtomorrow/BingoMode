@@ -11,6 +11,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> unlock;
 
+        public BingoUnlockChallenge()
+        {
+            unlock = new("", "Unlock", 0, listName: "unlocks");
+        }
+
         public override void UpdateDescription()
         {
             description = "Get the " + ChallengeTools.IGT.Translate(unlock.Value) + " unlock";

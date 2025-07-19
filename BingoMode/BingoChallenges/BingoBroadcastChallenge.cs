@@ -11,6 +11,12 @@ namespace BingoMode.BingoChallenges
     public class BingoBroadcastChallenge : BingoChallenge
     {
         public SettingBox<string> chatlog;
+
+        public BingoBroadcastChallenge()
+        {
+            chatlog = new("", "Broadcast", 0, listName: "chatlogs");
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Collect the <chatlog> broadcast")

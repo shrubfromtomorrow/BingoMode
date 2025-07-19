@@ -18,6 +18,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> crit;
         public List<EntityID> origins = [];
 
+        public BingoTransportChallenge()
+        {
+            from = new("", "From Region", 0, listName: "regions");
+            to = new("", "To Region", 1, listName: "regions");
+            crit = new("", "Creature Type", 2, listName: "transport");
+            origins = [];
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

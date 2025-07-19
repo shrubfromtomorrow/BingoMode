@@ -18,6 +18,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> crit;
         public Dictionary<EntityID, List<string>> creatureGates = [];
 
+        public BingoCreatureGateChallenge()
+        {
+            amount = new(0, "Amount", 0);
+            crit = new("", "Creature Type", 1, listName: "transport");
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

@@ -22,6 +22,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
 
+        BingoCollectPearlChallenge()
+        {
+            pearl = new("", "Pearl", 1, listName: "pearls");
+            collected = [];
+            amount = new (0, "Amount", 3);
+            specific = new(false, "Specific Pearl", 0);
+        }
+
         public override void UpdateDescription()
         {
             region = pearl.Value.Substring(0, 2);

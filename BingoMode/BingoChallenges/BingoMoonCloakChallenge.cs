@@ -14,6 +14,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<bool> deliver;
 
+        public BingoMoonCloakChallenge()
+        {
+            deliver = new(false, "Deliver", 0);
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate(!deliver.Value ? "Grab Moon's Cloak" : "Deliver the Cloak to Moon");

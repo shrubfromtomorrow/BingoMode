@@ -16,6 +16,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> target;
         public int score;
 
+        public BingoGlobalScoreChallenge()
+        {
+            target = new(0, "Target Score", 0);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills").Replace("<score_target>", ValueConverter.ConvertToString<int>(target.Value)).Replace("<current_score>", ValueConverter.ConvertToString<int>(this.score));

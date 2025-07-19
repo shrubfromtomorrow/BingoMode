@@ -14,6 +14,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> ID; //WinState.EndgameID
 
+        public BingoAchievementChallenge()
+        {
+            ID = new("", "Passage", 0, "passage");
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Earn <achievement_name> passage").Replace("<achievement_name>", ChallengeTools.IGT.Translate(WinState.PassageDisplayName(new(ID.Value))));

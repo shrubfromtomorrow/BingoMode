@@ -25,6 +25,17 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
 
+        public BingoKillChallenge()
+        {
+            crit = new("", "Creature Type", 0, listName: "creatures");
+            amount = new(0, "Amount", 1);
+            starve = new(false, "While Starving", 2);
+            oneCycle = new(false, "In one Cycle", 3);
+            region = new("", "Region", 5, listName: "regions");
+            weapon = new("", "Weapon Used", 6, listName: "weaponsnojelly");
+            deathPit = new(false, "Via a Death Pit", 7);
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

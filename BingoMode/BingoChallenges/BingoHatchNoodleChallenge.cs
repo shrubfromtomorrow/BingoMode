@@ -15,6 +15,12 @@ namespace BingoMode.BingoChallenges
         public int current;
         public SettingBox<bool> atOnce;
 
+        public BingoHatchNoodleChallenge()
+        {
+            atOnce = new(false, "At Once", 0);
+            amount = new(0, "Amount", 1);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " in one cycle" : ""))

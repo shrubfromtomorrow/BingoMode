@@ -17,6 +17,12 @@ namespace BingoMode.BingoChallenges
         public int current;
         public List<EntityID> bannedIDs;
 
+        public BingoTradeChallenge()
+        {
+            amount = new(0, "Value", 0);
+            bannedIDs = [];
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Trade [<current>/<amount>] worth of value to Scavenger Merchants")

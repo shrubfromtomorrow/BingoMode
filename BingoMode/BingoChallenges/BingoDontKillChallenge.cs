@@ -14,6 +14,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> victim;
 
+        public BingoDontKillChallenge()
+        {
+            victim = new("", "Creature Type", 0, listName: "creatures");
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

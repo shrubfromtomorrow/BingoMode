@@ -12,6 +12,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> crit;
 
+        public BingoDepthsChallenge()
+        {
+            crit = new("", "Creature Type", 0, listName: "depths");
+        }
+
         public override void UpdateDescription()
         {
             if (ChallengeTools.creatureNames == null)

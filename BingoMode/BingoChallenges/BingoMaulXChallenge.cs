@@ -12,13 +12,18 @@ namespace BingoMode.BingoChallenges
     public class BingoMaulXChallenge : BingoChallenge
     {
         public int current;
-        public SettingBox<int> amound;
+        public SettingBox<int> amount;
+
+        public BingoMaulXChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
 
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Maul creatures [<current>/<amount>] times")
                 .Replace("<current>", current.ToString())
-                .Replace("<amount>", amound.Value.ToString());
+                .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
         }
 
@@ -26,7 +31,7 @@ namespace BingoMode.BingoChallenges
         {
             return new(
                 [[new Icon("artimaul")],
-                [new Counter(current, amound.Value)]]);
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -42,7 +47,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoMaulXChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(7, 29), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(7, 29), "Amount", 0);
             return ch;
         }
 
@@ -52,7 +57,7 @@ namespace BingoMode.BingoChallenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= (int)amound.Value) CompleteChallenge();
+                if (current >= (int)amount.Value) CompleteChallenge();
                 else ChangeValue();
             }
         }
@@ -86,7 +91,7 @@ namespace BingoMode.BingoChallenges
                 "~",
                 current.ToString(),
                 "><",
-                amound.ToString(),
+                amount.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -100,7 +105,7 @@ namespace BingoMode.BingoChallenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amound = SettingBoxFromString(array[1]) as SettingBox<int>;
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
                 UpdateDescription();
@@ -122,6 +127,6 @@ namespace BingoMode.BingoChallenges
             IL.Player.GrabUpdate -= Player_GrabUpdateArtiMaulX;
         }
 
-        public override List<object> Settings() => [amound];
+        public override List<object> Settings() => [amount];
     }
 }

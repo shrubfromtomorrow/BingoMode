@@ -14,6 +14,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public int iterator = -1;
 
+        public BingoPearlDeliveryChallenge()
+        {
+            region = new("", "Pearl from Region", 0, listName: "regions");
+        }
+
         public override void UpdateDescription()
         {
             region.Value = region.Value.Substring(0, 2);

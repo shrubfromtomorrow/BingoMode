@@ -15,6 +15,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> pass;
         public SettingBox<string> roomName;
 
+        public BingoBombTollChallenge()
+        {
+            pass = new(false, "Pass the Toll", 0);
+            roomName = new("", "Scavenger Toll", 1, listName: "tolls");
+        }
+
         public override void UpdateDescription()
         {
             string region = roomName.Value.Substring(0, 2);

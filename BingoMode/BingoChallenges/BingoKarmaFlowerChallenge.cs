@@ -12,13 +12,18 @@ namespace BingoMode.BingoChallenges
     public class BingoKarmaFlowerChallenge : BingoChallenge
     {
         public int current;
-        public SettingBox<int> amound;
+        public SettingBox<int> amount;
+
+        public BingoKarmaFlowerChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
 
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Consume [<current>/<amount>] Karma Flowers")
                 .Replace("<current>", current.ToString())
-                .Replace("<amount>", amound.Value.ToString());
+                .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
         }
 
@@ -26,7 +31,7 @@ namespace BingoMode.BingoChallenges
         {
             return new(
                 [[new Icon("foodSymbol"), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold)],
-                [new Counter(current, amound.Value)]]);
+                [new Counter(current, amount.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -42,7 +47,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoKarmaFlowerChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
             return ch;
         }
 
@@ -52,7 +57,7 @@ namespace BingoMode.BingoChallenges
             {
                 current++;
                 UpdateDescription();
-                if (current >= amound.Value) CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
                 else ChangeValue();
             }
         }
@@ -86,7 +91,7 @@ namespace BingoMode.BingoChallenges
                 "~",
                 current.ToString(),
                 "><",
-                amound.ToString(),
+                amount.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -100,7 +105,7 @@ namespace BingoMode.BingoChallenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amound = SettingBoxFromString(array[1]) as SettingBox<int>;
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
                 UpdateDescription();
@@ -131,6 +136,6 @@ namespace BingoMode.BingoChallenges
             IL.Player.FoodInRoom_Room_bool -= Player_FoodInRoom_Room_bool;
         }
 
-        public override List<object> Settings() => [amound];
+        public override List<object> Settings() => [amount];
     }
 }

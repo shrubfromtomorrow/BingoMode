@@ -12,6 +12,11 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> region;
 
+        public BingoEnterRegionChallenge()
+        {
+            region = new("", "Region", 0, listName: "regionsreal");
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Enter " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));

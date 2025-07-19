@@ -16,6 +16,13 @@ namespace BingoMode.BingoChallenges
         public List<string> regionsToEnter = [];
         public int current;
 
+        public BingoAllRegionsExcept()
+        {
+            region = new("", "Region", 0, listName: "regionsreal");
+            regionsToEnter = [.. ChallengeUtils.AllEnterableRegions];
+            required = new(0, "Amount", 1);
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions without visiting " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))

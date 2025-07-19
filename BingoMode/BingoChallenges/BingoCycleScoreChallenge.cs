@@ -15,6 +15,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> target;
         public int score;
 
+        public BingoCycleScoreChallenge()
+        {
+            target = new(0, "Target Score", 0);
+        }
+
         public override void UpdateDescription()
         {
             int value = completed ? target.Value : score;

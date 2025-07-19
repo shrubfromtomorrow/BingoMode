@@ -16,6 +16,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> neurons;
         public int delivered;
 
+        public BingoNeuronDeliveryChallenge()
+        {
+            neurons = new(0, "Amount of Neurons", 0);
+        }
+
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
             return !ModManager.MSC || (!(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Spear) && !(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Saint) && !(slugcat == MoreSlugcatsEnums.SlugcatStatsName.Artificer));

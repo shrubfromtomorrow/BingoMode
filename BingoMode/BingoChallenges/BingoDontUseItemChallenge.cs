@@ -15,6 +15,11 @@ namespace BingoMode.BingoChallenges
         public bool isFood;
         public bool isCreature;
 
+        public BingoDontUseItemChallenge()
+        {
+            item = new("", "Item type", 0, listName: "banitem");
+        }
+
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("Never " + (isFood ? "eat" : "use") + " <item>")
