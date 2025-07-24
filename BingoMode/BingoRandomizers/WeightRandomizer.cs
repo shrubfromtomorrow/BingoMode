@@ -32,7 +32,10 @@ namespace BingoMode.BingoRandomizer
         public override StringBuilder Serialize(string indent)
         {
             string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serialized = new($"{{__Type__:{Name}[");
+            StringBuilder serialized = base.Serialize("");
+            if (!serialized.ToString().Contains("__Content__"))
+                return serialized;
+            serialized = new($"{{__Type__:{Name}[");
             foreach (Weighted<T> weighted in _list)
             {
                 serialized.Append($"{weighted.value}:{weighted.weight},");

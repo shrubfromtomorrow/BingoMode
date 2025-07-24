@@ -19,7 +19,10 @@ namespace BingoMode.BingoRandomizer
 
         public override StringBuilder Serialize(string indent)
         {
-            return new($"{{Bool:{probability}}}");
+            StringBuilder serialized = base.Serialize(indent);
+            if (!serialized.ToString().Contains("__Content__"))
+                return serialized.Replace("__Type__", "Bool");
+            return new($"{{Bool:{Name} {probability}}}");
         }
 
         public override void Deserialize(string serialized)

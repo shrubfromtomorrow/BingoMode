@@ -20,7 +20,10 @@ namespace BingoMode.BingoRandomizer
 
         public override StringBuilder Serialize(string indent)
         {
-            return new($"{{Range:{min}, {max}}}");
+            StringBuilder serialized = base.Serialize("");
+            if (!serialized.ToString().Contains("__Content__"))
+                return serialized.Replace("__Type__", "Range");
+            return new($"{{Range:{Name} {min}, {max}}}");
         }
 
         public override void Deserialize(string serialized)

@@ -59,7 +59,7 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
 
-        BingoCollectPearlChallenge()
+        public BingoCollectPearlChallenge()
         {
             pearl = new("", "Pearl", 1, listName: "pearls");
             collected = [];

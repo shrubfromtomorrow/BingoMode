@@ -15,12 +15,14 @@ namespace BingoMode.BingoRandomizer
 
     public static class BingoRandomizationProfile
     {
-        private static bool _loaded;
-        public static bool IsLoaded => _loaded;
         public static readonly string PROFILE_PATH = Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() +
             "Bingo" + Path.DirectorySeparatorChar.ToString() +
             "RandomizerProfiles" + Path.DirectorySeparatorChar.ToString();
         public static readonly string FILE_EXTENSION = ".txt";
+
+        private static bool _loaded;
+        public static bool IsLoaded => _loaded;
+        public static Dictionary<string, object> savedRandomizers = [];
         public static Randomizer<Challenge> profile;
 
         public static Challenge GetChallenge()
@@ -44,6 +46,7 @@ namespace BingoMode.BingoRandomizer
             Directory.CreateDirectory(PROFILE_PATH);
             string serialized = profile.Serialize("").ToString();
             File.WriteAllText(PROFILE_PATH + profileName + FILE_EXTENSION, serialized);
+            savedRandomizers = [];
         }
 
         public static void OpenSaveFolder()
