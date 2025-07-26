@@ -125,7 +125,6 @@ namespace BingoMode.BingoChallenges
                 if ((rr == from.Value || from.Value == "Any Region") && !origins.Contains(c.abstractCreature.ID))
                 {
                     origins.Add(c.abstractCreature.ID);
-                    
                 }
             }
         }

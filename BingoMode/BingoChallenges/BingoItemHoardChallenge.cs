@@ -256,6 +256,18 @@ namespace BingoMode.BingoChallenges
                     stored = [.. arr];
                 }
                 // Legacy board hoard challenge compatibility
+                else if (array.Length == 7)
+                {
+                    anyShelter = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[2]) as SettingBox<int>;
+                    target = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    string[] arr = Regex.Split(array[6], "cLtD");
+                    region = SettingBoxFromString("System.String|Any Region|Region|3|regions") as SettingBox<string>;
+                    stored = [.. arr];
+                }
                 else if (array.Length == 4)
                 {
                     amount = SettingBoxFromString(array[0]) as SettingBox<int>;

@@ -98,7 +98,7 @@ namespace BingoMode.BingoHUD
                     }
                     else (info.challenge as BingoChallenge).OnChallengeCompleted(team);
                 }
-                else 
+                else
                 {
                     if ((info.challenge as BingoChallenge).ReverseChallenge())
                     {

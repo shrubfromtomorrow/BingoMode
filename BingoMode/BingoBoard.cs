@@ -13,6 +13,7 @@ using UnityEngine;
 namespace BingoMode
 {
     using BingoMenu;
+    using Rewired.ControllerExtensions;
 
     public class BingoBoard
     {
