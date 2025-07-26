@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace BingoMode.BingoRandomizer
 {
+    public class FailedRandomChallengeException : Exception;
+
     public abstract class Randomizer<T>
     {
         private enum NameType
@@ -20,25 +22,26 @@ namespace BingoMode.BingoRandomizer
         private string _serializeString;
         private static Dictionary<string, Randomizer<T>> NamedRandomizers = [];
         public string Name { get; set; }
-        protected const string INDENT_INCREMENT = "  ";
+        protected const string INDENT_INCREMENT = "\t";
         // match highest-level matching braces (and everything within)
         // see https://www.regular-expressions.info/balancing.html for more details on balancing groups
-        protected const string SUBRANDOMIZER_PATTERN = @"(\{(?>\{(?<c>)|[^{}]+|\}(?<-c>))*(?(c)(?!))\})(\d*)";
+        protected const string SUBRANDOMIZER_PATTERN = @"(\{(?>\{(?<c>)|[^{}]+|\}(?<-c>))*(?(c)(?!))\})\s*\[?(?:\s*(\d+)\s*,?\s*)*\]?";
         protected const string LIST_PATTERN = @"\[(?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!))\]";
         protected const string WEIGHTED_ITEM_PATTERN = @"([^\:\s]+)\s*:\s*(\d+)";
 
         public abstract T Random();
 
+        public static void ResetNamed() => NamedRandomizers.Clear();
+        
         public virtual StringBuilder Serialize(string indent)
         {
             string saveKey = $"{typeof(T)} {Name}";
             if (BingoRandomizationProfile.savedRandomizers.ContainsKey(saveKey))
             {
-                if (ReferenceEquals(this, BingoRandomizationProfile.savedRandomizers[saveKey]))
-                    Name = $"~{Name}";
-                return new StringBuilder($"{indent}{{__Type__:{Name}}}");
+                bool refEq = ReferenceEquals(this, BingoRandomizationProfile.savedRandomizers[saveKey]);
+                return new StringBuilder($"{indent}{{__Type__:{(refEq?"~":"")}{Name}}}");
             }
-            if (!Name.IsNullOrWhiteSpace())
+            else if (!Name.IsNullOrWhiteSpace())
                 BingoRandomizationProfile.savedRandomizers.Add(saveKey, this);
             return new StringBuilder($"{indent}{{__Type__:{Name}\n__Content__{indent}}}");
         }

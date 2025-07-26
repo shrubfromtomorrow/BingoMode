@@ -27,7 +27,7 @@ namespace BingoMode.BingoRandomizer
 
         public override void Deserialize(string serialized)
         {
-            bool success = float.TryParse(Regex.Match(serialized, @"0?\.\d*").Value, out probability);
+            bool success = float.TryParse(Regex.Match(serialized, @"[01]\.?\d*").Value, out probability);
             if (!success) Plugin.logger.LogError($"Failed to parse decimal value in {serialized}.");
         }
     }

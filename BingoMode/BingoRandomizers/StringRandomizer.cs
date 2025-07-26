@@ -18,9 +18,12 @@ namespace BingoMode.BingoRandomizer
         {
             string stringList = Regex.Match(serialized, LIST_PATTERN).Value;
             stringList = stringList.Substring(1, stringList.Length - 2);
-            foreach (Match weighted in Regex.Matches(stringList, @"([^:\s]+)\s*:\s*(\d+)"))
+            foreach (Match weighted in Regex.Matches(stringList, @"([^:,]+)\s*:\s*\[?(?:\s*(\d+)\s*,?\s*)+\]?"))
             {
-                List.Add(new(weighted.Groups[1].Value, int.Parse(weighted.Groups[2].Value)));
+                int[] weights = new int[weighted.Groups[2].Captures.Count];
+                for (int i = 0; i < weights.Length; i++)
+                    weights[i] = int.Parse(weighted.Groups[2].Captures[i].Value);
+                List.Add(new(weighted.Groups[1].Value.Trim(), weights));
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace BingoMode.BingoRandomizer
 
     public static class BingoRandomizationProfile
     {
+        private const int ATTEMPT_CEILING = 100;
         public static readonly string PROFILE_PATH = Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() +
             "Bingo" + Path.DirectorySeparatorChar.ToString() +
             "RandomizerProfiles" + Path.DirectorySeparatorChar.ToString();
@@ -27,26 +29,55 @@ namespace BingoMode.BingoRandomizer
 
         public static Challenge GetChallenge()
         {
-            Challenge challenge = profile.Random();
+            Challenge challenge = default;
+            int attempt = 0;
+            while (challenge == default(Challenge) && attempt < ATTEMPT_CEILING)
+            {
+                try
+                { challenge = profile.Random(); }
+                catch (FailedRandomChallengeException)
+                { attempt++; }
+            }
+            if (attempt >= ATTEMPT_CEILING)
+            {
+                Plugin.logger.LogError("Failed to generate a challenge after too many attempts");
+                throw new BingoRandomProfileException();
+            }
             ExpeditionData.challengeList.Add(challenge);
             return challenge;
         }
 
+        public static void Reset()
+        {
+            Weighted<bool>.Reset();
+            Weighted<int>.Reset();
+            Weighted<string>.Reset();
+            Weighted<Randomizer<Challenge>>.Reset();
+        }
+
         public static void LoadFromFile(string profileName)
         {
+            Randomizer<bool>.ResetNamed();
+            Randomizer<int>.ResetNamed();
+            Randomizer<string>.ResetNamed();
+            Randomizer<Challenge>.ResetNamed();
             string serialized = File.ReadAllText(PROFILE_PATH + profileName + FILE_EXTENSION);
             profile = Randomizer<Challenge>.InitDeserialize(serialized);
             _loaded = true;
         }
 
-        public static void Unload() => _loaded = false;
+        public static void Unload()
+        {
+            profile = null;
+            _loaded = false;
+        }
 
         public static void SaveToFile(string profileName)
         {
             Directory.CreateDirectory(PROFILE_PATH);
             string serialized = profile.Serialize("").ToString();
             File.WriteAllText(PROFILE_PATH + profileName + FILE_EXTENSION, serialized);
-            savedRandomizers = [];
+            savedRandomizers.Clear();
         }
 
         public static void OpenSaveFolder()
