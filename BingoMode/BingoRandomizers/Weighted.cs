@@ -43,7 +43,6 @@ namespace BingoMode.BingoRandomizer
 
         public void Discard()
         {
-            Plugin.logger.LogInfo(value.ToString());
             discarded = true;
             usedWeighted.Add(this);
         }
