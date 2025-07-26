@@ -1,9 +1,11 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -12,6 +14,41 @@ namespace BingoMode.BingoChallenges
 {
     // Copied from vanilla game and modified
     using static ChallengeHooks;
+
+    public class BingoPinRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<int> target;
+        public Randomizer<string> region;
+        public Randomizer<string> crit;
+
+        public override Challenge Random()
+        {
+            BingoPinChallenge challenge = new();
+            challenge.target.Value = target.Random();
+            challenge.region.Value = region.Random();
+            challenge.crit.Value = crit.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Pin").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            target = Randomizer<int>.InitDeserialize(dict["target"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
+        }
+    }
+
     public class BingoPinChallenge : BingoChallenge
     {
         public int current;
@@ -21,6 +58,13 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public List<string> pinRegions = [];
         public SettingBox<string> crit;
+
+        public BingoPinChallenge()
+        {
+            target = new(0, "Amount", 0);
+            crit = new("", "Creature Type", 1, listName: "creatures");
+            region = new("", "Region", 2, listName: "regions");
+        }
 
         public override void UpdateDescription()
         {

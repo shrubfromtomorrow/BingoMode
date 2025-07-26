@@ -1,15 +1,54 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoStealRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<int> amount;
+        public Randomizer<bool> toll;
+        public Randomizer<string> subject;
+        public Randomizer<bool> starve;
+        public Randomizer<bool> oneCycle;
+
+        public override Challenge Random()
+        {
+            BingoStealChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            challenge.toll.Value = toll.Random();
+            challenge.subject.Value = subject.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}toll-{toll.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}subject-{subject.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Steal").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            toll = Randomizer<bool>.InitDeserialize(dict["toll"]);
+            subject = Randomizer<string>.InitDeserialize(dict["subject"]);
+        }
+    }
+
     public class BingoStealChallenge : BingoChallenge
     {
         public int current;
@@ -17,6 +56,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> toll;
         public SettingBox<string> subject;
         public List<EntityID> checkedIDs;
+
+        public BingoStealChallenge()
+        {
+            checkedIDs = [];
+            toll = new(false, "From Scavenger Toll", 0);
+            subject = new("", "Item", 1, listName: "theft");
+            amount = new(0, "Amount", 2);
+        }
 
         public override void UpdateDescription()
         {

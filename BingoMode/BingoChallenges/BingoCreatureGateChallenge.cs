@@ -1,22 +1,61 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using CreatureType = CreatureTemplate.Type;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoCreatureGateRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<int> amount;
+        public Randomizer<string> crit;
+
+        public override Challenge Random()
+        {
+            BingoCreatureGateChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            challenge.crit.Value = crit.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "CreatureGate").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
+        }
+    }
+
     public class BingoCreatureGateChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
         public SettingBox<string> crit;
         public Dictionary<EntityID, List<string>> creatureGates = [];
+
+        public BingoCreatureGateChallenge()
+        {
+            amount = new(0, "Amount", 0);
+            crit = new("", "Creature Type", 1, listName: "transport");
+        }
 
         public override void UpdateDescription()
         {

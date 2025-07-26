@@ -1,16 +1,50 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoEnterRegionRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> region;
+
+        public override Challenge Random()
+        {
+            BingoEnterRegionChallenge challenge = new();
+            challenge.region.Value = region.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "EnterRegion").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+        }
+    }
+
     public class BingoEnterRegionChallenge : BingoChallenge
     {
         public SettingBox<string> region;
+
+        public BingoEnterRegionChallenge()
+        {
+            region = new("", "Region", 0, listName: "regionsreal");
+        }
 
         public override void UpdateDescription()
         {

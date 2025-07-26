@@ -1,10 +1,12 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -13,6 +15,57 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoKillRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> crit;
+        public Randomizer<string> weapon;
+        public Randomizer<int> amount;
+        public Randomizer<string> region;
+        public Randomizer<bool> deathPit;
+        public Randomizer<bool> starve;
+        public Randomizer<bool> oneCycle;
+
+        public override Challenge Random()
+        {
+            BingoKillChallenge challenge = new();
+            challenge.crit.Value = crit.Random();
+            challenge.weapon.Value = weapon.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.region.Value = region.Random();
+            challenge.deathPit.Value = deathPit.Random();
+            challenge.starve.Value = starve.Random();
+            challenge.oneCycle.Value = oneCycle.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}weapon-{weapon.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}deathPit-{deathPit.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}starve-{starve.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}oneCycle-{oneCycle.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Kill").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
+            weapon = Randomizer<string>.InitDeserialize(dict["weapon"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            deathPit = Randomizer<bool>.InitDeserialize(dict["deathPit"]);
+            starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
+            oneCycle = Randomizer<bool>.InitDeserialize(dict["oneCycle"]);
+        }
+    }
+
     public class BingoKillChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
@@ -24,6 +77,17 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> deathPit; 
         public SettingBox<bool> starve; 
         public SettingBox<bool> oneCycle;
+
+        public BingoKillChallenge()
+        {
+            crit = new("", "Creature Type", 0, listName: "creatures");
+            amount = new(0, "Amount", 1);
+            starve = new(false, "While Starving", 2);
+            oneCycle = new(false, "In one Cycle", 3);
+            region = new("", "Region", 5, listName: "regions");
+            weapon = new("", "Weapon Used", 6, listName: "weaponsnojelly");
+            deathPit = new(false, "Via a Death Pit", 7);
+        }
 
         public override void UpdateDescription()
         {

@@ -1,17 +1,58 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
+using Menu.Remix;
 using MoreSlugcats;
 using RWCustom;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using Menu.Remix;
-using System.Globalization;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoEchoRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> ghost;
+        public Randomizer<bool> starve;
+        public Randomizer<bool> specific;
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoEchoChallenge challenge = new();
+            challenge.ghost.Value = ghost.Random();
+            challenge.starve.Value = starve.Random();
+            challenge.specific.Value = specific.Random();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}ghost-{ghost.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}starve-{starve.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}specific-{specific.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Echo").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            ghost = Randomizer<string>.InitDeserialize(dict["ghost"]);
+            starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
+            specific = Randomizer<bool>.InitDeserialize(dict["specific"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+        }
+    }
+
     // Literally copied from base game, to add the starving thing easily, and to customize which echoes appear
     public class BingoEchoChallenge : BingoChallenge
     {
@@ -21,6 +62,14 @@ namespace BingoMode.BingoChallenges
         public int current;
         public SettingBox<int> amount;
         public List<string> visited = [];
+
+        public BingoEchoChallenge()
+        {
+            specific = new(false, "Specific Echo", 0);
+            ghost = new("", "Region", 1, listName: "echoes");
+            amount = new(0, "Amount", 2);
+            starve = new(false, "While Starving", 3);
+        }
 
         public override void UpdateDescription()
         {

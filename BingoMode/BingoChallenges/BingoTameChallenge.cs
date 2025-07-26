@@ -1,16 +1,53 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
-using MoreSlugcats;
 using Menu.Remix;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using System.Globalization;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoTameRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> crit;
+        public Randomizer<int> amount;
+        public Randomizer<bool> specific;
+
+        public override Challenge Random()
+        {
+            BingoTameChallenge challenge = new();
+            challenge.crit.Value = crit.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.specific.Value = specific.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}specific-{specific.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Tame").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            specific = Randomizer<bool>.InitDeserialize(dict["specific"]);
+        }
+    }
+
     public class BingoTameChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
@@ -19,6 +56,13 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
 
+        public BingoTameChallenge()
+        {
+            specific = new(false, "Specific Creature Type", 0);
+            crit = new("", "Creature Type", 1, listName: "friend");
+            amount = new(0, "Amount", 2);
+            tamed = [];
+        }
 
         public override void UpdateDescription()
         {

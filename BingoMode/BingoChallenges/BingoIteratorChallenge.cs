@@ -1,16 +1,51 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
+using MoreSlugcats;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using MoreSlugcats;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+    using static MonoMod.InlineRT.MonoModRule;
+
+    public class BingoIteratorRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<bool> moon;
+
+        public override Challenge Random()
+        {
+            BingoIteratorChallenge challenge = new();
+            challenge.moon.Value = moon.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}moon-{moon.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Iterator").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            moon = Randomizer<bool>.InitDeserialize(dict["moon"]);
+        }
+    }
+
     public class BingoIteratorChallenge : BingoChallenge
     {
         public SettingBox<bool> moon;
+
+        public BingoIteratorChallenge()
+        {
+            moon = new(false, "Looks to the Moon", 0);
+        }
 
         public override void UpdateDescription()
         {

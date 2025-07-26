@@ -1,8 +1,10 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
@@ -10,11 +12,48 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoCraftRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> craftee;
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoCraftChallenge challenge = new();
+            challenge.craftee.Value = craftee.Random();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}craftee-{craftee.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Craft").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            craftee = Randomizer<string>.InitDeserialize(dict["craftee"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+        }
+    }
+
     public class BingoCraftChallenge : BingoChallenge
     {
         public SettingBox<string> craftee;
         public SettingBox<int> amount;
         public int current;
+
+        public BingoCraftChallenge()
+        {
+            craftee = new("", "Item to Craft", 0, listName: "craft");
+            amount = new(0, "Amount", 1);
+        }
 
         public override void UpdateDescription()
         {

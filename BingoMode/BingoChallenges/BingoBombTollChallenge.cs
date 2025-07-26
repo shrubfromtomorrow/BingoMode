@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
+using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
@@ -10,6 +12,37 @@ using MoreSlugcats;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoBombTollRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<bool> pass;
+        public Randomizer<string> roomName;
+
+        public override Challenge Random()
+        {
+            BingoBombTollChallenge challenge = new();
+            challenge.pass.Value = pass.Random();
+            challenge.roomName.Value = roomName.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}pass-{pass.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}roomName-{roomName.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "BombToll").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            pass = Randomizer<bool>.InitDeserialize(dict["pass"]);
+            roomName = Randomizer<string>.InitDeserialize(dict["roomName"]);
+        }
+    }
+
     public class BingoBombTollChallenge : BingoChallenge
     {
         public Dictionary<string, bool> bombed = [];
@@ -18,6 +51,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> specific;
         public SettingBox<int> amount;
         public int current;
+
+        public BingoBombTollChallenge()
+        {
+            pass = new(false, "Pass the Toll", 0);
+            roomName = new("", "Scavenger Toll", 1, listName: "tolls");
+        }
 
         public override void UpdateDescription()
         {
