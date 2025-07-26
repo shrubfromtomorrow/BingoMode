@@ -13,7 +13,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoMoonCloakRandomizer : Randomizer<Challenge>
+    public class BingoMoonCloakRandomizer : ChallengeRandomizer
     {
         public Randomizer<bool> deliver;
 
@@ -34,8 +34,8 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            deliver = Randomizer<bool>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            deliver = Randomizer<bool>.InitDeserialize(dict["deliver"]);
         }
     }
 

@@ -16,7 +16,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoKillRandomizer : Randomizer<Challenge>
+    public class BingoKillRandomizer : ChallengeRandomizer
     {
         public Randomizer<string> crit;
         public Randomizer<string> weapon;
@@ -55,14 +55,14 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            crit = Randomizer<string>.InitDeserialize(matches[0].ToString());
-            weapon = Randomizer<string>.InitDeserialize(matches[1].ToString());
-            amount = Randomizer<int>.InitDeserialize(matches[2].ToString());
-            region = Randomizer<string>.InitDeserialize(matches[3].ToString());
-            deathPit = Randomizer<bool>.InitDeserialize(matches[4].ToString());
-            starve = Randomizer<bool>.InitDeserialize(matches[5].ToString());
-            oneCycle = Randomizer<bool>.InitDeserialize(matches[6].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
+            weapon = Randomizer<string>.InitDeserialize(dict["weapon"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            deathPit = Randomizer<bool>.InitDeserialize(dict["deathPit"]);
+            starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
+            oneCycle = Randomizer<bool>.InitDeserialize(dict["oneCycle"]);
         }
     }
 

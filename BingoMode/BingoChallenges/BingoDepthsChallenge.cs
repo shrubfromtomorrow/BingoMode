@@ -11,7 +11,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoDepthsRandomizer : Randomizer<Challenge>
+    public class BingoDepthsRandomizer : ChallengeRandomizer
     {
         public Randomizer<string> crit;
 
@@ -32,8 +32,8 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            crit = Randomizer<string>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
         }
     }
 

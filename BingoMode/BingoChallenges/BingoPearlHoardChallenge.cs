@@ -16,7 +16,7 @@ namespace BingoMode.BingoChallenges
     using static ChallengeHooks;
     using static MonoMod.InlineRT.MonoModRule;
 
-    public class BingoPearlHoardRandomizer : Randomizer<Challenge>
+    public class BingoPearlHoardRandomizer : ChallengeRandomizer
     {
         public Randomizer<bool> common;
         public Randomizer<string> region;
@@ -43,10 +43,10 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            common = Randomizer<bool>.InitDeserialize(matches[0].ToString());
-            region = Randomizer<string>.InitDeserialize(matches[1].ToString());
-            amount = Randomizer<int>.InitDeserialize(matches[2].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            common = Randomizer<bool>.InitDeserialize(dict["common"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
         }
     }
 

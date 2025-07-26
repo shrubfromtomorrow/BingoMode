@@ -16,7 +16,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoVistaRandomizer : Randomizer<Challenge>
+    public class BingoVistaRandomizer : ChallengeRandomizer
     {
         public Randomizer<string> room;
 
@@ -37,8 +37,9 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            room = Randomizer<string>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            room = Randomizer<string>.InitDeserialize(dict["room"]);
+            room = Randomizer<string>.InitDeserialize(dict["room"]);
         }
     }
 

@@ -115,6 +115,7 @@
     <Compile Include="BingoMenu\BingoPage.cs" />
     <Compile Include="BingoRandomizers\BoolRandomizer.cs" />
     <Compile Include="BingoRandomizers\ChallengeGroup.cs" />
+    <Compile Include="BingoRandomizers\ChallengeRandomizer.cs" />
     <Compile Include="BingoRandomizers\GroupRandomizer.cs" />
     <Compile Include="BingoRandomizers\Randomizer.cs" />
     <Compile Include="BingoRandomizers\RangeRandomizer.cs" />

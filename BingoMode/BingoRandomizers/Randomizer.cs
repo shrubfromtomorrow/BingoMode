@@ -25,7 +25,7 @@ namespace BingoMode.BingoRandomizer
         protected const string INDENT_INCREMENT = "\t";
         // match highest-level matching braces (and everything within)
         // see https://www.regular-expressions.info/balancing.html for more details on balancing groups
-        protected const string SUBRANDOMIZER_PATTERN = @"(\{(?>\{(?<c>)|[^{}]+|\}(?<-c>))*(?(c)(?!))\})\s*\[?(?:\s*(\d+)\s*,?\s*)*\]?";
+        protected const string SUBRANDOMIZER_PATTERN = @"(?:(?'name'\w+)-)?(?'value'\{(?>\{(?<c>)|[^{}]+|\}(?<-c>))*(?(c)(?!))\})\s*\[?(?:\s*(?'weights'\d+)\s*,?\s*)*\]?";
         protected const string LIST_PATTERN = @"\[(?>\[(?<c>)|[^\[\]]+|\](?<-c>))*(?(c)(?!))\]";
         protected const string WEIGHTED_ITEM_PATTERN = @"([^\:\s]+)\s*:\s*(\d+)";
 

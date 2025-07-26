@@ -14,7 +14,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoNeuronDeliveryRandomizer : Randomizer<Challenge>
+    public class BingoNeuronDeliveryRandomizer : ChallengeRandomizer
     {
         public Randomizer<int> neurons;
 
@@ -35,8 +35,8 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            neurons = Randomizer<int>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            neurons = Randomizer<int>.InitDeserialize(dict["neurons"]);
         }
     }
 

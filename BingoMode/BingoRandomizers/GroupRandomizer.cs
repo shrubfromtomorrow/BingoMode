@@ -52,10 +52,10 @@ namespace BingoMode.BingoRandomizer
             MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
             foreach (Match match in matches)
             {
-                int[] weights = new int[match.Groups[2].Captures.Count];
+                int[] weights = new int[match.Groups["weights"].Captures.Count];
                 for (int i = 0; i < weights.Length; i++)
-                    weights[i] = int.Parse(match.Groups[2].Captures[i].Value);
-                List.Add(new(InitDeserialize(match.Groups[1].Value), weights));
+                    weights[i] = int.Parse(match.Groups["weights"].Captures[i].Value);
+                List.Add(new(InitDeserialize(match.Groups["value"].Value), weights));
             }
         }
 

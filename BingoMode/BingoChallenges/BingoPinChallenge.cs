@@ -15,7 +15,7 @@ namespace BingoMode.BingoChallenges
     // Copied from vanilla game and modified
     using static ChallengeHooks;
 
-    public class BingoPinRandomizer : Randomizer<Challenge>
+    public class BingoPinRandomizer : ChallengeRandomizer
     {
         public Randomizer<int> target;
         public Randomizer<string> region;
@@ -42,10 +42,10 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            target = Randomizer<int>.InitDeserialize(matches[0].ToString());
-            region = Randomizer<string>.InitDeserialize(matches[1].ToString());
-            crit = Randomizer<string>.InitDeserialize(matches[2].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            target = Randomizer<int>.InitDeserialize(dict["target"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
         }
     }
 

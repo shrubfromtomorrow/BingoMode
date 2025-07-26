@@ -12,7 +12,7 @@ namespace BingoMode.BingoChallenges
     using static ChallengeHooks;
     using static MonoMod.InlineRT.MonoModRule;
 
-    public class BingoIteratorRandomizer : Randomizer<Challenge>
+    public class BingoIteratorRandomizer : ChallengeRandomizer
     {
         public Randomizer<bool> moon;
 
@@ -33,8 +33,8 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            moon = Randomizer<bool>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            moon = Randomizer<bool>.InitDeserialize(dict["moon"]);
         }
     }
 

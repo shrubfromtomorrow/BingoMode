@@ -14,7 +14,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoDamageRandomizer : Randomizer<Challenge>
+    public class BingoDamageRandomizer : ChallengeRandomizer
     {
         public Randomizer<string> weapon;
         public Randomizer<string> victim;
@@ -47,12 +47,12 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            weapon = Randomizer<string>.InitDeserialize(matches[0].ToString());
-            victim = Randomizer<string>.InitDeserialize(matches[1].ToString());
-            amount = Randomizer<int>.InitDeserialize(matches[2].ToString());
-            inOneCycle = Randomizer<bool>.InitDeserialize(matches[3].ToString());
-            region = Randomizer<string>.InitDeserialize(matches[4].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            weapon = Randomizer<string>.InitDeserialize(dict["weapon"]);
+            victim = Randomizer<string>.InitDeserialize(dict["victim"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            inOneCycle = Randomizer<bool>.InitDeserialize(dict["inOneCycle"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
         }
     }
 

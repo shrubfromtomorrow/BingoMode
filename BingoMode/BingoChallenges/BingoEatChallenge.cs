@@ -15,7 +15,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoEatRandomizer : Randomizer<Challenge>
+    public class BingoEatRandomizer : ChallengeRandomizer
     {
         public Randomizer<string> foodType;
         public Randomizer<int> amountRequired;
@@ -39,9 +39,9 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            foodType = Randomizer<string>.InitDeserialize(matches[0].ToString());
-            amountRequired = Randomizer<int>.InitDeserialize(matches[1].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            foodType = Randomizer<string>.InitDeserialize(dict["foodType"]);
+            amountRequired = Randomizer<int>.InitDeserialize(dict["amountRequired"]);
         }
     }
 

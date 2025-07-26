@@ -11,7 +11,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoGreenNeuronRandomizer : Randomizer<Challenge>
+    public class BingoGreenNeuronRandomizer : ChallengeRandomizer
     {
         public Randomizer<bool> moon;
 
@@ -32,8 +32,8 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            moon = Randomizer<bool>.InitDeserialize(matches[0].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            moon = Randomizer<bool>.InitDeserialize(dict["moon"]);
         }
     }
 

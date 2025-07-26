@@ -12,7 +12,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoBombTollRandomizer : Randomizer<Challenge>
+    public class BingoBombTollRandomizer : ChallengeRandomizer
     {
         public Randomizer<bool> pass;
         public Randomizer<string> roomName;
@@ -36,9 +36,9 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
-            pass = Randomizer<bool>.InitDeserialize(matches[0].ToString());
-            roomName = Randomizer<string>.InitDeserialize(matches[1].ToString());
+            Dictionary<string, string> dict = ToDict(serialized);
+            pass = Randomizer<bool>.InitDeserialize(dict["pass"]);
+            roomName = Randomizer<string>.InitDeserialize(dict["roomName"]);
         }
     }
 

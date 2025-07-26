@@ -12,7 +12,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoSaintDeliveryRandomizer : Randomizer<Challenge>
+    public class BingoSaintDeliveryRandomizer : ChallengeRandomizer
     {
         public override Challenge Random()
         {
@@ -29,7 +29,7 @@ namespace BingoMode.BingoChallenges
 
         public override void Deserialize(string serialized)
         {
-            MatchCollection matches = Regex.Matches(serialized, SUBRANDOMIZER_PATTERN);
+            Dictionary<string, string> dict = ToDict(serialized);
         }
     }
 
