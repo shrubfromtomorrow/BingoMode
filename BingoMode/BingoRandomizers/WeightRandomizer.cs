@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BingoMode.BingoRandomizer
 {
@@ -45,6 +44,12 @@ namespace BingoMode.BingoRandomizer
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Generate a new <c>WeightRandomizer&lt;<typeparamref name="T"/>&gt;</c> with uniform
+        /// weight distribution from a <c>List&lt;<typeparamref name="T"/>&gt;</c>
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static WeightRandomizer<T> UniformFromList(List<T> list)
         {
             WeightRandomizer<T> randomizer = new();
@@ -52,6 +57,11 @@ namespace BingoMode.BingoRandomizer
             return randomizer;
         }
 
+        /// <summary>
+        /// Compute cumulative weights for this <c>WeightRandomizer&lt;<typeparamref name="T"/>&gt;</c>.<br/>
+        /// Throw an error if all weights are 0.
+        /// </summary>
+        /// <exception cref="EmptyWeightsException"></exception>
         private void ComputeWeights()
         {
             _cumulative_weights = new int[List.Count];

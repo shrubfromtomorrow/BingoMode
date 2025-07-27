@@ -1,15 +1,16 @@
 ﻿using Expedition;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BingoMode.BingoRandomizer
 {
     public abstract class ChallengeRandomizer : Randomizer<Challenge>
     {
+        /// <summary>
+        /// Organize serialized subrandomizers into a dictionnary, using their property name as a key.
+        /// </summary>
+        /// <param name="serialized">This <c>ChallengeRandomizer</c>'s serialized string, external {} excluded.</param>
+        /// <returns>A dictionnary of serialized randomizers, indexed by their property name.</returns>
         protected Dictionary<string, string> ToDict(string serialized)
         {
             Dictionary<string, string> dict = [];

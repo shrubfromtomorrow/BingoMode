@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BingoMode.BingoRandomizer
 {
@@ -59,6 +58,12 @@ namespace BingoMode.BingoRandomizer
             }
         }
 
+
+        /// <summary>
+        /// Compute cumulative weights for this <c>GroupRandomizer&lt;<typeparamref name="T"/>&gt;</c>.<br/>
+        /// Throw an error if all weights are 0.
+        /// </summary>
+        /// <exception cref="EmptyWeightsException"></exception>
         private void ComputeWeights()
         {
             _cumulative_weights = new int[List.Count];

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BingoMode.BingoRandomizer
 {
@@ -32,6 +29,9 @@ namespace BingoMode.BingoRandomizer
         private int weightIndex = 0;
         private bool discarded = false;
 
+        /// <summary>
+        /// Advance this <c>Weighted&lt;<typeparamref name="T"/>&gt;</c>'s weight index and mark it for reset.
+        /// </summary>
         public void Advance()
         {
             if (weightIndex + 1 < weights.Length)
@@ -41,12 +41,18 @@ namespace BingoMode.BingoRandomizer
             }
         }
 
+        /// <summary>
+        /// Override this <c>Weighted&lt;<typeparamref name="T"/>&gt;</c>'s <c>Weight</c> to 0 and mark it for reset.
+        /// </summary>
         public void Discard()
         {
             discarded = true;
             usedWeighted.Add(this);
         }
 
+        /// <summary>
+        /// Reset all <c>Weighted&lt;<typeparamref name="T"/>&gt;</c> marked for reset and unmark them.
+        /// </summary>
         public static void Reset()
         {
             foreach (Weighted<T> weighted in usedWeighted)
