@@ -10,6 +10,7 @@ using UnityEngine;
 using System;
 using System.IO;
 using RWCustom;
+using System.Data.SqlTypes;
 
 namespace BingoMode.BingoChallenges
 {
@@ -150,7 +151,7 @@ namespace BingoMode.BingoChallenges
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
                 case "chatlogs": return [.. BingoData.possibleTokens[4]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
-                case "expobject": return ["FirecrackerPlant", "SporePlant", "FlareBomb", "FlyLure", "JellyFish", "Lantern", "Mushroom", "PuffBall", "ScavengerBomb", "VultureMask", "DangleFruit", "SlimeMold"];
+                case "expobject": return Storable;
                 case "vista": // hate
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
                     foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in BingoVistaLocations)
@@ -195,6 +196,7 @@ namespace BingoMode.BingoChallenges
             if (type == ItemType.DataPearl) return translator.Translate("Pearls");
             // Food items
             if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
+            if (type == ItemType.SSOracleSwarmer) return translator.Translate("Pebbles Neurons");
             if (type == ItemType.EggBugEgg) return translator.Translate("Eggbug Eggs");
             if (type == ItemType.WaterNut) return translator.Translate("Bubble Fruit");
             if (type == ItemType.SlimeMold) return translator.Translate("Slime Mold");
@@ -523,6 +525,28 @@ namespace BingoMode.BingoChallenges
             "GlowWeed",
             "GooieDuck",
             "FireEgg",
+        };
+
+        public static readonly string[] Storable =
+        {
+            "FirecrackerPlant",
+            "SporePlant",
+            "FlareBomb",
+            "FlyLure",
+            "JellyFish",
+            "Lantern",
+            "Mushroom",
+            "PuffBall",
+            "ScavengerBomb",
+            "VultureMask",
+            "DangleFruit",
+            "SlimeMold",
+            "BubbleGrass",
+
+            // MSC
+            "GooieDuck",
+            "LillyPuck",
+            "DandelionPeach"
         };
     }
 }

@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
@@ -60,7 +61,7 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> anyShelter;
         public SettingBox<string> region;
-        public List<string> stored = [];
+        public List<string> collected = [];
 
         public BingoItemHoardChallenge()
         {
@@ -118,11 +119,19 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] liste = ChallengeUtils.GetSortedCorrectListForChallenge("expobject");
+            List<string> liste = ChallengeUtils.GetSortedCorrectListForChallenge("expobject").ToList();
+            if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear)
+            {
+                liste.Remove("BubbleGrass");
+            }
+            if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
+            {
+                liste.Remove("LillyPuck");
+            }
             return new BingoItemHoardChallenge
             {
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 0),
-                target = new(liste[UnityEngine.Random.Range(0, liste.Length)], "Item", 1, listName: "expobject"),
+                target = new(liste[UnityEngine.Random.Range(0, liste.Count())], "Item", 1, listName: "expobject"),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
                 region = new("Any Region", "Region", 4, listName: "regions"),
             };
@@ -165,9 +174,9 @@ namespace BingoMode.BingoChallenges
                                 if (anyShelter.Value)
                                 {
                                     string id = p.abstractPhysicalObject.ID.ToString();
-                                    if (!stored.Contains(id))
+                                    if (!collected.Contains(id))
                                     {
-                                        stored.Add(id);
+                                        collected.Add(id);
                                         current++;
                                         UpdateDescription();
                                         if (current >= amount.Value)
@@ -234,7 +243,7 @@ namespace BingoMode.BingoChallenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                string.Join("cLtD", stored)
+                string.Join("cLtD", collected)
             });
         }
 
@@ -253,7 +262,7 @@ namespace BingoMode.BingoChallenges
                     completed = (array[5] == "1");
                     revealed = (array[6] == "1");
                     string[] arr = Regex.Split(array[7], "cLtD");
-                    stored = [.. arr];
+                    collected = [.. arr];
                 }
                 // Legacy board hoard challenge compatibility
                 else if (array.Length == 7)
@@ -266,7 +275,7 @@ namespace BingoMode.BingoChallenges
                     revealed = (array[5] == "1");
                     string[] arr = Regex.Split(array[6], "cLtD");
                     region = SettingBoxFromString("System.String|Any Region|Region|3|regions") as SettingBox<string>;
-                    stored = [.. arr];
+                    collected = [.. arr];
                 }
                 else if (array.Length == 4)
                 {
@@ -276,7 +285,7 @@ namespace BingoMode.BingoChallenges
                     revealed = (array[3] == "1");
                     anyShelter = SettingBoxFromString("System.Boolean|false|Any Shelter|2|NULL") as SettingBox<bool>;
                     current = 0;
-                    stored = [];
+                    collected = [];
                     region = SettingBoxFromString("System.String|Any Region|Region|3|regions") as SettingBox<string>;
                 }
                 UpdateDescription();
