@@ -17,13 +17,7 @@ namespace BingoMode.BingoChallenges
 
     public class BingoDodgeNootRandomizer : ChallengeRandomizer
     {
-        public Randomizer<string> crit;
-        public Randomizer<string> weapon;
         public Randomizer<int> amount;
-        public Randomizer<string> region;
-        public Randomizer<bool> deathPit;
-        public Randomizer<bool> starve;
-        public Randomizer<bool> oneCycle;
 
         public override Challenge Random()
         {

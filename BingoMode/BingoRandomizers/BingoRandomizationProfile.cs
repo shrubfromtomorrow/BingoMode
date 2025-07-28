@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using BingoMode.BingoChallenges;
 using Expedition;
 using UnityEngine;
@@ -60,6 +61,30 @@ namespace BingoMode.BingoRandomizer
         }
 
         /// <summary>
+        /// Get all the relative paths to files in the user's RandomizerProfiles directory and subdirectories.
+        /// All values in the returned list should be good to use with <c>LoadFromFile(string)</c>.
+        /// </summary>
+        /// <param name="path">full path to subdirectory for recursive call. Default is <c>persistentDataPath/Bingo/RandomizerProfiles</c>.</param>
+        /// <returns>A list containing all available profiles in the user's RandomizerProfiles directory.</returns>
+        public static List<string> GetAvailableProfiles(string path = null)
+        {
+            if (path == null)
+                path = PROFILE_PATH;
+            List<string> profiles = [];
+
+            foreach (string directory in Directory.EnumerateDirectories(path))
+                profiles.AddRange(GetAvailableProfiles(directory));
+            foreach (string profile in Directory.EnumerateFiles(path))
+            {
+                string[] splitPath = profile.Split(Path.DirectorySeparatorChar);
+                int relativeStartIndex = Array.IndexOf(splitPath, "RandomizerProfiles") + 1;
+                string relativePath = Path.Combine([.. splitPath.Skip(relativeStartIndex)]).Replace(FILE_EXTENSION, "");
+                profiles.Add(relativePath);
+            }
+            return profiles;
+        }
+
+        /// <summary>
         /// Load a profile from the user's persistent data directory.
         /// </summary>
         /// <param name="profileName">The name of the file containing the profile to load, without path or file extension.</param>
@@ -94,10 +119,11 @@ namespace BingoMode.BingoRandomizer
         /// <param name="profileName"></param>
         public static void SaveToFile(string profileName)
         {
-            Directory.CreateDirectory(PROFILE_PATH);
+            string fullPath = PROFILE_PATH + profileName + FILE_EXTENSION;
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
             string serialized = profile.Serialize("").ToString();
-            File.WriteAllText(PROFILE_PATH + profileName + FILE_EXTENSION, serialized);
             savedRandomizers.Clear();
+            File.WriteAllText(fullPath, serialized);
         }
 
         /// <summary>
