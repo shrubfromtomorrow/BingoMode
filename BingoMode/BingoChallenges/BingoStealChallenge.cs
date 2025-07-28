@@ -18,8 +18,6 @@ namespace BingoMode.BingoChallenges
         public Randomizer<int> amount;
         public Randomizer<bool> toll;
         public Randomizer<string> subject;
-        public Randomizer<bool> starve;
-        public Randomizer<bool> oneCycle;
 
         public override Challenge Random()
         {
