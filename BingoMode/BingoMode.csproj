@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
+    <Compile Include="BingoRandomizers\BingoRandomizationProfile.cs" />
     <Compile Include="BingoChallenges\BingoBroadcastChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDodgeNootChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDontKillChallenge.cs" />
@@ -112,6 +113,15 @@
     <Compile Include="BingoHUD\BingoHUDHint.cs" />
     <Compile Include="BingoModOptions.cs" />
     <Compile Include="BingoMenu\BingoPage.cs" />
+    <Compile Include="BingoRandomizers\BoolRandomizer.cs" />
+    <Compile Include="BingoRandomizers\ChallengeGroup.cs" />
+    <Compile Include="BingoRandomizers\ChallengeRandomizer.cs" />
+    <Compile Include="BingoRandomizers\GroupRandomizer.cs" />
+    <Compile Include="BingoRandomizers\Randomizer.cs" />
+    <Compile Include="BingoRandomizers\RangeRandomizer.cs" />
+    <Compile Include="BingoRandomizers\StringRandomizer.cs" />
+    <Compile Include="BingoRandomizers\Weighted.cs" />
+    <Compile Include="BingoRandomizers\WeightRandomizer.cs" />
     <Compile Include="BingoSaveFile.cs" />
     <Compile Include="BingoSong.cs" />
     <Compile Include="BingoSteamworks\InnerWorkings.cs" />

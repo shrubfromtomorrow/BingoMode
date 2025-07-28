@@ -1,19 +1,58 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoHatchNoodleRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<int> amount;
+        public Randomizer<bool> atOnce;
+
+        public override Challenge Random()
+        {
+            BingoHatchNoodleChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            challenge.atOnce.Value = atOnce.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}atOnce-{atOnce.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "HatchNoodle").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            atOnce = Randomizer<bool>.InitDeserialize(dict["atOnce"]);
+        }
+    }
+
     public class BingoHatchNoodleChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
         public SettingBox<bool> atOnce;
+
+        public BingoHatchNoodleChallenge()
+        {
+            atOnce = new(false, "At Once", 0);
+            amount = new(0, "Amount", 1);
+        }
 
         public override void UpdateDescription()
         {

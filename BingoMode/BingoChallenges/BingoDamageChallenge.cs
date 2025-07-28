@@ -1,9 +1,11 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -11,6 +13,49 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoDamageRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> weapon;
+        public Randomizer<string> victim;
+        public Randomizer<int> amount;
+        public Randomizer<bool> inOneCycle;
+        public Randomizer<string> region;
+
+        public override Challenge Random()
+        {
+            BingoDamageChallenge challenge = new();
+            challenge.weapon.Value = weapon.Random();
+            challenge.victim.Value = victim.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.inOneCycle.Value = inOneCycle.Random();
+            challenge.region.Value = region.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}weapon-{weapon.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}victim-{victim.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}inOneCycle-{inOneCycle.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Damage").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            weapon = Randomizer<string>.InitDeserialize(dict["weapon"]);
+            victim = Randomizer<string>.InitDeserialize(dict["victim"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            inOneCycle = Randomizer<bool>.InitDeserialize(dict["inOneCycle"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+        }
+    }
+
     public class BingoDamageChallenge : BingoChallenge
     {
         public SettingBox<string> weapon;
@@ -19,6 +64,15 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> inOneCycle;
         public SettingBox<string> region;
         public int current;
+
+        public BingoDamageChallenge()
+        {
+            weapon = new("", "Weapon", 0, listName: "weapons");
+            victim = new("", "Creature Type", 1, listName: "creatures");
+            amount = new(0, "Amount", 2);
+            inOneCycle = new(false, "In One Cycle", 3);
+            region = new("", "Region", 4, listName: "regions");
+        }
 
         public override void UpdateDescription()
         {

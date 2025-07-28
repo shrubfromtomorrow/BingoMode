@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoRandomizer;
+using Expedition;
 using MoreSlugcats;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,44 @@ using UnityEngine;
 namespace BingoMode.BingoChallenges
 {
     using BingoSteamworks;
+    using System.Text;
     using static ChallengeHooks;
+
+    public class BingoAchievementRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> passage;
+
+        public override Challenge Random()
+        {
+            BingoAchievementChallenge challenge = new();
+            challenge.ID.Value = passage.Random();
+            return challenge;
+        }
+        
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}passage-{passage.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Achievement").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            passage = Randomizer<string>.InitDeserialize(dict["passage"]);
+        }
+    }
+
     // Taken from vanilla and modified
     public class BingoAchievementChallenge : BingoChallenge
     {
         public SettingBox<string> ID; //WinState.EndgameID
+
+        public BingoAchievementChallenge()
+        {
+            ID = new("", "Passage", 0, "passage");
+        }
 
         public override void UpdateDescription()
         {

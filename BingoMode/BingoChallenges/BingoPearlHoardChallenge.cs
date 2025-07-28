@@ -1,18 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
 using RWCustom;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+    using static MonoMod.InlineRT.MonoModRule;
+
+    public class BingoPearlHoardRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<bool> common;
+        public Randomizer<string> region;
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoPearlHoardChallenge challenge = new();
+            challenge.common.Value = common.Random();
+            challenge.region.Value = region.Random();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}common-{common.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "PearlHoard").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            common = Randomizer<bool>.InitDeserialize(dict["common"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+        }
+    }
+
     public class BingoPearlHoardChallenge : BingoChallenge
     {
         public SettingBox<bool> common;
@@ -21,6 +58,13 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> anyShelter;
         public SettingBox<string> region;
         public List<string> collected = [];
+
+        public BingoPearlHoardChallenge()
+        {
+            common = new(false, "Common Pearls", 0);
+            amount = new(0, "Amount", 1);
+            region = new("", "In Region", 2, listName: "regionsreal");
+        }
 
         public override void UpdateDescription()
         {

@@ -1,4 +1,5 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
@@ -6,7 +7,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -14,6 +15,45 @@ using UnityEngine;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoItemHoardRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> target;
+        public Randomizer<int> amount;
+        public Randomizer<bool> anyShelter;
+        public Randomizer<string> region;
+
+        public override Challenge Random()
+        {
+            BingoItemHoardChallenge challenge = new();
+            challenge.target.Value = target.Random();
+            challenge.amount.Value = amount.Random();
+            challenge.anyShelter.Value = anyShelter.Random();
+            challenge.region.Value = region.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}anyShelter-{anyShelter.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "ItemHoard").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            target = Randomizer<string>.InitDeserialize(dict["target"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            anyShelter = Randomizer<bool>.InitDeserialize(dict["anyShelter"]);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+        }
+    }
+
     public class BingoItemHoardChallenge : BingoChallenge
     {
         public int current;
@@ -22,6 +62,14 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> anyShelter;
         public SettingBox<string> region;
         public List<string> collected = [];
+
+        public BingoItemHoardChallenge()
+        {
+            amount = new(0, "Amount", 0);
+            target = new("", "Item", 1, listName: "expobject");
+            anyShelter = new(false, "Any Shelter", 2);
+            region = new("", "Region", 3, listName: "regions");
+        }
 
         public override void UpdateDescription()
         {
