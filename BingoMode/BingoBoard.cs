@@ -188,7 +188,7 @@ namespace BingoMode
         {
             bool won = false;
             currentWinLine = [];
-            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout;
+            bool lockout = BingoData.IsCurrentSaveLockout();
 
             // Vertical lines
             for (int i = 0; i < size; i++)
@@ -299,7 +299,7 @@ namespace BingoMode
         {
             bool won = false;
             currentWinLine = [];
-            bool lockout = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout;
+            bool lockout = BingoData.IsCurrentSaveLockout();
 
             // Vertical lines
             for (int i = 0; i < size; i++)
@@ -748,8 +748,7 @@ namespace BingoMode
                                         }
                                         break;
                                     case '1':
-                                        // If lockout
-                                        if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoData.BingoGameMode.Lockout)
+                                        if (BingoData.IsCurrentSaveLockout())
                                         {
                                             // If its the same team
                                             if (SteamTest.team == k || SteamTest.team == 8 || ch.ReverseChallenge())

@@ -15,7 +15,6 @@ namespace BingoMode.BingoMenu
 {
     using BingoSteamworks;
     using System;
-    using System.CodeDom;
     using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoPage : PositionedMenuObject
@@ -41,7 +40,6 @@ namespace BingoMode.BingoMenu
         public SimpleButton copyBoard;
         public SimpleButton pasteBoard;
         public SymbolButton eggButton;
-
 
         // Multiplayer
         public SimpleButton multiButton;
@@ -439,7 +437,6 @@ namespace BingoMode.BingoMenu
                 {
                     foreach (var playere in lobbyPlayers)
                     {
-
                         int team = int.Parse(SteamMatchmaking.GetLobbyMemberData(SteamTest.CurrentLobby, playere.identity.GetSteamID(), "playerTeam"));
                         if (!BingoData.TeamsInBingo.Contains(team) && team != 8) BingoData.TeamsInBingo.Add(team);
                     }

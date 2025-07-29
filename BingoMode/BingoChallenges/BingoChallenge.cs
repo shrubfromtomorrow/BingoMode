@@ -58,7 +58,7 @@ namespace BingoMode.BingoChallenges
                 {
                     if (TeamsCompleted[i]) completed = true;
                 }
-                else if (!ReverseChallenge() && TeamsCompleted[i] && BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var saveData) && saveData.gamemode == BingoData.BingoGameMode.Lockout)
+                else if (!ReverseChallenge() && TeamsCompleted[i] && BingoData.IsCurrentSaveLockout())
                 {
                     hidden = true;
                 }

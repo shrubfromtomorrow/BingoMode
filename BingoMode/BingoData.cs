@@ -41,7 +41,8 @@ namespace BingoMode
         {
             Bingo,
             Lockout,
-            Blackout
+            Blackout,
+            LockoutNoTies
         }
 
         public class BingoSaveData
@@ -81,6 +82,12 @@ namespace BingoMode
                 this.teamsInBingo = teamsInBingo;
                 this.songPlayed = songPlayed;
             }
+        }
+        
+        public static bool IsCurrentSaveLockout()
+        {
+            return BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 
+                (BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoGameMode.Lockout || BingoSaves[ExpeditionData.slugcatPlayer].gamemode == BingoGameMode.LockoutNoTies);
         }
 
         public static List<int> TeamsStringToList(string teams)

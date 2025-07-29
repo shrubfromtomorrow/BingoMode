@@ -92,7 +92,7 @@ namespace BingoMode.BingoHUD
             {
                 if (tickSprite.element.name == "Menu_Symbol_CheckBox")
                 {
-                    if ((team != SteamTest.team && SteamTest.team != 8) && BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data) && data.gamemode == BingoData.BingoGameMode.Lockout)
+                    if (team != SteamTest.team && SteamTest.team != 8 && BingoData.IsCurrentSaveLockout())
                     {
                         (info.challenge as BingoChallenge).OnChallengeLockedOut(team);
                     }
