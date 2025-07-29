@@ -89,6 +89,16 @@ namespace BingoMode.BingoChallenges
             {
                 if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value)); 
             }
+            for (int i = 0; i < game.Players.Count; i++)
+            {
+                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null)
+                {
+                    if (player.objectInStomach != null && player.objectInStomach.type.value == item.Value)
+                    {
+                        Used(new(item.Value));
+                    }
+                }
+            }
         }
 
         public override int Points()

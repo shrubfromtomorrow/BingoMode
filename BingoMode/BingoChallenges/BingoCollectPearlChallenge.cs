@@ -40,8 +40,7 @@ namespace BingoMode.BingoChallenges
             {
                 return new Phrase(
                     [[new Verse(pearl.Value)],
-                    [new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))) { background = new FSprite("radialgradient") }],
-                    [new Counter(current, 1)]]);
+                    [new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))) { background = new FSprite("radialgradient") }]]);
             }
             return new Phrase(
                 [[Icon.PEARL_HOARD_COLOR],
@@ -50,7 +49,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCollectPearlChallenge c || (c.specific.Value == true && specific.Value == true) || c.pearl.Value != pearl.Value;
+            return challenge is not BingoCollectPearlChallenge c || ((c.specific.Value && specific.Value) && c.pearl.Value != pearl.Value) || (c.specific.Value != specific.Value);
         }
 
         public override string ChallengeName()
