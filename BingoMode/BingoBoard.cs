@@ -14,6 +14,7 @@ namespace BingoMode
 {
     using BingoMenu;
     using Rewired.ControllerExtensions;
+    using BingoMode.BingoRandomizer;
 
     public class BingoBoard
     {
@@ -41,6 +42,7 @@ namespace BingoMode
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
+            BingoRandomizationProfile.LoadFromFile("Test");
             if (changeSize)
             { 
                 ghostGrid = challengeGrid;
@@ -63,7 +65,10 @@ namespace BingoMode
                     {
                         continue;
                     }
-                    challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
+                    if (BingoRandomizationProfile.IsLoaded)
+                        challengeGrid[i, j] = BingoRandomizationProfile.GetChallenge();
+                    else
+                        challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                 }
             }
             SteamTest.UpdateOnlineBingo();
