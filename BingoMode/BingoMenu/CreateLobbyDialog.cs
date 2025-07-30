@@ -192,16 +192,30 @@ namespace BingoMode.BingoMenu
             hostMods.pos = new Vector2(xPos, yTop);
             maxPlayers.pos = new Vector2(xPos, yTop - 35f);
 
+            // I'm sorry nacu it was my constitutional duty to center ts
+
             for (int i = 0; i < 3; i++)
             {
-                perks[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 150f);
-                burdens[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 200f);
-                gamemode[i].pos = new Vector2(xPos - 120f + 120f * i, yTop - 100f);
+                perks[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 150f);
+                burdens[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 200f);
+                if (perks[i].displayText == "Host decides - ")
+                {
+                    perks[i].pos.x += 20f;
+                    burdens[i].pos.x += 20f;
+                }
             }
 
             for (int i = 0; i < 4; i++)
             {
-                gamemode[i].pos = new Vector2(xPos - 210f + 140f * i, yTop - 100f);
+                gamemode[i].pos = new Vector2(xPos - 188f + 140f * i, yTop - 100f);
+                if (gamemode[i].displayText == "Bingo - ")
+                {
+                    gamemode[i].pos.x += 17f;
+                }
+                else if (gamemode[i].displayText == "Blackout - ")
+                {
+                    gamemode[i].pos.x -= 44f;
+                }
             }
 
             labels[0].SetPosition(pagePos + new Vector2(xPos, yTop - 115f));

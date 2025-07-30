@@ -26,6 +26,8 @@ namespace BingoMode
         public static ConditionalWeakTable<ExpeditionMenu, BingoPage> bingoPage = new ();
         public static ConditionalWeakTable<CharacterSelectPage, HoldButton> newBingoButton = new ();
 
+        public static float cantpresscounter;
+
         public static void EarlyApply()
         {
             // Ignoring bingo challenges in bingo (has to be done here)
@@ -156,6 +158,7 @@ namespace BingoMode
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
             On.Menu.CharacterSelectPage.ClearStats += CharacterSelectPage_ClearStats;
+            On.Menu.CharacterSelectPage.Update += CharacterSelectPage_Update;
 
             // Win and lose screens
             IL.WinState.CycleCompleted += WinState_CycleCompleted;
@@ -623,10 +626,12 @@ namespace BingoMode
 
             if (BingoData.BingoSaves.TryGetValue(ExpeditionData.slugcatPlayer, out var data))
             {
-                // Temp logs for suspected NRE
-                if (self.expPassage == null) Plugin.logger.LogMessage("expPassage is null");
-                if (self.expPassage?.buttonBehav == null) Plugin.logger.LogMessage("buttonBehav is null");
                 self.expPassage.buttonBehav.greyedOut = data.passageUsed;
+            }
+
+            if (self.goalMalnourished)
+            {
+                self.expPassage.buttonBehav.greyedOut = true;
             }
 
             if (self.hud == null || self.hud.parts == null || self.killsDisplay == null) return;
@@ -776,6 +781,20 @@ namespace BingoMode
             BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
             BingoSaveFile.Save();
             orig.Invoke(self, trigger);
+        }
+
+        private static void CharacterSelectPage_Update(On.Menu.CharacterSelectPage.orig_Update orig, CharacterSelectPage self)
+        {
+            orig.Invoke(self);
+            cantpresscounter = Mathf.Max(0, cantpresscounter - 1);
+            if (Input.anyKey && Plugin.PluginInstance != null && Input.GetKey(Plugin.PluginInstance.BingoConfig.ResetBind.Value) && cantpresscounter == 0)
+            {
+                if (self.abandonButton != null)
+                {
+                    cantpresscounter = 20;
+                    self.AbandonButton_OnPressDone(self.abandonButton);
+                }
+            }
         }
 
         private static float ExpeditionMenu_ValueOfSlider(On.Menu.ExpeditionMenu.orig_ValueOfSlider orig, ExpeditionMenu self, Slider slider)
