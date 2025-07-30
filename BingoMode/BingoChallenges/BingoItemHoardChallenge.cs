@@ -119,7 +119,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<string> liste = ChallengeUtils.GetSortedCorrectListForChallenge("expobject").ToList();
+            List<string> liste = [.. ChallengeUtils.GetSortedCorrectListForChallenge("expobject")];
             if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear)
             {
                 liste.Remove("BubbleGrass");
@@ -131,7 +131,7 @@ namespace BingoMode.BingoChallenges
             return new BingoItemHoardChallenge
             {
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 0),
-                target = new(liste[UnityEngine.Random.Range(0, liste.Count())], "Item", 1, listName: "expobject"),
+                target = new(liste[UnityEngine.Random.Range(0, liste.Count)], "Item", 1, listName: "expobject"),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
                 region = new("Any Region", "Region", 4, listName: "regions"),
             };

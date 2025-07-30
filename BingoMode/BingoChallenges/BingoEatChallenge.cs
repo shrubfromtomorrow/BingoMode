@@ -25,6 +25,8 @@ namespace BingoMode.BingoChallenges
             BingoEatChallenge challenge = new();
             challenge.foodType.Value = foodType.Random();
             challenge.amountRequired.Value = amountRequired.Random();
+            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.foodType.Value);
+            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             return challenge;
         }
 

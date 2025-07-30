@@ -35,6 +35,7 @@ namespace BingoMode.BingoRandomizer
             {
                 serialized.Append($"{weighted.value}:{weighted.WeightsString},");
             }
+            serialized.Remove(serialized.Length - 2, 1);
             serialized.Append("]}");
             return serialized;
         }

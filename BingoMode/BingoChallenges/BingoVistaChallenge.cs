@@ -24,6 +24,8 @@ namespace BingoMode.BingoChallenges
         {
             BingoVistaChallenge challenge = new();
             challenge.room.Value = room.Random();
+            challenge.region = challenge.room.Value.Substring(0, 2);
+            challenge.location = ChallengeUtils.BingoVistaLocations[challenge.region][challenge.room.Value];
             return challenge;
         }
 
