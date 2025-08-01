@@ -38,11 +38,10 @@ namespace BingoMode
 
         public void GenerateBoard(int size, bool changeSize = false)
         {
-            
+            BingoRandomizationProfile.Reset();
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
-            BingoRandomizationProfile.LoadFromFile("Test");
             if (changeSize)
             { 
                 ghostGrid = challengeGrid;
@@ -65,10 +64,7 @@ namespace BingoMode
                     {
                         continue;
                     }
-                    if (BingoRandomizationProfile.IsLoaded)
-                        challengeGrid[i, j] = BingoRandomizationProfile.GetChallenge();
-                    else
-                        challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
+                    challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                 }
             }
             SteamTest.UpdateOnlineBingo();
@@ -443,6 +439,9 @@ namespace BingoMode
 
         public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)
         {
+            if (BingoRandomizationProfile.IsLoaded)
+                return BingoRandomizationProfile.GetChallenge();
+
             if (BingoData.availableBingoChallenges == null)
             {
                 ChallengeOrganizer.SetupChallengeTypes();
