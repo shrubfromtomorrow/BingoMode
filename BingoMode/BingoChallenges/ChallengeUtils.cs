@@ -457,7 +457,8 @@ namespace BingoMode.BingoChallenges
             "ScavengerBomb",
             "FirecrackerPlant",
             "BubbleGrass",
-            "Rock"
+            "Rock",
+            "DataPearl"
         };
 
         public static readonly string[] Befriendable =

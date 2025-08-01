@@ -53,8 +53,6 @@ namespace BingoMode.BingoChallenges
             };
         }
 
-        public override bool RequireSave() => false;
-
         public override bool CombatRequired()
         {
             return false;

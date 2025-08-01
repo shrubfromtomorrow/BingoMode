@@ -787,7 +787,7 @@ namespace BingoMode
         {
             orig.Invoke(self);
             cantpresscounter = Mathf.Max(0, cantpresscounter - 1);
-            if (Input.anyKey && Plugin.PluginInstance != null && Input.GetKey(Plugin.PluginInstance.BingoConfig.ResetBind.Value) && cantpresscounter == 0)
+            if ((self.menu as ExpeditionMenu).currentPage == 1 && Input.anyKey && Plugin.PluginInstance != null && Input.GetKey(Plugin.PluginInstance.BingoConfig.ResetBind.Value) && cantpresscounter == 0)
             {
                 if (self.abandonButton != null)
                 {
