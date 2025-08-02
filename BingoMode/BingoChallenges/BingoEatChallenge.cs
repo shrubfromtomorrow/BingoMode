@@ -4,6 +4,7 @@ using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace BingoMode.BingoChallenges
     {
         public SettingBox<string> foodType;
         public SettingBox<int> amountRequired;
+        public SettingBox<bool> starve;
         public int currentEated;
         public bool isCreature;
 
@@ -25,18 +27,21 @@ namespace BingoMode.BingoChallenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type>")
+            description = ChallengeTools.IGT.Translate("Eat [<current>/<amount>] <food_type> <starved>")
                 .Replace("<current>", ValueConverter.ConvertToString(currentEated))
                 .Replace("<amount>", ValueConverter.ConvertToString(amountRequired.Value))
-                .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureType(foodType.Value).Index]) : ChallengeTools.ItemName(new(foodType.Value)));
+                .Replace("<food_type>", isCreature ? ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureType(foodType.Value).Index]) : ChallengeTools.ItemName(new(foodType.Value)))
+                .Replace("<starved>", starve.Value ? ChallengeTools.IGT.Translate("while starving") : "");
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            return new(
+            Phrase phrase = new(
                 [[new Icon("foodSymbol"), Icon.FromEntityName(foodType.Value)],
                 [new Counter(currentEated, amountRequired.Value)]]);
+            if (starve.Value) phrase.InsertWord(new Icon("Multiplayer_Death"), 1);
+            return phrase;
         }
 
         public override string ChallengeName()
@@ -79,7 +84,8 @@ namespace BingoMode.BingoChallenges
             {
                 foodType = new(randomFood, "Food type", 0, listName: "food"),
                 isCreature = c,
-                amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 1)
+                starve = new(UnityEngine.Random.value < 0.1f, "While Starving", 2),
+                amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 3)
             };
         }
 
@@ -108,10 +114,10 @@ namespace BingoMode.BingoChallenges
         //    return 1f;
         //}
     
-        public void FoodEated(IPlayerEdible thisEdibleIsShit)
+        public void FoodEated(IPlayerEdible thisEdibleIsShit, Player playuh)
         {
             if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
-                (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)))
+                (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)) && (!starve.Value || playuh.Malnourished))
             {
                 currentEated++;
                 UpdateDescription();
@@ -140,6 +146,8 @@ namespace BingoMode.BingoChallenges
                 "><",
                 foodType.ToString(),
                 "><",
+                starve.ToString(),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
@@ -151,12 +159,27 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                isCreature = (array[2] == "1");
-                foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                completed = (array[4] == "1");
-                revealed = (array[5] == "1");
+                if (array.Length == 7)
+                {
+                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    isCreature = (array[2] == "1");
+                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                    completed = (array[5] == "1");
+                    revealed = (array[6] == "1");
+                }
+                // Legacy board eat challenge compatibility
+                else if (array.Length == 6)
+                {
+                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    isCreature = (array[2] == "1");
+                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    starve = SettingBoxFromString("System.Boolean|false|While Starving|2|NULL") as SettingBox<bool>;
+                }
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -181,6 +204,6 @@ namespace BingoMode.BingoChallenges
             On.Player.ObjectEaten -= Player_ObjectEaten;
         }
 
-        public override List<object> Settings() => [foodType, amountRequired];
+        public override List<object> Settings() => [foodType, amountRequired, starve];
     }
 }

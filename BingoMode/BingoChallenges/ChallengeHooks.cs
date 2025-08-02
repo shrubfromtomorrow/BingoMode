@@ -1621,15 +1621,16 @@ namespace BingoMode.BingoChallenges
 
         public static void Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
         {
-            orig.Invoke(self, edible);
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoEatChallenge c)
                 {
-                    c.FoodEated(edible);
+                    c.FoodEated(edible, self);
                 }
             }
+            // Invoke after so player malnourishment is correct
+            orig.Invoke(self, edible);
         }
 
         public static void Player_ObjectEatenSeed(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
