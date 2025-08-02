@@ -28,6 +28,7 @@ namespace BingoMode.BingoChallenges
             challenge.pearl.Value = pearl.Random();
             challenge.amount.Value = amount.Random();
             challenge.specific.Value = specific.Random();
+            challenge.region = challenge.pearl.Value.Substring(0, 2);
             return challenge;
         }
 

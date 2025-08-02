@@ -6,6 +6,7 @@ using MoreSlugcats;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,6 +22,7 @@ namespace BingoMode.BingoChallenges
         public Randomizer<bool> common;
         public Randomizer<string> region;
         public Randomizer<int> amount;
+        public Randomizer<bool> anyShelter;
 
         public override Challenge Random()
         {
@@ -28,6 +30,7 @@ namespace BingoMode.BingoChallenges
             challenge.common.Value = common.Random();
             challenge.region.Value = region.Random();
             challenge.amount.Value = amount.Random();
+            challenge.anyShelter.Value = anyShelter.Random();
             return challenge;
         }
 
@@ -38,6 +41,7 @@ namespace BingoMode.BingoChallenges
             serializedContent.AppendLine($"{surindent}common-{common.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}anyShelter-{anyShelter.Serialize(surindent)}");
             return base.Serialize(indent).Replace("__Type__", "PearlHoard").Replace("__Content__", serializedContent.ToString());
         }
 
@@ -47,6 +51,7 @@ namespace BingoMode.BingoChallenges
             common = Randomizer<bool>.InitDeserialize(dict["common"]);
             region = Randomizer<string>.InitDeserialize(dict["region"]);
             amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+            anyShelter = Randomizer<bool>.InitDeserialize(dict["anyShelter"]);
         }
     }
 
@@ -63,7 +68,8 @@ namespace BingoMode.BingoChallenges
         {
             common = new(false, "Common Pearls", 0);
             amount = new(0, "Amount", 1);
-            region = new("", "In Region", 2, listName: "regionsreal");
+            anyShelter = new(false, "Any Shelter", 2);
+            region = new("", "Region", 3, listName: "regionsreal");
         }
 
         public override void UpdateDescription()

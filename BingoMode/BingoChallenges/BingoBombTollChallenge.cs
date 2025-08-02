@@ -15,12 +15,16 @@ namespace BingoMode.BingoChallenges
 
     public class BingoBombTollRandomizer : ChallengeRandomizer
     {
+        public Randomizer<bool> specific;
+        public Randomizer<int> amount;
         public Randomizer<bool> pass;
         public Randomizer<string> roomName;
 
         public override Challenge Random()
         {
             BingoBombTollChallenge challenge = new();
+            challenge.specific.Value = specific.Random();
+            challenge.amount.Value = amount.Random();
             challenge.pass.Value = pass.Random();
             challenge.roomName.Value = roomName.Random();
             return challenge;
@@ -30,6 +34,8 @@ namespace BingoMode.BingoChallenges
         {
             string surindent = indent + INDENT_INCREMENT;
             StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}specific-{specific.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}pass-{pass.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}roomName-{roomName.Serialize(surindent)}");
             return base.Serialize(indent).Replace("__Type__", "BombToll").Replace("__Content__", serializedContent.ToString());
@@ -38,6 +44,8 @@ namespace BingoMode.BingoChallenges
         public override void Deserialize(string serialized)
         {
             Dictionary<string, string> dict = ToDict(serialized);
+            specific = Randomizer<bool>.InitDeserialize(dict["specific"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
             pass = Randomizer<bool>.InitDeserialize(dict["pass"]);
             roomName = Randomizer<string>.InitDeserialize(dict["roomName"]);
         }
@@ -54,8 +62,11 @@ namespace BingoMode.BingoChallenges
 
         public BingoBombTollChallenge()
         {
-            pass = new(false, "Pass the Toll", 0);
-            roomName = new("", "Scavenger Toll", 1, listName: "tolls");
+            specific = new(false, "Specific toll", 0);
+            amount = new(0, "Amount", 1);
+            pass = new(false, "Pass the Toll", 2);
+            roomName = new("", "Scavenger Toll", 3, listName: "tolls");
+            bombed = [];
         }
 
         public override void UpdateDescription()
