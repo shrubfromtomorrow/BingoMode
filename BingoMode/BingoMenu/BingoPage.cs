@@ -234,13 +234,14 @@ namespace BingoMode.BingoMenu
 
         private void ConstructRandomizerPanel()
         {
-            randomizerButton = new(menu, this, "Randomization", "SWITCH_RANDOMIZATION", expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
+            randomizerButton = new(menu, this, "Profiles", "SWITCH_RANDOMIZATION", expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
             subObjects.Add(randomizerButton);
             randomizerMenuBg = new(menu, this, randomizerButton.pos + new Vector2(200f, 325f), new Vector2(190f, 300f), true);
             subObjects.Add(randomizerMenuBg);
-            randomizerUnloadButton = new(menu, this, "buttonCrossA", "UNLOADR", randomizerMenuBg.pos);
+            randomizerUnloadButton = new(menu, this, "Menu_Symbol_Clear_All", "UNLOADR", randomizerMenuBg.pos);
             subObjects.Add(randomizerUnloadButton);
             randomizerLabel = new(menu, this, "unloaded", randomizerMenuBg.pos, new Vector2(50f, 20f), false);
+            randomizerLabel.label.alignment = FLabelAlignment.Left;
             subObjects.Add(randomizerLabel);
             randomizerDivider = new("pixel")
             {
@@ -996,8 +997,8 @@ namespace BingoMode.BingoMenu
         {
             randomizerSlideIn = Mathf.Clamp01(randomizerSlideIn + randomizerSlideStep * 0.05f);
             randomizerMenuBg.pos = randomizerButton.pos - new Vector2(-25f + randomizerMenuBg.size.x - randomizerButton.size.x, 325f) + Vector2.right * (1f - Custom.LerpExpEaseInOut(0f, 1f, randomizerSlideIn)) * 250f;
-            randomizerUnloadButton.pos = randomizerMenuBg.pos + new Vector2(10f, randomizerMenuBg.size.y - randomizerUnloadButton.size.y - 10f);
-            randomizerLabel.pos = randomizerUnloadButton.pos + new Vector2(randomizerUnloadButton.size.x + 10f, 0f);
+            randomizerUnloadButton.pos = randomizerMenuBg.pos + new Vector2(10f, randomizerMenuBg.size.y - randomizerUnloadButton.size.y - 13f);
+            randomizerLabel.pos = randomizerUnloadButton.pos + new Vector2(5f, 3f);
             randomizerDivider.x = randomizerMenuBg.pos.x;
             randomizerSlider.pos.x = randomizerMenuBg.pos.x + randomizerMenuBg.size.x - randomizerSlider.size.x - 5f;
             foreach (var line in randomizerSlider.lineSprites)
