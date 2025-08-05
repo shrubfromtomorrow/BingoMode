@@ -1785,12 +1785,37 @@ namespace BingoMode.BingoChallenges
 
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c)
                 {
-                    c.MeetPebbles();
+                    // These fucking rw devs man
+                    if (self.oracle.ID == MoreSlugcatsEnums.OracleID.DM)
+                    {
+                        c.MeetMoon();
+                    }
+                    else
+                    {
+                        c.MeetPebbles();
+                    }
                 }
             }
         }
+
+        public static void RMOracleBehavior_Update(On.MoreSlugcats.SSOracleRotBehavior.orig_Update orig, SSOracleRotBehavior self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            if (self.hasNoticedPlayer)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoIteratorChallenge c && !c.moon.Value)
+                    {
+                        c.MeetPebbles();
+                    }
+                }
+            }
+        }
+
         public static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
         {
             orig.Invoke(self);

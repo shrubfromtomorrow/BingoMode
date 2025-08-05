@@ -104,7 +104,7 @@ namespace BingoMode.BingoChallenges
             On.SSOracleBehavior.SeePlayer += SSOracleBehavior_SeePlayer;
             On.SLOracleBehaviorHasMark.InitateConversation += SLOracleBehaviorHasMark_InitateConversation;
             On.MoreSlugcats.CLOracleBehavior.Update += CLOracleBehavior_Update;
-
+            On.MoreSlugcats.SSOracleRotBehavior.Update += RMOracleBehavior_Update;
         }
 
         public override void RemoveHooks()
@@ -112,6 +112,7 @@ namespace BingoMode.BingoChallenges
             On.SSOracleBehavior.SeePlayer -= SSOracleBehavior_SeePlayer;
             On.SLOracleBehaviorHasMark.InitateConversation -= SLOracleBehaviorHasMark_InitateConversation;
             On.MoreSlugcats.CLOracleBehavior.Update -= CLOracleBehavior_Update;
+            On.MoreSlugcats.SSOracleRotBehavior.Update -= RMOracleBehavior_Update;
         }
 
         public override List<object> Settings() => [moon];

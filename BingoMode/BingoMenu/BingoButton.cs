@@ -1,9 +1,11 @@
-﻿using BingoMode.BingoChallenges;
+﻿using System.Linq;
+using BingoMode.BingoChallenges;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu;
 using Menu.Remix.MixedUI;
 using RWCustom;
-using System.Linq;
+using Steamworks;
 using UnityEngine;
 
 namespace BingoMode.BingoMenu
@@ -162,9 +164,13 @@ namespace BingoMode.BingoMenu
             }
             if (boxVisible && mouseRightDown && cantClickCounter == 0)
             {
-                Singal(this, "SWITCH");
-                // Good lord this is jank but whatever. 40tps, quarter of a second cooldown on clicks, since cantClickCounter decrements per goal, need to multiply it by goal count
-                cantClickCounter = BingoHooks.GlobalBoard.challengeGrid.GetLength(0) * BingoHooks.GlobalBoard.challengeGrid.GetLength(1) * 10;
+                if (!BingoData.MultiplayerGame ||
+                    SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby))
+                {
+                    Singal(this, "SWITCH");
+                    // Good lord this is jank but whatever. 40tps, quarter of a second cooldown on clicks, since cantClickCounter decrements per goal, need to multiply it by goal count
+                    cantClickCounter = BingoHooks.GlobalBoard.challengeGrid.GetLength(0) * BingoHooks.GlobalBoard.challengeGrid.GetLength(1) * 10;
+                }
             }
             if (BingoHooks.GlobalBoard.switch1 == this.challenge && BingoHooks.GlobalBoard.switch1Pos == boardPos)
             {

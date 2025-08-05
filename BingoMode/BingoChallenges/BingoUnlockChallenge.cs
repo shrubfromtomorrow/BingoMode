@@ -107,7 +107,7 @@ namespace BingoMode.BingoChallenges
                 if (ExpeditionData.slugcatPlayer.value == "Rivulet" || ExpeditionData.slugcatPlayer.value == "Saint") { }
                 else goto gibacj;
             }
-            if (unl.ToLowerInvariant().StartsWith("ds"))
+            if (unl.ToLowerInvariant().StartsWith("ds") || unl.ToLowerInvariant().StartsWith("sh"))
             {
                 if (ExpeditionData.slugcatPlayer.value == "Saint") goto gibacj;
             }
