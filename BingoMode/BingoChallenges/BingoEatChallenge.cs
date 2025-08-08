@@ -1,4 +1,5 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
@@ -13,6 +15,39 @@ using CreatureType = CreatureTemplate.Type;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoEatRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> foodType;
+        public Randomizer<int> amountRequired;
+
+        public override Challenge Random()
+        {
+            BingoEatChallenge challenge = new();
+            challenge.foodType.Value = foodType.Random();
+            challenge.amountRequired.Value = amountRequired.Random();
+            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.foodType.Value);
+            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}foodType-{foodType.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amountRequired-{amountRequired.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Eat").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            foodType = Randomizer<string>.InitDeserialize(dict["foodType"]);
+            amountRequired = Randomizer<int>.InitDeserialize(dict["amountRequired"]);
+        }
+    }
+
     public class BingoEatChallenge : BingoChallenge
     {
         public SettingBox<string> foodType;
@@ -20,6 +55,12 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> starve;
         public int currentEated;
         public bool isCreature;
+
+        public BingoEatChallenge()
+        {
+            foodType = new("", "Food type", 0, "food");
+            amountRequired = new(0, "Amount", 1);
+        }
 
         public override void UpdateDescription()
         {

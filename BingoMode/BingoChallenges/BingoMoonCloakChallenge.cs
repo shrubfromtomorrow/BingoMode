@@ -1,18 +1,52 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
-using MoreSlugcats;
 using Menu.Remix;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoMoonCloakRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<bool> deliver;
+
+        public override Challenge Random()
+        {
+            BingoMoonCloakChallenge challenge = new();
+            challenge.deliver.Value = deliver.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}deliver-{deliver.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "MoonCloak").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            deliver = Randomizer<bool>.InitDeserialize(dict["deliver"]);
+        }
+    }
+
     public class BingoMoonCloakChallenge : BingoChallenge
     {
         public SettingBox<bool> deliver;
+
+        public BingoMoonCloakChallenge()
+        {
+            deliver = new(false, "Deliver", 0);
+        }
 
         public override void UpdateDescription()
         {

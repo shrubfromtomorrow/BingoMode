@@ -14,6 +14,7 @@ namespace BingoMode
 {
     using BingoMenu;
     using Rewired.ControllerExtensions;
+    using BingoMode.BingoRandomizer;
 
     public class BingoBoard
     {
@@ -37,7 +38,7 @@ namespace BingoMode
 
         public void GenerateBoard(int size, bool changeSize = false)
         {
-            
+            BingoRandomizationProfile.Reset();
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
@@ -487,6 +488,9 @@ namespace BingoMode
 
         public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)
         {
+            if (BingoRandomizationProfile.IsLoaded)
+                return BingoRandomizationProfile.GetChallenge();
+
             if (BingoData.availableBingoChallenges == null)
             {
                 ChallengeOrganizer.SetupChallengeTypes();

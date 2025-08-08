@@ -1,20 +1,58 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+    public class BingoAllRegionsExceptRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> region;
+        public Randomizer<int> required;
+
+        public override Challenge Random()
+        {
+            BingoAllRegionsExcept challenge = new();
+            challenge.region.Value = region.Random();
+            challenge.required.Value = required.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}required-{required.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "AllRegionExcept").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            region = Randomizer<string>.InitDeserialize(dict["region"]);
+            required = Randomizer<int>.InitDeserialize(dict["required"]);
+        }
+    }
     public class BingoAllRegionsExcept : BingoChallenge
     {
         public SettingBox<string> region;
         public SettingBox<int> required;
         public List<string> regionsToEnter = [];
         public int current;
+
+        public BingoAllRegionsExcept()
+        {
+            region = new("", "Region", 0, listName: "regionsreal");
+            regionsToEnter = [.. ChallengeUtils.AllEnterableRegions];
+            required = new(0, "Amount", 1);
+        }
 
         public override void UpdateDescription()
         {

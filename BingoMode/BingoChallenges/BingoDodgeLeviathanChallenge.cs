@@ -1,14 +1,38 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoDodgeLeviathanRandomizer : ChallengeRandomizer
+    {
+        public override Challenge Random()
+        {
+            BingoDodgeLeviathanChallenge challenge = new();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            return base.Serialize(indent).Replace("__Type__", "DodgeLeviathan").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+        }
+    }
+
     public class BingoDodgeLeviathanChallenge : BingoChallenge
     {
         //public int wasInArea;

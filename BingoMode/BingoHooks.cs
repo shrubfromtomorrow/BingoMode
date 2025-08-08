@@ -800,7 +800,9 @@ namespace BingoMode
 
         private static float ExpeditionMenu_ValueOfSlider(On.Menu.ExpeditionMenu.orig_ValueOfSlider orig, ExpeditionMenu self, Slider slider)
         {
-            if (slider.ID == BingoEnums.MultiplayerSlider && bingoPage.TryGetValue(self, out var page))
+            if ((slider.ID == BingoEnums.MultiplayerSlider ||
+                    slider.ID == BingoEnums.RandomizerSlider) &&
+                    bingoPage.TryGetValue(self, out var page))
             {
                 return page.ValueOfSlider(slider);
             }
@@ -812,7 +814,9 @@ namespace BingoMode
         {
             orig.Invoke(self, slider, f);
 
-            if (slider.ID == BingoEnums.MultiplayerSlider && bingoPage.TryGetValue(self, out var page))
+            if ((slider.ID == BingoEnums.MultiplayerSlider ||
+                    slider.ID == BingoEnums.RandomizerSlider) &&
+                    bingoPage.TryGetValue(self, out var page))
             {
                 page.SliderSetValue(slider, f);
             }

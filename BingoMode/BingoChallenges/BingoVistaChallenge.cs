@@ -1,4 +1,5 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
@@ -7,17 +8,54 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoVistaRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<string> room;
+
+        public override Challenge Random()
+        {
+            BingoVistaChallenge challenge = new();
+            challenge.room.Value = room.Random();
+            challenge.region = challenge.room.Value.Substring(0, 2);
+            challenge.location = ChallengeUtils.BingoVistaLocations[challenge.region][challenge.room.Value];
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}room-{room.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Vista").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            room = Randomizer<string>.InitDeserialize(dict["room"]);
+            room = Randomizer<string>.InitDeserialize(dict["room"]);
+        }
+    }
+
     public class BingoVistaChallenge : BingoChallenge
     {
         public SettingBox<string> room;
         public string region;
         public Vector2 location;
+
+        public BingoVistaChallenge()
+        {
+            room = new("", "Room", 0, listName: "vista");
+            location = new();
+        }
 
         public override void UpdateDescription()
         {

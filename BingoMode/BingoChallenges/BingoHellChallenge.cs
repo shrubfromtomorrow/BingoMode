@@ -1,18 +1,52 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
+
+    public class BingoHellRandomizer : ChallengeRandomizer
+    {
+        public Randomizer<int> amount;
+
+        public override Challenge Random()
+        {
+            BingoHellChallenge challenge = new();
+            challenge.amount.Value = amount.Random();
+            return challenge;
+        }
+
+        public override StringBuilder Serialize(string indent)
+        {
+            string surindent = indent + INDENT_INCREMENT;
+            StringBuilder serializedContent = new();
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Hell").Replace("__Content__", serializedContent.ToString());
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Dictionary<string, string> dict = ToDict(serialized);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
+        }
+    }
+
     public class BingoHellChallenge : BingoChallenge
     {
         public int current;
-        public SettingBox<int> amound;
+        public SettingBox<int> amount;
+
+        public BingoHellChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
 
         public override bool RequireSave() => false;
         public override bool ReverseChallenge() => true;
@@ -21,12 +55,12 @@ namespace BingoMode.BingoChallenges
         {
             description = ChallengeTools.IGT.Translate("Do not die before completing [<current>/<amount>] bingo challenges")
                 .Replace("<current>", current.ToString())
-                .Replace("<amount>", amound.Value.ToString());
+                .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase() => new(
-            [[new Icon("completechallenge"), new Counter(current, amound.Value)],
+            [[new Icon("completechallenge"), new Counter(current, amount.Value)],
             [new Icon("buttonCrossA", 1f, Color.red), new Icon("Multiplayer_Death")]]);
 
         public override bool Duplicable(Challenge challenge)
@@ -42,13 +76,13 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoHellChallenge ch = new();
-            ch.amound = new(UnityEngine.Random.Range(1, 4), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 4), "Amount", 0);
             return ch;
         }
 
         public void GetChallenge()
         {
-            if (!TeamsFailed[SteamTest.team] && completed && current < amound.Value)
+            if (!TeamsFailed[SteamTest.team] && completed && current < amount.Value)
             {
                 current++;
                 UpdateDescription();
@@ -58,7 +92,7 @@ namespace BingoMode.BingoChallenges
 
         public void Fail()
         {
-            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amound.Value)) return;
+            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amount.Value)) return;
             
             FailChallenge(SteamTest.team);
         }
@@ -92,7 +126,7 @@ namespace BingoMode.BingoChallenges
                 "~",
                 current.ToString(),
                 "><",
-                amound.ToString(),
+                amount.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -106,7 +140,7 @@ namespace BingoMode.BingoChallenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amound = SettingBoxFromString(array[1]) as SettingBox<int>;
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
                 UpdateDescription();
@@ -132,6 +166,6 @@ namespace BingoMode.BingoChallenges
             On.RainWorldGame.GoToStarveScreen -= RainWorldGame_GoToStarveScreenHell;
         }
 
-        public override List<object> Settings() => [amound];
+        public override List<object> Settings() => [amount];
     }
 }
