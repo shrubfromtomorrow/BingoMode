@@ -1849,5 +1849,20 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
+
+        public static void LizardTongue_Update(On.LizardTongue.orig_Update orig, LizardTongue self)
+        {
+            orig.Invoke(self);
+            if (self.state == LizardTongue.State.Attatched && self.attached.owner is Player)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoLickChallenge c)
+                    {
+                        c.Licked(self.lizard);
+                    }
+                }
+            }
+        }
     }
 }

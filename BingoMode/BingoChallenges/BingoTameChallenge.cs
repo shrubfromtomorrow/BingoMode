@@ -40,7 +40,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoTameChallenge c || (c.specific.Value == true && specific.Value == true && c.specific.Value != specific.Value) || c.specific.Value != specific.Value;
+            return challenge is not BingoTameChallenge c || specific.Value != c.specific.Value || (specific.Value && c.specific.Value && crit.Value != c.crit.Value);
         }
 
         public override string ChallengeName()

@@ -591,6 +591,7 @@ namespace BingoMode
                 }
                 else if (!SteamFinal.ReceivedHostUpKeep)
                 {
+                    // Would like to pause game here and make button unpause
                     self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
                 }
                 

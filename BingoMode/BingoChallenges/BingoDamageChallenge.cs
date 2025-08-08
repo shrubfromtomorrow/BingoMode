@@ -186,18 +186,31 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
+                // 1.2
                 if (array.Length == 8)
                 {
                     weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
                     victim = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                    current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                     amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
                     region = SettingBoxFromString(array[5]) as SettingBox<string>;
                     completed = (array[6] == "1");
                     revealed = (array[7] == "1");
+                    current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
-                // Legacy board damage challenge compatibility
+                // 1.1
+                else if (array.Length == 9)
+                {
+                    weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    victim = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                    region = SettingBoxFromString(array[5]) as SettingBox<string>;
+                    completed = (array[7] == "1");
+                    revealed = (array[8] == "1");
+                    current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                }
+                // Pre 1.1
                 else if (array.Length == 6)
                 {
                     weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
