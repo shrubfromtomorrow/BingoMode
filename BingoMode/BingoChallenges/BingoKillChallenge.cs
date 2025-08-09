@@ -25,6 +25,7 @@ namespace BingoMode.BingoChallenges
         public Randomizer<bool> deathPit;
         public Randomizer<bool> starve;
         public Randomizer<bool> oneCycle;
+        public Randomizer<bool> shrooms;
 
         public override Challenge Random()
         {
@@ -36,6 +37,7 @@ namespace BingoMode.BingoChallenges
             challenge.deathPit.Value = deathPit.Random();
             challenge.starve.Value = starve.Random();
             challenge.oneCycle.Value = oneCycle.Random();
+            challenge.shrooms.Value = shrooms.Random();
             return challenge;
         }
 
@@ -50,6 +52,7 @@ namespace BingoMode.BingoChallenges
             serializedContent.AppendLine($"{surindent}deathPit-{deathPit.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}starve-{starve.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}oneCycle-{oneCycle.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}shrooms-{shrooms.Serialize(surindent)}");
             return base.Serialize(indent).Replace("__Type__", "Kill").Replace("__Content__", serializedContent.ToString());
         }
 
@@ -63,6 +66,7 @@ namespace BingoMode.BingoChallenges
             deathPit = Randomizer<bool>.InitDeserialize(dict["deathPit"]);
             starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
             oneCycle = Randomizer<bool>.InitDeserialize(dict["oneCycle"]);
+            shrooms = Randomizer<bool>.InitDeserialize(dict["shrooms"]);
         }
     }
 
@@ -73,7 +77,6 @@ namespace BingoMode.BingoChallenges
         public int current;
         public SettingBox<int> amount;
         public SettingBox<string> region;
-        //public SettingBox<string> room;
         public SettingBox<bool> deathPit;
         public SettingBox<bool> starve;
         public SettingBox<bool> oneCycle;

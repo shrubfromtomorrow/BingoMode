@@ -106,7 +106,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Visiting vistas");
+            return ChallengeTools.IGT.Translate("Collecting vistas");
         }
 
         public override bool Duplicable(Challenge challenge)

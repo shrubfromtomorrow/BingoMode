@@ -75,7 +75,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Trading already traded items");
+            return ChallengeTools.IGT.Translate("Trading same items between merchants");
         }
 
         public override Challenge Generate()

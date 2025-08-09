@@ -48,12 +48,11 @@ namespace BingoMode.BingoChallenges
             amount = new(0, "Amount", 0);
         }
 
-        public override bool RequireSave() => false;
-        public override bool ReverseChallenge() => true;
+        public override bool RequireSave() => true;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Do not die before completing [<current>/<amount>] bingo challenges")
+            description = ChallengeTools.IGT.Translate("Do not die before completing [<current>/<amount>] bingo challenges in a row")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
@@ -70,7 +69,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Not dying before completing challenges");
+            return ChallengeTools.IGT.Translate("Avoiding death before completing challenges");
         }
 
         public override Challenge Generate()
@@ -82,20 +81,24 @@ namespace BingoMode.BingoChallenges
 
         public void GetChallenge()
         {
-            if (!TeamsFailed[SteamTest.team] && completed && current < amount.Value)
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
                 current++;
                 UpdateDescription();
-                ChangeValue();
+                if (current >= amount.Value)
+                {
+                    CompleteChallenge();
+                }
+                else ChangeValue();
             }
         }
 
-        public void Fail()
-        {
-            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amount.Value)) return;
+        //public void Fail()
+        //{
+        //    if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amount.Value)) return;
             
-            FailChallenge(SteamTest.team);
-        }
+        //    FailChallenge(SteamTest.team);
+        //}
 
         public override int Points()
         {

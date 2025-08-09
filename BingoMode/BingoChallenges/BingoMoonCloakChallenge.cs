@@ -72,7 +72,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Moon's Cloak");
+            return ChallengeTools.IGT.Translate("Collecting or delivering Moon's cloak");
         }
 
         public override Challenge Generate()

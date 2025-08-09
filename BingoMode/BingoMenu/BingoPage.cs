@@ -280,6 +280,7 @@ namespace BingoMode.BingoMenu
             plusButton.buttonBehav.greyedOut = !isHost;
             minusButton.buttonBehav.greyedOut = !isHost;
             pasteBoard.buttonBehav.greyedOut = !isHost;
+            randomizerButton.buttonBehav.greyedOut = !isHost;
             grid.Switch(!isHost);
 
             if (isHost)

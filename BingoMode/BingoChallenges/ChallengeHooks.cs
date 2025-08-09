@@ -256,7 +256,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Fail();
+                    hell.Reset();
                 }
             }
         }
@@ -269,7 +269,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Fail();
+                    hell.Reset();
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Fail();
+                    hell.Reset();
                 }
             }
         }

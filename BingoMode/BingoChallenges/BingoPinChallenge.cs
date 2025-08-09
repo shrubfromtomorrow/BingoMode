@@ -194,7 +194,7 @@ namespace BingoMode.BingoChallenges
     
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Pinning creatures to walls");
+            return ChallengeTools.IGT.Translate("Pinning creatures");
         }
     
         public override string ToString()

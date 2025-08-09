@@ -77,7 +77,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Gifting neurons");
+            return ChallengeTools.IGT.Translate("Delivering neurons");
         }
 
         public override void Update()

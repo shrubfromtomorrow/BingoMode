@@ -20,12 +20,14 @@ namespace BingoMode.BingoChallenges
     {
         public Randomizer<string> foodType;
         public Randomizer<int> amountRequired;
+        public Randomizer<bool> starve;
 
         public override Challenge Random()
         {
             BingoEatChallenge challenge = new();
             challenge.foodType.Value = foodType.Random();
             challenge.amountRequired.Value = amountRequired.Random();
+            challenge.starve.Value = starve.Random();
             int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.foodType.Value);
             challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             return challenge;
@@ -37,6 +39,7 @@ namespace BingoMode.BingoChallenges
             StringBuilder serializedContent = new();
             serializedContent.AppendLine($"{surindent}foodType-{foodType.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}amountRequired-{amountRequired.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}starve-{starve.Serialize(surindent)}");
             return base.Serialize(indent).Replace("__Type__", "Eat").Replace("__Content__", serializedContent.ToString());
         }
 
@@ -45,6 +48,7 @@ namespace BingoMode.BingoChallenges
             Dictionary<string, string> dict = ToDict(serialized);
             foodType = Randomizer<string>.InitDeserialize(dict["foodType"]);
             amountRequired = Randomizer<int>.InitDeserialize(dict["amountRequired"]);
+            starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
         }
     }
 

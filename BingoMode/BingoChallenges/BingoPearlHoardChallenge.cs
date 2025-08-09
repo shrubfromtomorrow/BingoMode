@@ -76,7 +76,7 @@ namespace BingoMode.BingoChallenges
         {
             string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>")
-                .Replace("<action>", anyShelter.Value ? "Bring" : "Store")
+                .Replace("<action>", anyShelter.Value ? "Bring" : "Hoard")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
                 .Replace("<target_item>", common.Value ? ChallengeTools.IGT.Translate("common pearls") : ChallengeTools.IGT.Translate("colored pearls"))
@@ -107,7 +107,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Hoarding pearls in shelters");
+            return ChallengeTools.IGT.Translate("Putting pearls in shelters");
         }
 
         public override Challenge Generate()

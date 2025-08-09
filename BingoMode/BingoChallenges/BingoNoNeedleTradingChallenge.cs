@@ -55,7 +55,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Avoiding gifting Needles to Scavengers");
+            return ChallengeTools.IGT.Translate("Avoiding giving Needles to Scavengers");
         }
 
         public override Challenge Generate()

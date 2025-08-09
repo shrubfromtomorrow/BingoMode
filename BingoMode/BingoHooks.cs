@@ -166,6 +166,7 @@ namespace BingoMode
             // Add Bingo HUD and Stop the base Expedition HUD from appearing
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
+            On.HUD.HUD.InitFastTravelHud += HUD_InitFastTravelHud;
             //IL.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHudIL;
 
             // Ficks
@@ -244,6 +245,11 @@ namespace BingoMode
 
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
+        }
+
+        private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
+        {
+            throw new NotImplementedException();
         }
 
         private static void Menu_ShutDownProcess(On.Menu.Menu.orig_ShutDownProcess orig, Menu.Menu self)
@@ -947,6 +953,15 @@ namespace BingoMode
         private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
         {
             orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
+            if (BingoData.BingoMode && GlobalBoard != null && GlobalBoard.challengeGrid != null)
+            {
+                self.AddPart(new BingoHUDMain(self));
+            }
+        }
+
+        private static void HUD_InitFastTravelHud(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
+        {
+            orig.Invoke(self, mapData);
             if (BingoData.BingoMode && GlobalBoard != null && GlobalBoard.challengeGrid != null)
             {
                 self.AddPart(new BingoHUDMain(self));
