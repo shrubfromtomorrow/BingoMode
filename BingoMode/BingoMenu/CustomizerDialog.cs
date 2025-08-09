@@ -15,33 +15,33 @@ namespace BingoMode.BingoMenu
 {
     public class CustomizerDialog : Dialog
     {
-        readonly int[] maxItems = [10, 5];
-        float leftAnchor;
-        bool opening;
-        bool closing;
-        float uAlpha;
-        float currentAlpha;
-        float lastAlpha;
-        float targetAlpha;
-        float sliderF;
-        float num;
-        bool onSettings;
-        bool lastOnSettings;
-        BingoButton owner;
-        FSprite pageTitle;
-        SimpleButton closeButton;
-        FSprite[] dividers;
-        FLabel description;
-        MenuLabel page;
-        SymbolButton randomize;
-        SymbolButton settings;
-        SymbolButton types;
-        List<Challenge> testList;
-        TypeButton[] testLabels;
-        VerticalSlider slider;
-        List<ChallengeSetting> challengeSettings;
-        MenuTab tab;
-        MenuTabWrapper wrapper;
+        private readonly int[] maxItems = [10, 5];
+        private float leftAnchor;
+        private bool opening;
+        private bool closing;
+        private float uAlpha;
+        private float currentAlpha;
+        private float lastAlpha;
+        private float targetAlpha;
+        private float sliderF;
+        private float num;
+        private bool onSettings;
+        private bool lastOnSettings;
+        private BingoButton owner;
+        private FSprite pageTitle;
+        private SimpleButton closeButton;
+        private FSprite[] dividers;
+        private FLabel description;
+        private MenuLabel page;
+        private SymbolButton randomize;
+        private SymbolButton settings;
+        private SymbolButton types;
+        private List<Challenge> testList;
+        private TypeButton[] testLabels;
+        private VerticalSlider slider;
+        private List<ChallengeSetting> challengeSettings;
+        private MenuTab tab;
+        private MenuTabWrapper wrapper;
 
         public CustomizerDialog(ProcessManager manager, BingoButton owner) : base(manager)
         {

@@ -256,7 +256,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Reset();
+                    hell.Die();
                 }
             }
         }
@@ -269,7 +269,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Reset();
+                    hell.Die();
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Reset();
+                    hell.Die();
                 }
             }
         }
@@ -1017,6 +1017,38 @@ namespace BingoMode.BingoChallenges
             orig.Invoke(self, game, survived, newMalnourished);
         }
 
+        public static void DantesInferno(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
+        {
+            if (survived && !newMalnourished)
+            {
+                int revealedChallenges = 0;
+                List<BingoHellChallenge> hellChallenges = [];
+
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is BingoChallenge g)
+                    {
+                        if (g.RequireSave() && g.revealed)
+                        {
+                            revealedChallenges++;
+                        }
+
+                        if (g is BingoHellChallenge h && !h.hidden && !h.revealed && !h.completed && !h.TeamsCompleted[SteamTest.team] && !h.TeamsFailed[SteamTest.team])
+                        {
+                            hellChallenges.Add(h);
+                        }
+                    }
+                }
+
+                foreach (BingoHellChallenge hell in hellChallenges)
+                {
+                    hell.SessionEnded(revealedChallenges);
+                }
+            }
+
+            orig.Invoke(self, game, survived, newMalnourished);
+        }
+
         public static void ScavengerBomb_Explode(On.ScavengerBomb.orig_Explode orig, ScavengerBomb self, BodyChunk hitChunk)
         {
             orig.Invoke(self, hitChunk);
@@ -1032,19 +1064,6 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
-
-        //public static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel self)
-        //{
-        //    orig.Invoke(self);
-        //
-        //    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-        //    {
-        //        if (!self.clampedObjects.Any(x => x.chunk.owner is Player) && ExpeditionData.challengeList[j] is BingoDodgeLeviathanChallenge c && c.wasInArea > 0)
-        //        {
-        //            c.Dodged();
-        //        }
-        //    }
-        //}
 
         public static void FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
         {

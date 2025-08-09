@@ -90,13 +90,11 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = anyShelter.Value ?
                 new Phrase([[common.Value ? Icon.PEARL_HOARD_NORMAL : Icon.PEARL_HOARD_COLOR, new Icon("singlearrow"), new Icon("doubleshelter")]]) :
                 new Phrase([[new Icon("ShelterMarker"), common.Value ? Icon.PEARL_HOARD_NORMAL : Icon.PEARL_HOARD_COLOR]]);
-            int lastLine = 1;
+            phrase.InsertWord(new Counter(current, amount.Value), 1);
             if (region.Value != "Any Region")
             {
-                phrase.InsertWord(new Verse(region.Value), 1);
-                lastLine = 2;
+                phrase.InsertWord(new Verse(region.Value), 2);
             }
-            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
             return phrase;
         }
 
