@@ -39,7 +39,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Dodge a leviathan's bite");
+            this.description = ChallengeTools.IGT.Translate("Dodge a Leviathan's bite");
             base.UpdateDescription();
         }
 

@@ -59,7 +59,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Reach the vista point in <region_name>").Replace("<region_name>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)));
+            this.description = ChallengeTools.IGT.Translate("Collect the vista in <region_name>").Replace("<region_name>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(this.region, ExpeditionData.slugcatPlayer)));
             base.UpdateDescription();
         }
 

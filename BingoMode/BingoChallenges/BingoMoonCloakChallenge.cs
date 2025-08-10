@@ -50,7 +50,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate(!deliver.Value ? "Grab Moon's Cloak" : "Deliver the Cloak to Moon");
+            description = ChallengeTools.IGT.Translate(!deliver.Value ? "Collect Moon's Cloak" : "Deliver the Cloak to Moon");
             base.UpdateDescription();
         }
 

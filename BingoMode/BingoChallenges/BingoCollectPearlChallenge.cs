@@ -173,6 +173,7 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
+            collected?.Clear();
             collected = [];
         }
 

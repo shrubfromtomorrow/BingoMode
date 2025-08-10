@@ -48,7 +48,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            description = "Get the " + ChallengeTools.IGT.Translate(unlock.Value) + " unlock";
+            description = "Collect the " + ChallengeTools.IGT.Translate(unlock.Value) + " unlock";
             base.UpdateDescription();
         }
 

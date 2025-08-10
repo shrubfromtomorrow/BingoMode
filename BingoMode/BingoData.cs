@@ -139,10 +139,13 @@ namespace BingoMode
         {
             if (!bannedChallenges.ContainsKey(slug))
             {
-                bannedChallenges[slug] = [];
+                bannedChallenges[slug] = new List<string>
+                {
+                    nameof(BingoHellChallenge)
+                };
             }
         }
-        
+
         public static bool IsCurrentSaveLockout()
         {
             return BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && 

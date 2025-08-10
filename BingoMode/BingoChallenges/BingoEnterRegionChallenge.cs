@@ -134,12 +134,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoaderYesRegion1;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoaderYesRegion1;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded;
         }
 
         public override List<object> Settings() => [region];

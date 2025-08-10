@@ -57,7 +57,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Neurons delivered to Looks to the Moon <progress>").Replace("<progress>", string.Concat(new string[]
+            this.description = ChallengeTools.IGT.Translate("Deliver <progress> neurons to Looks to the Moon").Replace("<progress>", string.Concat(new string[]
             {
                 "[",
                 this.delivered.ToString(),

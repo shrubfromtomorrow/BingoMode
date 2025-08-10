@@ -52,7 +52,7 @@ namespace BingoMode.BingoChallenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            description = ChallengeTools.IGT.Translate("Drop a <crit> into the depths drop room")
+            description = ChallengeTools.IGT.Translate("Drop a <crit> into the depths drop room (SB_D06)")
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
             base.UpdateDescription();
         }

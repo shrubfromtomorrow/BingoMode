@@ -63,10 +63,11 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase(
-                [[new Verse(from.Value)],
-                [new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 180f)],
-                [new Verse(to.Value)]]);
+            //return new Phrase(
+            //    [[new Verse(from.Value)],
+            //    [new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 180f)],
+            //    [new Verse(to.Value)]]);
+            return new Phrase([[new Verse(from.Value), new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 90f), new Verse(to.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)
@@ -201,12 +202,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded3;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded;
         }
 
         public override void RemoveHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded3;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded;
         }
 
         public override List<object> Settings() => [from, to];

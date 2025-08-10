@@ -88,7 +88,7 @@ namespace BingoMode.BingoChallenges
         {
             List<string> regiones = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
-            int req = UnityEngine.Random.Range(3, regiones.Count);
+            int req = UnityEngine.Random.Range(3, regiones.Count - 4);
 
             return new BingoAllRegionsExcept
             {
@@ -180,12 +180,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoaderNoRegion2;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoaderNoRegion2;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded;
         }
 
         public override List<object> Settings() => [region, required];

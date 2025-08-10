@@ -186,6 +186,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\newest\plugins\$(TargetName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

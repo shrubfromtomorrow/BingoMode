@@ -182,7 +182,9 @@ namespace BingoMode.BingoChallenges
         public override void Reset()
         {
             current = 0;
+            pinList?.Clear();
             pinList = [];
+            spearList?.Clear();
             spearList = [];
             base.Reset();
         }

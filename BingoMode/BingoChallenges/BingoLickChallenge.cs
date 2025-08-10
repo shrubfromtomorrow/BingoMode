@@ -100,6 +100,7 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
+            lickers?.Clear();
             lickers = [];
         }
 
@@ -110,8 +111,8 @@ namespace BingoMode.BingoChallenges
 
         public override string ToString()
         {
-            return string.Concat(new string[]
-            {
+            return string.Concat(
+            [
                 "BingoLickChallenge",
                 "~",
                 current.ToString(),
@@ -123,7 +124,7 @@ namespace BingoMode.BingoChallenges
                 revealed ? "1" : "0",
                 "><",
                 string.Join("|", lickers),
-            });
+            ]);
         }
 
         public override void FromString(string args)

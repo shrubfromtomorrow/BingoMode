@@ -51,7 +51,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Maul [<current>/<amount>] different types of creatures")
+            description = ChallengeTools.IGT.Translate("Maul [<current>/<amount>] unique creature types")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();

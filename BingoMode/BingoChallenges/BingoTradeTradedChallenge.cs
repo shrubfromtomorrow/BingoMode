@@ -119,6 +119,7 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
+            traderItems?.Clear();
             traderItems = [];
         }
 

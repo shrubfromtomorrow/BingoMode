@@ -170,6 +170,14 @@ namespace BingoMode.BingoChallenges
             return ChallengeTools.IGT.Translate("Visiting echoes");
         }
 
+        public override void Reset()
+        {
+            base.Reset();
+            current = 0;
+            visited?.Clear();
+            visited = [];
+        }
+
         public override string ToString()
         {
             return string.Concat(
