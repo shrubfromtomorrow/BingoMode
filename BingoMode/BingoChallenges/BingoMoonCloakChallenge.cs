@@ -79,7 +79,7 @@ namespace BingoMode.BingoChallenges
         {
             BingoMoonCloakChallenge ch = new BingoMoonCloakChallenge
             {
-                deliver = new(UnityEngine.Random.value < 0.5f, "Deliver", 0)
+                deliver = new(true, "Deliver", 0)
             };
 
             return ch;

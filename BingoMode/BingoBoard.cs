@@ -498,7 +498,7 @@ namespace BingoMode
 
             List<Challenge> list = [];
             list.AddRange(BingoData.availableBingoChallenges);
-            if (type is not BingoHellChallenge) list.RemoveAll(x => x is BingoHellChallenge);
+            if (type is not BingoAllRegionsExcept) list.RemoveAll(x => x is BingoAllRegionsExcept); 
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
         resette:
             Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];

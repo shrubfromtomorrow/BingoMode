@@ -74,13 +74,13 @@ namespace BingoMode.BingoChallenges
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogInfo("Singleplayer, challenge completed but not locked in: " + this.ToString());
+                    //Plugin.logger.LogInfo("Singleplayer, challenge completed but not locked in: " + this.ToString());
                     
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
-                Plugin.logger.LogInfo("Singleplayer, challenge locked in: " + this.ToString());
+                //Plugin.logger.LogInfo("Singleplayer, challenge locked in: " + this.ToString());
                 OnChallengeCompleted(SteamTest.team);
 
                 //if (ExpeditionGame.activeUnlocks.Contains("unl-passage"))
@@ -102,13 +102,13 @@ namespace BingoMode.BingoChallenges
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogInfo("Multiplayer HOST, challenge completed but not locked in: " + this.ToString());
+                    //Plugin.logger.LogInfo("Multiplayer HOST, challenge completed but not locked in: " + this.ToString());
 
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
-                Plugin.logger.LogInfo("Multiplayer HOST, challenge locked in: " + this.ToString());
+                //Plugin.logger.LogInfo("Multiplayer HOST, challenge locked in: " + this.ToString());
                 OnChallengeCompleted(SteamTest.team);
 
                 //if (ExpeditionGame.activeUnlocks.Contains("unl-passage"))
@@ -126,13 +126,13 @@ namespace BingoMode.BingoChallenges
                 if (RequireSave() && !revealed)
                 {
                     revealed = true;
-                    Plugin.logger.LogInfo("Multiplayer PLAYER, challenge completed but not locked in: " + this.ToString());
+                    //Plugin.logger.LogInfo("Multiplayer PLAYER, challenge completed but not locked in: " + this.ToString());
 
                     ChallengeAlmostComplete?.Invoke(SteamTest.team);
                     return;
                 }
 
-                Plugin.logger.LogInfo("Multiplayer PLAYER, challenge locked in: " + this.ToString());
+                //Plugin.logger.LogInfo("Multiplayer PLAYER, challenge locked in: " + this.ToString());
                 SteamFinal.ChallengeStateChangeToHost(this, false);
                 return;
             }

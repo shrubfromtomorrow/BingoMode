@@ -69,7 +69,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Avoiding death before completing challenges");
+            return ChallengeTools.IGT.Translate("Avoiding death while completing challenges");
         }
 
         public override Challenge Generate()
@@ -83,13 +83,22 @@ namespace BingoMode.BingoChallenges
         {
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
-                current++;
-                UpdateDescription();
+                // mayn whad ta fuk
                 if (current >= amount.Value)
                 {
+                    UpdateDescription();
                     CompleteChallenge();
                 }
-                else ChangeValue();
+                else
+                {
+                    current++;
+                    UpdateDescription();
+                    if (current >= amount.Value)
+                    {
+                        CompleteChallenge();
+                    }
+                    else ChangeValue();
+                }
             }
         }
 

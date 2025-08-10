@@ -709,26 +709,6 @@ namespace BingoMode
                 {
                     SteamFinal.BroadcastCurrentBoardState();
                 }
-
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoHellChallenge hell && hell.TeamsCompleted[SteamTest.team] && !hell.TeamsFailed[SteamTest.team])
-                    {
-                        int newCurrent = 0;
-
-                        foreach (var cha in ExpeditionData.challengeList)
-                        {
-                            if (cha is BingoChallenge ch && !ch.ReverseChallenge() && ch.TeamsCompleted[SteamTest.team]) newCurrent++;
-                        }
-
-                        if (hell.current != newCurrent)
-                        {
-                            hell.current = newCurrent;
-                            hell.UpdateDescription();
-                            hell.ChangeValue();
-                        }
-                    }
-                }
             }
         }
 

@@ -1712,15 +1712,12 @@ namespace BingoMode.BingoChallenges
         //For debugging moonCloak and Timeline, make sure to uncomment the BingoMoonCloak hooks so its used
         public static void SaveState_ctorCloak(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
         {
-            Plugin.logger.LogInfo("Original Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
             progression.miscProgressionData.cloakTimelinePosition = null;
 
             orig.Invoke(self, saveStateNumber, progression);
 
             self.miscWorldSaveData.moonGivenRobe = false;
 
-            Plugin.logger.LogInfo("Modified Cloak timeline position: " + progression.miscProgressionData.cloakTimelinePosition);
-            Plugin.logger.LogInfo("Cloak after invoke! " + self.miscWorldSaveData.moonGivenRobe);
         }
 
         public static void Room_LoadedMoonCloak(ILContext il)
