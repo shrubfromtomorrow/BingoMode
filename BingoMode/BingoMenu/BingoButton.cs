@@ -153,7 +153,7 @@ namespace BingoMode.BingoMenu
             //bkgRect.addSize = new Vector2(10f, 6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
             selectRect.addSize = new Vector2(-10f, -6f) * (buttonBehav.sizeBump + 0.5f * Mathf.Sin(buttonBehav.extraSizeBump * 3.1415927f)) * (buttonBehav.clicked ? 0f : 1f);
 
-            boxVisible = mouseOver && !menu.manager.sideProcesses.Any(x => x is CustomizerDialog);
+            boxVisible = mouseOver && !menu.manager.sideProcesses.Any(x => x is CustomizerDialog or FilterDialog);
             if (boxVisible && lastMouseOver != mouseOver)
             {
                 for (int i = 0; i < boxSprites.Length; i++)

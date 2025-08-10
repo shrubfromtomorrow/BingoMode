@@ -29,6 +29,7 @@ namespace BingoMode.BingoMenu
         public HoldButton startGame;
         public SymbolButton randomize;
         public SymbolButton shuffle;
+        public SymbolButton filter;
         public OpHoldButton unlocksButton;
         public UIelementWrapper unlockWrapper;
         public MenuTabWrapper menuTabWrapper;
@@ -156,6 +157,12 @@ namespace BingoMode.BingoMenu
             shuffle.roundedRect.size = shuffle.size;
             subObjects.Add(shuffle);
 
+            filter = new SymbolButton(menu, this, "filter", "FILTER", new Vector2(497f, 690f));
+            filter.size = new Vector2(30f, 30f);
+            filter.symbolSprite.scale = 0.8f;
+            filter.roundedRect.size = filter.size;
+            subObjects.Add(filter);
+
             float xx = menu.manager.rainWorld.screenSize.x * 0.79f;
             float yy = 85f;
             startGame = new HoldButton(menu, this, "BEGIN", "STARTBINGO",
@@ -277,6 +284,7 @@ namespace BingoMode.BingoMenu
             shelterSetting.greyedOut = !isHost;
             randomize.buttonBehav.greyedOut = !isHost;
             shuffle.buttonBehav.greyedOut = !isHost;
+            filter.buttonBehav.greyedOut = !isHost;
             plusButton.buttonBehav.greyedOut = !isHost;
             minusButton.buttonBehav.greyedOut = !isHost;
             pasteBoard.buttonBehav.greyedOut = !isHost;
@@ -323,6 +331,7 @@ namespace BingoMode.BingoMenu
                 shelterSetting.greyedOut = !create;
                 randomize.buttonBehav.greyedOut = !create;
                 shuffle.buttonBehav.greyedOut = !create;
+                filter.buttonBehav.greyedOut = !create;
                 plusButton.buttonBehav.greyedOut = !create;
                 minusButton.buttonBehav.greyedOut = !create;
                 pasteBoard.buttonBehav.greyedOut = !create;
@@ -346,6 +355,7 @@ namespace BingoMode.BingoMenu
             startGame.menuLabel.text = "BEGIN";
             randomize.buttonBehav.greyedOut = false;
             shuffle.buttonBehav.greyedOut = false;
+            filter.buttonBehav.greyedOut = false;
             plusButton.buttonBehav.greyedOut = false;
             minusButton.buttonBehav.greyedOut = false;
             pasteBoard.buttonBehav.greyedOut = false;
@@ -620,6 +630,12 @@ namespace BingoMode.BingoMenu
             if (message == "SHUFFLE")
             {
                 Shuffle();
+                return;
+            }
+
+            if (message == "FILTER")
+            {
+                OpenFilterDialog();
                 return;
             }
 
@@ -923,6 +939,12 @@ namespace BingoMode.BingoMenu
                 Plugin.logger.LogInfo(chal.ToString());
             }
             menu.PlaySound(SoundID.MENU_Next_Slugcat);
+        }
+
+        public void OpenFilterDialog()
+        {
+            menu.manager.ShowDialog(new FilterDialog(menu.manager));
+            menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
         }
 
         public void SwitchChals(MenuObject sender)

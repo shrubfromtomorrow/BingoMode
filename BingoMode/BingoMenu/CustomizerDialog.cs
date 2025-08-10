@@ -42,6 +42,7 @@ namespace BingoMode.BingoMenu
         private List<ChallengeSetting> challengeSettings;
         private MenuTab tab;
         private MenuTabWrapper wrapper;
+        private float scrollWheelVelocity;
 
         public CustomizerDialog(ProcessManager manager, BingoButton owner) : base(manager)
         {
@@ -123,7 +124,7 @@ namespace BingoMode.BingoMenu
             slider.subtleSliderNob.outerCircle.alpha = 0f;
             pages[0].subObjects.Add(slider);
 
-            testList = [.. BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer)];
+            testList = [.. BingoData.GetValidChallengeList(ExpeditionData.slugcatPlayer)];
             testLabels = new TypeButton[testList.Count];
             for (int i = 0; i < testList.Count; i++)
             {
@@ -183,6 +184,44 @@ namespace BingoMode.BingoMenu
                 return sliderF;
             }
             return 0f;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            lastAlpha = currentAlpha;
+            currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, 0.2f);
+            if (opening && pages[0].pos.y <= 0.01f)
+            {
+                opening = false;
+            }
+            if (closing && Math.Abs(currentAlpha - targetAlpha) < 0.09f)
+            {
+                pageTitle.RemoveFromContainer();
+                description.RemoveFromContainer();
+                for (int i = 0; i < 3; i++)
+                {
+                    dividers[i].RemoveFromContainer();
+                }
+                manager.StopSideProcess(this);
+                closing = false;
+                tab._Unload();
+                testList.Clear();
+            }
+            closeButton.buttonBehav.greyedOut = opening;
+
+            tab._Update();
+
+            if (manager.menuesMouseMode && mouseScrollWheelMovement != 0)
+            {
+                scrollWheelVelocity = Mathf.Sign(mouseScrollWheelMovement);
+            }
+            scrollWheelVelocity *= 0.8f;
+            if (scrollWheelVelocity != 0f)
+            {
+                SliderSetValue(slider, Mathf.Clamp01(ValueOfSlider(slider) - scrollWheelVelocity * 0.05f));
+            }
+            if (Mathf.Abs(scrollWheelVelocity) < 0.02f) scrollWheelVelocity = 0f;
         }
 
         public override void GrafUpdate(float timeStacker)
@@ -320,33 +359,6 @@ namespace BingoMode.BingoMenu
                 ListItem[] list = (s.field as OpComboBox)._itemList;
                 (s.field as OpComboBox).value = list[UnityEngine.Random.Range(0, list.Length)].name;
             }
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            lastAlpha = currentAlpha;
-            currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, 0.2f);
-            if (opening && pages[0].pos.y <= 0.01f)
-            {
-                opening = false;
-            }
-            if (closing && Math.Abs(currentAlpha - targetAlpha) < 0.09f)
-            {
-                pageTitle.RemoveFromContainer();
-                description.RemoveFromContainer();
-                for (int i = 0; i < 3; i++)
-                {
-                    dividers[i].RemoveFromContainer();
-                }
-                manager.StopSideProcess(this);
-                closing = false;
-                tab._Unload();
-                testList.Clear();
-            }
-            closeButton.buttonBehav.greyedOut = opening;
-
-            tab._Update();
         }
 
         public void AssignChallenge(Challenge ch = null)

@@ -79,6 +79,8 @@ namespace BingoMode
                     return;
                 }
 
+                BingoData.LoadAllBannedChallengeLists();
+
                 SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");

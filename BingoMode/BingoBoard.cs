@@ -497,16 +497,13 @@ namespace BingoMode
             }
 
             List<Challenge> list = [];
-            list.AddRange(BingoData.availableBingoChallenges);
-            if (type is not BingoAllRegionsExcept) list.RemoveAll(x => x is BingoAllRegionsExcept); 
+            list.AddRange(BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer));
+            list.RemoveAll(x => (type == null || x.GetType() != type.GetType()) && BingoData.bannedChallenges[ExpeditionData.slugcatPlayer].Contains(x.GetType().Name));
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
+            int tries = 0;
         resette:
-            Challenge ch = list[UnityEngine.Random.Range(0, list.Count)];
-            if (!ch.ValidForThisSlugcat(ExpeditionData.slugcatPlayer))
-            {
-                list.Remove(ch);
-                goto resette;
-            }
+            tries++;
+            Challenge ch = list.Count == 0 || tries > 500 ? new BingoKillChallenge() : list[UnityEngine.Random.Range(0, list.Count)];
             try
             {
                 ch = ch.Generate();
@@ -518,7 +515,7 @@ namespace BingoMode
                 goto resette;
             }
 
-            if (ExpeditionData.challengeList.Count > 0 && type == null && !ignore)
+            if (list.Count > 0 && ExpeditionData.challengeList.Count > 0 && type == null && !ignore)
             {
                 for (int i = 0; i < ExpeditionData.challengeList.Count; i++)
                 {

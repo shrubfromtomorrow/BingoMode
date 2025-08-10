@@ -12,6 +12,8 @@ namespace BingoMode
     using BingoSteamworks;
     using MoreSlugcats;
     using Steamworks;
+    using System.IO;
+    using UnityEngine;
 
     public static class BingoData
     {
@@ -34,6 +36,7 @@ namespace BingoMode
         public static bool CreateKarmaFlower = false;
         public static Dictionary<string, List<string>> pinnableCreatureRegions;
         public static int RandomStartingSeed = -1;
+        public static Dictionary<SlugcatStats.Name, List<string>> bannedChallenges = [];
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
@@ -83,6 +86,62 @@ namespace BingoMode
                 this.songPlayed = songPlayed;
             }
         }
+
+        public static void SaveChallengeBlacklistFor(SlugcatStats.Name slug)
+        {
+            TryGenerateDefaultBlacklistFor(slug);
+
+            string text = string.Join(";", bannedChallenges[slug]);
+
+            File.WriteAllText(Application.persistentDataPath +
+                Path.DirectorySeparatorChar.ToString() +
+                "Bingo" +
+                Path.DirectorySeparatorChar.ToString() +
+                "blacklist-" +
+                slug.value +
+                ".txt",
+                text);
+        }
+
+        public static void LoadAllBannedChallengeLists()
+        {
+            foreach (SlugcatStats.Name slug in ExpeditionData.GetPlayableCharacters())
+            {
+                try
+                {
+                    string path = Application.persistentDataPath +
+                    Path.DirectorySeparatorChar.ToString() +
+                    "Bingo" +
+                    Path.DirectorySeparatorChar.ToString() +
+                    "blacklist-" +
+                    slug.value +
+                    ".txt";
+
+                    if (!File.Exists(path))
+                    {
+                        SaveChallengeBlacklistFor(slug);
+                        continue;
+                    }
+
+                    string data = File.ReadAllText(path);
+
+                    bannedChallenges[slug] = string.IsNullOrEmpty(data) ? [] : data.Split(';').ToList();
+                }
+                catch
+                {
+                    Plugin.logger.LogError("Failed to load banned challenge list for " + slug.value);
+                    SaveChallengeBlacklistFor(slug);
+                }
+            }
+        }
+
+        private static void TryGenerateDefaultBlacklistFor(SlugcatStats.Name slug)
+        {
+            if (!bannedChallenges.ContainsKey(slug))
+            {
+                bannedChallenges[slug] = [];
+            }
+        }
         
         public static bool IsCurrentSaveLockout()
         {
@@ -118,6 +177,14 @@ namespace BingoMode
         {
             List<Challenge> list = [.. availableBingoChallenges];
             list.RemoveAll(x => !x.ValidForThisSlugcat(slug));
+            return list;
+        }
+
+        public static List<Challenge> GetValidChallengeList(SlugcatStats.Name slug)
+        {
+            List<Challenge> list = [.. availableBingoChallenges];
+            list.RemoveAll(x => !x.ValidForThisSlugcat(slug));
+            list.RemoveAll(x => bannedChallenges[slug].Contains(x.GetType().Name));
             return list;
         }
 
@@ -180,8 +247,6 @@ namespace BingoMode
                 }
             }
         }
-
-
 
         public static void FillPossibleTokens(SlugcatStats.Name slug)
         {
