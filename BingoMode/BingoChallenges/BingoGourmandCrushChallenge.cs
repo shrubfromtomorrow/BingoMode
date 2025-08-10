@@ -41,7 +41,7 @@ namespace BingoMode.BingoChallenges
 
     public class BingoGourmandCrushChallenge : BingoChallenge
     {
-        public List<string> crushedTypes = [];
+        public List<EntityID> crushed = [];
         public int current;
         public SettingBox<int> amount;
 
@@ -86,8 +86,8 @@ namespace BingoMode.BingoChallenges
         public override void Reset()
         {
             current = 0;
-            crushedTypes?.Clear();
-            crushedTypes = [];
+            crushed?.Clear();
+            crushed = [];
             base.Reset();
         }
 
@@ -96,10 +96,10 @@ namespace BingoMode.BingoChallenges
             return challenge is not BingoGourmandCrushChallenge c;
         }
 
-        public void Crush(string type)
+        public void Crush(EntityID id)
         {
-            if (completed || revealed || hidden || TeamsCompleted[SteamTest.team] || crushedTypes.Contains(type)) return;
-            crushedTypes.Add(type);
+            if (completed || revealed || hidden || TeamsCompleted[SteamTest.team] || crushed.Contains(id)) return;
+            crushed.Add(id);
             current++;
             UpdateDescription();
             if (current >= (int)amount.Value) CompleteChallenge();
@@ -130,7 +130,7 @@ namespace BingoMode.BingoChallenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                string.Join("|", crushedTypes),
+                string.Join("|", crushed),
             });
         }
 
@@ -143,8 +143,15 @@ namespace BingoMode.BingoChallenges
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
-                crushedTypes = [];
-                crushedTypes = [.. array[4].Split('|')];
+                string[] arr = array[4].Split('|');
+                crushed = [];
+                if (arr != null && arr.Length > 0)
+                {
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        if (arr[i] != string.Empty) crushed.Add(EntityID.FromString(arr[i]));
+                    }
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

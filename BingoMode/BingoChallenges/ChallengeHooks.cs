@@ -1743,7 +1743,7 @@ namespace BingoMode.BingoChallenges
                         {
                             if (ExpeditionData.challengeList[j] is BingoGourmandCrushChallenge c)
                             {
-                                c.Crush((crit as Creature).Template.type.value);
+                                c.Crush((crit as Creature).abstractCreature.ID);
                             }
                         }
                     }
