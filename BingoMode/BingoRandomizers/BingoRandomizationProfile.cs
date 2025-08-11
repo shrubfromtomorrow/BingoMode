@@ -68,6 +68,8 @@ namespace BingoMode.BingoRandomizer
         /// <returns>A list containing all available profiles in the user's RandomizerProfiles directory.</returns>
         public static List<string> GetAvailableProfiles(string path = null)
         {
+            Directory.CreateDirectory(PROFILE_PATH);
+
             if (path == null)
                 path = PROFILE_PATH;
             List<string> profiles = [];
