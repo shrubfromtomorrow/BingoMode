@@ -42,6 +42,11 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public List<string> lickers = [];
 
+        public BingoLickChallenge()
+        {
+            amount = new(0, "Amount", 0);
+        }
+
         public override void UpdateDescription()
         {
             description = ChallengeTools.IGT.Translate("Get licked by [<current>/<amount>] unique lizards")

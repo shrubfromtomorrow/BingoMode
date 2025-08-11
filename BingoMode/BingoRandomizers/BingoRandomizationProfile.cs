@@ -178,6 +178,7 @@ namespace BingoMode.BingoRandomizer
                 case "Iterator": return new BingoIteratorRandomizer() as Randomizer<T>;
                 case "KarmaFlower": return new BingoKarmaFlowerRandomizer() as Randomizer<T>;
                 case "Kill": return new BingoKillRandomizer() as Randomizer<T>;
+                case "Lick": return new BingoLickRandomizer() as Randomizer<T>;
                 case "MaulTypes": return new BingoMaulTypesRandomizer() as Randomizer<T>;
                 case "MaulX": return new BingoMaulXRandomizer() as Randomizer<T>;
                 case "MoonCloak": return new BingoMoonCloakRandomizer() as Randomizer<T>;
