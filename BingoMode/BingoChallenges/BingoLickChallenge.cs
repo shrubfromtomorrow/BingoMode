@@ -136,7 +136,7 @@ namespace BingoMode.BingoChallenges
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
-                string[] arr = Regex.Split(array[6], "|");
+                string[] arr = Regex.Split(array[4], "|");
                 lickers = [.. arr];
                 UpdateDescription();
             }

@@ -543,6 +543,7 @@ namespace BingoMode.BingoChallenges
             "DangleFruit",
             "SlimeMold",
             "BubbleGrass",
+            "EggBugEgg",
 
             // MSC
             "GooieDuck",

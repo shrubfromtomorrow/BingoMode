@@ -764,7 +764,8 @@ namespace BingoMode.BingoHUD
                             {
                                 Random.State state = Random.state;
                                 Random.InitState(obj.ID.RandomSeed);
-                                if (Random.value < 0.00999f)
+                                // 1/999
+                                if (Random.value < 0.000999f)
                                 {
                                     BingoHUDHint hint = new BingoHUDHint(obj.realizedObject, room.abstractRoom.index, "pipis", Color.white, new Vector2(-17f, -22f), player.abstractCreature.world.game.cameras[0]);
                                     hints.Add(hint);

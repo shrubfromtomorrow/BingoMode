@@ -95,7 +95,7 @@ namespace BingoMode
                     greyedOut = bock.GetValueBool();
                 }
 
-                if (item is OpKeyBinder g)
+                if (item is OpKeyBinder g && !(g.cfgEntry == ResetBind))
                 {
                     g.greyedOut = greyedOut;
                 }
