@@ -91,6 +91,7 @@ namespace BingoMode.BingoChallenges
             region = new("", "Region", 5, listName: "regions");
             weapon = new("", "Weapon Used", 6, listName: "weaponsnojelly");
             deathPit = new(false, "Via a Death Pit", 7);
+            shrooms = new(false, "While under mushroom effect", 8);
         }
 
         public override void UpdateDescription()

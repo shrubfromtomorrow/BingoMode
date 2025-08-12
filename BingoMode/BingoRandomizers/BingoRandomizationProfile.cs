@@ -68,6 +68,8 @@ namespace BingoMode.BingoRandomizer
         /// <returns>A list containing all available profiles in the user's RandomizerProfiles directory.</returns>
         public static List<string> GetAvailableProfiles(string path = null)
         {
+            Directory.CreateDirectory(PROFILE_PATH);
+
             if (path == null)
                 path = PROFILE_PATH;
             List<string> profiles = [];
@@ -178,6 +180,7 @@ namespace BingoMode.BingoRandomizer
                 case "Iterator": return new BingoIteratorRandomizer() as Randomizer<T>;
                 case "KarmaFlower": return new BingoKarmaFlowerRandomizer() as Randomizer<T>;
                 case "Kill": return new BingoKillRandomizer() as Randomizer<T>;
+                case "Lick": return new BingoLickRandomizer() as Randomizer<T>;
                 case "MaulTypes": return new BingoMaulTypesRandomizer() as Randomizer<T>;
                 case "MaulX": return new BingoMaulXRandomizer() as Randomizer<T>;
                 case "MoonCloak": return new BingoMoonCloakRandomizer() as Randomizer<T>;

@@ -64,6 +64,7 @@ namespace BingoMode.BingoChallenges
         {
             foodType = new("", "Food type", 0, "food");
             amountRequired = new(0, "Amount", 1);
+            starve = new(false, "While Starving", 2);
         }
 
         public override void UpdateDescription()
