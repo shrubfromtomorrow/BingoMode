@@ -1066,8 +1066,11 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_EnterRegionFrom(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            if (game.world != null)
+            if (game != null && game.world != null)
             {
+                Plugin.logger.LogInfo("EnterFrom");
+                Plugin.logger.LogInfo(worldName);
+                Plugin.logger.LogInfo(game.world.region?.name);
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge EnterRegionFrom)
@@ -1081,7 +1084,7 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_Transport(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            if (game.world != null)
+            if (game != null && game.world != null)
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
@@ -1096,9 +1099,9 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_CreatureGate(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            if (game.world != null)
+            if (game != null && game.world != null)
             {
-                for(int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
                     {
@@ -1111,11 +1114,14 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_EnterRegion(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            if (game != null && game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge enterRegion)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    enterRegion.Entered(worldName);
+                    if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge enterRegion)
+                    {
+                        enterRegion.Entered(worldName);
+                    }
                 }
             }
         }
@@ -1123,11 +1129,14 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_AllRegionsExcept(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            if (game != null && game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    allExcept.Entered(worldName);
+                    if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
+                    {
+                        allExcept.Entered(worldName);
+                    }
                 }
             }
         }
@@ -1135,11 +1144,14 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_NoRegion(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            if (game != null && game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge noRegion)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    noRegion.Entered(worldName);
+                    if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge noRegion)
+                    {
+                        noRegion.Entered(worldName);
+                    }
                 }
             }
         }

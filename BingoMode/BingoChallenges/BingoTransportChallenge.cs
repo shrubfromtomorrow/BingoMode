@@ -130,7 +130,7 @@ namespace BingoMode.BingoChallenges
         }
 
         public void Gate(string regionName)
-        { 
+        {
             if (regionName != to.Value && to.Value != "Any Region") return;
             
             bool g = false;

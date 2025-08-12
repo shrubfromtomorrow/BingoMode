@@ -130,11 +130,6 @@ namespace BingoMode.BingoChallenges
             fromWorld = FixSlugSpecificRegions(fromWorld).ToUpperInvariant();
             toWorld = FixSlugSpecificRegions(toWorld).ToUpperInvariant();
 
-            Plugin.logger.LogInfo("From: " + from.Value.ToUpperInvariant());
-            Plugin.logger.LogInfo("Coming from: " + fromWorld);
-            Plugin.logger.LogInfo("To: " + to.Value.ToUpperInvariant());
-            Plugin.logger.LogInfo("Coming to: " + toWorld);
-
             string fromValue = from.Value.ToUpperInvariant();
             string toValue = to.Value.ToUpperInvariant();
 
