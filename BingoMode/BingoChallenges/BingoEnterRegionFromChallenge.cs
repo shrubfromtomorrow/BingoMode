@@ -123,21 +123,23 @@ namespace BingoMode.BingoChallenges
             return ch;
         }
 
-        public void Gated(string gateName, string newWorld)
+        public void Gate(string fromWorld, string toWorld)
         {
             if (completed || TeamsCompleted[SteamTest.team] || hidden || revealed || TeamsFailed[SteamTest.team]) return;
 
-            gateName = FixSlugSpecificRegions(gateName);
-            List<string> worlds = gateName.Split('_').ToList();
-            worlds.RemoveAt(0);
-            //
-            //if ((worlds[0] != from.Value || worlds[1] != from.Value) && (worlds[0] != to.Value || worlds[1] != to.Value)) return;
-            // 
-            string prevWorld = worlds[worlds.IndexOf(newWorld) == 0 ? 1 : 0];
-            //
+            fromWorld = FixSlugSpecificRegions(fromWorld).ToUpperInvariant();
+            toWorld = FixSlugSpecificRegions(toWorld).ToUpperInvariant();
 
-            bool prevCheck = prevWorld == from.Value.ToUpperInvariant();
-            bool newCheck = newWorld == to.Value.ToUpperInvariant();
+            Plugin.logger.LogInfo("From: " + from.Value.ToUpperInvariant());
+            Plugin.logger.LogInfo("Coming from: " + fromWorld);
+            Plugin.logger.LogInfo("To: " + to.Value.ToUpperInvariant());
+            Plugin.logger.LogInfo("Coming to: " + toWorld);
+
+            string fromValue = from.Value.ToUpperInvariant();
+            string toValue = to.Value.ToUpperInvariant();
+
+            bool prevCheck = fromWorld == from.Value.ToUpperInvariant();
+            bool newCheck = toWorld == to.Value.ToUpperInvariant();
 
             if (prevCheck && newCheck)
             {
@@ -202,12 +204,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded_EnterRegionFrom;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_EnterRegionFrom;
         }
 
         public override void RemoveHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded_EnterRegionFrom;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_EnterRegionFrom;
         }
 
         public override List<object> Settings() => [from, to];

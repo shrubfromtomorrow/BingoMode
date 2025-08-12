@@ -180,12 +180,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded_AllRegionsExcept;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_AllRegionsExcept;
         }
 
         public override void RemoveHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded_AllRegionsExcept;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_AllRegionsExcept;
         }
 
         public override List<object> Settings() => [region, required];

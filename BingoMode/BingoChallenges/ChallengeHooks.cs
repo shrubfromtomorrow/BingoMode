@@ -1062,74 +1062,84 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_EnterRegionFrom(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        // worldName is being loaded, game.world.region.name is currently loaded. null check to prevent progress check on goals when loading first region
+        public static void WorldLoader_EnterRegionFrom(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
+            if (game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge regionFrom)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    regionFrom.Gated(self.room.abstractRoom.name.ToUpperInvariant(), self.room.world.region.name.ToUpperInvariant());
+                    if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge EnterRegionFrom)
+                    {
+                        EnterRegionFrom.Gate(game.world.region.name, worldName);
+                    }
                 }
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_Transport(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void WorldLoader_Transport(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
+            if (game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoTransportChallenge transport)
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    transport.Gated(self.room.world.region.name);
+                    if (ExpeditionData.challengeList[j] is BingoTransportChallenge transport)
+                    {
+                        transport.Gate(worldName);
+                    }
                 }
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_CreatureGate(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void WorldLoader_CreatureGate(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
+            if (game.world != null)
             {
-                if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
+                for(int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    creatureGate.Gate(self.room.abstractRoom.name);
+                    if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
+                    {
+                        creatureGate.Gate(worldName);
+                    }
                 }
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_EnterRegion(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void WorldLoader_EnterRegion(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge enterRegion)
                 {
-                    enterRegion.Entered(newRoom.world.name);
+                    enterRegion.Entered(worldName);
                 }
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_AllRegionsExcept(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void WorldLoader_AllRegionsExcept(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
                 {
-                    allExcept.Entered(newRoom.world.name);
+                    allExcept.Entered(worldName);
                 }
             }
         }
 
-        public static void RegionGate_NewWorldLoaded_NoRegion(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void WorldLoader_NoRegion(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
-            orig.Invoke(self, newRoom);
+            orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge noRegion)
                 {
-                    noRegion.Entered(newRoom.world.name);
+                    noRegion.Entered(worldName);
                 }
             }
         }

@@ -129,7 +129,7 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public void Gated(string regionName)
+        public void Gate(string regionName)
         { 
             if (regionName != to.Value && to.Value != "Any Region") return;
             
@@ -235,13 +235,13 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.Player.SlugcatGrab += Player_SlugcatGrab;
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded_Transport;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_Transport;
         }
 
         public override void RemoveHooks()
         {
             On.Player.SlugcatGrab -= Player_SlugcatGrab;
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded_Transport;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_Transport;
         }
 
         public override List<object> Settings() => [from, to, crit];
