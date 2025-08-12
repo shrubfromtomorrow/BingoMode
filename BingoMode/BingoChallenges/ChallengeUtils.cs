@@ -196,7 +196,7 @@ namespace BingoMode.BingoChallenges
             if (type == ItemType.DataPearl) return translator.Translate("Pearls");
             // Food items
             if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
-            if (type == ItemType.SSOracleSwarmer) return translator.Translate("Pebbles Neurons");
+            if (type == ItemType.SSOracleSwarmer) return translator.Translate("Pebbles' Neurons");
             if (type == ItemType.EggBugEgg) return translator.Translate("Eggbug Eggs");
             if (type == ItemType.WaterNut) return translator.Translate("Bubble Fruit");
             if (type == ItemType.SlimeMold) return translator.Translate("Slime Mold");

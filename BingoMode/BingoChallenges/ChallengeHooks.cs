@@ -294,7 +294,7 @@ namespace BingoMode.BingoChallenges
             self.miscWorldSaveData.halcyonStolen = true;
         }
 
-        public static void CLOracleBehavior_Update(On.MoreSlugcats.CLOracleBehavior.orig_Update orig, CLOracleBehavior self, bool eu)
+        public static void CLOracleBehavior_Update_Iterator(On.MoreSlugcats.CLOracleBehavior.orig_Update orig, CLOracleBehavior self, bool eu)
         {
             orig.Invoke(self, eu);
 
@@ -308,6 +308,11 @@ namespace BingoMode.BingoChallenges
                     }
                 }
             }
+        }
+
+        public static void CLOracleBehavior_Update_SaintDelivery(On.MoreSlugcats.CLOracleBehavior.orig_Update orig, CLOracleBehavior self, bool eu)
+        {
+            orig.Invoke(self, eu);
 
             if (self.FocusedOnHalcyon)
             {
@@ -1057,33 +1062,72 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void RegionGate_NewWorldLoaded(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        public static void RegionGate_NewWorldLoaded_EnterRegionFrom(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
         {
             orig.Invoke(self, newRoom);
-
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge regionFrom)
                 {
                     regionFrom.Gated(self.room.abstractRoom.name.ToUpperInvariant(), self.room.world.region.name.ToUpperInvariant());
                 }
-                else if (ExpeditionData.challengeList[j] is BingoTransportChallenge transport)
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded_Transport(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        {
+            orig.Invoke(self, newRoom);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoTransportChallenge transport)
                 {
                     transport.Gated(self.room.world.region.name);
                 }
-                else if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded_CreatureGate(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        {
+            orig.Invoke(self, newRoom);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
                 {
                     creatureGate.Gate(self.room.abstractRoom.name);
                 }
-                else if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge enterRegion)
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded_EnterRegion(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        {
+            orig.Invoke(self, newRoom);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoEnterRegionChallenge enterRegion)
                 {
                     enterRegion.Entered(newRoom.world.name);
                 }
-                else if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded_AllRegionsExcept(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        {
+            orig.Invoke(self, newRoom);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
                 {
                     allExcept.Entered(newRoom.world.name);
                 }
-                else if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge noRegion)
+            }
+        }
+
+        public static void RegionGate_NewWorldLoaded_NoRegion(On.RegionGate.orig_NewWorldLoaded_Room orig, RegionGate self, Room newRoom)
+        {
+            orig.Invoke(self, newRoom);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoNoRegionChallenge noRegion)
                 {
                     noRegion.Entered(newRoom.world.name);
                 }

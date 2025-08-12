@@ -235,13 +235,13 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.Player.SlugcatGrab += Player_SlugcatGrab;
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded_Transport;
         }
 
         public override void RemoveHooks()
         {
             On.Player.SlugcatGrab -= Player_SlugcatGrab;
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded_Transport;
         }
 
         public override List<object> Settings() => [from, to, crit];

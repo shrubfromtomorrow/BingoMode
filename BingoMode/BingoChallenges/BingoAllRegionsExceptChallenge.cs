@@ -56,7 +56,7 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Visit [<current>/<required>] regions without entering " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
+            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions without entering " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer))
                 .Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString());
             base.UpdateDescription();
         }
@@ -180,12 +180,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded;
+            On.RegionGate.NewWorldLoaded_Room += RegionGate_NewWorldLoaded_AllRegionsExcept;
         }
 
         public override void RemoveHooks()
         {
-            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded;
+            On.RegionGate.NewWorldLoaded_Room -= RegionGate_NewWorldLoaded_AllRegionsExcept;
         }
 
         public override List<object> Settings() => [region, required];

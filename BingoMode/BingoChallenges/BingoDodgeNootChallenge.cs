@@ -74,7 +74,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Dodging Noodlefly Attacks");
+            return ChallengeTools.IGT.Translate("Dodging Noodlefly attacks");
         }
 
         public override bool Duplicable(Challenge challenge)

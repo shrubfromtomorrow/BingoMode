@@ -138,7 +138,7 @@ namespace BingoMode.BingoChallenges
         {
             On.SSOracleBehavior.SeePlayer += SSOracleBehavior_SeePlayer;
             On.SLOracleBehaviorHasMark.InitateConversation += SLOracleBehaviorHasMark_InitateConversation;
-            On.MoreSlugcats.CLOracleBehavior.Update += CLOracleBehavior_Update;
+            On.MoreSlugcats.CLOracleBehavior.Update += CLOracleBehavior_Update_Iterator;
             On.MoreSlugcats.SSOracleRotBehavior.Update += RMOracleBehavior_Update;
         }
 
@@ -146,7 +146,7 @@ namespace BingoMode.BingoChallenges
         {
             On.SSOracleBehavior.SeePlayer -= SSOracleBehavior_SeePlayer;
             On.SLOracleBehaviorHasMark.InitateConversation -= SLOracleBehaviorHasMark_InitateConversation;
-            On.MoreSlugcats.CLOracleBehavior.Update -= CLOracleBehavior_Update;
+            On.MoreSlugcats.CLOracleBehavior.Update -= CLOracleBehavior_Update_Iterator;
             On.MoreSlugcats.SSOracleRotBehavior.Update -= RMOracleBehavior_Update;
         }
 
