@@ -67,16 +67,12 @@ namespace BingoMode.BingoMenu
         public float slideStep;
 
         // Randomizer
-        public SimpleButton randomizerButton;
-        public RoundedRect randomizerMenuBg;
-        public SymbolButton randomizerUnloadButton;
-        public MenuLabel randomizerLabel;
-        public FSprite randomizerDivider;
-        public VerticalSlider randomizerSlider;
-        public float sliderRF;
-        public List<SimpleButton> randomizers = [];
-        public float randomizerSlideIn;
-        public float randomizerSlideStep;
+        private SimpleButton randomizerButton;
+        private const float RANDOMIZER_PANEL_WIDTH = 190f;
+        private const float RANDOMIZER_PANEL_HEIGHT = 300f;
+        private RandomizerPanel randomizerPanel;
+        private float randomizerSlideIn;
+        private float randomizerSlideStep;
 
         public static readonly float desaturara = 0.1f;
         public static readonly Color[] TEAM_COLOR =
@@ -226,7 +222,10 @@ namespace BingoMode.BingoMenu
             subObjects.Add(slider);
             sliderF = 1f;
 
-            ConstructRandomizerPanel();
+            randomizerButton = new(menu, this, "Profiles", "SWITCH_RANDOMIZATION", expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
+            subObjects.Add(randomizerButton);
+            randomizerPanel = new(menu, this, Vector2.zero, new Vector2(RANDOMIZER_PANEL_WIDTH, RANDOMIZER_PANEL_HEIGHT));
+            subObjects.Add(randomizerPanel);
 
             if (ExpeditionData.ints.Sum() >= 8)
             {
@@ -235,29 +234,6 @@ namespace BingoMode.BingoMenu
                 eggButton.size = eggButton.roundedRect.size;
                 subObjects.Add(eggButton);
             }
-        }
-
-        private void ConstructRandomizerPanel()
-        {
-            randomizerButton = new(menu, this, "Profiles", "SWITCH_RANDOMIZATION", expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
-            subObjects.Add(randomizerButton);
-            randomizerMenuBg = new(menu, this, randomizerButton.pos + new Vector2(200f, 325f), new Vector2(190f, 300f), true);
-            subObjects.Add(randomizerMenuBg);
-            randomizerUnloadButton = new(menu, this, "Menu_Symbol_Clear_All", "UNLOADR", randomizerMenuBg.pos);
-            subObjects.Add(randomizerUnloadButton);
-            randomizerLabel = new(menu, this, "unloaded", randomizerMenuBg.pos, new Vector2(50f, 20f), false);
-            randomizerLabel.label.alignment = FLabelAlignment.Left;
-            subObjects.Add(randomizerLabel);
-            randomizerDivider = new("pixel")
-            {
-                scaleX = randomizerMenuBg.size.x,
-                scaleY = 2f,
-                anchorX = 0f,
-                y = 583f
-            };
-            randomizerSlider = new(menu, this, "", new Vector2(0f, randomizerDivider.y - randomizerMenuBg.size.y + 65f), new Vector2(30f, randomizerMenuBg.size.y - 100f), BingoEnums.RandomizerSlider, true) { floatValue = 1f };
-            subObjects.Add(randomizerSlider);
-            Container.AddChild(randomizerDivider);
         }
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
@@ -464,7 +440,6 @@ namespace BingoMode.BingoMenu
                 {
                     line.alpha = 0f;
                 }
-                ClearRandomizerList();
                 expMenu.manualButton.signalText = "MANUAL";
                 expMenu.manualButton.menuLabel.text = expMenu.Translate("MANUAL");
                 expMenu.UpdatePage(1);
@@ -851,32 +826,6 @@ namespace BingoMode.BingoMenu
                 if (randomizerSlideStep == 0f) randomizerSlideStep = 1f;
                 else randomizerSlideStep = -randomizerSlideStep;
                 float ff = randomizerSlideStep == 1f ? 1f : 0f;
-                if (randomizerSlideStep == 1f)
-                    PopulateRandomizerList();
-                else
-                    ClearRandomizerList();
-                return;
-            }
-            
-            if (message.StartsWith("LOADR-"))
-            {
-                string profileName = message.Split('-')[1];
-                try
-                {
-                    BingoRandomizationProfile.LoadFromFile(profileName);
-                    randomizerLabel.text = profileName;
-                }
-                catch (Exception e)
-                {
-                    Plugin.logger.LogError($"Error loading profile {profileName} : {e.Message}");
-                }
-                return;
-            }
-
-            if (message == "UNLOADR")
-            {
-                BingoRandomizationProfile.Unload();
-                randomizerLabel.text = "unloaded";
                 return;
             }
         }
@@ -972,7 +921,6 @@ namespace BingoMode.BingoMenu
             divider.y = 583f;
 
             RandomizerSlide(timeStacker);
-            DrawProfileList(timeStacker);
 
             if (!inLobby)
             {
@@ -1005,22 +953,15 @@ namespace BingoMode.BingoMenu
 
         private void RandomizerSlide(float timeStacker)
         {
+            const float DIST_TO_EDGE = RANDOMIZER_PANEL_WIDTH + 50f;
+            const float OFFSET_TO_BUTTON_X = 25f; // right of button to right of panel
+            const float OFFSET_TO_BUTTON_Y = -25f; // bottom of button to top of panel
             randomizerSlideIn = Mathf.Clamp01(randomizerSlideIn + randomizerSlideStep * 0.05f);
-            randomizerMenuBg.pos = randomizerButton.pos - new Vector2(-25f + randomizerMenuBg.size.x - randomizerButton.size.x, 325f) + Vector2.right * (1f - Custom.LerpExpEaseInOut(0f, 1f, randomizerSlideIn)) * 250f;
-            randomizerUnloadButton.pos = randomizerMenuBg.pos + new Vector2(10f, randomizerMenuBg.size.y - randomizerUnloadButton.size.y - 13f);
-            randomizerLabel.pos = randomizerUnloadButton.pos + new Vector2(5f, 3f);
-            randomizerDivider.x = randomizerMenuBg.pos.x;
-            randomizerSlider.pos.x = randomizerMenuBg.pos.x + randomizerMenuBg.size.x - randomizerSlider.size.x - 5f;
-            foreach (var line in randomizerSlider.lineSprites)
-                line.x = randomizerSlider.pos.x + randomizerSlider.size.x / 2f;
-
-            MenuObject owner = randomizerSlideIn >= 0.99f ? this : null;
-            randomizerMenuBg.owner = owner;
-            randomizerUnloadButton.owner = owner;
-            randomizerLabel.owner = owner;
-            randomizerSlider.subtleSliderNob.outerCircle.alpha = (owner != null && randomizers.Count >= 13) ? 1f : 0f;
-            foreach (var line in randomizerSlider.lineSprites)
-                line.alpha = (owner != null && randomizers.Count >= 13) ? 1f : 0f;
+            randomizerPanel.pos =
+                    randomizerButton.pos
+                    + new Vector2(randomizerButton.size.x + OFFSET_TO_BUTTON_X - RANDOMIZER_PANEL_WIDTH, OFFSET_TO_BUTTON_Y - RANDOMIZER_PANEL_HEIGHT)
+                    + Vector2.right * (1f - Custom.LerpExpEaseInOut(0f, 1f, randomizerSlideIn)) * DIST_TO_EDGE;
+            randomizerPanel.Visible = randomizerSlideIn >= 0.01f;
         }
 
         public override void Update()
@@ -1154,27 +1095,6 @@ namespace BingoMode.BingoMenu
             }
 
             DrawPlayerInfo(menu.myTimeStacker);
-        }
-
-        private void PopulateRandomizerList()
-        {
-            foreach (string profile in BingoRandomizationProfile.GetAvailableProfiles())
-            {
-                SimpleButton button = new(menu, this, profile, $"LOADR-{profile}", new(randomizerMenuBg.pos.x, 0f), new(randomizerMenuBg.size.x - 50f, 16f));
-                randomizers.Add(button);
-                subObjects.Add(button);
-            }
-            randomizerSlider.floatValue = 1f;
-        }
-
-        private void ClearRandomizerList()
-        {
-            foreach (SimpleButton button in randomizers)
-            {
-                button.RemoveSprites();
-                RemoveSubObject(button);
-            }
-            randomizers.Clear();
         }
 
         public void CreateSearchPage()
@@ -1364,20 +1284,6 @@ namespace BingoMode.BingoMenu
             }
         }
 
-        private void DrawProfileList(float timeStacker)
-        {
-            const float deltaY = -20f;
-            float top = randomizerDivider.y - 20f;
-            float bottom = randomizerDivider.y - 248f;
-            float y = top + Mathf.Lerp(20f * (randomizers.Count - 12.4f), 0f, sliderRF);
-            foreach (SimpleButton button in randomizers)
-            {
-                button.pos.x = y > top || y < bottom ? randomizerMenuBg.pos.x + 250f : randomizerMenuBg.pos.x + 10f;
-                button.pos.y = y;
-                y += deltaY;
-            }
-        }
-
         public void AddLobbies(List<CSteamID> lobbies)
         {
             //if (fromContinueGame)
@@ -1440,7 +1346,9 @@ namespace BingoMode.BingoMenu
             if (slider.ID == BingoEnums.MultiplayerSlider)
                 sliderF = f;
             else if (slider.ID == BingoEnums.RandomizerSlider)
-                sliderRF = f;
+            {
+                randomizerPanel.sliderF = f;
+            }
         }
 
         public float ValueOfSlider(Slider slider)
@@ -1448,7 +1356,7 @@ namespace BingoMode.BingoMenu
             if (slider.ID == BingoEnums.MultiplayerSlider)
                 return sliderF;
             if (slider.ID == BingoEnums.RandomizerSlider)
-                return sliderRF;
+                return randomizerPanel.sliderF;
             return 0f;
         }
 
