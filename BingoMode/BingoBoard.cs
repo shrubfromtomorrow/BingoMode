@@ -489,7 +489,13 @@ namespace BingoMode
         public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)
         {
             if (BingoRandomizationProfile.IsLoaded)
-                return BingoRandomizationProfile.GetChallenge();
+                try
+                {
+                    return BingoRandomizationProfile.GetChallenge();
+                } catch (Exception)
+                {
+                    Plugin.logger.LogMessage("Error getting challenge from randomizer, resorting to default generation.");
+                }
 
             if (BingoData.availableBingoChallenges == null)
             {
