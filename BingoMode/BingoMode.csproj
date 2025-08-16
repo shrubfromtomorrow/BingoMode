@@ -94,6 +94,9 @@
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoMenu\FilterDialog.cs" />
+    <Compile Include="BingoMenu\LobbyInfo.cs" />
+    <Compile Include="BingoMenu\MultiplayerPanel.cs" />
+    <Compile Include="BingoMenu\PlayerInfo.cs" />
     <Compile Include="BingoMenu\RandomizerPanel.cs" />
     <Compile Include="BingoRandomizers\BingoRandomizationProfile.cs" />
     <Compile Include="BingoChallenges\BingoBroadcastChallenge.cs" />

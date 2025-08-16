@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Expedition;
+using RWCustom;
+using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Expedition;
-using RWCustom;
-using Steamworks;
 using UnityEngine;
 
 namespace BingoMode.BingoSteamworks
 {
     using BingoMenu;
+    using Menu;
+    using static BingoMode.BingoSteamworks.LobbySettings;
 
     internal class SteamTest
     {
@@ -45,8 +47,8 @@ namespace BingoMode.BingoSteamworks
             }
 
             BingoData.globalSettings.gamemode = BingoData.BingoGameMode.Bingo;
-            BingoData.globalSettings.perks = LobbySettings.AllowUnlocks.None;
-            BingoData.globalSettings.burdens = LobbySettings.AllowUnlocks.None;
+            BingoData.globalSettings.perks = AllowUnlocks.None;
+            BingoData.globalSettings.burdens = AllowUnlocks.None;
         }
 
         public static void CreateLobby(int maxPlayers)
@@ -65,6 +67,132 @@ namespace BingoMode.BingoSteamworks
             SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
             SteamAPICall_t call = SteamMatchmaking.RequestLobbyList();
             lobbyMatchList.Set(call, OnLobbyMatchList);
+        }
+
+        public static LobbyData GetLobbyData(CSteamID lobby)
+        {
+            return new LobbyData()
+            {
+                lobbyID = lobby,
+                name = SteamMatchmaking.GetLobbyData(lobby, "name"),
+                maxPlayers = SteamMatchmaking.GetLobbyMemberLimit(lobby),
+                currentPlayers = SteamMatchmaking.GetNumLobbyMembers(lobby),
+                gameMode = (BingoData.BingoGameMode)int.Parse(SteamMatchmaking.GetLobbyData(lobby, "gamemode"), NumberStyles.Any),
+                hostMods = SteamMatchmaking.GetLobbyData(lobby, "hostMods") != "none",
+                version = SteamMatchmaking.GetLobbyData(lobby, "lobbyVersion"),
+                slugcat = SteamMatchmaking.GetLobbyData(lobby, "slugcat"),
+                perks = (AllowUnlocks)int.Parse(SteamMatchmaking.GetLobbyData(lobby, "perks").Trim(), NumberStyles.Any),
+                burdens = (AllowUnlocks)int.Parse(SteamMatchmaking.GetLobbyData(lobby, "burdens").Trim(), NumberStyles.Any)
+            };
+        }
+
+        public static List<PlayerData> GetPlayersData()
+        {
+            PlayerData[] members = new PlayerData[SteamMatchmaking.GetNumLobbyMembers(CurrentLobby)];
+            for (int i = 0; i < members.Length; i++)
+                members[i] = GetPlayerData(SteamMatchmaking.GetLobbyMemberByIndex(CurrentLobby, i));
+            ;
+            return [.. members.OrderBy(x => x.playerIndex)];
+        }
+
+        public static PlayerData GetPlayerData(CSteamID id)
+        {
+            SteamNetworkingIdentity identity = new();
+            identity.SetSteamID(id);
+            if (!int.TryParse(SteamMatchmaking.GetLobbyMemberData(CurrentLobby, id, "playerIndex"), NumberStyles.Any, null, out int playerIndex))
+                playerIndex = 0;
+            if (!int.TryParse(SteamMatchmaking.GetLobbyMemberData(CurrentLobby, id, "playerTeam"), NumberStyles.Any, null, out int team))
+                team = 0;
+            return new()
+            {
+                identity = identity,
+                isSelf = selfIdentity.GetSteamID() == id,
+                isHost = SteamMatchmaking.GetLobbyOwner(CurrentLobby) == id,
+                playerIndex = playerIndex,
+                nickname = SteamFriends.GetFriendPersonaName(id),
+                team = team,
+                ready = SteamMatchmaking.GetLobbyMemberData(CurrentLobby, id, "ready") == "1"
+            };
+        }
+
+        /// <summary>
+        /// Try to join a steam lobby identified by its CSteamID.
+        /// </summary>
+        /// <param name="lobby">The identifier of the lobby you are trying to join</param>
+        /// <param name="manager">A process manager to check for save data</param>
+        /// <param name="errMsg">A message describing the why the lobby cannot be joined</param>
+        /// <param name="tryReconnect">Whether to immediately try to reconnect, ignoring the reason of failure</param>
+        /// <returns>Whether the lobby has been successfully joined</returns>
+        public static bool JoinLobby(CSteamID lobby, ProcessManager manager, out string errMsg, out bool tryReconnect)
+        {
+            LobbyData data = GetLobbyData(lobby);
+            if (data.version != Plugin.VERSION)
+            {
+                errMsg = $"Version mismatch.\n" +
+                    $"Please make sure you're using the same Bingo mod version as the lobby.\n" +
+                    $"Your version: {Plugin.VERSION} Lobby version: {data.version}";
+                tryReconnect = false;
+                return false;
+            }
+
+            if (data.hostMods)
+            {
+                string hostRequiredMods = SteamMatchmaking.GetLobbyData(lobby, "hostMods");
+                List<string> modStrings = [.. Regex.Split(hostRequiredMods, "<bMd>")];
+
+                Dictionary<string, string> requiredMods = [];
+                string[] skipMods = GetCommonClientMods();
+                foreach (string m in modStrings)
+                {
+                    string[] idAndName = m.Split('|');
+                    if (skipMods.Contains(idAndName[0]))
+                        continue;
+                    requiredMods.Add(idAndName[0], idAndName[1]);
+                }
+
+                List<string> tooManyMods = [];
+                foreach (var mod in ModManager.ActiveMods)
+                {
+                    if (skipMods.Contains(mod.id))
+                        continue;
+
+                    if (requiredMods.Keys.Count == 0)
+                        tooManyMods.Add(mod.name);
+
+                    if (requiredMods.Count > 0 && requiredMods.ContainsKey(mod.id))
+                        requiredMods.Remove(mod.id);
+                }
+
+                if (tooManyMods.Count > 0)
+                {
+                    errMsg = "Please disable these mods if you wish to join this lobby:\n-" +
+                        string.Join("\n- ", tooManyMods);
+                    tryReconnect = false;
+                    return false;
+                }
+                if (requiredMods.Count > 0)
+                {
+                    errMsg = "Please have all of these mods enabled if you wish to join this lobby:\n-" +
+                        string.Join("\n- ", requiredMods.Values);
+                    tryReconnect = false;
+                    return false;
+                }
+            }
+
+            SlugcatSelectMenu.SaveGameData saveGameData = SlugcatSelectMenu.MineForSaveData(manager, new SlugcatStats.Name(data.slugcat));
+            if (saveGameData != null)
+            {
+                errMsg = $"You already have a saved game session as {SlugcatStats.getSlugcatName(new(data.slugcat))}.\n" +
+                    $"Are you sure you want to join this lobby?";
+                tryReconnect = true;
+                return false;
+            }
+
+            var call = SteamMatchmaking.JoinLobby(lobby);
+            lobbyEntered.Set(call, OnLobbyEntered);
+            errMsg = "";
+            tryReconnect = false;
+            return true;
         }
 
         public static void LeaveLobby()
@@ -97,14 +225,14 @@ namespace BingoMode.BingoSteamworks
                         page.grid = new BingoGrid(BingoData.globalMenu, page, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
                         page.subObjects.Add(page.grid);
                     }
-                    page.multiButton.Clicked();
+                    page.multiplayerButton.Clicked();
                     BingoData.globalMenu.UpdatePage(4);
                     BingoData.globalMenu.MovePage(new Vector2(1500f, 0f));
                 }
-                if (page.slideStep == -1f)
+                if (page.multiplayerSlideStep == -1f)
                 {
-                    page.multiButton.buttonBehav.greyedOut = false;
-                    page.multiButton.Clicked();
+                    page.multiplayerButton.buttonBehav.greyedOut = false;
+                    page.multiplayerButton.Clicked();
                 }
 
                 var call = SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
@@ -120,6 +248,30 @@ namespace BingoMode.BingoSteamworks
         {
             SteamNetworkingMessages.AcceptSessionWithUser(ref callback.m_identityRemote);
             
+        }
+
+        public static string[] GetCommonClientMods()
+        {
+            return ["bro.mergefix",
+                "pjb3005.sharpener",
+                "kevadroz.no_mod_update_confirm",
+                "Gamer025.RemixAutoRestart",
+                "willowwisp.audiofix",
+                "rwremix",
+                "dressmyslugcat",
+                "fastrollbutton",
+                "greyscreen",
+                "vigaro.guardian",
+                "healthbars",
+                "improved-input-confirm",
+                "franklygd.killfeed",
+                "lsbjorn52.ModPresets",
+                "notchoc.ModTags",
+                "sabreml.musicannouncements",
+                "SBCameraScroll",
+                "slime-cubed.inputdisplay",
+                "googlyeyes",
+                "rebinddevtools"];
         }
 
         public static string ActiveModsToString()
@@ -145,15 +297,15 @@ namespace BingoMode.BingoSteamworks
                 return;
             }
                         
-            if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
-            if (BingoData.globalSettings.burdens == LobbySettings.AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
+            if (BingoData.globalSettings.perks == AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("unl-"));
+            if (BingoData.globalSettings.burdens == AllowUnlocks.None) ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
             team = 0;
                         
             CSteamID lobbyID = (CSteamID)result.m_ulSteamIDLobby;
             CurrentLobby = lobbyID;
             string hostName = SteamFriends.GetPersonaName();
             SteamMatchmaking.SetLobbyData(lobbyID, "mode", "BingoMode");
-            SteamMatchmaking.SetLobbyData(lobbyID, "name", hostName + "'s lobby");
+            SteamMatchmaking.SetLobbyData(lobbyID, "name", $"{hostName}'s lobby");
             SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "hostID", selfIdentity.GetSteamID64().ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);
@@ -294,7 +446,7 @@ namespace BingoMode.BingoSteamworks
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
 
                     bool isHost = SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby) == selfIdentity.GetSteamID();
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.InLobby)
                     {
                         page2.UpdateLobbyHost(isHost);
                         page2.ResetPlayerLobby();
@@ -317,7 +469,7 @@ namespace BingoMode.BingoSteamworks
 
                     if (Custom.rainWorld.processManager.upcomingProcess == ProcessManager.ProcessID.Game) break;
                     if (SteamMatchmaking.GetLobbyData(CurrentLobby, "startGame") != "") break;
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.inLobby)
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page3) && page3.InLobby)
                     {
                         page3.ResetPlayerLobby();
                     }
@@ -367,7 +519,7 @@ namespace BingoMode.BingoSteamworks
             else
             {
                 bool isHost = SteamMatchmaking.GetLobbyOwner((CSteamID)callback.m_ulSteamIDLobby) == selfIdentity.GetSteamID();
-                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.inLobby)
+                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2) && page2.InLobby)
                 {
                     page2.UpdateLobbyHost(isHost); 
                     page2.ResetPlayerLobby();
@@ -421,7 +573,7 @@ namespace BingoMode.BingoSteamworks
                 //var call = SteamMatchmaking.JoinLobby(lobbyID);
                 //lobbyEntered.Set(call, OnLobbyEntered);
             }
-            if (JoinableLobbies.Count > 0 && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
                 page.AddLobbies(JoinableLobbies);
             }
@@ -458,5 +610,30 @@ namespace BingoMode.BingoSteamworks
             receiver.SetSteamID(persone);
             InnerWorkings.SendMessage("%" + newTeam, receiver);
         }
+    }
+
+    public struct LobbyData
+    {
+        public CSteamID lobbyID;
+        public string name;
+        public int maxPlayers;
+        public int currentPlayers;
+        public BingoData.BingoGameMode gameMode;
+        public bool hostMods;
+        public string version;
+        public string slugcat;
+        public AllowUnlocks perks;
+        public AllowUnlocks burdens;
+    }
+
+    public struct PlayerData
+    {
+        public SteamNetworkingIdentity identity;
+        public bool isSelf;
+        public bool isHost;
+        public int playerIndex;
+        public string nickname;
+        public int team;
+        public bool ready;
     }
 }
