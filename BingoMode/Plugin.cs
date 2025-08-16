@@ -26,6 +26,7 @@ namespace BingoMode
     {
         public const string VERSION = "1.23";
         public static bool AppliedAlreadyDontDoItAgainPlease;
+        public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
         private BingoModOptions _bingoConfig;
         public BingoModOptions BingoConfig => _bingoConfig;
@@ -38,6 +39,7 @@ namespace BingoMode
             //new Hook(typeof(LogEventArgs).GetMethod("ToString", BindingFlags.Default | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.InvokeMethod), AddTimeToLog);
             logger = Logger;
             On.RainWorld.OnModsInit += OnModsInit;
+            On.RainWorld.PostModsInit += RainWorld_PostModsInit;
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
         }
@@ -79,8 +81,6 @@ namespace BingoMode
                     return;
                 }
 
-                BingoData.LoadAllBannedChallengeLists();
-
                 SteamTest.Apply();
 
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
@@ -95,6 +95,17 @@ namespace BingoMode
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
                 MachineConnector.SetRegisteredOI("nacu.bingomodebeta", PluginInstance.BingoConfig);
+            }
+        }
+
+        private static void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
+        {
+            orig.Invoke(self);
+
+            if (!AppliedAlreadyDontDoItAgainPleasePartTwo)
+            {
+                AppliedAlreadyDontDoItAgainPleasePartTwo = true;
+                BingoData.LoadAllBannedChallengeLists();
             }
         }
 
