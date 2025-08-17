@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -141,8 +142,7 @@ namespace BingoMode.BingoChallenges
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
-                string[] arr = Regex.Split(array[4], "|");
-                lickers = [.. arr];
+                lickers = [.. array[4].Split('|')];
                 UpdateDescription();
             }
             catch (Exception ex)

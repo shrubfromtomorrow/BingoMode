@@ -225,25 +225,19 @@ namespace BingoMode.BingoChallenges
         public string BombedTollsToString()
         {
             List<string> joinLater = [];
-
             foreach (var kvp in bombed)
             {
                 joinLater.Add(kvp.Key.ToString() + "|" + string.Join("|", kvp.Value));
             }
-
             if (joinLater.Count == 0) return "empty";
-
             return string.Join("%", joinLater);
         }
 
         public Dictionary<string, bool> BombedTollsFromString(string input)
         {
             Dictionary<string, bool> result = new();
-
             if (input == "empty") return result;
-
             string[] entries = input.Split('%');
-
             foreach (string entry in entries)
             {
                 string[] parts = entry.Split('|');

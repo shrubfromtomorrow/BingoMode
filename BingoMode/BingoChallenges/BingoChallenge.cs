@@ -179,7 +179,6 @@ namespace BingoMode.BingoChallenges
 
         public void OnChallengeCompleted(int team)
         {
-            
             bool lastCompleted = TeamsCompleted[team];
 
             TeamsCompleted[team] = true;
@@ -196,7 +195,8 @@ namespace BingoMode.BingoChallenges
                     {
                         if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
                         {
-                            c.GetChallenge();
+                            Plugin.logger.LogInfo("GetChallenge called for " + ToString());
+                            c.GetChallenge(this);
                         }
                     }
                 }

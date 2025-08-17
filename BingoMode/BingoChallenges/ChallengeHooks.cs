@@ -614,8 +614,8 @@ namespace BingoMode.BingoChallenges
             {
                 c.EmitDelegate<Func<bool, bool>>((orig) =>
                 {
-                    if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig;
-                    else return false;
+                    //if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig;
+                    return false;
                 });
             }
             else Plugin.logger.LogError("Room_LoadedKarmaFlower FAILURE " + il);
@@ -1557,7 +1557,7 @@ namespace BingoMode.BingoChallenges
         public delegate bool orig_PlaceKarmaFlower(Player self);
         public static bool Player_PlaceKarmaFlower_get(orig_PlaceKarmaFlower orig, Player self)
         {
-            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
+            //if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
             return false;
         }
 

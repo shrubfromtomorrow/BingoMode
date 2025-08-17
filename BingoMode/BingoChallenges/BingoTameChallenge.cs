@@ -185,7 +185,7 @@ namespace BingoMode.BingoChallenges
                     amount = SettingBoxFromString(array[3]) as SettingBox<int>;
                     completed = (array[4] == "1");
                     revealed = (array[5] == "1");
-                    string[] arr = Regex.Split(array[6], "cLtD");
+                    string[] arr = Regex.Split(array[6], @"cLtD");
                     tamed = [.. arr];
                 }
                 // Legacy board tame challenge compatibility

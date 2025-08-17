@@ -173,9 +173,9 @@ namespace BingoMode.BingoChallenges
         public override void Reset()
         {
             base.Reset();
-            current = 0;
             visited?.Clear();
             visited = [];
+            current = 0;
         }
 
         public override string ToString()
@@ -216,8 +216,7 @@ namespace BingoMode.BingoChallenges
                     amount = SettingBoxFromString(array[4]) as SettingBox<int>;
                     completed = (array[5] == "1");
                     revealed = (array[6] == "1");
-                    string[] arr = Regex.Split(array[7], "|");
-                    visited = [.. arr];
+                    visited = [.. array[7].Split('|')];
                 }
                 // Legacy board echo challenge compatibility
                 else if (array.Length == 4)

@@ -79,38 +79,34 @@ namespace BingoMode.BingoChallenges
             return ch;
         }
 
-        public void GetChallenge()
+        public void GetChallenge(BingoChallenge chal)
         {
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
-                // mayn whad ta fuk
+                current++;
+                Plugin.logger.LogInfo("Challenge " + chal.ToString() + " got, current is: " + current + " and hellchallenge is revealed? " + revealed);
+                UpdateDescription();
                 if (current >= amount.Value)
                 {
-                    UpdateDescription();
                     CompleteChallenge();
                 }
-                else
-                {
-                    current++;
-                    UpdateDescription();
-                    if (current >= amount.Value)
-                    {
-                        CompleteChallenge();
-                    }
-                    else ChangeValue();
-                }
+                else ChangeValue();
             }
         }
+
+        // HELL CHALLENGE IS COUNTING THE FIRST REVEALED CHALLENGE FOR COMPLETION AND UNDOING THE REVEAL SET IN SESSIONENDED
 
         public void SessionEnded(int revealedChallenges)
         {
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
             {
+                Plugin.logger.LogInfo("Session ended with " + (current + revealedChallenges) + " challenges");
                 if (current + revealedChallenges >= amount.Value)
                 {
                     current = amount.Value;
                     UpdateDescription();
                     CompleteChallenge();
+                    Plugin.logger.LogInfo("CompleteChallenge called inside sessionended " + revealed);
                 }
             }
         }
@@ -119,6 +115,7 @@ namespace BingoMode.BingoChallenges
         {
             if (TeamsFailed[SteamTest.team] || TeamsCompleted[SteamTest.team] || completed || current >= amount.Value) return;
 
+            Plugin.logger.LogInfo("Dieded");
             current = 0;
             ChangeValue();
         }
