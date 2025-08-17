@@ -17,7 +17,7 @@ namespace BingoMode.BingoMenu
     internal class MultiplayerPanel : PositionedMenuObject
     {
         private const float MARGIN = 7f;
-        private const float TEXT_BUTTON_HEIGHT = 25f;
+        private const float TEXT_BUTTON_HEIGHT = 25f; // only partially changes stuff, change not recommended
         private const float BIG_TEXT_HEIGHT = 30f; // not actually modifiable from here
         private const float SYMBOL_BUTTON_SIZE = 35f;
         private const float REFRESH_SEARCH_WIDTH = 60f;
@@ -145,7 +145,7 @@ namespace BingoMode.BingoMenu
 
             if (message == "CREATE_LOBBY")
             {
-                menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, page));
+                menu.manager.ShowDialog(new CreateLobbyDialog(menu.manager, this));
                 return;
             }
 
@@ -241,8 +241,10 @@ namespace BingoMode.BingoMenu
         public override void RemoveSprites()
         {
             base.RemoveSprites();
+            owner = ownerMemory;
             foreach (MenuObject obj in subObjects)
             {
+                obj.owner = this;
                 obj.RemoveSprites();
                 RecursiveRemoveSelectables(obj);
             }

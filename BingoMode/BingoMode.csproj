@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
     <Compile Include="BingoMenu\FilterDialog.cs" />
+    <Compile Include="BingoMenu\GameControls.cs" />
     <Compile Include="BingoMenu\LobbyInfo.cs" />
     <Compile Include="BingoMenu\MultiplayerPanel.cs" />
     <Compile Include="BingoMenu\PlayerInfo.cs" />

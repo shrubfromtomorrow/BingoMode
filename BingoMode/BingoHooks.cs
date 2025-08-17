@@ -843,7 +843,7 @@ namespace BingoMode
         {
             orig.Invoke(self);
 
-            if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag) && pag.unlocksButton.greyedOut)
+            if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
             {
                 self.pageTitle.x = pag.pos.x + 685f;
                 self.pageTitle.y = pag.pos.y + 680f;
@@ -857,10 +857,7 @@ namespace BingoMode
             if (message == "CLOSE")
             {
                 if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
-                {
-                    pag.unlocksButton.greyedOut = false;
-                    pag.unlocksButton.Reset();
-                }
+                    pag.UnlocksDialogClose();
 
                 if (!BingoData.MultiplayerGame || SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) != SteamTest.selfIdentity.GetSteamID()) return;
                 if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited)

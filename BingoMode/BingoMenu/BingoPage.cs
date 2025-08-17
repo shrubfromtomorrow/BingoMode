@@ -22,24 +22,12 @@ namespace BingoMode.BingoMenu
         public ExpeditionMenu expMenu;
         public BingoBoard board;
         public BingoGrid grid;
-        public int size;
         public FSprite pageTitle;
         public SymbolButton rightPage;
-        public HoldButton startGame;
+        private GameControls gameControls;
         public SymbolButton randomize;
         public SymbolButton shuffle;
         public SymbolButton filter;
-        public OpHoldButton unlocksButton;
-        public UIelementWrapper unlockWrapper;
-        public MenuTabWrapper menuTabWrapper;
-        public SymbolButton plusButton;
-        public SymbolButton minusButton;
-        public OpTextBox shelterSetting;
-        public ConfigurableBase shelterSettingConf;
-        public UIelementWrapper shelterSettingWrapper;
-        public MenuLabel shelterLabel;
-        public SimpleButton copyBoard;
-        public SimpleButton pasteBoard;
         public SymbolButton eggButton;
 
         #region Multiplayer
@@ -115,7 +103,6 @@ namespace BingoMode.BingoMenu
         {
             expMenu = menu as ExpeditionMenu;
             board = BingoHooks.GlobalBoard;
-            size = board.size;
             BingoData.BingoMode = false;
             BingoData.TeamsInBingo = [0];
 
@@ -148,44 +135,8 @@ namespace BingoMode.BingoMenu
             filter.roundedRect.size = filter.size;
             subObjects.Add(filter);
 
-            float xx = menu.manager.rainWorld.screenSize.x * 0.79f;
-            float yy = 85f;
-            startGame = new HoldButton(menu, this, "BEGIN", "STARTBINGO",
-                new Vector2(xx + 75f, yy + 160f), 40f);
-            subObjects.Add(startGame);
-
-            menuTabWrapper = new MenuTabWrapper(menu, this);
-            subObjects.Add(menuTabWrapper);
-            unlocksButton = new OpHoldButton(new Vector2(xx, yy), new Vector2(150f, 50f), menu.Translate("CONFIGURE<LINE>PERKS & BURDENS").Replace("<LINE>", "\r\n"), 20f);
-            unlocksButton.OnPressDone += UnlocksButton_OnPressDone;
-            unlocksButton.description = " ";
-            unlockWrapper = new UIelementWrapper(menuTabWrapper, unlocksButton);
-
-            minusButton = new SymbolButton(menu, this, "minus", "REMOVESIZE", new Vector2(xx - 45f, yy + 5f));
-            minusButton.size = new Vector2(40f, 40f);
-            minusButton.roundedRect.size = minusButton.size;
-            subObjects.Add(minusButton);
-            plusButton = new SymbolButton(menu, this, "plus", "ADDSIZE", new Vector2(xx + 155f, yy + 5f));
-            plusButton.size = new Vector2(40f, 40f);
-            plusButton.roundedRect.size = plusButton.size;
-            subObjects.Add(plusButton);
-
-            shelterSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ShelterSettingBingo", "_", (ConfigAcceptableBase)null);
-            shelterSetting = new OpTextBox(shelterSettingConf as Configurable<string>, new Vector2(xx + 48, yy + 56), 100f);
-            shelterSetting.alignment = FLabelAlignment.Center;
-            shelterSetting.description = "The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'";
-            shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
-            shelterSetting.maxLength = 100;
-            shelterSettingWrapper = new UIelementWrapper(menuTabWrapper, shelterSetting);
-            shelterSetting.value = "random";
-
-            shelterLabel = new MenuLabel(menu, this, "Shelter: ", new Vector2(xx + 26f, yy + 69), default, false);
-            subObjects.Add(shelterLabel);
-
-            copyBoard = new SimpleButton(menu, this, "Copy board", "COPYTOCLIPBOARD", new Vector2(xx - 10f, yy - 25f), new Vector2(80f, 20f));
-            subObjects.Add(copyBoard);
-            pasteBoard = new SimpleButton(menu, this, "Paste board", "PASTEFROMCLIPBOARD", new Vector2(xx + 80f, yy - 25f), new Vector2(80f, 20f));
-            subObjects.Add(pasteBoard);
+            gameControls = new(menu, this, new Vector2(menu.manager.rainWorld.screenSize.x * 0.79f - 45f, 60f));
+            subObjects.Add(gameControls);
 
             multiplayerButton = new SimpleButton(menu, this, "Multiplayer", "SWITCH_MULTIPLAYER", expMenu.exitButton.pos + new Vector2(0f, -40f), new Vector2(140f, 30f));
             subObjects.Add(multiplayerButton);
@@ -206,33 +157,15 @@ namespace BingoMode.BingoMenu
             }
         }
 
-        private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue)
-        {
-
-            string lastDen = BingoData.BingoDen;
-            if (value.Trim() == string.Empty)
-            {
-                BingoData.BingoDen = "random";
-                return;
-            }
-            BingoData.BingoDen = value;
-
-        }
-
         public void UpdateLobbyHost(bool isHost)
         {
-            shelterSetting.greyedOut = !isHost;
+            gameControls.HostPrivilege = isHost;
             randomize.buttonBehav.greyedOut = !isHost;
             shuffle.buttonBehav.greyedOut = !isHost;
             filter.buttonBehav.greyedOut = !isHost;
-            plusButton.buttonBehav.greyedOut = !isHost;
-            minusButton.buttonBehav.greyedOut = !isHost;
-            pasteBoard.buttonBehav.greyedOut = !isHost;
             randomizerButton.buttonBehav.greyedOut = !isHost;
             grid.Switch(!isHost);
 
-            startGame.signalText = isHost ? "STARTBINGO" : "GETREADY";
-            startGame.menuLabel.text = isHost ? "BEGIN" : "I'M\nREADY";
             multiplayerPanel.UpdateLobbyHost(isHost);
         }
 
@@ -254,18 +187,10 @@ namespace BingoMode.BingoMenu
 
                 expMenu.exitButton.buttonBehav.greyedOut = true;
                 rightPage.buttonBehav.greyedOut = true;
-                if (!create)
-                {
-                    startGame.signalText = "GETREADY";
-                    startGame.menuLabel.text = "I'M\nREADY";
-                }
-                shelterSetting.greyedOut = !create;
+                gameControls.HostPrivilege = create;
                 randomize.buttonBehav.greyedOut = !create;
                 shuffle.buttonBehav.greyedOut = !create;
                 filter.buttonBehav.greyedOut = !create;
-                plusButton.buttonBehav.greyedOut = !create;
-                minusButton.buttonBehav.greyedOut = !create;
-                pasteBoard.buttonBehav.greyedOut = !create;
                 expMenu.manualButton.buttonBehav.greyedOut = true;
                 multiplayerButton.menuLabel.text = "Leave Lobby";
                 multiplayerButton.signalText = "LEAVE_LOBBY";
@@ -278,19 +203,17 @@ namespace BingoMode.BingoMenu
 
             expMenu.exitButton.buttonBehav.greyedOut = false;
             rightPage.buttonBehav.greyedOut = false;
-            startGame.signalText = "STARTBINGO";
-            startGame.menuLabel.text = "BEGIN";
+            gameControls.HostPrivilege = true;
             randomize.buttonBehav.greyedOut = false;
             shuffle.buttonBehav.greyedOut = false;
             filter.buttonBehav.greyedOut = false;
-            plusButton.buttonBehav.greyedOut = false;
-            minusButton.buttonBehav.greyedOut = false;
-            pasteBoard.buttonBehav.greyedOut = false;
             expMenu.manualButton.buttonBehav.greyedOut = false;
             multiplayerButton.menuLabel.text = "Multiplayer";
             multiplayerButton.signalText = "SWITCH_MULTIPLAYER";
             grid.Switch(false);
         }
+
+        public void UnlocksDialogClose() => gameControls.UnlocksDialogClose();
 
         public static string ExpeditionRandomStartsUnlocked(RainWorld rainWorld, SlugcatStats.Name slug)
         {
@@ -364,19 +287,6 @@ namespace BingoMode.BingoMenu
         public override void Singal(MenuObject sender, string message)
         {
             base.Singal(sender, message);
-
-            if (message == "COPYTOCLIPBOARD")
-            {
-                UniClipboard.SetText(BingoHooks.GlobalBoard.ToString());
-                return;
-            }
-
-            if (message == "PASTEFROMCLIPBOARD")
-            {
-                BingoHooks.GlobalBoard.FromString(UniClipboard.GetText());
-                SteamTest.UpdateOnlineBingo();
-                return;
-            }
 
             if (message == "GOBACK")
             {
@@ -535,7 +445,8 @@ namespace BingoMode.BingoMenu
 
             if (message == "RANDOMIZE")
             {
-                Regen(false);
+                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);
+                menu.PlaySound(SoundID.MENU_Next_Slugcat);
                 return;
             }
 
@@ -554,22 +465,6 @@ namespace BingoMode.BingoMenu
             if (message == "SWITCH")
             {
                 SwitchChals(sender);
-                return;
-            }
-
-            if (message == "ADDSIZE")
-            {
-                int lastSize = BingoHooks.GlobalBoard.size;
-                BingoHooks.GlobalBoard.size = Mathf.Min(lastSize + 1, 9);
-                if (lastSize != BingoHooks.GlobalBoard.size) Regen(true);
-                return;
-            }
-
-            if (message == "REMOVESIZE")
-            {
-                int lastSize = BingoHooks.GlobalBoard.size;
-                BingoHooks.GlobalBoard.size = Mathf.Max(1, lastSize - 1);
-                if (lastSize != BingoHooks.GlobalBoard.size) Regen(true);
                 return;
             }
 
@@ -607,22 +502,6 @@ namespace BingoMode.BingoMenu
                 return;
             }
 
-            if (message == "GETREADY")
-            {
-                SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "1");
-                startGame.signalText = "GETUNREADY";
-                startGame.menuLabel.text = "I'M NOT\nREADY";
-                menu.PlaySound(SoundID.MENU_Start_New_Game);
-            }
-
-            if (message == "GETUNREADY")
-            {
-                SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "0");
-                startGame.signalText = "GETREADY";
-                startGame.menuLabel.text = "I'M\nREADY";
-                menu.PlaySound(SoundID.MENU_Start_New_Game);
-            }
-
             if (message == "SWITCH_RANDOMIZATION")
             {
                 if (randomizerSlideStep == 0f) randomizerSlideStep = 1f;
@@ -633,20 +512,6 @@ namespace BingoMode.BingoMenu
         }
 
         public void ResetPlayerLobby() => multiplayerPanel.ResetPlayerLobby();
-
-        public void Regen(bool sizeChange)
-        {
-            BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, sizeChange);
-            //if (grid != null)
-            //{
-            //    grid.RemoveSprites();
-            //    RemoveSubObject(grid);
-            //    grid = null;
-            //}
-            //grid = new BingoGrid(menu, page, new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y / 2f), 500f);
-            //subObjects.Add(grid);
-            menu.PlaySound(SoundID.MENU_Next_Slugcat);
-        }
 
         public void Shuffle()
         {
@@ -716,53 +581,7 @@ namespace BingoMode.BingoMenu
         {
             base.RemoveSprites();
             pageTitle.RemoveFromContainer();
-            unlocksButton.Hide();
-            shelterSetting.Hide();
-            unlocksButton.Unload();
-            shelterSetting.Unload();
-            shelterSetting.OnValueUpdate -= ShelterSetting_OnValueUpdate;
-            menuTabWrapper.wrappers.Remove(unlocksButton);
-            menuTabWrapper.wrappers.Remove(shelterSetting);
-            menuTabWrapper.subObjects.Remove(unlockWrapper);
-            menuTabWrapper.subObjects.Remove(shelterSettingWrapper);
-        }
-
-        public void UnlocksButton_OnPressDone(UIfocusable trigger)
-        {
-            UnlockDialog unlockDialog = new UnlockDialog(menu.manager, (menu as ExpeditionMenu).challengeSelect);
-            unlocksButton.Reset();
-            unlocksButton.greyedOut = true;
-            if (BingoData.MultiplayerGame)
-            {
-                bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
-                foreach (var perj in unlockDialog.perkButtons)
-                {
-                    perj.buttonBehav.greyedOut = perj.buttonBehav.greyedOut || BingoData.globalSettings.perks == AllowUnlocks.None || (BingoData.globalSettings.perks == AllowUnlocks.Inherited && !isHost);
-                }
-                foreach (var bur in unlockDialog.burdenButtons)
-                {
-                    bur.buttonBehav.greyedOut = bur.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.burdens == AllowUnlocks.Inherited && !isHost);
-                }
-            }
-            string[] bannedBurdens = ["bur-doomed"];
-            string[] bannedPerks = ["unl-passage", "unl-karma"];
-            foreach (var bur in unlockDialog.burdenButtons)
-            {
-                if (bannedBurdens.Contains(bur.signalText))
-                {
-                    bur.buttonBehav.greyedOut = true;
-                    if (ExpeditionGame.activeUnlocks.Contains(bur.signalText)) unlockDialog.ToggleBurden(bur.signalText);
-                }
-            }
-            foreach (var per in unlockDialog.perkButtons)
-            {
-                if (bannedPerks.Contains(per.signalText))
-                {
-                    per.buttonBehav.greyedOut = true;
-                    if (ExpeditionGame.activeUnlocks.Contains(per.signalText)) unlockDialog.ToggleBurden(per.signalText);
-                }
-            }
-            menu.manager.ShowDialog(unlockDialog);
+            gameControls.RemoveSprites();
         }
 
         public void AddLobbies(List<CSteamID> lobbies) => multiplayerPanel.AddLobbies(lobbies);
