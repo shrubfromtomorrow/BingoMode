@@ -207,7 +207,7 @@ namespace BingoMode.BingoMenu
                     infoLabel.text += "\nCompleted by: ";
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
                     {
-                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
+                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName[i] + ", ";
                     }
                     infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
                 }

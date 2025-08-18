@@ -72,40 +72,30 @@ namespace BingoMode.BingoMenu
             Custom.Saturate(new Color(0.3f, 0f, 1f), desaturara), // Hurricane
             Custom.Saturate(Color.grey, desaturara), // Spectator
         };
-
-        public static string TeamName(int teamIndex)
+        public static readonly string[] TeamName =
+        [
+            "Red",
+            "Blue",
+            "Green",
+            "Orange",
+            "Pink",
+            "Cyan",
+            "Black",
+            "Hurricane",
+            "Board view",
+        ];
+        public static readonly Dictionary<string, int> TeamNumber = new()
         {
-            switch (teamIndex)
-            {
-                case 0: return "Red";
-                case 1: return "Blue";
-                case 2: return "Green";
-                case 3: return "Orange";
-                case 4: return "Pink";
-                case 5: return "Cyan";
-                case 6: return "Black";
-                case 7: return "Hurricane";
-                case 8: return "Board view";
-            }
-            return "Change";
-        }
-
-        public static int TeamNumber(string teamName)
-        {
-            switch (teamName)
-            {
-                case "Red": return 0;
-                case "Blue": return 1;
-                case "Green": return 2;
-                case "Orange": return 3;
-                case "Pink": return 4;
-                case "Cyan": return 5;
-                case "Black": return 6;
-                case "Hurricane": return 7;
-                case "Board view": return 8;
-            }
-            return 0;
-        }
+            { "Red", 0 },
+            { "Blue", 1 },
+            { "Green", 2 },
+            { "Orange", 3 },
+            { "Pink", 4 },
+            { "Cyan", 5 },
+            { "Black", 6 },
+            { "Hurricane", 7 },
+            { "Board view", 8 },
+        };
 
         public BingoPage(Menu.Menu menu, MenuObject owner, Vector2 pos) : base(menu, owner, pos)
         {
@@ -461,7 +451,7 @@ namespace BingoMode.BingoMenu
                 }
                 else
                 {
-                    int newTeam = TeamNumber(Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value);
+                    int newTeam = TeamNumber[Plugin.PluginInstance.BingoConfig.SinglePlayerTeam.Value];
 
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer] = new(BingoHooks.GlobalBoard.size, false, newTeam, false, false);
                     SteamTest.team = newTeam;

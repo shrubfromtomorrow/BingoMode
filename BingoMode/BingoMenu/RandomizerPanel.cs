@@ -92,8 +92,7 @@ namespace BingoMode.BingoMenu
 
             DrawProfileList(timeStacker);
 
-            divider.x = pos.x;
-            divider.y = pos.y + size.y - HEADER_HEIGHT;
+            divider.SetPosition(DrawPos(timeStacker) + new Vector2(0f, size.y - HEADER_HEIGHT));
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -105,7 +104,8 @@ namespace BingoMode.BingoMenu
                 {
                     BingoRandomizationProfile.LoadFromFile(profileName);
                     randomizerLabel.text = profileName;
-                    Singal(sender, "RANDOMIZE");
+                    BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);
+                    menu.PlaySound(SoundID.MENU_Next_Slugcat);
                 }
                 catch (Exception e)
                 {
@@ -118,7 +118,8 @@ namespace BingoMode.BingoMenu
             {
                 BingoRandomizationProfile.Unload();
                 randomizerLabel.text = "unloaded";
-                Singal(sender, "RANDOMIZE");
+                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);
+                menu.PlaySound(SoundID.MENU_Next_Slugcat);
                 return;
             }
 
@@ -138,6 +139,19 @@ namespace BingoMode.BingoMenu
             }
 
             base.Singal(sender, message);
+        }
+
+        public override void RemoveSprites()
+        {
+            base.RemoveSprites();
+
+            foreach (MenuObject obj in subObjects)
+            {
+                obj.RemoveSprites();
+                RecursiveRemoveSelectables(obj);
+            }
+            subObjects.Clear();
+            divider.RemoveFromContainer();
         }
 
         private void PopulateRandomizerList()
@@ -176,15 +190,20 @@ namespace BingoMode.BingoMenu
                 float overshoot = (y > bottom + (top - bottom) / 2f) ?
                         (y - top) / MARGIN :
                         (bottom - y) / MARGIN;
-                for (int i = 0; i < 9; i++)
-                    button.roundedRect.sprites[i].alpha = Mathf.Lerp(0.07f, 0f, overshoot);
-                for (int i = 9; i < 17; i++)
-                    button.roundedRect.sprites[i].alpha = Mathf.Lerp(1f, 0f, overshoot);
-                button.menuLabel.label.alpha = Mathf.Lerp(1f, 0f, overshoot);
+                SetButtonAlpha(button, 1f - overshoot);
                 button.buttonBehav.greyedOut = overshoot >= 1f;
                 button.pos.y = y;
                 y -= LIST_BUTTON_HEIGHT + LIST_SPACING;
             }
+        }
+
+        private static void SetButtonAlpha(SimpleButton button, float alpha)
+        {
+            for (int i = 0; i < 9; i++)
+                button.roundedRect.sprites[i].alpha = Mathf.Lerp(0f, 0.3f, alpha);
+            for (int i = 9; i < 17; i++)
+                button.roundedRect.sprites[i].alpha = Mathf.Lerp(0f, 1f, alpha);
+            button.menuLabel.label.alpha = Mathf.Lerp(0f, 1f, alpha);
         }
     }
 }

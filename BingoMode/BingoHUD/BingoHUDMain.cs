@@ -189,7 +189,7 @@ namespace BingoMode.BingoHUD
                             }
                         }
                     }
-                    bingoCompleteInfo.text = endGameInfo.subTitle.Replace("<team_name>", BingoPage.TeamName(endGameInfo.teams[0])) + "\n" + endGameInfo.evenSubtlerTitle;
+                    bingoCompleteInfo.text = endGameInfo.subTitle.Replace("<team_name>", BingoPage.TeamName[endGameInfo.teams[0]]) + "\n" + endGameInfo.evenSubtlerTitle;
                     bingoCompleteInfo.color = BingoPage.TEAM_COLOR[endGameInfo.teams[0]];
                     break;
 
@@ -201,7 +201,7 @@ namespace BingoMode.BingoHUD
                         completeQueue.Add(grid[g.x, g.y]);
                         grid[g.x, g.y].teamResponsible = endGameInfo.teams[0];
                     }
-                    bingoCompleteInfo.text = endGameInfo.subTitle.Replace("<team_name>", BingoPage.TeamName(endGameInfo.teams[0])) + "\n" + endGameInfo.evenSubtlerTitle;
+                    bingoCompleteInfo.text = endGameInfo.subTitle.Replace("<team_name>", BingoPage.TeamName[endGameInfo.teams[0]]) + "\n" + endGameInfo.evenSubtlerTitle;
                     bingoCompleteInfo.color = BingoPage.TEAM_COLOR[endGameInfo.teams[0]];
                     break;
                 case BingoCompleteReason.Tie:
@@ -523,7 +523,7 @@ namespace BingoMode.BingoHUD
                 foreach (var kvp in completedForTeam)
                 {
                     
-                    addText += "\n" + BingoPage.TeamName(kvp.Key) + " - " + kvp.Value;
+                    addText += "\n" + BingoPage.TeamName[kvp.Key] + " - " + kvp.Value;
                 }
             }
             else
@@ -1513,7 +1513,7 @@ namespace BingoMode.BingoHUD
                     infoLabel.text += "\nCompleted by: ";
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
                     {
-                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
+                        if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName[i] + ", ";
                     }
                     infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
                 }
@@ -1522,7 +1522,7 @@ namespace BingoMode.BingoHUD
                     infoLabel.text += "\nFailed by: ";
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsFailed.Length; i++)
                     {
-                        if ((challenge as BingoChallenge).TeamsFailed[i]) infoLabel.text += BingoPage.TeamName(i) + ", ";
+                        if ((challenge as BingoChallenge).TeamsFailed[i]) infoLabel.text += BingoPage.TeamName[i] + ", ";
                     }
                     infoLabel.text = infoLabel.text.Substring(0, infoLabel.text.Length - 2); // Trim the last ", "
                 }

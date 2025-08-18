@@ -56,7 +56,6 @@ namespace BingoMode.BingoMenu
         private List<FSprite> lobbyDividers = [];
 
         private bool _visible = true;
-        private MenuObject ownerMemory;
         
         public Vector2 size;
         public float sliderF;
@@ -74,14 +73,13 @@ namespace BingoMode.BingoMenu
                     RemovePlayersSprites();
                 }
 
-                owner = value ? ownerMemory : null;
                 _visible = value;
             }
         }
         public bool InLobby { get => inLobby; }
+
         public MultiplayerPanel(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size) : base(menu, owner, pos)
         {
-            ownerMemory = owner;
             this.size = size;
 
             background = new RoundedRect(menu, this, Vector2.zero, size, true);
@@ -241,10 +239,8 @@ namespace BingoMode.BingoMenu
         public override void RemoveSprites()
         {
             base.RemoveSprites();
-            owner = ownerMemory;
             foreach (MenuObject obj in subObjects)
             {
-                obj.owner = this;
                 obj.RemoveSprites();
                 RecursiveRemoveSelectables(obj);
             }

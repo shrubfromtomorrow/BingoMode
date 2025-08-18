@@ -81,7 +81,7 @@ namespace BingoMode.BingoMenu
             this.size = size;
             this.data = data;
 
-            string nameAndTeam = $"{data.nickname} ({BingoPage.TeamName(data.team)})";
+            string nameAndTeam = $"{data.nickname} ({BingoPage.TeamName[data.team]})";
 
             string markAtlas = data.isHost ? "TinyCrown" : data.ready ? "TinyCheck" : "TinyX";
             Color markColor = data.isHost ? Color.yellow : data.ready ? Color.green : Color.red;
@@ -97,7 +97,7 @@ namespace BingoMode.BingoMenu
             if (!controls)
                 return;
 
-            Configurable<string> conf = MenuModList.ModButton.RainWorldDummy.config.Bind("_PlayerInfoSelect", BingoPage.TeamName(data.team), (ConfigAcceptableBase)null);
+            Configurable<string> conf = MenuModList.ModButton.RainWorldDummy.config.Bind("_PlayerInfoSelect", BingoPage.TeamName[data.team], (ConfigAcceptableBase)null);
             selectTeam = new(
                     conf,
                     new Vector2(size.x - MARGIN - SELECT_TEAM_WIDTH, DROPDOWN_SIZE), // DROPDOWN_SIZE part of hack described below
@@ -149,7 +149,7 @@ namespace BingoMode.BingoMenu
 
         private void SelectTeam_OnValueChanged(UIconfig config, string value, string oldValue)
         {
-            data.team = BingoPage.TeamNumber(value);
+            data.team = BingoPage.TeamNumber[value];
             Singal(null, $"SWTEAM-{data.identity.GetSteamID64()}-{data.team}");
         }
 
