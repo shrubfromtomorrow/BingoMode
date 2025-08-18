@@ -1091,7 +1091,7 @@ namespace BingoMode
             {
                 if (bingoPage.TryGetValue(self, out var page))
                 {
-                    self.selectedObject = page.randomize;
+                    self.selectedObject = page.grid;
                 }
                 else self.selectedObject = self.characterSelect.slugcatButtons[0];
             }

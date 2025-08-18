@@ -20,14 +20,22 @@ namespace BingoMode.BingoMenu
     public class BingoPage : PositionedMenuObject
     {
         public ExpeditionMenu expMenu;
+
+        #region Title
+        private const float TITLE_MARGIN = 36f;
+        private const float TITLE_WIDTH = 164f; // source : atlases/bingomode.txt
+        private const float TITLE_HEIGHT = 52f; // source : atlases/bingomode.txt
+        private const float BACK_BUTTON_SIZE = 45f;
+        private const float TITLE_SPRITE_ALIGN = 5f;
+
+        private FSprite title;
+        private SymbolButton back;
+        #endregion
+
         public BingoBoard board;
         public BingoGrid grid;
-        public FSprite pageTitle;
-        public SymbolButton rightPage;
+        private BoardControls boardControls;
         private GameControls gameControls;
-        public SymbolButton randomize;
-        public SymbolButton shuffle;
-        public SymbolButton filter;
         public SymbolButton eggButton;
 
         #region Multiplayer
@@ -106,44 +114,59 @@ namespace BingoMode.BingoMenu
             BingoData.BingoMode = false;
             BingoData.TeamsInBingo = [0];
 
-            pageTitle = new FSprite("bingotitle");
-            pageTitle.SetAnchor(0.5f, 0f);
-            pageTitle.x = 683f;
-            pageTitle.y = 680f;
-            pageTitle.shader = menu.manager.rainWorld.Shaders["MenuText"];
-            Container.AddChild(pageTitle);
+            Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+            title = new("bingotitle")
+            {
+                anchorX = 0.5f,
+                anchorY = 1f,
+                x = topCenter.x,
+                y = topCenter.y,
+                shader = menu.manager.rainWorld.Shaders["MenuText"]
+            };
+            Container.AddChild(title);
 
-            rightPage = new SymbolButton(menu, this, "Big_Menu_Arrow", "GOBACK", new Vector2(783f, 685f));
-            rightPage.symbolSprite.rotation = 90f;
-            rightPage.size = new Vector2(45f, 45f);
-            rightPage.roundedRect.size = rightPage.size;
-            subObjects.Add(rightPage);
+            back = new(
+                    menu,
+                    this,
+                    "Big_Menu_Arrow",
+                    "GOBACK",
+                    topCenter + new Vector2(TITLE_WIDTH / 2f + TITLE_MARGIN, -TITLE_HEIGHT + TITLE_SPRITE_ALIGN))
+            { size = Vector2.one * BACK_BUTTON_SIZE };
+            back.symbolSprite.rotation = 90f;
+            back.roundedRect.size = Vector2.one * BACK_BUTTON_SIZE;
+            subObjects.Add(back);
 
-            randomize = new SymbolButton(menu, this, "Sandbox_Randomize", "RANDOMIZE", new Vector2(530f, 690f));
-            randomize.size = new Vector2(30f, 30f);
-            randomize.roundedRect.size = randomize.size;
-            subObjects.Add(randomize);
+            boardControls = new(
+                    menu,
+                    this,
+                    topCenter + new Vector2(-TITLE_WIDTH / 2f - TITLE_MARGIN, -TITLE_HEIGHT / 2f),
+                    1f,
+                    0.5f);
+            subObjects.Add(boardControls);
 
-            shuffle = new SymbolButton(menu, this, "Menu_Symbol_Shuffle", "SHUFFLE", new Vector2(563f, 690f));
-            shuffle.size = new Vector2(30f, 30f);
-            shuffle.roundedRect.size = shuffle.size;
-            subObjects.Add(shuffle);
-
-            filter = new SymbolButton(menu, this, "filter", "FILTER", new Vector2(497f, 690f));
-            filter.size = new Vector2(30f, 30f);
-            filter.symbolSprite.scale = 0.8f;
-            filter.roundedRect.size = filter.size;
-            subObjects.Add(filter);
-
-            gameControls = new(menu, this, new Vector2(menu.manager.rainWorld.screenSize.x * 0.79f - 45f, 60f));
+            gameControls = new(
+                    menu,
+                    this,
+                    new Vector2(menu.manager.rainWorld.screenSize.x * 0.79f - 45f, 60f));
             subObjects.Add(gameControls);
 
-            multiplayerButton = new SimpleButton(menu, this, "Multiplayer", "SWITCH_MULTIPLAYER", expMenu.exitButton.pos + new Vector2(0f, -40f), new Vector2(140f, 30f));
+            multiplayerButton = new SimpleButton(
+                    menu,
+                    this,
+                    "Multiplayer",
+                    "SWITCH_MULTIPLAYER",
+                    expMenu.exitButton.pos + new Vector2(0f, -40f),
+                    new Vector2(140f, 30f));
             subObjects.Add(multiplayerButton);
             multiplayerPanel = new(menu, this, Vector2.zero, new Vector2(MULTIPLAYER_PANEL_WIDTH, MULTIPLAYER_PANEL_HEIGHT));
             subObjects.Add(multiplayerPanel);
 
-            randomizerButton = new(menu, this, "Profiles", "SWITCH_RANDOMIZATION", expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
+            randomizerButton = new(
+                    menu,
+                    this,
+                    "Profiles",
+                    "SWITCH_RANDOMIZATION",
+                    expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
             subObjects.Add(randomizerButton);
             randomizerPanel = new(menu, this, Vector2.zero, new Vector2(RANDOMIZER_PANEL_WIDTH, RANDOMIZER_PANEL_HEIGHT));
             subObjects.Add(randomizerPanel);
@@ -160,9 +183,7 @@ namespace BingoMode.BingoMenu
         public void UpdateLobbyHost(bool isHost)
         {
             gameControls.HostPrivilege = isHost;
-            randomize.buttonBehav.greyedOut = !isHost;
-            shuffle.buttonBehav.greyedOut = !isHost;
-            filter.buttonBehav.greyedOut = !isHost;
+            boardControls.HostPrivilege = isHost;
             randomizerButton.buttonBehav.greyedOut = !isHost;
             grid.Switch(!isHost);
 
@@ -186,11 +207,9 @@ namespace BingoMode.BingoMenu
                     ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
 
                 expMenu.exitButton.buttonBehav.greyedOut = true;
-                rightPage.buttonBehav.greyedOut = true;
+                back.buttonBehav.greyedOut = true;
                 gameControls.HostPrivilege = create;
-                randomize.buttonBehav.greyedOut = !create;
-                shuffle.buttonBehav.greyedOut = !create;
-                filter.buttonBehav.greyedOut = !create;
+                boardControls.HostPrivilege = create;
                 expMenu.manualButton.buttonBehav.greyedOut = true;
                 multiplayerButton.menuLabel.text = "Leave Lobby";
                 multiplayerButton.signalText = "LEAVE_LOBBY";
@@ -202,11 +221,9 @@ namespace BingoMode.BingoMenu
             ExpeditionGame.activeUnlocks.RemoveAll(x => x.StartsWith("bur-"));
 
             expMenu.exitButton.buttonBehav.greyedOut = false;
-            rightPage.buttonBehav.greyedOut = false;
+            back.buttonBehav.greyedOut = false;
             gameControls.HostPrivilege = true;
-            randomize.buttonBehav.greyedOut = false;
-            shuffle.buttonBehav.greyedOut = false;
-            filter.buttonBehav.greyedOut = false;
+            boardControls.HostPrivilege = true;
             expMenu.manualButton.buttonBehav.greyedOut = false;
             multiplayerButton.menuLabel.text = "Multiplayer";
             multiplayerButton.signalText = "SWITCH_MULTIPLAYER";
@@ -282,6 +299,25 @@ namespace BingoMode.BingoMenu
                 return text2;
             }
             return "SU_S01";
+        }
+
+        public override void GrafUpdate(float timeStacker)
+        {
+            base.GrafUpdate(timeStacker);
+
+            title.SetPosition(DrawPos(timeStacker) + new Vector2(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN));
+
+            if (eggButton != null && expMenu.challengeSelect != null)
+            {
+                int num = ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer);
+                if (num > -1)
+                {
+                    eggButton.symbolSprite.color = ((ExpeditionData.ints[num] == 2) ? new HSLColor(Mathf.Sin(expMenu.challengeSelect.colorCounter / 20f), 1f, 0.75f).rgb : new Color(0.3f, 0.3f, 0.3f));
+                }
+            }
+
+            MultiplayerSlide(timeStacker);
+            RandomizerSlide(timeStacker);
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -443,31 +479,6 @@ namespace BingoMode.BingoMenu
                 return;
             }
 
-            if (message == "RANDOMIZE")
-            {
-                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);
-                menu.PlaySound(SoundID.MENU_Next_Slugcat);
-                return;
-            }
-
-            if (message == "SHUFFLE")
-            {
-                Shuffle();
-                return;
-            }
-
-            if (message == "FILTER")
-            {
-                OpenFilterDialog();
-                return;
-            }
-
-            if (message == "SWITCH")
-            {
-                SwitchChals(sender);
-                return;
-            }
-
             if (message == "LEAVE_LOBBY")
             {
                 SteamTest.LeaveLobby();
@@ -511,45 +522,20 @@ namespace BingoMode.BingoMenu
             }
         }
 
-        public void ResetPlayerLobby() => multiplayerPanel.ResetPlayerLobby();
-
-        public void Shuffle()
+        public override void RemoveSprites()
         {
-            BingoHooks.GlobalBoard.ShuffleBoard();
-            menu.PlaySound(SoundID.MENU_Next_Slugcat);
-        }
+            base.RemoveSprites();
 
-        public void OpenFilterDialog()
-        {
-            menu.manager.ShowDialog(new FilterDialog(menu.manager));
-            menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
-        }
-
-        public void SwitchChals(MenuObject sender)
-        {
-            BingoButton chal = sender as BingoButton;
-            BingoHooks.GlobalBoard.SwitchChals(chal.challenge, chal.x, chal.y);
-        }
-
-        public override void GrafUpdate(float timeStacker)
-        {
-            base.GrafUpdate(timeStacker);
-
-            pageTitle.x = Mathf.Lerp(owner.page.lastPos.x, owner.page.pos.x, timeStacker) + 680f;
-            pageTitle.y = Mathf.Lerp(owner.page.lastPos.y, owner.page.pos.y, timeStacker) + 680f;
-
-            if (eggButton != null && expMenu.challengeSelect != null)
+            title.RemoveFromContainer();
+            foreach (MenuObject obj in subObjects)
             {
-                int num = ExpeditionGame.ExIndex(ExpeditionData.slugcatPlayer);
-                if (num > -1)
-                {
-                    eggButton.symbolSprite.color = ((ExpeditionData.ints[num] == 2) ? new HSLColor(Mathf.Sin(expMenu.challengeSelect.colorCounter / 20f), 1f, 0.75f).rgb : new Color(0.3f, 0.3f, 0.3f));
-                }
+                obj.RemoveSprites();
+                RecursiveRemoveSelectables(obj);
             }
-
-            MultiplayerSlide(timeStacker);
-            RandomizerSlide(timeStacker);
+            subObjects.Clear();
         }
+
+        public void ResetPlayerLobby() => multiplayerPanel.ResetPlayerLobby();
 
         private void MultiplayerSlide(float timeStacker)
         {
@@ -575,13 +561,6 @@ namespace BingoMode.BingoMenu
                     + new Vector2(randomizerButton.size.x + OFFSET_TO_BUTTON_X - RANDOMIZER_PANEL_WIDTH, OFFSET_TO_BUTTON_Y - RANDOMIZER_PANEL_HEIGHT)
                     + Vector2.right * (1f - Custom.LerpExpEaseInOut(0f, 1f, randomizerSlideIn)) * DIST_TO_EDGE;
             randomizerPanel.Visible = randomizerSlideIn >= 0.01f;
-        }
-
-        public override void RemoveSprites()
-        {
-            base.RemoveSprites();
-            pageTitle.RemoveFromContainer();
-            gameControls.RemoveSprites();
         }
 
         public void AddLobbies(List<CSteamID> lobbies) => multiplayerPanel.AddLobbies(lobbies);

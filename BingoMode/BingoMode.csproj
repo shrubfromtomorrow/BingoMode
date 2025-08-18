@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BingoBoard.cs" />
+    <Compile Include="BingoMenu\BoardControls.cs" />
     <Compile Include="BingoMenu\FilterDialog.cs" />
     <Compile Include="BingoMenu\GameControls.cs" />
     <Compile Include="BingoMenu\LobbyInfo.cs" />
