@@ -30,13 +30,13 @@ namespace BingoMode.BingoMenu
         private FLabel[] labels;
         private FSprite[] dividers;
         private bool inLobby;
-        private BingoPage owner;
+        private PositionedMenuObject owner;
         private MenuTabWrapper menuTabWrapper;
         private ConfigurableBase maxPlayersConf;
         private OpUpdown maxPlayers;
         private UIelementWrapper maxPlayersWrapper;
 
-        public CreateLobbyDialog(ProcessManager manager, BingoPage owner, bool inLobby = false, bool host = false) : base(manager)
+        public CreateLobbyDialog(ProcessManager manager, PositionedMenuObject owner, bool inLobby = false, bool host = false) : base(manager)
         {
             this.inLobby = inLobby;
             float[] screenOffsets = Custom.GetScreenOffsets();
