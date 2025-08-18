@@ -43,27 +43,22 @@ namespace BingoMode
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
             if (changeSize)
-            { 
                 ghostGrid = challengeGrid;
-            }
+
             challengeGrid = new Challenge[size, size];
-            for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
             {
-                for (int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
-                    if (changeSize)
+                    if (changeSize && !(i + 1 > ghostGrid.GetLength(0) || j + 1 > ghostGrid.GetLength(1)) && ghostGrid[i, j] != null)
                     {
-                        if (!(i + 1 > ghostGrid.GetLength(0) || j + 1 > ghostGrid.GetLength(1)) && ghostGrid[i, j] != null)
-                        {
-                            challengeGrid[i, j] = ghostGrid[i, j];
-                            if (!ExpeditionData.challengeList.Contains(challengeGrid[i, j])) ExpeditionData.challengeList.Add(challengeGrid[i, j]);
-                            continue;
-                        }
-                    }
-                    if (challengeGrid[i, j] != null)
-                    {
+                        challengeGrid[i, j] = ghostGrid[i, j];
+                        if (!ExpeditionData.challengeList.Contains(challengeGrid[i, j]))
+                            ExpeditionData.challengeList.Add(challengeGrid[i, j]);
                         continue;
                     }
+                    if (challengeGrid[i, j] != null)
+                        continue;
                     challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                 }
             }
@@ -76,36 +71,28 @@ namespace BingoMode
             int rows = challengeGrid.GetLength(0);
             int cols = challengeGrid.GetLength(1);
 
-            List<Challenge> flatList = new List<Challenge>();
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
+            List<Challenge> flatList = [];
+            for (int j = 0; j < cols; j++)
+                for (int i = 0; i < rows; i++)
                     flatList.Add(challengeGrid[i, j]);
-                }
-            }
 
             for (int i = 0; i < flatList.Count; i++)
             {
                 int randomIndex = UnityEngine.Random.Range(i, flatList.Count);
-                Challenge temp = flatList[i];
-                flatList[i] = flatList[randomIndex];
-                flatList[randomIndex] = temp;
+                (flatList[randomIndex], flatList[i]) = (flatList[i], flatList[randomIndex]);
             }
 
             ExpeditionData.ClearActiveChallengeList();
             int index = 0;
-            for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++)
             {
-                for (int j = 0; j < cols; j++)
+                for (int i = 0; i < rows; i++)
                 {
                     Challenge shuffledChallenge = flatList[index++];
                     challengeGrid[i, j] = shuffledChallenge;
 
                     if (!ExpeditionData.challengeList.Contains(shuffledChallenge))
-                    {
                         ExpeditionData.challengeList.Add(shuffledChallenge);
-                    }
                 }
             }
 
@@ -139,15 +126,13 @@ namespace BingoMode
                 ExpeditionData.ClearActiveChallengeList();
                 int rows = challengeGrid.GetLength(0);
                 int cols = challengeGrid.GetLength(1);
-                for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
                 {
-                    for (int j = 0; j < cols; j++)
+                    for (int i = 0; i < rows; i++)
                     {
                         Challenge c = challengeGrid[i, j];
                         if (c != null && !ExpeditionData.challengeList.Contains(c))
-                        {
                             ExpeditionData.challengeList.Add(c);
-                        }
                     }
                 }
 
@@ -164,9 +149,8 @@ namespace BingoMode
             switch1 = null;
             switch2 = null;
             foreach (Challenge c in ExpeditionData.challengeList)
-            {
                 c.UpdateDescription();
-            }
+
             ExpeditionMenu self = BingoData.globalMenu;
             if (self != null && BingoHooks.bingoPage.TryGetValue(self, out var page) && page.grid != null)
             {
@@ -199,48 +183,40 @@ namespace BingoMode
                 {
                     var ch = challengeGrid[i, j];
                     if ((ch as BingoChallenge).TeamsFailed[t])
-                    {
                         line = false;
-                    }
                     if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                    {
                         line = false;
-                    }
-                    if (line) currentWinLine.Add(new IntVector2(i, j));
+                    if (line)
+                        currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
                 if (won)
-                {
                     break;
-                }
-                else currentWinLine.Clear();
+                else
+                    currentWinLine.Clear();
             }
 
             // Horizontal lines
             if (!won)
             {
-                for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
                 {
                     bool line = true;
-                    for (int j = 0; j < size; j++)
+                    for (int i = 0; i < size; i++)
                     {
-                        var ch = challengeGrid[j, i];
+                        var ch = challengeGrid[i, j];
                         if ((ch as BingoChallenge).TeamsFailed[t])
-                        {
                             line = false;
-                        }
                         if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                        {
                             line = false;
-                        }
-                        if (line) currentWinLine.Add(new IntVector2(j, i));
+                        if (line)
+                            currentWinLine.Add(new IntVector2(i, j));
                     }
                     won = line;
                     if (won)
-                    {
                         break;
-                    }
-                    else currentWinLine.Clear();
+                    else
+                        currentWinLine.Clear();
                 }
             }
 
@@ -252,20 +228,15 @@ namespace BingoMode
                 {
                     var ch = challengeGrid[i, i];
                     if ((ch as BingoChallenge).TeamsFailed[t])
-                    {
                         line = false;
-                    }
                     if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                    {
                         line = false;
-                    }
-                    if (line) currentWinLine.Add(new IntVector2(i, i));
+                    if (line)
+                        currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
-                if (won)
-                {
-                }
-                else currentWinLine.Clear();
+                if (!won)
+                    currentWinLine.Clear();
             }
 
             // Diagonal line 2
@@ -276,20 +247,15 @@ namespace BingoMode
                 {
                     var ch = challengeGrid[size - 1 - i, i];
                     if ((ch as BingoChallenge).TeamsFailed[t])
-                    {
                         line = false;
-                    }
                     if (line && lockout && (ch as BingoChallenge).TeamsCompleted.Any(x => x == true) && !(ch as BingoChallenge).TeamsCompleted[t])
-                    {
                         line = false;
-                    }
-                    if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
+                    if (line)
+                        currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
-                if (won)
-                {
-                }
-                else currentWinLine.Clear();
+                if (!won)
+                    currentWinLine.Clear();
             }
 
             currentWinLine = [];
@@ -310,34 +276,33 @@ namespace BingoMode
                 {
                     var ch = challengeGrid[i, j];
                     line &= (ch as BingoChallenge).TeamsCompleted[t];
-                    if (line) currentWinLine.Add(new IntVector2(i, j));
+                    if (line)
+                        currentWinLine.Add(new IntVector2(i, j));
                 }
                 won = line;
                 if (won)
-                {
-                                        break;
-                }
-                else currentWinLine.Clear();
+                    break;
+                else
+                    currentWinLine.Clear();
             }
 
             // Horizontal lines
             if (!won)
             {
-                for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
                 {
                     bool line = true;
-                    for (int j = 0; j < size; j++)
+                    for (int i = 0; i < size; i++)
                     {
-                        var ch = challengeGrid[j, i];
+                        var ch = challengeGrid[i, j];
                         line &= (ch as BingoChallenge).TeamsCompleted[t];
-                        if (line) currentWinLine.Add(new IntVector2(j, i));
+                        if (line) currentWinLine.Add(new IntVector2(i, j));
                     }
                     won = line;
                     if (won)
-                    {
-                                                break;
-                    }
-                    else currentWinLine.Clear();
+                        break;
+                    else
+                        currentWinLine.Clear();
                 }
             }
 
@@ -352,10 +317,8 @@ namespace BingoMode
                     if (line) currentWinLine.Add(new IntVector2(i, i));
                 }
                 won = line;
-                if (won)
-                {
-                                    }
-                else currentWinLine.Clear();
+                if (!won)
+                    currentWinLine.Clear();
             }
 
             // Diagonal line 2
@@ -369,19 +332,13 @@ namespace BingoMode
                     if (line) currentWinLine.Add(new IntVector2(size - 1 - i, i));
                 }
                 won = line;
-                if (won)
-                {
-                                    }
-                else currentWinLine.Clear();
+                if (!won)
+                    currentWinLine.Clear();
             }
 
             if (overrideArray != null)
-            {
                 foreach (var coord in currentWinLine)
-                {
                     overrideArray.Add(coord);
-                }
-            }
             currentWinLine = [];
             return won;
         }
@@ -418,13 +375,13 @@ namespace BingoMode
             }
 
             // Horizontal lines
-            for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
             {
                 int tempSquaresH = 0;
                 bool fuckThisShitImOut = false;
-                for (int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
-                    var ch = challengeGrid[j, i] as BingoChallenge;
+                    var ch = challengeGrid[i, j] as BingoChallenge;
                     if (ch.TeamsCompleted[t]) tempSquaresH++;
                     else if (lockout)
                     {
@@ -489,7 +446,13 @@ namespace BingoMode
         public Challenge RandomBingoChallenge(Challenge type = null, bool ignore = false, int x = 1, int y = -1)
         {
             if (BingoRandomizationProfile.IsLoaded)
-                return BingoRandomizationProfile.GetChallenge();
+                try
+                {
+                    return BingoRandomizationProfile.GetChallenge();
+                } catch (Exception)
+                {
+                    Plugin.logger.LogMessage("Error getting challenge from randomizer, resorting to default generation.");
+                }
 
             if (BingoData.availableBingoChallenges == null)
             {
@@ -533,8 +496,10 @@ namespace BingoMode
                 list.Remove(ch);
                 goto resette;
             }
-            if (ch == null) ch = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate();
-            if (!ExpeditionData.challengeList.Contains(ch) && !ignore) ExpeditionData.challengeList.Add(ch);
+            if (ch == null)
+                ch = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoKillChallenge").GetType()) as Challenge).Generate();
+            if (!ExpeditionData.challengeList.Contains(ch) && !ignore)
+                ExpeditionData.challengeList.Add(ch);
             return ch;
         }
 
@@ -543,19 +508,22 @@ namespace BingoMode
             // Horizontal check
             for (int i = 0; i < size; i++)
             {
-                if (challengeGrid[i, y] != null && (challengeGrid[i, y] as BingoChallenge).ReverseChallenge()) return true;
+                if (challengeGrid[i, y] != null && (challengeGrid[i, y] as BingoChallenge).ReverseChallenge())
+                    return true;
             }
             // Vertical check
             for (int i = 0; i < size; i++)
             {
-                if (challengeGrid[x, i] != null && (challengeGrid[x, i] as BingoChallenge).ReverseChallenge()) return true;
+                if (challengeGrid[x, i] != null && (challengeGrid[x, i] as BingoChallenge).ReverseChallenge())
+                    return true;
             }
             // Diagonal 1 check
             if (x == y)
             {
                 for (int i = 0; i < size; i++)
                 {
-                    if (challengeGrid[i, i] != null && (challengeGrid[i, i] as BingoChallenge).ReverseChallenge()) return true;
+                    if (challengeGrid[i, i] != null && (challengeGrid[i, i] as BingoChallenge).ReverseChallenge())
+                        return true;
                 }
             }
             // Diagonal 2 check
@@ -563,7 +531,8 @@ namespace BingoMode
             {
                 for (int i = 0; i < size; i++)
                 {
-                    if (challengeGrid[size - 1 - i, i] != null && (challengeGrid[size - 1 - i, i] as BingoChallenge).ReverseChallenge()) return true;
+                    if (challengeGrid[size - 1 - i, i] != null && (challengeGrid[size - 1 - i, i] as BingoChallenge).ReverseChallenge())
+                        return true;
                 }
             }
 
@@ -579,21 +548,9 @@ namespace BingoMode
                  
                 challengeGrid = new Challenge[size, size];
                 int next = 0;
-                for (int i = 0; i < size; i++)
-                {
-                    for (int j = 0; j < size; j++)
-                    {
-                        //if (recreateList.Count < next + 1)
-                        //{
-                        //    challengeGrid[i, j] = RandomBingoChallenge();
-                        //}
-                        //else 
-                        challengeGrid[i, j] = recreateList[next];
-                        //(challengeGrid[i, j] as IBingoChallenge).Index = next;
-                         
-                        next++;
-                    }
-                }
+                for (int j = 0; j < size; j++)
+                    for (int i = 0; i < size; i++)
+                        challengeGrid[i, j] = recreateList[next++];
                 
                 SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
@@ -632,7 +589,13 @@ namespace BingoMode
             
             if (slug.ToLowerInvariant() != ExpeditionData.slugcatPlayer.value.ToLowerInvariant())
             {
-                if (BingoData.globalMenu != null) BingoData.globalMenu.manager.ShowDialog(new InfoDialog(BingoData.globalMenu.manager, $"Slugcat mismatch!\n\nSelected slugcat: {ExpeditionData.slugcatPlayer.value}\nProvided Slugcat: {slug}\n\nPlease paste a board from the same slugcat that's currently selected."));
+                if (BingoData.globalMenu != null)
+                    BingoData.globalMenu.manager.ShowDialog(new InfoDialog(
+                            BingoData.globalMenu.manager,
+                            $"Slugcat mismatch!\n\n" +
+                            $"Selected slugcat: {ExpeditionData.slugcatPlayer.value}\n" +
+                            $"Provided Slugcat: {slug}\n\n" +
+                            $"Please paste a board from the same slugcat that's currently selected."));
                 return;
             }
 
@@ -644,9 +607,9 @@ namespace BingoMode
                 size = Mathf.RoundToInt(Mathf.Sqrt(challenges.Length));
                 int next = 0;
                 challengeGrid = new Challenge[size, size];
-                for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
                 {
-                    for (int j = 0; j < size; j++)
+                    for (int i = 0; i < size; i++)
                     {
                         try
                         {
@@ -685,35 +648,35 @@ namespace BingoMode
 
         public Challenge GetChallenge(int x, int y)
         {
-            if (x < challengeGrid.GetLength(0) && y < challengeGrid.GetLength(1)) return challengeGrid[x, y];
+            if (x < challengeGrid.GetLength(0) && y < challengeGrid.GetLength(1))
+                return challengeGrid[x, y];
             return null;
         }
 
         public string GetBingoState()
         {
             string state = "";
-            for (int i = 0; i < challengeGrid.GetLength(0); i++)
-            {
-                for (int j = 0; j < challengeGrid.GetLength(1); j++)
-                {
+            for (int j = 0; j < challengeGrid.GetLength(1); j++)
+                for (int i = 0; i < challengeGrid.GetLength(0); i++)
                     state += "<>" + (challengeGrid[i, j] as BingoChallenge).TeamsToString();
-                }
-            }
             if (state != "") state = state.Substring(2);
             return state;
         }
 
         public void InterpretBingoState(string state)
         {
-            if (challengeGrid == null) { Plugin.logger.LogError("CHALLENGE GRID IS NULL!! Returning"); return; }
+            if (challengeGrid == null)
+            {
+                Plugin.logger.LogError("CHALLENGE GRID IS NULL!! Returning");
+                return;
+            }
 
             string[] challenges = Regex.Split(state, "<>");
-            
 
             int next = 0;
-            for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
             {
-                for (int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
                     if (challengeGrid[i, j] == null)
                     {
@@ -722,9 +685,8 @@ namespace BingoMode
                     }
                     BingoChallenge ch = challengeGrid[i, j] as BingoChallenge;
                     string currentTeamsString = ch.TeamsToString();
-                    string newTeamsString = challenges[next];
+                    string newTeamsString = challenges[next++];
 
-                    //
                     // All the switch statements to make it 100% clear, obviously can be shortened down
                     if (currentTeamsString != newTeamsString)
                     {
@@ -835,7 +797,6 @@ namespace BingoMode
                             }
                         }
                     }
-                    next++;
                 }
             }
         }

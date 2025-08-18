@@ -843,7 +843,7 @@ namespace BingoMode
         {
             orig.Invoke(self);
 
-            if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag) && pag.unlocksButton.greyedOut)
+            if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
             {
                 self.pageTitle.x = pag.pos.x + 685f;
                 self.pageTitle.y = pag.pos.y + 680f;
@@ -857,10 +857,7 @@ namespace BingoMode
             if (message == "CLOSE")
             {
                 if (bingoPage.TryGetValue(self.owner.menu as ExpeditionMenu, out var pag))
-                {
-                    pag.unlocksButton.greyedOut = false;
-                    pag.unlocksButton.Reset();
-                }
+                    pag.UnlocksDialogClose();
 
                 if (!BingoData.MultiplayerGame || SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) != SteamTest.selfIdentity.GetSteamID()) return;
                 if (BingoData.globalSettings.perks == LobbySettings.AllowUnlocks.Inherited)
@@ -1070,13 +1067,12 @@ namespace BingoMode
             GlobalBoard.size = size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
             int chIndex = 0;
-            for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
             {
-                for (int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
-                    GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
+                    GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex++];
                     //ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
-                    chIndex++;
                 }
             }
             SteamTest.team = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team;
@@ -1094,7 +1090,7 @@ namespace BingoMode
             {
                 if (bingoPage.TryGetValue(self, out var page))
                 {
-                    self.selectedObject = page.randomize;
+                    self.selectedObject = page.grid;
                 }
                 else self.selectedObject = self.characterSelect.slugcatButtons[0];
             }

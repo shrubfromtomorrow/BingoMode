@@ -17,11 +17,9 @@ namespace BingoMode.BingoSteamworks
     {
         public static void SendMessage(string data, SteamNetworkingIdentity receiver, bool reliable = true)
         {
-            if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID()) return;
+            if (receiver.GetSteamID() == SteamTest.selfIdentity.GetSteamID())
+                return;
             IntPtr ptr = Marshal.StringToHGlobalAuto(data);
-
-            //Plugin.logger.LogMessage("SENDING MESSAGE " + data);
-
             if (SteamNetworkingMessages.SendMessageToUser(ref receiver, ptr, (uint)(data.Length * sizeof(char)), reliable ? 40 : 32, 0) != EResult.k_EResultOK)
             {
                 Plugin.logger.LogError("FAILED TO SEND MESSAGE \"" + data + "\" TO USER " + receiver.GetSteamID());
@@ -128,10 +126,10 @@ namespace BingoMode.BingoSteamworks
                 case '@':
                     if (SteamTest.CurrentLobby == default) break;
 
-                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page6) && page6.inLobby)
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page6) && page6.InLobby)
                     {
-                        page6.multiButton.buttonBehav.greyedOut = false;
-                        page6.Singal(page6.multiButton, "LEAVE_LOBBY");
+                        page6.multiplayerButton.buttonBehav.greyedOut = false;
+                        page6.Singal(page6.multiplayerButton, "LEAVE_LOBBY");
                         Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
                     }
                     break;
