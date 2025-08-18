@@ -1067,13 +1067,12 @@ namespace BingoMode
             GlobalBoard.size = size;
             GlobalBoard.challengeGrid = new Challenge[size, size];
             int chIndex = 0;
-            for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
             {
-                for (int j = 0; j < size; j++)
+                for (int i = 0; i < size; i++)
                 {
-                    GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex];
+                    GlobalBoard.challengeGrid[i, j] = ExpeditionData.challengeList[chIndex++];
                     //ExpeditionData.challengeList.Add(GlobalBoard.challengeGrid[i, j]);
-                    chIndex++;
                 }
             }
             SteamTest.team = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team;

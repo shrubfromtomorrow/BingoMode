@@ -230,10 +230,10 @@ namespace BingoMode.BingoSteamworks
         {
             int x = -1;
             int y = -1;
-            for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
+            for (int j = 0; j < BingoHooks.GlobalBoard.challengeGrid.GetLength(1); j++)
             {
                 bool b = false;
-                for (int j = 0; j < BingoHooks.GlobalBoard.challengeGrid.GetLength(1); j++)
+                for (int i = 0; i < BingoHooks.GlobalBoard.challengeGrid.GetLength(0); i++)
                 {
                     if (BingoHooks.GlobalBoard.challengeGrid[i, j] == ch)
                     {

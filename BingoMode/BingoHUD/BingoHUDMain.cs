@@ -468,13 +468,10 @@ namespace BingoMode.BingoHUD
         public int CompletedChallengesForTeam(int team)
         {
             int all = 0;
-            for (int x = 0; x < grid.GetLength(0); x++)
-            {
-                for (int y = 0; y < grid.GetLength(0); y++)
-                {
-                    if ((BingoHooks.GlobalBoard.challengeGrid[x, y] as BingoChallenge).TeamsCompleted[team]) all++;
-                }
-            }
+            for (int j = 0; j < grid.GetLength(1); j++)
+                for (int i = 0; i < grid.GetLength(0); i++)
+                    if ((BingoHooks.GlobalBoard.challengeGrid[i, j] as BingoChallenge).TeamsCompleted[team])
+                        all++;
             
             return all;
         }
@@ -822,9 +819,9 @@ namespace BingoMode.BingoHUD
         {
             grid = new BingoInfo[board.size, board.size];
 
-            for (int i = 0; i < grid.GetLength(0); i++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
-                for (int j = 0; j < grid.GetLength(1); j++)
+                for (int i = 0; i < grid.GetLength(0); i++)
                 {
                     float size = (BingoData.SpectatorMode ? 475f : 420f) / board.size;
                     float topLeft = -size * board.size / 2f;
