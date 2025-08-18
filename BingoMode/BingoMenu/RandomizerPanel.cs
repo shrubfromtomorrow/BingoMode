@@ -145,6 +145,7 @@ namespace BingoMode.BingoMenu
         {
             base.RemoveSprites();
 
+            owner = ownerMemory;
             foreach (MenuObject obj in subObjects)
             {
                 obj.RemoveSprites();
