@@ -133,6 +133,7 @@ namespace BingoMode.BingoChallenges
                 if (current != 0)
                 {
                     current = 0;
+                    grabbedPoles.Clear();
                     UpdateDescription();
                 }
                 return;
