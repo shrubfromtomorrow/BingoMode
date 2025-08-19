@@ -55,6 +55,7 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public SettingBox<bool> oneCycle;
         public int current;
+        public List<EntityID> grabbedPoles = [];
 
         public BingoGrabPoleMimicChallenge()
         {
@@ -99,6 +100,14 @@ namespace BingoMode.BingoChallenges
             return ChallengeTools.IGT.Translate("Grabing Pole Mimics");
         }
 
+        public override void Reset()
+        {
+            current = 0;
+            grabbedPoles?.Clear();
+            grabbedPoles = [];
+            base.Reset();
+        }
+
         public override bool Duplicable(Challenge challenge)
         {
             return challenge is not BingoGrabPoleMimicChallenge;
@@ -130,15 +139,14 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public void Grabbed()
+        public void Grabbed(EntityID id, string poleRegion)
         {
-            if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed)
-            {
-                current++;
-                UpdateDescription();
-                if (current >= amount.Value) CompleteChallenge();
-                else ChangeValue();
-            }
+            if (completed || TeamsCompleted[SteamTest.team] || hidden || revealed || grabbedPoles.Contains(id) || (region.Value != "Any Region" && poleRegion != region.Value)) return;
+            grabbedPoles.Add(id);
+            current++;
+            UpdateDescription();
+            if (current >= amount.Value) CompleteChallenge();
+            else ChangeValue();
         }
 
         public override bool CombatRequired()
@@ -168,6 +176,8 @@ namespace BingoMode.BingoChallenges
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
+                "><",
+                string.Join("|", grabbedPoles),
             });
         }
 
@@ -178,10 +188,19 @@ namespace BingoMode.BingoChallenges
                 string[] array = Regex.Split(args, "><");
                 amount = SettingBoxFromString(array[0]) as SettingBox<int>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                oneCycle = SettingBoxFromString(array[5]) as SettingBox<bool>;
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
+                region = SettingBoxFromString(array[2]) as SettingBox<string>;
+                oneCycle = SettingBoxFromString(array[3]) as SettingBox<bool>;
+                completed = (array[4] == "1");
+                revealed = (array[5] == "1");
+                string[] arr = array[6].Split('|');
+                grabbedPoles = [];
+                if (arr != null && arr.Length > 0)
+                {
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        if (arr[i] != string.Empty) grabbedPoles.Add(EntityID.FromString(arr[i]));
+                    }
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

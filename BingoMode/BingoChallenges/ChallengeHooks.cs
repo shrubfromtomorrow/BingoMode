@@ -1886,7 +1886,7 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is BingoGrabPoleMimicChallenge c)
                     {
-                        c.Grabbed();
+                        c.Grabbed(self.abstractCreature.ID, self.room.world.region.name);
                     }
                 }
             }
