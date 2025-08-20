@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace BingoMode.BingoChallenges
 {
@@ -49,6 +50,7 @@ namespace BingoMode.BingoChallenges
         }
 
         public override bool RequireSave() => true;
+        public override bool SaveOnDeath() => true;
 
         public override void UpdateDescription()
         {
@@ -79,34 +81,47 @@ namespace BingoMode.BingoChallenges
             return ch;
         }
 
+        public override void Update()
+        {
+            base.Update();
+            if (TeamsFailed[SteamTest.team] || completed) return;
+            if ((BingoHooks.GlobalBoard.completableChallenges + current < amount.Value))
+            {
+                Plugin.logger.LogInfo("Failing");
+                FailChallenge(SteamTest.team);
+            }
+        }
+
         public void GetChallenge(BingoChallenge chal)
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && !TeamsFailed[SteamTest.team])
             {
-                current++;
-                Plugin.logger.LogInfo("Challenge " + chal.ToString() + " got, current is: " + current + " and hellchallenge is revealed? " + revealed);
-                UpdateDescription();
                 if (current >= amount.Value)
                 {
                     CompleteChallenge();
                 }
-                else ChangeValue();
+                else
+                {
+                    current++;
+                    UpdateDescription();
+                    if (current >= amount.Value)
+                    {
+                        CompleteChallenge();
+                    }
+                    else ChangeValue();
+                }
             }
         }
 
-        // HELL CHALLENGE IS COUNTING THE FIRST REVEALED CHALLENGE FOR COMPLETION AND UNDOING THE REVEAL SET IN SESSIONENDED
-
         public void SessionEnded(int revealedChallenges)
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && !TeamsFailed[SteamTest.team])
             {
-                Plugin.logger.LogInfo("Session ended with " + (current + revealedChallenges) + " challenges");
                 if (current + revealedChallenges >= amount.Value)
                 {
                     current = amount.Value;
                     UpdateDescription();
                     CompleteChallenge();
-                    Plugin.logger.LogInfo("CompleteChallenge called inside sessionended " + revealed);
                 }
             }
         }
@@ -115,9 +130,15 @@ namespace BingoMode.BingoChallenges
         {
             if (TeamsFailed[SteamTest.team] || TeamsCompleted[SteamTest.team] || completed || current >= amount.Value) return;
 
-            Plugin.logger.LogInfo("Dieded");
-            current = 0;
-            ChangeValue();
+            //Plugin.logger.LogInfo("Die");
+
+            //if (current != 0)
+            //{
+            //    current = 0;
+            //    UpdateDescription();
+            //    ChangeValue();
+            //}
+            UpdateHellChallengeOnDeath();
         }
 
         public override int Points()

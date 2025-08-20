@@ -23,6 +23,7 @@ namespace BingoMode
         public List<IntVector2> currentWinLine; // A list of grid coordinates
         public int size;
         public List<Challenge> recreateList;
+        public int completableChallenges;
 
         public Challenge switch1;
         public IntVector2 switch1Pos;
@@ -639,6 +640,19 @@ namespace BingoMode
             {
                 FromString(last);
             }
+        }
+
+        public void GetCompletableChallenges(int team)
+        {
+            int completable = 0;
+            foreach (Challenge chal in ExpeditionData.challengeList)
+            {
+                if (chal is BingoChallenge c && !c.ReverseChallenge() && ((!c.completed && !c.hidden && !c.TeamsFailed[team] && c is not BingoHellChallenge)))
+                {
+                    completable++;
+                }
+            }
+            completableChallenges = completable;
         }
 
         public void CompleteChallengeAt(int x, int y)

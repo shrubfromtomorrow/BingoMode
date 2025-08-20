@@ -18,6 +18,7 @@ namespace BingoMode
     using BingoMenu;
     using BingoSteamworks;
     using Music;
+    using Rewired.ControllerExtensions;
 
     public class BingoHooks
     {
@@ -245,6 +246,7 @@ namespace BingoMode
 
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
+
         }
 
         private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
@@ -1179,5 +1181,7 @@ namespace BingoMode
                 newBingoButton.Remove(self);
             }
         }
+
+        
     }
 }

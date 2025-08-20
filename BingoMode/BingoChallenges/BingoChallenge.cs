@@ -1,11 +1,12 @@
-﻿using BingoMode.BingoSteamworks;
-using Expedition;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BingoMode.BingoSteamworks;
+using Expedition;
 
 namespace BingoMode.BingoChallenges
 {
     using System.Linq;
+    using System.Text.RegularExpressions;
     using BingoMenu;
     using IL.Watcher;
 
@@ -27,6 +28,7 @@ namespace BingoMode.BingoChallenges
 
         public virtual bool ReverseChallenge() => false;
         public virtual bool RequireSave() => true;
+        public virtual bool SaveOnDeath() => false;
 
         public string TeamsToString()
         {
@@ -195,7 +197,6 @@ namespace BingoMode.BingoChallenges
                     {
                         if (ExpeditionData.challengeList[j] is BingoHellChallenge c && !ReverseChallenge())
                         {
-                            Plugin.logger.LogInfo("GetChallenge called for " + ToString());
                             c.GetChallenge(this);
                         }
                     }
@@ -209,7 +210,7 @@ namespace BingoMode.BingoChallenges
             {
                 BingoData.challengeTokens.Remove(brd.chatlog.Value);
             }
-
+            BingoHooks.GlobalBoard.GetCompletableChallenges(SteamTest.team);
             BingoSaveFile.Save();
         }
 
@@ -238,8 +239,6 @@ namespace BingoMode.BingoChallenges
 
         public void OnChallengeFailed(int team)
         {
-            
-
             if (team == SteamTest.team)
             {
                 completed = false;
@@ -250,6 +249,7 @@ namespace BingoMode.BingoChallenges
             UpdateDescription();
 
             ChallengeFailed?.Invoke(team);
+            BingoHooks.GlobalBoard.GetCompletableChallenges(SteamTest.team);
             BingoSaveFile.Save();
         }
 
@@ -260,6 +260,7 @@ namespace BingoMode.BingoChallenges
             hidden = true;
             TeamsCompleted[team] = true;
             if (!lastHidden) ChallengeLockedOut?.Invoke(team);
+            BingoHooks.GlobalBoard.GetCompletableChallenges(SteamTest.team);
             BingoSaveFile.Save();
         }
 
@@ -283,6 +284,7 @@ namespace BingoMode.BingoChallenges
                 ChallengeDepleted?.Invoke(team);
             }
             UpdateDescription();
+            BingoHooks.GlobalBoard.GetCompletableChallenges(SteamTest.team);
             BingoSaveFile.Save();
         }
 
@@ -293,6 +295,60 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
+        }
+
+        public static void UpdateHellChallengeOnDeath()
+        {
+            string board = Expedition.Expedition.coreFile.ToString();
+            string[] array = Regex.Split(board, "<expC>");
+            bool flag = false;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == "[END CHALLENGES]")
+                {
+                    flag = false;
+                }
+
+                if (flag)
+                {
+                    string[] array10 = Regex.Split(array[i], "#");
+                    if (array10.Length < 2) continue;
+
+                    SlugcatStats.Name name = new SlugcatStats.Name(array10[0], false);
+                    if (name == ExpeditionData.slugcatPlayer)
+                    {
+                        string[] array11 = Regex.Split(array10[1], "~");
+                        if (array11.Length < 2) continue;
+
+                        string type = array11[0];
+                        string text2 = array11[1];
+
+                        if (type == "BingoHellChallenge")
+                        {
+                            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                            {
+                                if (ExpeditionData.challengeList[j] is BingoHellChallenge c)
+                                {
+                                    array10[1] = $"BingoHellChallenge~0><System.Int32|{c.amount}|Amount|0|NULL><{(c.completed ? '1' : '2')}><{(c.revealed ? '1' : '2')}";
+                                    array[i] = array10[0] + "#" + array10[1];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (array[i] == "[CHALLENGES]")
+                {
+                    flag = true;
+                }
+            }
+
+            string newBoard = string.Join("<expC>", array);
+            Plugin.logger.LogInfo(board);
+            Plugin.logger.LogInfo(newBoard);
+
+            Expedition.Expedition.coreFile.FromString(newBoard);
         }
     }
 }
