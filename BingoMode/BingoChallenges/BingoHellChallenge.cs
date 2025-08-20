@@ -1,11 +1,11 @@
-﻿using BingoMode.BingoRandomizer;
-using BingoMode.BingoSteamworks;
-using Expedition;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using BingoMode.BingoRandomizer;
+using BingoMode.BingoSteamworks;
+using Expedition;
 using UnityEngine;
 
 namespace BingoMode.BingoChallenges
@@ -42,17 +42,12 @@ namespace BingoMode.BingoChallenges
     {
         public int current;
         public SettingBox<int> amount;
-
-        public BingoHellChallenge()
-        {
-            amount = new(0, "Amount", 0);
-        }
-
-        public override bool RequireSave() => true;
+        public override bool RequireSave() => false;
+        public override bool ReverseChallenge() => true;
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Complete [<current>/<amount>] bingo challenges in a row without dying")
+            description = ChallengeTools.IGT.Translate("Do not die before completing [<current>/<amount>] bingo challenges")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString());
             base.UpdateDescription();
@@ -69,55 +64,31 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Avoiding death while completing challenges");
+            return ChallengeTools.IGT.Translate("Avoiding death before completing challenges");
         }
 
         public override Challenge Generate()
         {
             BingoHellChallenge ch = new();
-            ch.amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 4), "Amount", 0);
             return ch;
         }
 
-        public void GetChallenge(BingoChallenge chal)
+        public void GetChallenge()
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
+            if (!TeamsFailed[SteamTest.team] && completed && current < amount.Value)
             {
                 current++;
-                Plugin.logger.LogInfo("Challenge " + chal.ToString() + " got, current is: " + current + " and hellchallenge is revealed? " + revealed);
                 UpdateDescription();
-                if (current >= amount.Value)
-                {
-                    CompleteChallenge();
-                }
-                else ChangeValue();
+                ChangeValue();
             }
         }
 
-        // HELL CHALLENGE IS COUNTING THE FIRST REVEALED CHALLENGE FOR COMPLETION AND UNDOING THE REVEAL SET IN SESSIONENDED
-
-        public void SessionEnded(int revealedChallenges)
+        public void Fail()
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
-            {
-                Plugin.logger.LogInfo("Session ended with " + (current + revealedChallenges) + " challenges");
-                if (current + revealedChallenges >= amount.Value)
-                {
-                    current = amount.Value;
-                    UpdateDescription();
-                    CompleteChallenge();
-                    Plugin.logger.LogInfo("CompleteChallenge called inside sessionended " + revealed);
-                }
-            }
-        }
+            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amount.Value)) return;
 
-        public void Die()
-        {
-            if (TeamsFailed[SteamTest.team] || TeamsCompleted[SteamTest.team] || completed || current >= amount.Value) return;
-
-            Plugin.logger.LogInfo("Dieded");
-            current = 0;
-            ChangeValue();
+            FailChallenge(SteamTest.team);
         }
 
         public override int Points()
@@ -180,7 +151,6 @@ namespace BingoMode.BingoChallenges
             On.Player.Die += Player_DieHell;
             On.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreenHell;
             On.RainWorldGame.GoToStarveScreen += RainWorldGame_GoToStarveScreenHell;
-            On.SaveState.SessionEnded += DantesInferno;
         }
 
         public override void RemoveHooks()
@@ -188,7 +158,6 @@ namespace BingoMode.BingoChallenges
             On.Player.Die -= Player_DieHell;
             On.RainWorldGame.GoToDeathScreen -= RainWorldGame_GoToDeathScreenHell;
             On.RainWorldGame.GoToStarveScreen -= RainWorldGame_GoToStarveScreenHell;
-            On.SaveState.SessionEnded -= DantesInferno;
         }
 
         public override List<object> Settings() => [amount];

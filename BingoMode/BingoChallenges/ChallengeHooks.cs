@@ -256,7 +256,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Die();
+                    hell.Fail();
                 }
             }
         }
@@ -269,7 +269,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Die();
+                    hell.Fail();
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is BingoHellChallenge hell)
                 {
-                    hell.Die();
+                    hell.Fail();
                 }
             }
         }
@@ -978,38 +978,6 @@ namespace BingoMode.BingoChallenges
                 BingoData.hitTimeline.Clear();
                 BingoData.blacklist.Clear();
                 BingoData.heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
-            }
-
-            orig.Invoke(self, game, survived, newMalnourished);
-        }
-
-        public static void DantesInferno(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
-        {
-            if (survived && !newMalnourished)
-            {
-                int revealedChallenges = 0;
-                List<BingoHellChallenge> hellChallenges = [];
-
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is BingoChallenge g)
-                    {
-                        if (g.RequireSave() && g.revealed)
-                        {
-                            revealedChallenges++;
-                        }
-
-                        if (g is BingoHellChallenge h && !h.hidden && !h.revealed && !h.completed && !h.TeamsCompleted[SteamTest.team] && !h.TeamsFailed[SteamTest.team])
-                        {
-                            hellChallenges.Add(h);
-                        }
-                    }
-                }
-
-                foreach (BingoHellChallenge hell in hellChallenges)
-                {
-                    hell.SessionEnded(revealedChallenges);
-                }
             }
 
             orig.Invoke(self, game, survived, newMalnourished);
