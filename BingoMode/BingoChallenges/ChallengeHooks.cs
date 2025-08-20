@@ -604,6 +604,7 @@ namespace BingoMode.BingoChallenges
             }
         }
 
+        // false allows a flower to spawn
         public static void Room_LoadedKarmaFlower(ILContext il)
         {
             ILCursor c = new(il);
@@ -1036,9 +1037,6 @@ namespace BingoMode.BingoChallenges
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
             if (game != null && game.world != null)
             {
-                Plugin.logger.LogInfo("EnterFrom");
-                Plugin.logger.LogInfo(worldName);
-                Plugin.logger.LogInfo(game.world.region?.name);
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is BingoEnterRegionFromChallenge EnterRegionFrom)
@@ -1097,14 +1095,12 @@ namespace BingoMode.BingoChallenges
         public static void WorldLoader_AllRegionsExcept(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, SlugcatStats.Timeline timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             orig.Invoke(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
-            if (game != null && game.world != null)
+            // This one doesn't check if the game or world is null because I want to count the starting region (popular demand as well)
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
-                    {
-                        allExcept.Entered(worldName);
-                    }
+                    allExcept.Entered(worldName);
                 }
             }
         }
@@ -1523,9 +1519,10 @@ namespace BingoMode.BingoChallenges
         }
 
         public delegate bool orig_PlaceKarmaFlower(Player self);
+        // false prevents a death flower from spawning
         public static bool Player_PlaceKarmaFlower_get(orig_PlaceKarmaFlower orig, Player self)
         {
-            //if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
+            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
             return false;
         }
 
@@ -1839,7 +1836,6 @@ namespace BingoMode.BingoChallenges
         public static void BigNeedleWorm_Swish(On.BigNeedleWorm.orig_Swish orig,  BigNeedleWorm self)
         {
             orig.Invoke(self);
-            Plugin.logger.LogInfo("Swish");
 
             if (self.impaleChunk != null && self.impaleChunk.owner is Player)
             {
