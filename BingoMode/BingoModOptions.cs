@@ -31,7 +31,7 @@ namespace BingoMode
             HUDKeybindC3 = config.Bind<KeyCode>("HUDKeybindC3", KeyCode.Joystick3Button5);
             HUDKeybindC4 = config.Bind<KeyCode>("HUDKeybindC4", KeyCode.Joystick4Button5);
 
-            ResetBind = config.Bind<KeyCode>("Reset", KeyCode.Backspace);
+            ResetBind = config.Bind<KeyCode>("Reset", KeyCode.Slash);
 
             SinglePlayerTeam = config.Bind<string>("SinglePlayerTeam", "Red");
             UseMapInput = config.Bind<bool>("UseMapInput", false);

@@ -17,6 +17,7 @@ namespace BingoMode
     using BingoHUD;
     using BingoMenu;
     using BingoSteamworks;
+    using IL.JollyCoop.JollyMenu;
     using Music;
 
     public class BingoHooks
@@ -421,7 +422,7 @@ namespace BingoMode
                     if (BingoData.BingoMode)
                     {
                         string ghost = GhostWorldPresence.GetGhostID(self.region.name).value;
-                        if (ExpeditionData.challengeList.Any(x => x is BingoEchoChallenge c && c.ghost.Value.ToUpperInvariant() == ghost.ToUpperInvariant()))
+                        if (ExpeditionData.challengeList.Any(x => x is BingoEchoChallenge))
                         {
                             return false;
                         }

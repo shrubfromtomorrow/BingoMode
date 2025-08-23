@@ -21,7 +21,7 @@ namespace BingoMode
     using BingoHUD;
     using System.IO;
 
-    [BepInPlugin("nacu.bingomodebeta", "Bingo Beta", VERSION)]
+    [BepInPlugin("nacu.bingomode", "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
         public const string VERSION = "1.25";
@@ -94,7 +94,7 @@ namespace BingoMode
                 // Timeline fix
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
-                MachineConnector.SetRegisteredOI("nacu.bingomodebeta", PluginInstance.BingoConfig);
+                MachineConnector.SetRegisteredOI("nacu.bingomode", PluginInstance.BingoConfig);
             }
         }
 
