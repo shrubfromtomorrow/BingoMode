@@ -129,12 +129,10 @@ namespace BingoMode.BingoChallenges
                 EntityID id = gateCrit.ID;
                 if (!creatureGates.ContainsKey(id))
                 {
-                   // 
                     creatureGates.Add(id, [roomName]);
                 }
                 else
                 {
-                    //
                     if (!creatureGates[id].Contains(roomName))
                     {
                         creatureGates[id].Add(roomName);

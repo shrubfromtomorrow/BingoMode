@@ -1071,7 +1071,7 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is BingoCreatureGateChallenge creatureGate)
                     {
-                        creatureGate.Gate(worldName);
+                        creatureGate.Gate(game.Players[0].Room.name);
                     }
                 }
             }

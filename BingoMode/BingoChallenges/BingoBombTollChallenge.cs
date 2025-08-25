@@ -227,7 +227,7 @@ namespace BingoMode.BingoChallenges
             List<string> joinLater = [];
             foreach (var kvp in bombed)
             {
-                joinLater.Add(kvp.Key.ToString() + "|" + string.Join("|", kvp.Value));
+                joinLater.Add($"{kvp.Key}|{kvp.Value}");
             }
             if (joinLater.Count == 0) return "empty";
             return string.Join("%", joinLater);
