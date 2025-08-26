@@ -7,8 +7,10 @@ using Menu.Remix.MixedUI;
 using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using static BingoMode.BingoSteamworks.LobbySettings;
@@ -46,7 +48,7 @@ namespace BingoMode.BingoMenu
         private MenuLabel nallReady;
         private HoldButton startGame;
         private MenuLabel shelterLabel;
-        private OpTextBox shelterSetting;
+        private OpComboBox shelterSetting;
         private UIelementWrapper shelterSettingWrapper;
         private OpHoldButton unlocksButton;
         private UIelementWrapper unlockWrapper;
@@ -153,16 +155,16 @@ namespace BingoMode.BingoMenu
                     false);
             shelterLabel.label.alignment = FLabelAlignment.Left;
             subObjects.Add(shelterLabel);
-            
+
             Configurable<string> shelterSettingConf = MenuModList.ModButton.RainWorldDummy.config.Bind("_ShelterSettingBingo", "_", (ConfigAcceptableBase)null);
             shelterSetting = new(
                     shelterSettingConf,
                     offset + new Vector2(RESIZE_BUTTON_SIZE + MARGIN + shelterLabel.label.textRect.width, SHELTER_Y),
-                    UNLOCKS_BUTTON_WIDTH - shelterLabel.label.textRect.width)
+                    UNLOCKS_BUTTON_WIDTH - shelterLabel.label.textRect.width,
+                    GetValidSpawns(menu.manager.rainWorld, ExpeditionData.slugcatPlayer).ToArray()
+            )
             {
-                alignment = FLabelAlignment.Center,
-                description = "The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'",
-                maxLength = 100,
+                description = "AThe shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'",
             };
             shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
             shelterSettingWrapper = new UIelementWrapper(tabWrapper, shelterSetting);
@@ -348,5 +350,35 @@ namespace BingoMode.BingoMenu
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue) =>
             BingoData.BingoDen = value.IsNullOrWhiteSpace() ? "random" : value;
+
+        private List<string> GetValidSpawns(RainWorld rainWorld, SlugcatStats.Name slug)
+        {
+            List<string> ret = new();
+            ret.Add("random");
+            Dictionary<string, int> weights = new Dictionary<string, int>();
+            Dictionary<string, List<string>> regionShelters = new Dictionary<string, List<string>>();
+            List<string> slugRegions = SlugcatStats.SlugcatStoryRegions(slug);
+            if (File.Exists(AssetManager.ResolveFilePath("randomstarts.txt")))
+            {
+                string[] fileLines = File.ReadAllLines(AssetManager.ResolveFilePath("randomstarts.txt"));
+                for (int i = 0; i < fileLines.Length; i++)
+                {
+                    if (fileLines[i].StartsWith("//") || fileLines[i].Length == 0)
+                    {
+                        continue;
+                    }
+                    string regionAcronym = Regex.Split(fileLines[i], "_")[0];
+                    bool shouldSpawnInMSCRegions = ModManager.MSC 
+                        && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow) 
+                        && (regionAcronym == "OE" || regionAcronym == "LC" || (regionAcronym == "MS" && fileLines[i] != "MS_S07"));
+                    if ((slugRegions.Contains(regionAcronym) || shouldSpawnInMSCRegions) && !ret.Contains(fileLines[i]))
+                    {
+                        ret.Add(fileLines[i]);
+                    }
+                }
+            }
+            return ret;
+
+        }
     }
 }
