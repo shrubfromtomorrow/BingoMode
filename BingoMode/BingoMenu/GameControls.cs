@@ -56,6 +56,7 @@ namespace BingoMode.BingoMenu
         private SymbolButton plusButton;
         private SimpleButton copyBoard;
         private SimpleButton pasteBoard;
+        private bool listOpen = false;
 
         private float anchorX;
         public float AnchorX
@@ -164,9 +165,12 @@ namespace BingoMode.BingoMenu
                     GetValidSpawns(menu.manager.rainWorld, ExpeditionData.slugcatPlayer).ToArray()
             )
             {
-                description = "AThe shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'",
+                description = "The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'",
             };
             shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
+            shelterSetting.OnKeyDown += ShelterSetting_OnKeyDown;
+            shelterSetting.OnListOpen += ShelterSetting_OnListOpen;
+            shelterSetting.OnListClose += ShelterSetting_OnListClose;
             shelterSettingWrapper = new UIelementWrapper(tabWrapper, shelterSetting);
             shelterSetting.value = "random";
 
@@ -218,6 +222,52 @@ namespace BingoMode.BingoMenu
                     new Vector2(COPY_PASTE_WDITH, COPY_PASTE_HEIGHT));
             subObjects.Add(pasteBoard);
 
+        }
+
+        private void ShelterSetting_OnKeyDown(char c)
+        {
+            if (c == '_')
+            {
+                shelterSetting.bumpBehav.flash = 2.5f;
+                shelterSetting._searchQuery += c;
+                shelterSetting._searchIdle = -1;
+                shelterSetting.PlaySound(SoundID.MENU_Checkbox_Uncheck);
+
+            }
+        }
+
+        private void ShelterSetting_OnListClose(UIfocusable trigger)
+        {
+            if (listOpen)
+            {
+                listOpen = false;
+                startGame.buttonBehav.greyedOut = false;
+                startGame.pos.x -= 9999f;
+                if (trigger is OpComboBox box && box._searchList != null)
+                {
+                    List<ListItem> searchResults = new();
+                    for (int i = 0; i < box._itemList.Length; i++)
+                    {
+                        if (ListItem.SearchMatch(box._searchQuery, box._itemList[i].displayName) || ListItem.SearchMatch(box._searchQuery, box._itemList[i].name))
+                        {
+                            searchResults.Add(box._itemList[i]);
+                        }
+                    }
+                    if (searchResults.Count == 0) return;
+                    box.value = searchResults.Min().name;
+                }
+            }
+        }
+
+        private void ShelterSetting_OnListOpen(UIfocusable trigger)
+        {
+            trigger.myContainer.MoveToFront();
+            if (!listOpen)
+            {
+                listOpen = true;
+                startGame.buttonBehav.greyedOut = true;
+                startGame.pos.x += 9999f;
+            }
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -368,8 +418,8 @@ namespace BingoMode.BingoMenu
                         continue;
                     }
                     string regionAcronym = Regex.Split(fileLines[i], "_")[0];
-                    bool shouldSpawnInMSCRegions = ModManager.MSC 
-                        && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow) 
+                    bool shouldSpawnInMSCRegions = ModManager.MSC
+                        && (slug == SlugcatStats.Name.White || slug == SlugcatStats.Name.Yellow)
                         && (regionAcronym == "OE" || regionAcronym == "LC" || (regionAcronym == "MS" && fileLines[i] != "MS_S07"));
                     if ((slugRegions.Contains(regionAcronym) || shouldSpawnInMSCRegions) && !ret.Contains(fileLines[i]))
                     {
