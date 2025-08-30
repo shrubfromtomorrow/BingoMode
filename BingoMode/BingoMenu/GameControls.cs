@@ -19,11 +19,15 @@ namespace BingoMode.BingoMenu
     {
         // if you make changes, WIDTH and HEIGHT formulas *might* need to change to reflect that.
         private const float WIDTH = 2f * RESIZE_BUTTON_SIZE + 2f * MARGIN + UNLOCKS_BUTTON_WIDTH;
-        private const float HEIGHT = START_Y + HOLD_BUTTON_RADIUS * 2f;
+        private const float HEIGHT = NALL_READY_Y + TEXTBOX_HEIGHT;
         private const float MARGIN = 5f;
+
+        private const float NALL_READY_Y = START_Y + HOLD_BUTTON_RADIUS * 2f + MARGIN;
 
         private const float START_Y = SHELTER_Y + TEXTBOX_HEIGHT + MARGIN;
         private const float HOLD_BUTTON_RADIUS = 157f / 2f; // not modifiable from here; radius of the biggest circle when focused
+        private const float ALL_READY_FILL_TIME = 40f;
+        private const float NALL_READY_FILL_TIME = 200f;
 
         private const float SHELTER_Y = UNLOCKS_Y + UNLOCKS_BUTTON_HEIGHT + MARGIN;
         private const float TEXTBOX_HEIGHT = 25f; // not modifiable from here
@@ -39,6 +43,7 @@ namespace BingoMode.BingoMenu
         private const float COPY_PASTE_HEIGHT = 20f;
 
         private MenuTabWrapper tabWrapper;
+        private MenuLabel nallReady;
         private HoldButton startGame;
         private MenuLabel shelterLabel;
         private OpTextBox shelterSetting;
@@ -98,6 +103,18 @@ namespace BingoMode.BingoMenu
                 startGame.menuLabel.text = value ? "BEGIN" : "I'M\nREADY";
             }
         }
+        private bool _allReady = true;
+        public bool AllReady
+        {
+            get => _allReady;
+            set
+            {
+                _allReady = value;
+                startGame.fillTime = value ? ALL_READY_FILL_TIME : NALL_READY_FILL_TIME;
+                nallReady.label.alpha = 0f;
+                nallReady.label.color = Color.white;
+            }
+        }
 
         public GameControls(Menu.Menu menu, MenuObject owner, Vector2 pos, float anchorX = 0f, float anchorY = 0f) : base(menu, owner, pos)
         {
@@ -108,13 +125,23 @@ namespace BingoMode.BingoMenu
             tabWrapper = new MenuTabWrapper(menu, this);
             subObjects.Add(tabWrapper);
 
+            nallReady = new(
+                    menu,
+                    this,
+                    "Not all players are ready !",
+                    new(WIDTH / 2f, NALL_READY_Y),
+                    Vector2.zero,
+                    false);
+            nallReady.label.alpha = 0f;
+            subObjects.Add(nallReady);
+
             startGame = new(
                     menu,
                     this,
                     "BEGIN",
                     "STARTBINGO",
                     offset + new Vector2(WIDTH / 2f, START_Y + HOLD_BUTTON_RADIUS),
-                    40f);
+                    ALL_READY_FILL_TIME);
             subObjects.Add(startGame);
 
             shelterLabel = new MenuLabel(
@@ -243,6 +270,17 @@ namespace BingoMode.BingoMenu
             }
 
             base.Singal(sender, message);
+        }
+
+        public override void GrafUpdate(float timeStacker)
+        {
+            base.GrafUpdate(timeStacker);
+
+            if (!_allReady)
+            {
+                nallReady.label.alpha = startGame.filled * 5f;
+                nallReady.label.color = Color.Lerp(Color.white, Color.red, startGame.filled);
+            }
         }
 
         public override void RemoveSprites()

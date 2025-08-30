@@ -473,6 +473,7 @@ namespace BingoMode.BingoMenu
             {
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
+                gameControls.AllReady = true;
                 return;
             }
 
@@ -485,6 +486,18 @@ namespace BingoMode.BingoMenu
                 float ff = multiplayerSlideStep == 1f ? 1f : 0f;
                 if (multiplayerSlideStep == 1f)
                     SteamTest.GetJoinableLobbies();
+                return;
+            }
+
+            if (message == "ALL_READY")
+            {
+                gameControls.AllReady = true;
+                return;
+            }
+
+            if (message == "NALL_READY")
+            {
+                gameControls.AllReady = false;
                 return;
             }
 
