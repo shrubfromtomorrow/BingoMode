@@ -265,7 +265,6 @@ namespace BingoMode.BingoMenu
 
             ConstructLobbyHeader();
             CreateLobbyPlayers();
-
         }
 
         public void SwitchToSearch()
@@ -465,6 +464,7 @@ namespace BingoMode.BingoMenu
             BingoData.MultiplayerGame = true;
             List<PlayerData> players = SteamTest.GetPlayersData();
 
+            bool allReady = true;
             // Build the list backwards because z-indexing doesn't exist in these lands. yippee...
             players.Reverse();
             foreach (PlayerData player in players)
@@ -472,6 +472,7 @@ namespace BingoMode.BingoMenu
                 PlayerInfo info = new(menu, this, Vector2.zero, playerSize, isHost, player);
                 lobbyPlayers.Insert(0, info);
                 subObjects.Add(info);
+                allReady &= player.ready || player.isHost;
             }
 
             if (lobbyPlayers.Count == 0)
@@ -488,6 +489,8 @@ namespace BingoMode.BingoMenu
                 lobbyDividers.Add(divider);
                 Container.AddChild(divider);
             }
+            if (isHost)
+                Singal(this, allReady ? "ALL_READY" : "NALL_READY");
         }
 
         private void RemovePlayersSprites()
