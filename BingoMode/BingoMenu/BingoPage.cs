@@ -201,7 +201,7 @@ namespace BingoMode.BingoMenu
                 gameControls.HostPrivilege = create;
                 boardControls.HostPrivilege = create;
                 expMenu.manualButton.buttonBehav.greyedOut = true;
-                multiplayerButton.menuLabel.text = "Leave Lobby";
+                multiplayerButton.menuLabel.text = expMenu.Translate("Leave Lobby");
                 multiplayerButton.signalText = "LEAVE_LOBBY";
                 grid.Switch(!create);
                 return;
@@ -215,7 +215,7 @@ namespace BingoMode.BingoMenu
             gameControls.HostPrivilege = true;
             boardControls.HostPrivilege = true;
             expMenu.manualButton.buttonBehav.greyedOut = false;
-            multiplayerButton.menuLabel.text = "Multiplayer";
+            multiplayerButton.menuLabel.text = expMenu.Translate("Multiplayer");
             multiplayerButton.signalText = "SWITCH_MULTIPLAYER";
             grid.Switch(false);
         }

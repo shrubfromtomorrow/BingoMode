@@ -736,6 +736,7 @@ namespace BingoMode
                 BingoData.CreateKarmaFlower = false;
                 BingoData.RandomStartingSeed = -1;
                 BingoHUDMain.ForceTallyUp = false;
+                BingoData.ResetMoonDeadOverride();
                 if (BingoHUDMain.ReadyForLeave)
                 {
                     if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost)

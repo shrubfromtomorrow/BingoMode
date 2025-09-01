@@ -179,7 +179,6 @@ namespace BingoMode.BingoChallenges
 
         public void OnChallengeCompleted(int team)
         {
-
             bool lastCompleted = TeamsCompleted[team];
 
             TeamsCompleted[team] = true;
@@ -284,6 +283,21 @@ namespace BingoMode.BingoChallenges
             }
             UpdateDescription();
             BingoSaveFile.Save();
+        }
+
+        public bool CompletedByAny()
+        {
+            bool completedByAny = false;
+            foreach (bool team in TeamsCompleted)
+            {
+                if (team)
+                {
+                    completedByAny = true;
+                    break;
+                }
+            }
+            if (completed) completedByAny = true;
+            return completedByAny;
         }
 
         public void ChangeValue()

@@ -38,7 +38,18 @@ namespace BingoMode
         public static int RandomStartingSeed = -1;
         public static Dictionary<SlugcatStats.Name, List<string>> bannedChallenges = [];
 
-        public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
+        private static bool? _moonDeadOverride;
+
+        public static bool MoonDead
+        {
+            get => _moonDeadOverride ?? ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
+            set => _moonDeadOverride = value;
+        }
+
+        public static void ResetMoonDeadOverride()
+        {
+            _moonDeadOverride = null;
+        }
 
         public enum BingoGameMode
         {
@@ -253,7 +264,6 @@ namespace BingoMode
 
         public static void FillPossibleTokens(SlugcatStats.Name slug)
         {
-            
             possibleTokens[0] = []; // blue
             possibleTokens[1] = []; // gold
             possibleTokens[2] = []; // red
@@ -263,10 +273,10 @@ namespace BingoMode
             {
                 for (int n = 0; n < kvp.Value.Count; n++)
                 {
+
                     if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        
                         possibleTokens[0].Add(kvp.Value[n].value);
                     }
                 }
@@ -281,7 +291,6 @@ namespace BingoMode
                     if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
                     if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
                     {
-                        //*
                         possibleTokens[1].Add(kvp.Value[n].value);
                     }
                 }
@@ -296,7 +305,6 @@ namespace BingoMode
                 {
                     if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
                     {
-                        //.*
                         possibleTokens[2].Add(kvp.Value[n].value + "-safari");
                     }
                 }

@@ -309,7 +309,7 @@ namespace BingoMode.BingoMenu
         {
             if (owner.challenge is BingoEatChallenge c)
             {
-                c.isCreature = ChallengeUtils.FoodTypes.IndexOf(c.foodType.Value) >= ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
+                c.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, c.foodType.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
             else if (owner.challenge is BingoDontUseItemChallenge cc)
             {

@@ -1180,12 +1180,20 @@ namespace BingoMode.BingoChallenges
             if (c.TryGotoNext(
                 x => x.MatchCallOrCallvirt<RainWorld>("get_ExpeditionMode")
                 ) && c.TryGotoNext(
-                x => x.MatchCallOrCallvirt<SLOrcacleState>("set_neuronsLeft")   
+                x => x.MatchCallOrCallvirt<SLOrcacleState>("set_neuronsLeft")
                 ))
             {
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Func<int, SaveState, int>>((orig, self) =>
                 {
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                    {
+                        if (ExpeditionData.challengeList[j] is BingoGreenNeuronChallenge c && c.moon.Value && c.CompletedByAny())
+                        {
+                            // MoonDead is not really necessary but it's a good piece of information to expose
+                            BingoData.MoonDead = false;
+                        }
+                    }
                     if (BingoData.MoonDead) orig = 0;
 
                     return orig;

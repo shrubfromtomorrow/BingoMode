@@ -86,7 +86,7 @@ namespace BingoMode.BingoChallenges
 
         public void Fail()
         {
-            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed) && current >= amount.Value)) return;
+            if (TeamsFailed[SteamTest.team] || ((TeamsFailed[SteamTest.team] || completed || TeamsCompleted[SteamTest.team]) && current >= amount.Value)) return;
 
             FailChallenge(SteamTest.team);
         }
