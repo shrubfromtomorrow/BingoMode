@@ -56,7 +56,6 @@ namespace BingoMode.BingoMenu
         private SymbolButton plusButton;
         private SimpleButton copyBoard;
         private SimpleButton pasteBoard;
-        private bool listOpen = false;
 
         private float anchorX;
         public float AnchorX
@@ -238,23 +237,21 @@ namespace BingoMode.BingoMenu
 
         private void ShelterSetting_OnListClose(UIfocusable trigger)
         {
-            if (listOpen)
+            if (BingoData.listOpen)
             {
-                listOpen = false;
+                BingoData.listOpen = false;
                 startGame.buttonBehav.greyedOut = false;
                 startGame.pos.x -= 9999f;
                 if (trigger is OpComboBox box && box._searchList != null)
                 {
-                    List<ListItem> searchResults = new();
-                    for (int i = 0; i < box._itemList.Length; i++)
-                    {
-                        if (ListItem.SearchMatch(box._searchQuery, box._itemList[i].displayName) || ListItem.SearchMatch(box._searchQuery, box._itemList[i].name))
-                        {
-                            searchResults.Add(box._itemList[i]);
-                        }
-                    }
-                    if (searchResults.Count == 0) return;
-                    box.value = searchResults.Min().name;
+                    Plugin.logger.LogDebug($"OnListClose: query: {box._searchQuery}");
+                    IEnumerable<ListItem> searchResults = box._itemList.Where(
+                            item =>
+                            ListItem.SearchMatch(box._searchQuery, item.displayName) ||
+                            ListItem.SearchMatch(box._searchQuery, item.name)
+                            );
+                    if (searchResults == null || searchResults.Count() == 0) return;
+                    box.value = searchResults.Min(item => item.name);
                 }
             }
         }
@@ -262,9 +259,10 @@ namespace BingoMode.BingoMenu
         private void ShelterSetting_OnListOpen(UIfocusable trigger)
         {
             trigger.myContainer.MoveToFront();
-            if (!listOpen)
+            if (!BingoData.listOpen)
             {
-                listOpen = true;
+                BingoData.listOpen = true;
+                Plugin.logger.LogDebug($"listOpen: {BingoData.listOpen}");
                 startGame.buttonBehav.greyedOut = true;
                 startGame.pos.x += 9999f;
             }

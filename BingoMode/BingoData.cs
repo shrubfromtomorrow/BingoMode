@@ -37,6 +37,7 @@ namespace BingoMode
         public static Dictionary<string, List<string>> pinnableCreatureRegions;
         public static int RandomStartingSeed = -1;
         public static Dictionary<SlugcatStats.Name, List<string>> bannedChallenges = [];
+        public static bool listOpen = false;
 
         public static bool MoonDead => ExpeditionData.challengeList.Any(x => x is BingoGreenNeuronChallenge c && c.moon.Value);
 
