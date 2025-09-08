@@ -103,13 +103,18 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             List<string> regions = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
-            string region_ = UnityEngine.Random.value < 0.5f ? "Any Region" : regions[UnityEngine.Random.Range(0, regions.Count)];
-            int max_ = UnityEngine.Random.Range(3, 4);
-            int min_ = UnityEngine.Random.Range(1, 2);
+            bool anyRegion = UnityEngine.Random.value < 0.5f;
+            string region_ = anyRegion ? "Any Region" : regions[UnityEngine.Random.Range(0, regions.Count)];
+            int max_ = UnityEngine.Random.Range(3, 6);
+            int min_ = UnityEngine.Random.Range(1, 3);
 
-            return new BingoEnterRegionsTimes
+            if (anyRegion) {
+                max_ *= 2;
+            }
+
+            return new BingoEnterRegionsTimesChallenge
             {
-                region = new(region_, "Region", 0, listName: "regionsreal"),
+                region = new(region_, "Region", 0, listName: "regions"),
                 enteredRegions = [],
                 min = new(min_, "Minimum", 1),
                 max = new(max_, "Maximum", 2)
@@ -118,7 +123,7 @@ namespace BingoMode.BingoChallenges
 
         public void Entered(string regionName)
         {
-            if (SteamTest.team == 8 || hidden || revealed || TeamsFailed[SteamTest.team]) return;
+            if (SteamTest.team == 8 || hidden || TeamsFailed[SteamTest.team]) return;
 
             if (region.Value == "Any Region")
             {
@@ -141,7 +146,7 @@ namespace BingoMode.BingoChallenges
                 return;
             }
 
-            if (current >= min.Value)
+            if (!revealed && current >= min.Value)
             {
                 CompleteChallenge();
                 return;
@@ -167,7 +172,8 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoEnterRegionsTimes",
+                // Prevents future footguns when renaming
+                nameof(BingoEnterRegionsTimesChallenge),
                 "~",
                 region.ToString(),
                 "><",
