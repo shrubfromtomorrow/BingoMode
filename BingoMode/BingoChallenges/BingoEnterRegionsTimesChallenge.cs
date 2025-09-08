@@ -19,7 +19,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Random()
         {
-            BingoEnterRegionsTimes challenge = new();
+            BingoEnterRegionsTimesChallenge challenge = new();
             challenge.region.Value = region.Random();
             challenge.min.Value = min.Random();
             challenge.max.Value = max.Random();
@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
             max = Randomizer<int>.InitDeserialize(dict["max"]);
         }
     }
-    public class BingoEnterRegionsTimes : BingoChallenge
+    public class BingoEnterRegionsTimesChallenge : BingoChallenge
     {
         public SettingBox<string> region;
         public SettingBox<int> min;
@@ -52,7 +52,7 @@ namespace BingoMode.BingoChallenges
         public List<string> enteredRegions = [];
         public int current;
 
-        public BingoEnterRegionsTimes()
+        public BingoEnterRegionsTimesChallenge()
         {
             region = new("", "Region", 0, listName: "regionsreal");
             min = new(0, "Minimum", 1);

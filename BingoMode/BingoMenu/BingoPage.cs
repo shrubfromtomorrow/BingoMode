@@ -369,7 +369,7 @@ namespace BingoMode.BingoMenu
                     if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
                     if (ch is BingoEnterRegionChallenge b) bannedRegions.Add(b.region.Value);
                     if (ch is BingoEnterRegionFromChallenge a) bannedRegions.Add(a.to.Value);
-                    if (ch is BingoEnterRegionsTimes t) bannedRegions.Add(t.region.Value);
+                    if (ch is BingoEnterRegionsTimesChallenge t) bannedRegions.Add(t.region.Value);
                 }
                 if (BingoData.BingoDen.ToLowerInvariant() == "random")
                 {
