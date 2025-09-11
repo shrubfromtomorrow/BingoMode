@@ -60,7 +60,7 @@ namespace BingoMode.BingoMenu
             SymbolButton unloadButton = new(menu, this, "Menu_Symbol_Clear_All", "UNLOAD", new Vector2(MARGIN, size.y - SYMBOL_BUTTON_SIZE - MARGIN));
             subObjects.Add(unloadButton);
 
-            randomizerLabel = new(menu, this, "unloaded", unloadButton.pos + new Vector2(SYMBOL_BUTTON_SIZE + MARGIN, 3f), new Vector2(0f, 18f), false);
+            randomizerLabel = new(menu, this, menu.Translate("unloaded"), unloadButton.pos + new Vector2(SYMBOL_BUTTON_SIZE + MARGIN, 3f), new Vector2(0f, 18f), false);
             randomizerLabel.label.alignment = FLabelAlignment.Left;
             subObjects.Add(randomizerLabel);
 

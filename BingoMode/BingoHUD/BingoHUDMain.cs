@@ -536,7 +536,7 @@ namespace BingoMode.BingoHUD
                 addText += completedChallenges;
             }
 
-            return new BingoCompleteInfo([SteamTest.team], $"Game concluded!", addText, BingoCompleteReason.TallyUp);
+            return new BingoCompleteInfo([SteamTest.team], ChallengeTools.IGT.Translate("Game concluded!").Replace("<LINE>", "\r\n"), addText, BingoCompleteReason.TallyUp);
         }
 
         public override void ClearSprites()
@@ -1504,10 +1504,10 @@ namespace BingoMode.BingoHUD
                 }
                 label.text = phrase == null ? SplitString(challenge.description) : "";
                 infoLabel.text = challenge.description.WrapText(false, boxSprites[0].scaleX - 20f);
-                if (challenge.revealed && !challenge.completed) infoLabel.text += "\nSave the game to Complete";
+                if (challenge.revealed && !challenge.completed) infoLabel.text += ChallengeTools.IGT.Translate("<LINE>Save the game to Complete").Replace("<LINE>", "\r\n");
                 if ((challenge as BingoChallenge).TeamsCompleted.Any(x => x == true))
                 {
-                    infoLabel.text += "\nCompleted by: ";
+                    infoLabel.text += ChallengeTools.IGT.Translate("<LINE>Completed by: ").Replace("<LINE>", "\r\n");
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsCompleted.Length; i++)
                     {
                         if ((challenge as BingoChallenge).TeamsCompleted[i]) infoLabel.text += BingoPage.TeamName[i] + ", ";
@@ -1516,7 +1516,7 @@ namespace BingoMode.BingoHUD
                 }
                 if ((challenge as BingoChallenge).TeamsFailed.Any(x => x == true))
                 {
-                    infoLabel.text += "\nFailed by: ";
+                    infoLabel.text += ChallengeTools.IGT.Translate("<LINE>Failed by: ").Replace("<LINE>", "\r\n");
                     for (int i = 0; i < (challenge as BingoChallenge).TeamsFailed.Length; i++)
                     {
                         if ((challenge as BingoChallenge).TeamsFailed[i]) infoLabel.text += BingoPage.TeamName[i] + ", ";

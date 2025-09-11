@@ -128,7 +128,7 @@ namespace BingoMode.BingoMenu
             nallReady = new(
                     menu,
                     this,
-                    "Not all players are ready !",
+                    menu.Translate("Not all players are ready !"),
                     new(WIDTH / 2f, NALL_READY_Y),
                     Vector2.zero,
                     false);
@@ -138,7 +138,7 @@ namespace BingoMode.BingoMenu
             startGame = new(
                     menu,
                     this,
-                    "BEGIN",
+                    menu.Translate("BEGIN"),
                     "STARTBINGO",
                     offset + new Vector2(WIDTH / 2f, START_Y + HOLD_BUTTON_RADIUS),
                     ALL_READY_FILL_TIME);
@@ -147,7 +147,7 @@ namespace BingoMode.BingoMenu
             shelterLabel = new MenuLabel(
                     menu,
                     this,
-                    "Shelter: ",
+                    menu.Translate("Shelter: "),
                     offset + new Vector2(RESIZE_BUTTON_SIZE + MARGIN, SHELTER_Y + TEXTBOX_HEIGHT / 2f),
                     Vector2.zero,
                     false);

@@ -138,7 +138,7 @@ namespace BingoMode.BingoMenu
             if (message == "TOGGLE_FRIENDSONLY")
             {
                 SteamTest.CurrentFilters.friendsOnly = !SteamTest.CurrentFilters.friendsOnly;
-                friendsOnly.menuLabel.text = SteamTest.CurrentFilters.friendsOnly ? "Friends only: Yes" : "Friends only: No";
+                friendsOnly.menuLabel.text = SteamTest.CurrentFilters.friendsOnly ? menu.Translate("Friends only: Yes") : menu.Translate("Friends only: No");
                 return;
             }
 
