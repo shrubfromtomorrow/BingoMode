@@ -240,7 +240,7 @@ namespace BingoMode.BingoSteamworks
             }
             else
             {
-                Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "Please enter the expedition menu to accept an invite."));
+                Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, BingoData.globalMenu.Translate("Please enter the expedition menu to accept an invite.")));
             }
         }
 

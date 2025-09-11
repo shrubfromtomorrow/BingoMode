@@ -49,37 +49,37 @@ namespace BingoMode
 
             optionse = new UIelement[]
             {
-                new OpLabel(10f, 560f, "Bingo Mod Config", true),
-                new OpLabel(10f, 512f, "Open Bingo HUD keybind:") {alignment = FLabelAlignment.Left, description = "Which button opens/closes the Bingo grid in game"},
-                new OpLabel(320f, 510f, "-  Keyboard") {alignment = FLabelAlignment.Left},
-                new OpKeyBinder(HUDKeybindKeyboard, new Vector2(170f, 505f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.AnyController) {description = "Which button opens/closes the Bingo grid in game"},
+                new OpLabel(10f, 560f, Translate("Bingo Mod Config"), true),
+                new OpLabel(10f, 512f, Translate("Open Bingo HUD keybind:")) {alignment = FLabelAlignment.Left, description = Translate("Which button opens/closes the Bingo grid in game")},
+                new OpLabel(320f, 510f, Translate("-  Keyboard")) {alignment = FLabelAlignment.Left},
+                new OpKeyBinder(HUDKeybindKeyboard, new Vector2(170f, 505f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.AnyController) {description = Translate("Which button opens/closes the Bingo grid in game")},
 
-                new OpLabel(320f, 470f, "-  Controller 1") {alignment = FLabelAlignment.Left},
+                new OpLabel(320f, 470f, Translate("-  Controller 1")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(HUDKeybindC1, new Vector2(170f, 465f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller1),
-                new OpLabel(320f, 430f, "-  Controller 2") {alignment = FLabelAlignment.Left},
+                new OpLabel(320f, 430f, Translate("-  Controller 2")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(HUDKeybindC2, new Vector2(170f, 425f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller2),
-                new OpLabel(320f, 390f, "-  Controller 3") {alignment = FLabelAlignment.Left},
+                new OpLabel(320f, 390f, Translate("-  Controller 3")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(HUDKeybindC3, new Vector2(170f, 385f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller3),
-                new OpLabel(320f, 350f, "-  Controller 4") {alignment = FLabelAlignment.Left},
+                new OpLabel(320f, 350f, Translate("-  Controller 4")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(HUDKeybindC4, new Vector2(170f, 345f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.Controller4),
 
-                new OpLabel(430f, 512f, "Use map input instead:") {alignment = FLabelAlignment.Left},
+                new OpLabel(430f, 512f, Translate("Use map input instead:")) {alignment = FLabelAlignment.Left},
                 new OpCheckBox(UseMapInput, 560f, 509f),
 
-                new OpLabel(10f, 300f, "Quick reset keybind:") {alignment = FLabelAlignment.Left},
+                new OpLabel(10f, 300f, Translate("Quick reset keybind:")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(ResetBind, new Vector2(170f, 295f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.AnyController),
 
-                new OpLabel(10f, 263f, "Play custom music in bingo menu:") {alignment = FLabelAlignment.Left},
+                new OpLabel(10f, 263f, Translate("Play custom music in bingo menu:")) {alignment = FLabelAlignment.Left},
                 new OpCheckBox(PlayMenuSong, 288f, 260f),
                 
-                new OpLabel(10f, 223f, "Play custom music when game ends:") {alignment = FLabelAlignment.Left},
+                new OpLabel(10f, 223f, Translate("Play custom music when game ends:")) {alignment = FLabelAlignment.Left},
                 new OpCheckBox(PlayEndingSong, 288f, 220f),
                 
-                new OpLabel(10f, 183f, "Play custom music when your team is losing:") {alignment = FLabelAlignment.Left},
+                new OpLabel(10f, 183f, Translate("Play custom music when your team is losing:")) {alignment = FLabelAlignment.Left},
                 new OpCheckBox(PlayDangerSong, 288f, 180f),
                 
-                new OpLabel(10f, 143f, "Singleplayer team color:") {alignment = FLabelAlignment.Left, description = "Which team's color to use in singleplayer"},
-                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 140f), 140f, new string[] {"Red", "Blue", "Green", "Orange", "Pink", "Cyan", "Black", "Hurricane" }) {description = "Which team's color to use in singleplayer"},
+                new OpLabel(10f, 143f, Translate("Singleplayer team color:")) {alignment = FLabelAlignment.Left, description = Translate("Which team's color to use in singleplayer")},
+                new OpComboBox(SinglePlayerTeam, new Vector2(170f, 140f), 140f, new string[] {Translate("Red"), Translate("Blue"), Translate("Green"), Translate("Orange"), Translate("Pink"), Translate("Cyan"), Translate("Black"), Translate("Hurricane") }) {description = Translate("Which team's color to use in singleplayer")},
             };
             tab.AddItems(optionse);
         }

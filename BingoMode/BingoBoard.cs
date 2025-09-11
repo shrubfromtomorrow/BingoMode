@@ -592,10 +592,10 @@ namespace BingoMode
                 if (BingoData.globalMenu != null)
                     BingoData.globalMenu.manager.ShowDialog(new InfoDialog(
                             BingoData.globalMenu.manager,
-                            $"Slugcat mismatch!\n\n" +
-                            $"Selected slugcat: {ExpeditionData.slugcatPlayer.value}\n" +
-                            $"Provided Slugcat: {slug}\n\n" +
-                            $"Please paste a board from the same slugcat that's currently selected."));
+                            BingoData.globalMenu.Translate("Slugcat mismatch!<LINE><LINE>").Replace("<LINE>", "\r\n") +
+                            BingoData.globalMenu.Translate($"Selected slugcat: {ExpeditionData.slugcatPlayer.value}<LINE>").Replace("<LINE>", "\r\n") +
+                            BingoData.globalMenu.Translate($"Provided Slugcat: {slug}<LINE><LINE>").Replace("<LINE>", "\r\n") +
+                            BingoData.globalMenu.Translate($"Please paste a board from the same slugcat that's currently selected.")));
                 return;
             }
 

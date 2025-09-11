@@ -599,7 +599,7 @@ namespace BingoMode
                 else if (!SteamFinal.ReceivedHostUpKeep)
                 {
                     // Would like to pause game here and make button unpause
-                    self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, "Trying to reconnect to the host."));
+                    self.room.game.manager.ShowDialog(new InfoDialog(self.room.game.manager, BingoData.globalMenu.Translate("Trying to reconnect to the host.")));
                 }
                 
                 Custom.rainWorld.progression.currentSaveState.BringUpToDate(self.room.game);

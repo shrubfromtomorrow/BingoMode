@@ -79,7 +79,7 @@ namespace BingoMode.BingoSteamworks
                             
                             // Didnt receve host upkeep, so host is probably disconnected
                             if (rw.processManager.IsRunningAnyDialog) rw.processManager.StopSideProcess(rw.processManager.dialog);
-                            rw.processManager.ShowDialog(new InfoDialog(rw.processManager, "Lost connection to host."));
+                            rw.processManager.ShowDialog(new InfoDialog(rw.processManager, BingoData.globalMenu.Translate("Lost connection to host.")));
                         }
                     }
                 }

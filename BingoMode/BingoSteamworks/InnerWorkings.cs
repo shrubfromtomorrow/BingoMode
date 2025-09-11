@@ -130,7 +130,7 @@ namespace BingoMode.BingoSteamworks
                     {
                         page6.multiplayerButton.buttonBehav.greyedOut = false;
                         page6.Singal(page6.multiplayerButton, "LEAVE_LOBBY");
-                        Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, "You've been kicked from the lobby."));
+                        Custom.rainWorld.processManager.ShowDialog(new InfoDialog(Custom.rainWorld.processManager, BingoData.globalMenu.Translate("You've been kicked from the lobby.")));
                     }
                     break;
 
