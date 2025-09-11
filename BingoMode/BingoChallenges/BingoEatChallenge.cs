@@ -104,7 +104,7 @@ namespace BingoMode.BingoChallenges
         {
             bool c = UnityEngine.Random.value < 0.5f;
 
-            int critStart = ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
+            int critStart = Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             int foodCount = ChallengeUtils.FoodTypes.Length;
             string randomFood;
             if (c)
@@ -114,7 +114,7 @@ namespace BingoMode.BingoChallenges
             else
             {
                 List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(ChallengeUtils.FoodTypes.IndexOf("GooieDuck"), 4);
+                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
                 else if (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet &&
                          ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint) foob.Remove("GlowWeed");
                 if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)

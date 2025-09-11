@@ -82,10 +82,10 @@ namespace BingoMode.BingoChallenges
             if (edible)
             {
                 List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(ChallengeUtils.FoodTypes.IndexOf("GooieDuck"), 4);
+                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
                 if (ExpeditionData.slugcatPlayer.value != "Rivulet" && ExpeditionData.slugcatPlayer.value != "Saint") foob.Remove("GlowWeed");
                 type = foob[UnityEngine.Random.Range(0, foob.Count)];
-                c = ChallengeUtils.FoodTypes.IndexOf(type) >= ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
+                c = ChallengeUtils.FoodTypes.IndexOf(type) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             } 
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
             BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge

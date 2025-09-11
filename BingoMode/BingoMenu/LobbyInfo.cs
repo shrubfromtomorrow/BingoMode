@@ -146,12 +146,12 @@ namespace BingoMode.BingoMenu
                     labelPos += Vector2.up * HEIGHT / (labels.Length + 1f);
                 }
 
-                labels[0].text = "Game mode: " + data.gameMode;
-                labels[1].text = "Mod version: " + data.version;
-                labels[2].text = "Perks: " + (data.perks == AllowUnlocks.Any ? "Allowed" : data.perks == AllowUnlocks.None ? "Disabled" : "Host decides");
-                labels[3].text = "Burdens: " + (data.burdens == AllowUnlocks.Any ? "Allowed" : data.burdens == AllowUnlocks.None ? "Disabled" : "Host decides");
-                labels[4].text = "Require host's mods: " + (data.hostMods ? "Yes" : "No");
-                labels[5].text = "Slugcat: " + SlugcatStats.getSlugcatName(new(data.slugcat));
+                labels[0].text = menu.Translate("Game mode: ") + data.gameMode;
+                labels[1].text = menu.Translate("Mod version: ") + data.version;
+                labels[2].text = menu.Translate("Perks: ") + (data.perks == AllowUnlocks.Any ? menu.Translate("Allowed") : data.perks == AllowUnlocks.None ? menu.Translate("Disabled") : menu.Translate("Host decides"));
+                labels[3].text = menu.Translate("Burdens: ") + (data.burdens == AllowUnlocks.Any ? menu.Translate("Allowed") : data.burdens == AllowUnlocks.None ? menu.Translate("Disabled") : menu.Translate("Host decides"));
+                labels[4].text = menu.Translate("Require host's mods: ") + (data.hostMods ? menu.Translate("Yes") : menu.Translate("No"));
+                labels[5].text = menu.Translate("Slugcat: ") + SlugcatStats.getSlugcatName(new(data.slugcat));
             }
 
             public override void GrafUpdate(float timeStacker)

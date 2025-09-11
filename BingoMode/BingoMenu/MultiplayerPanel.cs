@@ -4,6 +4,7 @@ using Expedition;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
+using Rewired.ControllerExtensions;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -330,7 +331,7 @@ namespace BingoMode.BingoMenu
             refreshSearch = new(
                     menu,
                     this,
-                    "Refresh",
+                    menu.Translate("Refresh"),
                     "REFRESH_SEARCH",
                     new Vector2(size.x - 3f * MARGIN - REFRESH_SEARCH_WIDTH - FRIENDS_WIDTH - SYMBOL_BUTTON_SIZE, smallItemY),
                     new Vector2(REFRESH_SEARCH_WIDTH, TEXT_BUTTON_HEIGHT));
@@ -339,7 +340,7 @@ namespace BingoMode.BingoMenu
             friendsOnly = new(
                     menu,
                     this,
-                    "Friends only: No",
+                    menu.Translate("Friends only: No"),
                     "TOGGLE_FRIENDSONLY",
                     new Vector2(size.x - 2f * MARGIN - FRIENDS_WIDTH - SYMBOL_BUTTON_SIZE, smallItemY),
                     new Vector2(FRIENDS_WIDTH, TEXT_BUTTON_HEIGHT));

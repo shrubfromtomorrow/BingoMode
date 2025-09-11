@@ -61,15 +61,15 @@ namespace BingoMode.BingoMenu
             pages[0].subObjects.Add(closeButton);
             if (!inLobby)
             {
-                createButton = new SimpleButton(this, pages[0], "CREATE", "CREATE", outOfBounds, new Vector2(num, 35f));
+                createButton = new SimpleButton(this, pages[0], Translate("CREATE"), "CREATE", outOfBounds, new Vector2(num, 35f));
                 pages[0].subObjects.Add(createButton);
             }
 
-            friendsOnly = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Friends only: ", "FRIENDS");
+            friendsOnly = new CheckBox(this, pages[0], this, outOfBounds, 0f, Translate("Friends only: "), "FRIENDS");
             friendsOnly.label.label.alignment = FLabelAlignment.Right;
             friendsOnly.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(friendsOnly);
-            hostMods = new CheckBox(this, pages[0], this, outOfBounds, 0f, "Require host's mods: ", "HOSTMODS");
+            hostMods = new CheckBox(this, pages[0], this, outOfBounds, 0f, Translate("Require host's mods: "), "HOSTMODS");
             hostMods.label.label.alignment = FLabelAlignment.Right;
             hostMods.buttonBehav.greyedOut = inLobby && !host;
             pages[0].subObjects.Add(hostMods);
@@ -86,8 +86,8 @@ namespace BingoMode.BingoMenu
             perks = new CheckBox[3];
             burdens = new CheckBox[3];
             gamemode = new CheckBox[4];
-            string[] texts = { "Allowed - ", "Disabled - ", "Host decides - " };
-            string[] gamemodes = { "Bingo - ", "Lockout (ties) - ", "Lockout (no ties) - ", "Blackout - " };
+            string[] texts = { Translate("Allowed - "), Translate("Disabled - "), Translate("Host decides - ") };
+            string[] gamemodes = { Translate("Bingo - "), Translate("Lockout (ties) - "), Translate("Lockout (no ties) - "), Translate("Blackout - ") };
             for (int i = 0; i < 3; i++)
             {
                 perks[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "PERJ" + i.ToString());
@@ -112,12 +112,12 @@ namespace BingoMode.BingoMenu
             labels = new FLabel[4];
             for (int i = 0; i < 2; i++)
             {
-                labels[i] = new FLabel(Custom.GetFont(), i == 0 ? "Perks:" : "Burdens:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
+                labels[i] = new FLabel(Custom.GetFont(), i == 0 ? Translate("Perks:") : Translate("Burdens:")) { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
                 pages[0].Container.AddChild(labels[i]);
             }
-            labels[2] = new FLabel(Custom.GetFont(), "Max Players: ") { anchorX = 1f, anchorY = 0.5f, color = MenuColor(MenuColors.MediumGrey).rgb };
+            labels[2] = new FLabel(Custom.GetFont(), Translate("Max Players: ")) { anchorX = 1f, anchorY = 0.5f, color = MenuColor(MenuColors.MediumGrey).rgb };
             pages[0].Container.AddChild(labels[2]);
-            labels[3] = new FLabel(Custom.GetFont(), "Game mode:") { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
+            labels[3] = new FLabel(Custom.GetFont(), Translate("Game mode:")) { anchorX = 0.5f, anchorY = 0.5f, shader = manager.rainWorld.Shaders["MenuText"] };
             pages[0].Container.AddChild(labels[3]);
 
             dividers = new FSprite[2];
@@ -198,7 +198,7 @@ namespace BingoMode.BingoMenu
             {
                 perks[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 150f);
                 burdens[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 200f);
-                if (perks[i].displayText == "Host decides - ")
+                if (perks[i].displayText == Translate("Host decides - "))
                 {
                     perks[i].pos.x += 20f;
                     burdens[i].pos.x += 20f;
@@ -208,11 +208,11 @@ namespace BingoMode.BingoMenu
             for (int i = 0; i < 4; i++)
             {
                 gamemode[i].pos = new Vector2(xPos - 188f + 140f * i, yTop - 100f);
-                if (gamemode[i].displayText == "Bingo - ")
+                if (gamemode[i].displayText == Translate("Bingo - "))
                 {
                     gamemode[i].pos.x += 17f;
                 }
-                else if (gamemode[i].displayText == "Blackout - ")
+                else if (gamemode[i].displayText == Translate("Blackout - "))
                 {
                     gamemode[i].pos.x -= 44f;
                 }

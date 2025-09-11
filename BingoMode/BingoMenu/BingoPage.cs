@@ -143,7 +143,7 @@ namespace BingoMode.BingoMenu
             multiplayerButton = new SimpleButton(
                     menu,
                     this,
-                    "Multiplayer",
+                    expMenu.Translate("Multiplayer"),
                     "SWITCH_MULTIPLAYER",
                     expMenu.exitButton.pos + new Vector2(0f, -40f),
                     new Vector2(140f, 30f));
@@ -154,7 +154,7 @@ namespace BingoMode.BingoMenu
             randomizerButton = new(
                     menu,
                     this,
-                    "Profiles",
+                    expMenu.Translate("Profiles"),
                     "SWITCH_RANDOMIZATION",
                     expMenu.manualButton.pos + new Vector2(0, -40f), expMenu.manualButton.size);
             subObjects.Add(randomizerButton);

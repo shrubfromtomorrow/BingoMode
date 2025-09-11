@@ -1119,7 +1119,7 @@ namespace BingoMode
                 self.slugcatDescription.text = "";
                 if (!newBingoButton.TryGetValue(self, out _))
                 {
-                    newBingoButton.Add(self, new HoldButton(self.menu, self, isSpectator ? "CONTINUE\nSPECTATING" : isMultiplayer ? "CONTINUE\nMULTIPLAYER" : "CONTINUE\nBINGO", "LOADBINGO", new Vector2(680f, 210f), 30f));
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, isSpectator ? self.menu.Translate("CONTINUE<LINE>SPECTATING").Replace("<LINE>", "\r\n") : isMultiplayer ? self.menu.Translate("CONTINUE<LINE>MULTIPLAYER").Replace("<LINE>", "\r\n") : self.menu.Translate("CONTINUE<LINE>BINGO").Replace("<LINE>", "\r\n"), self.menu.Translate("LOADBINGO"), new Vector2(680f, 210f), 30f));
                 }
                 newBingoButton.TryGetValue(self, out var bb);
                 self.subObjects.Add(bb);
@@ -1135,7 +1135,7 @@ namespace BingoMode
 
             if (!newBingoButton.TryGetValue(self, out _))
             {
-                newBingoButton.Add(self, new HoldButton(self.menu, self, "PLAY\nBINGO", "NEWBINGO", new Vector2(590f, 180f), 30f));
+                newBingoButton.Add(self, new HoldButton(self.menu, self, self.menu.Translate("PLAY<LINE>BINGO").Replace("<LINE>", "\r\n"), "NEWBINGO", new Vector2(590f, 180f), 30f));
             }
             newBingoButton.TryGetValue(self, out var button);
             self.subObjects.Add(button);

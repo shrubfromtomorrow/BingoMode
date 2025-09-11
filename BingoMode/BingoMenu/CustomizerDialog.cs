@@ -314,8 +314,8 @@ namespace BingoMode.BingoMenu
             else if (owner.challenge is BingoDontUseItemChallenge cc)
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                cc.isFood = l.IndexOf(cc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
-                if (cc.isFood) cc.isCreature = ChallengeUtils.FoodTypes.IndexOf(cc.item.Value) >= ChallengeUtils.FoodTypes.IndexOf("VultureGrub");
+                cc.isFood = Array.IndexOf(l, cc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
+                if (cc.isFood) cc.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, cc.item.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {

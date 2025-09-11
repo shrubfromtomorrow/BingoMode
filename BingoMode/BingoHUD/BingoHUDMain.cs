@@ -150,8 +150,8 @@ namespace BingoMode.BingoHUD
 
             hudButtons = new BingoHUDButton[2];
 
-            hudButtons[0] = new BingoHUDButton(this, default, "Tally up", PressTallyUp) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost || BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID() == default) };
-            hudButtons[1] = new BingoHUDButton(this, default, "End Session", PressExitGame) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin };
+            hudButtons[0] = new BingoHUDButton(this, default, ChallengeTools.IGT.Translate("Tally up"), PressTallyUp) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost || BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID() == default) };
+            hudButtons[1] = new BingoHUDButton(this, default, ChallengeTools.IGT.Translate("End Session"), PressExitGame) { active = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].isHost && BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin };
         }
 
         public void ShowWinText()
@@ -265,7 +265,7 @@ namespace BingoMode.BingoHUD
             if (BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].showedWin) return null;
 
-            string addText = "Press the button in the bingo HUD or abandon the save to end the bingo session.";
+            string addText = ChallengeTools.IGT.Translate("Press the button in the bingo HUD or abandon the save to end the bingo session.");
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
             bool doDangerMusic = Plugin.PluginInstance.BingoConfig.PlayDangerSong.Value;
@@ -275,9 +275,9 @@ namespace BingoMode.BingoHUD
                 bool songAlreadyPlayed = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed;
                 if (BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != SteamTest.selfIdentity.GetSteamID64())
                 {
-                    addText = "Exit the game and abandon the save or wait for host to end the session.";
+                    addText = ChallengeTools.IGT.Translate("Exit the game and abandon the save or wait for host to end the session.");
                 }
-                else addText = "Press the button in the bingo HUD to end the bingo session for everyone.";
+                else addText = ChallengeTools.IGT.Translate("Press the button in the bingo HUD to end the bingo session for everyone.");
 
 
                 List<int> teamsInBingo = BingoData.TeamsStringToList(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
@@ -299,7 +299,7 @@ namespace BingoMode.BingoHUD
                 if (BingoHooks.GlobalBoard.CheckWin(SteamTest.team))
                 {
                     
-                    return new BingoCompleteInfo([SteamTest.team], "You won!", addText, BingoCompleteReason.Bingo);
+                    return new BingoCompleteInfo([SteamTest.team], ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
                 }
             }
 
@@ -312,12 +312,12 @@ namespace BingoMode.BingoHUD
             {
                 if (BingoHooks.GlobalBoard.CheckWin(t))
                 {
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
+                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
                 }
 
                 if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(t, false) == grid.GetLength(0) - 1)
                 {
-                    BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                    BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, ChallengeTools.IGT.Translate("Bingo - Scheming"));
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
                     BingoSaveFile.Save();
                 }
@@ -344,7 +344,7 @@ namespace BingoMode.BingoHUD
                 // Bingo wins
                 if (BingoHooks.GlobalBoard.CheckWin(t))
                 {
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Bingo);
+                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
                 }
 
                 completedForTeam.Add(t, 0);
@@ -413,14 +413,14 @@ namespace BingoMode.BingoHUD
 
             if (allowTies && tieTeams.Count > 0)
             {
-                return new BingoCompleteInfo(tieTeams, "We have a tie!", addText, BingoCompleteReason.Tie);
+                return new BingoCompleteInfo(tieTeams, ChallengeTools.IGT.Translate("We have a tie!"), addText, BingoCompleteReason.Tie);
             }
 
             foreach (int t in teamsInBingo)
             {
                 if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && (BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(t, true, teamsInBingo) == grid.GetLength(0) - 1 || completedForTeam[t] > majorityMargin - 3))
                 {
-                    BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                    BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, ChallengeTools.IGT.Translate("Bingo - Scheming"));
                     BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
                     BingoSaveFile.Save();
                 }
@@ -444,7 +444,7 @@ namespace BingoMode.BingoHUD
 
                         if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && squareCount > (grid.GetLength(0) * grid.GetLength(0) - 2))
                         {
-                            BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, "Bingo - Scheming");
+                            BingoHooks.RequestBingoSong(Custom.rainWorld.processManager.musicPlayer, ChallengeTools.IGT.Translate("Bingo - Scheming"));
                             BingoData.BingoSaves[ExpeditionData.slugcatPlayer].songPlayed = true;
                             BingoSaveFile.Save();
                         }
@@ -457,7 +457,7 @@ namespace BingoMode.BingoHUD
                 if (won)
                 {
 
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : "You won!", addText, BingoCompleteReason.Blackout);
+                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Blackout);
                 }
             }
 
@@ -497,13 +497,13 @@ namespace BingoMode.BingoHUD
 
         public BingoCompleteInfo? TallyUp()
         {
-            string addText = "Number of challenges completed: ";
+            string addText = ChallengeTools.IGT.Translate("Number of challenges completed: ");
             bool isMultiplayer = BingoData.BingoSaves.ContainsKey(ExpeditionData.slugcatPlayer) &&
                 BingoData.BingoSaves[ExpeditionData.slugcatPlayer].hostID.GetSteamID64() != default;
 
             if (isMultiplayer)
             {
-                addText = "Number of challenges completed for each team: ";
+                addText = ChallengeTools.IGT.Translate("Number of challenges completed for each team: ");
                 List<int> teamsInBingo = BingoData.TeamsStringToList(BingoData.BingoSaves[ExpeditionData.slugcatPlayer].teamsInBingo);
                 Dictionary<int, int> completedForTeam = [];
 

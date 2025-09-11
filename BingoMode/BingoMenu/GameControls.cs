@@ -99,8 +99,8 @@ namespace BingoMode.BingoMenu
                 plusButton.buttonBehav.greyedOut = !value;
                 minusButton.buttonBehav.greyedOut = !value;
                 pasteBoard.buttonBehav.greyedOut = !value;
-                startGame.signalText = value ? "STARTBINGO" : "GETREADY";
-                startGame.menuLabel.text = value ? "BEGIN" : "I'M\nREADY";
+                startGame.signalText = value ? menu.Translate("STARTBINGO") : menu.Translate("GETREADY");
+                startGame.menuLabel.text = value ? menu.Translate("BEGIN") : menu.Translate("I'M<LINE>READY").Replace("<LINE>", "\r\n");
             }
         }
         private bool _allReady = true;
@@ -161,7 +161,7 @@ namespace BingoMode.BingoMenu
                     UNLOCKS_BUTTON_WIDTH - shelterLabel.label.textRect.width)
             {
                 alignment = FLabelAlignment.Center,
-                description = "The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'",
+                description = menu.Translate("The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'"),
                 maxLength = 100,
             };
             shelterSetting.OnValueUpdate += ShelterSetting_OnValueUpdate;
@@ -201,7 +201,7 @@ namespace BingoMode.BingoMenu
             copyBoard = new(
                     menu,
                     this,
-                    "Copy board",
+                    menu.Translate("Copy board"),
                     "COPYTOCLIPBOARD",
                     offset + new Vector2((WIDTH - MARGIN) / 2f - COPY_PASTE_WDITH, COPY_PASTE_Y),
                     new Vector2(COPY_PASTE_WDITH, COPY_PASTE_HEIGHT));
@@ -210,7 +210,7 @@ namespace BingoMode.BingoMenu
             pasteBoard = new(
                     menu,
                     this,
-                    "Paste board",
+                    menu.Translate("Paste board"),
                     "PASTEFROMCLIPBOARD",
                     offset + new Vector2((WIDTH + MARGIN) / 2f, COPY_PASTE_Y),
                     new Vector2(COPY_PASTE_WDITH, COPY_PASTE_HEIGHT));
@@ -224,7 +224,7 @@ namespace BingoMode.BingoMenu
             {
                 SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "1");
                 startGame.signalText = "GETUNREADY";
-                startGame.menuLabel.text = "I'M NOT\nREADY";
+                startGame.menuLabel.text = menu.Translate("I'M NOT<LINE>READY").Replace("<LINE>", "\r\n");
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
             }
 
@@ -232,7 +232,7 @@ namespace BingoMode.BingoMenu
             {
                 SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "ready", "0");
                 startGame.signalText = "GETREADY";
-                startGame.menuLabel.text = "I'M\nREADY";
+                startGame.menuLabel.text = menu.Translate("I'M<LINE>READY").Replace("<LINE>", "\r\n");
                 menu.PlaySound(SoundID.MENU_Start_New_Game);
             }
 
