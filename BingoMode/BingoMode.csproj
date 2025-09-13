@@ -151,6 +151,7 @@
     <Compile Include="BingoChallenges\BingoEnterRegionFromChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGlobalScoreChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGreenNeuronChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoGrabPoleMimicChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDamageChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDontUseItemChallenge.cs" />
     <Compile Include="BingoChallenges\BingoEatChallenge.cs" />
