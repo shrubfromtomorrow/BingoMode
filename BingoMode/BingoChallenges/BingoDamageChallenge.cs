@@ -80,7 +80,7 @@ namespace BingoMode.BingoChallenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
+            string location = region.Value != "Any Region" ? ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)) : "";
             this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times<location>" + (inOneCycle.Value ? " in one cycle" : ""))
                 .Replace("<crit>", victim.Value == "Any Creature" ? ChallengeTools.IGT.Translate("creatures") : ChallengeTools.creatureNames[new CreatureType(victim.Value, false).Index])
                 .Replace("<location>", location != "" ? ChallengeTools.IGT.Translate(" in ") + location : "")

@@ -56,8 +56,8 @@ namespace BingoMode.BingoChallenges
         public override void UpdateDescription()
         {
             this.description = ChallengeTools.IGT.Translate("First time entering <to> must be from <from>")
-                .Replace("<to>", Region.GetRegionFullName(to.Value, ExpeditionData.slugcatPlayer))
-                .Replace("<from>", Region.GetRegionFullName(from.Value, ExpeditionData.slugcatPlayer));
+                .Replace("<to>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(to.Value, ExpeditionData.slugcatPlayer)))
+                .Replace("<from>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(from.Value, ExpeditionData.slugcatPlayer)));
             base.UpdateDescription();
         }
 

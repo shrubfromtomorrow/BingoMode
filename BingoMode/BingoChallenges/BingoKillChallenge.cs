@@ -113,7 +113,7 @@ namespace BingoMode.BingoChallenges
             {
                 ExpLog.Log("Error getting creature name for BingoKillChallenge | " + ex.Message);
             } 
-            string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
+            string location = region.Value != "Any Region" ? ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)) : "";
             description = ChallengeTools.IGT.Translate("Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
