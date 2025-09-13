@@ -113,17 +113,16 @@ namespace BingoMode.BingoChallenges
             {
                 ExpLog.Log("Error getting creature name for BingoKillChallenge | " + ex.Message);
             } 
-            //                room.Value != "" ? room.Value : 
             string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             description = ChallengeTools.IGT.Translate("Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
-                .Replace("<crit>", crit.Value != "Any Creature" ? newValue : "creatures")
-                .Replace("<location>", location != "" ? " in " + location : "")
-                .Replace("<pitorweapon>", deathPit.Value ? " with a death pit" : weapon.Value != "Any Weapon" ? " with " + ChallengeTools.ItemName(new(weapon.Value)) : "")
-                .Replace("<starving>", starve.Value ? " while starving" : "")
-                .Replace("<onecycle>", oneCycle.Value ? " in one cycle" : "")
-                .Replace("<shrooms>", shrooms.Value ? " while under mushroom effect" : "");
+                .Replace("<crit>", crit.Value != "Any Creature" ? newValue : ChallengeTools.IGT.Translate("creatures"))
+                .Replace("<location>", location != "" ? ChallengeTools.IGT.Translate(" in ") + location : "")
+                .Replace("<pitorweapon>", deathPit.Value ? ChallengeTools.IGT.Translate(" with a death pit") : weapon.Value != "Any Weapon" ? ChallengeTools.IGT.Translate(" with ") + ChallengeTools.ItemName(new(weapon.Value)) : "")
+                .Replace("<starving>", starve.Value ? ChallengeTools.IGT.Translate(" while starving") : "")
+                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate(" in one cycle") : "")
+                .Replace("<shrooms>", shrooms.Value ? ChallengeTools.IGT.Translate(" while under mushroom effect") : "");
             base.UpdateDescription();
         }
 

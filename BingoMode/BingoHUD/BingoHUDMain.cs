@@ -312,7 +312,7 @@ namespace BingoMode.BingoHUD
             {
                 if (BingoHooks.GlobalBoard.CheckWin(t))
                 {
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
+                    return new BingoCompleteInfo([t], isMultiplayer ? ChallengeTools.IGT.Translate("Team <team_name> won!") : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
                 }
 
                 if (!songAlreadyPlayed && doDangerMusic && t != SteamTest.team && Custom.rainWorld.processManager != null && Custom.rainWorld.processManager.musicPlayer != null && BingoHooks.GlobalBoard.CheckMaxTeamSquaresInLineForPlayingBingoThreatMusicYuh(t, false) == grid.GetLength(0) - 1)
@@ -407,7 +407,7 @@ namespace BingoMode.BingoHUD
 
                 if (canWin)
                 {
-                    return new BingoCompleteInfo([t], "Team <team_name> won!", addText, BingoCompleteReason.Majority);
+                    return new BingoCompleteInfo([t], ChallengeTools.IGT.Translate("Team <team_name> won!"), addText, BingoCompleteReason.Majority);
                 }
             }
 

@@ -75,12 +75,12 @@ namespace BingoMode.BingoChallenges
         {
             string location = region.Value != "Any Region" ? Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "";
             this.description = ChallengeTools.IGT.Translate("<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>")
-                .Replace("<action>", anyShelter.Value ? "Bring" : "Hoard")
+                .Replace("<action>", anyShelter.Value ? ChallengeTools.IGT.Translate("Bring") : ChallengeTools.IGT.Translate("Hoard"))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
                 .Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)))
-                .Replace("<shelter_type>", anyShelter.Value ? "to any" : "in the same")
-                .Replace("<location>", location != "" ? "in " + location : "");
+                .Replace("<shelter_type>", anyShelter.Value ? ChallengeTools.IGT.Translate("to any") : ChallengeTools.IGT.Translate("in the same"))
+                .Replace("<location>", location != "" ? ChallengeTools.IGT.Translate("in ") + location : "");
             base.UpdateDescription();
         }
 

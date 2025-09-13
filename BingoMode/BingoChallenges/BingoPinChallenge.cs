@@ -71,8 +71,8 @@ namespace BingoMode.BingoChallenges
             description = ChallengeTools.IGT.Translate("Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>")
                 .Replace("<current_pin>", current.ToString())
                 .Replace("<pin_amount>", target.Value.ToString())
-                .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : "creatures")
-                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? " in different regions" : " in " + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
+                .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : ChallengeTools.IGT.Translate("creatures"))
+                .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? ChallengeTools.IGT.Translate(" in different regions") : ChallengeTools.IGT.Translate(" in ") + Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer) : "");
             base.UpdateDescription();
         }
 

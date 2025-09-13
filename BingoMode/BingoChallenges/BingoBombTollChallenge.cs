@@ -71,9 +71,9 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            string action = specific.Value ? "a grenade" : "grenades";
+            string action = specific.Value ? ChallengeTools.IGT.Translate("a grenade") : ChallengeTools.IGT.Translate("grenades");
             string tollPart;
-            string passPart = pass.Value ? (specific.Value ? " and then pass it" : " and then pass them") : "";
+            string passPart = pass.Value ? (specific.Value ? ChallengeTools.IGT.Translate(" and then pass it") : ChallengeTools.IGT.Translate(" and then pass them")) : "";
 
             if (specific.Value)
             {
@@ -82,21 +82,21 @@ namespace BingoMode.BingoChallenges
 
                 if (roomName.Value == "gw_c05")
                 {
-                    regionName += " surface";
+                    regionName += ChallengeTools.IGT.Translate(" surface");
                 }
                 else if (roomName.Value == "gw_c11")
                 {
-                    regionName += " underground";
+                    regionName += ChallengeTools.IGT.Translate(" underground");
                 }
 
-                tollPart = "the <toll> toll".Replace("<toll>", regionName);
+                tollPart = ChallengeTools.IGT.Translate("the <toll> toll").Replace("<toll>", regionName);
             }
             else
             {
-                tollPart = "[<current>/<amount>] unique tolls".Replace("<current>", ValueConverter.ConvertToString(current)).Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
+                tollPart = ChallengeTools.IGT.Translate("[<current>/<amount>] unique tolls").Replace("<current>", ValueConverter.ConvertToString(current)).Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             }
 
-            description = "Throw <action> at <toll><pass>".Replace("<action>", action).Replace("<toll>", tollPart).Replace("<pass>", passPart);
+            description = ChallengeTools.IGT.Translate("Throw <action> at <toll><pass>").Replace("<action>", action).Replace("<toll>", tollPart).Replace("<pass>", passPart);
             base.UpdateDescription();
         }
 
