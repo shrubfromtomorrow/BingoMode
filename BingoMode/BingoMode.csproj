@@ -149,6 +149,7 @@
     <Compile Include="BingoChallenges\BingoDodgeLeviathanChallenge.cs" />
     <Compile Include="BingoChallenges\BingoEchoChallenge.cs" />
     <Compile Include="BingoChallenges\BingoEnterRegionFromChallenge.cs" />
+    <Compile Include="BingoChallenges\BingoEnterRegionsTimesChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGlobalScoreChallenge.cs" />
     <Compile Include="BingoChallenges\BingoGreenNeuronChallenge.cs" />
     <Compile Include="BingoChallenges\BingoDamageChallenge.cs" />
