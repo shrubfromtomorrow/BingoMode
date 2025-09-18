@@ -344,7 +344,7 @@ namespace BingoMode.BingoHUD
                 // Bingo wins
                 if (BingoHooks.GlobalBoard.CheckWin(t))
                 {
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
+                    return new BingoCompleteInfo([t], isMultiplayer ? ChallengeTools.IGT.Translate("Team <team_name> won!") : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
                 }
 
                 completedForTeam.Add(t, 0);
@@ -457,7 +457,7 @@ namespace BingoMode.BingoHUD
                 if (won)
                 {
 
-                    return new BingoCompleteInfo([t], isMultiplayer ? "Team <team_name> won!" : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Blackout);
+                    return new BingoCompleteInfo([t], isMultiplayer ? ChallengeTools.IGT.Translate("Team <team_name> won!") : ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Blackout);
                 }
             }
 

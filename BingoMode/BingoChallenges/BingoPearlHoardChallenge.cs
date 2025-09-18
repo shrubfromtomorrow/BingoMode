@@ -192,7 +192,7 @@ namespace BingoMode.BingoChallenges
                         }
                         else
                         {
-                            if (isMisc)
+                            if (common.Value && isMisc)
                             {
                                 num++;
                                 if (num >= amount.Value)
@@ -203,7 +203,7 @@ namespace BingoMode.BingoChallenges
                                     return;
                                 }
                             }
-                            else if (isColored)
+                            else if (!common.Value && isColored)
                             {
                                 num2++;
                                 if (num2 >= amount.Value)
