@@ -6,7 +6,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>BingoMode</RootNamespace>
     <AssemblyName>BingoMode</AssemblyName>
-    <OutputPath>../mod/newest/plugins</OutputPath>
+    <OutputPath>bin\Release</OutputPath>
     <PathMap>$(MSBuildProjectDirectory)=/$(SolutionName)</PathMap>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -24,14 +24,19 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-    
+
   <Target Name="GenerateMod" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <ItemGroup>
-      <RemovePlugins Include="../mod/newest/plugins/*.pdb" />
+      <RemovePlugins Include="bin\Release\*.pdb" />
     </ItemGroup>
-
     <Delete Files="@(RemovePlugins)" />
   </Target>
 
-</Project>
+  <Target Name="CopyBuild" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PropertyGroup>
+      <PluginPath>C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins</PluginPath>
+    </PropertyGroup>
+    <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(PluginPath)" />
+  </Target>
 
+</Project>
