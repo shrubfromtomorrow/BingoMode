@@ -32,11 +32,4 @@
     <Delete Files="@(RemovePlugins)" />
   </Target>
 
-  <Target Name="CopyBuild" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PropertyGroup>
-      <PluginPath>C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\bingomode\plugins</PluginPath>
-    </PropertyGroup>
-    <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(PluginPath)" />
-  </Target>
-
 </Project>
