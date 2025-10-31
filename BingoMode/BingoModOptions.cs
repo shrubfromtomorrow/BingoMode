@@ -15,6 +15,7 @@ namespace BingoMode
         public readonly Configurable<KeyCode> HUDKeybindC4;
         public readonly Configurable<KeyCode> ResetBind;
         public readonly Configurable<string> SinglePlayerTeam;
+        public readonly Configurable<bool> FillIcons;
         public readonly Configurable<bool> UseMapInput;
         public readonly Configurable<bool> PlayMenuSong;
         public readonly Configurable<bool> PlayEndingSong;
@@ -34,6 +35,7 @@ namespace BingoMode
             ResetBind = config.Bind<KeyCode>("Reset", KeyCode.Slash);
 
             SinglePlayerTeam = config.Bind<string>("SinglePlayerTeam", "Red");
+            FillIcons = config.Bind<bool>("FillIcons", false);
             UseMapInput = config.Bind<bool>("UseMapInput", false);
             PlayMenuSong = config.Bind<bool>("PlayMenuSong", true);
             PlayEndingSong = config.Bind<bool>("PlayEndingSong", true);
@@ -80,6 +82,9 @@ namespace BingoMode
                 
                 new OpLabel(10f, 143f, Translate("Singleplayer team color:")) {alignment = FLabelAlignment.Left, description = Translate("Which team's color to use in singleplayer")},
                 new OpComboBox(SinglePlayerTeam, new Vector2(170f, 140f), 140f, new string[] {Translate("Red"), Translate("Blue"), Translate("Green"), Translate("Orange"), Translate("Pink"), Translate("Cyan"), Translate("Black"), Translate("Hurricane") }) {description = Translate("Which team's color to use in singleplayer")},
+
+                new OpLabel(10f, 103f, Translate("Fill icon sprites:")) {alignment = FLabelAlignment.Left, description = Translate("Fill the crosses and arrows on certain goals")},
+                new OpCheckBox(FillIcons, 288f, 100f),
             };
             tab.AddItems(optionse);
         }

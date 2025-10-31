@@ -4,6 +4,7 @@ using RWCustom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode
@@ -14,6 +15,7 @@ namespace BingoMode
     using Steamworks;
     using System.IO;
     using UnityEngine;
+    using Watcher;
 
     public static class BingoData
     {
@@ -31,6 +33,7 @@ namespace BingoMode
         public static ExpeditionMenu globalMenu;
         public static LobbySettings globalSettings = new LobbySettings();
         public static string BingoDen = "random";
+        public static string normalBingoBoard;
         public static List<int> TeamsInBingo = [0];
         public static bool SpectatorMode = false;
         public static bool CreateKarmaFlower = false;
@@ -191,7 +194,31 @@ namespace BingoMode
         {
             List<Challenge> list = [.. availableBingoChallenges];
             list.RemoveAll(x => !x.ValidForThisSlugcat(slug));
+
+            if (slug == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                CullIllegalWatcherChallenges(list);
+            }
             return list;
+        }
+
+        //watchermethod
+        public static void CullIllegalWatcherChallenges(List<Challenge> chals)
+        {
+            var illegals = new HashSet<Type>
+{
+                typeof(BingoCollectPearlChallenge),
+                typeof(BingoPearlDeliveryChallenge),
+                typeof(BingoNeuronDeliveryChallenge),
+                typeof(BingoDepthsChallenge),
+                typeof(BingoEchoChallenge),
+                typeof(BingoIteratorChallenge),
+                typeof(BingoEnterRegionChallenge),
+                typeof(BingoNoRegionChallenge),
+                typeof(BingoEchoChallenge),
+            };
+
+            chals.RemoveAll(x => illegals.Contains(x.GetType()));
         }
 
         public static List<Challenge> GetValidChallengeList(SlugcatStats.Name slug)
@@ -199,6 +226,11 @@ namespace BingoMode
             List<Challenge> list = [.. availableBingoChallenges];
             list.RemoveAll(x => !x.ValidForThisSlugcat(slug));
             list.RemoveAll(x => bannedChallenges[slug].Contains(x.GetType().Name));
+
+            if (slug == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                CullIllegalWatcherChallenges(list);
+            }
             return list;
         }
 

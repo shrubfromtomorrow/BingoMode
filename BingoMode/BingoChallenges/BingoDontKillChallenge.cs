@@ -74,7 +74,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([[new Icon("buttonCrossA", 1f, Color.red), new Icon("Multiplayer_Bones")]]);
+            Phrase phrase = new Phrase([[new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red), new Icon("Multiplayer_Bones")]]);
             if (victim.Value != "Any Creature") phrase.InsertWord(Icon.FromEntityName(victim.Value));
             return phrase;
         }

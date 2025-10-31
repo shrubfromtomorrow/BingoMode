@@ -61,7 +61,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([[new Icon("buttonCrossA", 1f, Color.red), Icon.FromEntityName(item.Value)]]);
+            return new Phrase([[new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red), Icon.FromEntityName(item.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

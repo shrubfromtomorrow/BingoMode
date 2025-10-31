@@ -16,6 +16,7 @@ using CreatureType = CreatureTemplate.Type;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using DLCItemType = DLCSharedEnums.AbstractObjectType;
+using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -1588,20 +1589,22 @@ namespace BingoMode.BingoChallenges
         {
             ILCursor c = new(il);
             if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdloc(91),
+                x => x.MatchLdloc(89),
                 x => x.MatchCallOrCallvirt(typeof(List<PlacedObject>).GetMethod("get_Item")),
                 x => x.MatchLdfld<PlacedObject>("active")
                 ))
             {
                 c.Emit(OpCodes.Ldarg_0);
-                c.Emit(OpCodes.Ldloc, 91);
+                c.Emit(OpCodes.Ldloc, 89);
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     PlacedObject obj = self.roomSettings.placedObjects[i];
+                    Plugin.logger.LogInfo(obj.ToString());
                     if (obj.type == PlacedObject.Type.UniqueDataPearl &&
                         self.game.session is StoryGameSession session && !session.saveState.ItemConsumed(self.world, false, self.abstractRoom.index, i) &&
                         (obj.data as PlacedObject.DataPearlData).pearlType == MoreSlugcatsEnums.DataPearlType.RM)
                     {
+                        Plugin.logger.LogInfo("Returning false");
                         return false;
                     }
                     return orig;
@@ -1876,5 +1879,51 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
+
+        #region watcher
+        public static void Watcher_WarpPoint_ChangeState_EnterRegion(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
+        {
+            orig(self, state);
+            // This is the state transition, so understand that we are not yet in the room, so destination region is appropriate
+            if (state == WarpPoint.State.ExitWarp)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoEnterRegionChallenge wEnterRegion)
+                    {
+                        wEnterRegion.Entered(self.Data.destRegion);
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_WarpPoint_ChangeState_NoRegion(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
+        {
+            orig(self, state);
+            if (state == WarpPoint.State.ExitWarp)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoNoRegionChallenge wNoRegion)
+                    {
+                        wNoRegion.Entered(self.Data.destRegion);
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_SpinningTop_StartConversation(On.Watcher.SpinningTop.orig_StartConversation orig, SpinningTop self)
+        {
+            orig(self);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoSpinningTopChallenge c)
+                {
+                    c.SeeSpin(self.room.world.region.name);
+                }
+            }
+        }
+
+        #endregion
     }
 }

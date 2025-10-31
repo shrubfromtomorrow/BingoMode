@@ -12,37 +12,11 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoNoRegionRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> region;
-
-        public override Challenge Random()
-        {
-            BingoNoRegionChallenge challenge = new();
-            challenge.region.Value = region.Random();
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "NoRegion").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            region = Randomizer<string>.InitDeserialize(dict["region"]);
-        }
-    }
-
-    public class BingoNoRegionChallenge : BingoChallenge
+    public class WatcherBingoNoRegionChallenge : BingoChallenge
     {
         public SettingBox<string> region;
 
-        public BingoNoRegionChallenge()
+        public WatcherBingoNoRegionChallenge()
         {
             region = new("", "Region", 0, listName: "regionsreal");
         }
@@ -60,7 +34,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoNoRegionChallenge c || c.region.Value != region.Value;
+            return challenge is not WatcherBingoNoRegionChallenge c || c.region.Value != region.Value;
         }
 
         public override string ChallengeName()
@@ -70,9 +44,9 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").ToArray();
+            string[] regiones = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
 
-            BingoNoRegionChallenge ch = new BingoNoRegionChallenge
+            WatcherBingoNoRegionChallenge ch = new WatcherBingoNoRegionChallenge
             {
                 region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regionsreal")
             };
@@ -81,7 +55,7 @@ namespace BingoMode.BingoChallenges
         }
 
         public override bool RequireSave() => false;
-        public override bool ReverseChallenge () => true;
+        public override bool ReverseChallenge() => true;
 
         public void Entered(string regionName)
         {
@@ -110,7 +84,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoNoRegionChallenge",
+                "WatcherBingoNoRegionChallenge",
                 "~",
                 region.ToString(),
                 "><",
@@ -132,19 +106,19 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoNoRegionChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoNoRegionChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_NoRegion;
+            On.Watcher.WarpPoint.ChangeState += Watcher_WarpPoint_ChangeState_NoRegion;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_NoRegion;
+            On.Watcher.WarpPoint.ChangeState -= Watcher_WarpPoint_ChangeState_NoRegion;
         }
 
         public override List<object> Settings() => [region];

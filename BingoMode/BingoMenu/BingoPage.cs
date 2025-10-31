@@ -1,5 +1,6 @@
 ﻿using BingoMode.BingoChallenges;
 using Expedition;
+using Watcher;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
@@ -222,6 +223,19 @@ namespace BingoMode.BingoMenu
 
         public void UnlocksDialogClose() => gameControls.UnlocksDialogClose();
 
+        // watchermethod
+        public static string WExpeditionRandomStartsUnlocked()
+        {
+            if (File.Exists(AssetManager.ResolveFilePath("wrandomstarts.txt")))
+            {
+                string[] shelters = File.ReadAllLines(AssetManager.ResolveFilePath("wrandomstarts.txt"));
+                System.Random random = new System.Random();
+                string shelter = shelters[random.Next(0, shelters.Length)];
+                return shelter;
+            }
+            return "WSKB_S06";
+        }
+
         public static string ExpeditionRandomStartsUnlocked(RainWorld rainWorld, SlugcatStats.Name slug)
         {
             Dictionary<string, int> dictionary = new Dictionary<string, int>();
@@ -374,7 +388,14 @@ namespace BingoMode.BingoMenu
                 {
                     int tries = 0;
                 reset:
-                    ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                    {
+                        ExpeditionData.startingDen = WExpeditionRandomStartsUnlocked();
+                    }
+                    else
+                    {
+                        ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    }
                     BingoData.BingoDen = ExpeditionData.startingDen;
 
                     if (bannedRegions.Count > 0)

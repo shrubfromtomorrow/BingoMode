@@ -45,7 +45,7 @@ namespace BingoMode.BingoChallenges
         {
             return new Phrase(
                 [[new Icon("spearneedle"), new Icon("commerce"), new Icon("Kill_Scavenger")],
-                [new Icon("buttonCrossA", 1f, Color.red)]]);
+                [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red)]]);
         }
 
         public override bool Duplicable(Challenge challenge)

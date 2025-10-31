@@ -141,10 +141,13 @@ namespace BingoMode.BingoChallenges
                 case "ban": return Bannable;
                 case "friend": return Befriendable;
                 case "pearls": return CollectablePearls;
+                case "Wpearls": return WCollectablePearls;
                 case "craft": return CraftableItems;
                 case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
+                //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
+                case "spinners": return SpinningTopSpots;
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
@@ -399,6 +402,40 @@ namespace BingoMode.BingoChallenges
                     return "Light Pink";
                 case "MS":
                     return "Dull Yellow";
+                case "WARG_AUDIO_GROOVE":
+                    return "Pink";
+                case "WSKD_AUDIO_JAM2":
+                    return "audio";
+                case "WSKC_ABSTRACT":
+                    return "Dark Teal";
+                case "WBLA_AUDIO_VOICEWIND1":
+                    return "audio";
+                case "WARD_TEXT_STARDUST":
+                    return "Bright Viridian";
+                case "WARE_AUDIO_VOICEWIND2":
+                    return "audio";
+                case "WARB_TEXT_SECRET":
+                    return "Dark Purple";
+                case "WARC_TEXT_CONTEMPT":
+                    return "Pale Pink";
+                case "WPTA_DRONE":
+                    return "Beige";
+                case "WRFB_AUDIO_JAM4":
+                    return "audio";
+                case "WTDA_AUDIO_JAM1":
+                    return "audio";
+                case "WTDB_AUDIO_JAM3":
+                    return "audio";
+                case "WVWA_TEXT_KITESDAY":
+                    return "Amber";
+                case "WMPA_TEXT_NOTIONOFSELF":
+                    return "Pale Viridian";
+                case "WORA_WORA":
+                    return "Light Green";
+                case "WAUA_WAUA":
+                    return "Orange";
+                case "WAUA_TEXT_AUDIO_TALKSHOW":
+                    return "Light Magenta";
             }
 
             return "NULL";
@@ -509,6 +546,28 @@ namespace BingoMode.BingoChallenges
             "MS"
         };
 
+        // watcherlist
+        public static readonly string[] WCollectablePearls =
+        {
+            "WORA_WORA",
+            "WAUA_WAUA",
+            "WPTA_DRONE",
+            "WSKC_ABSTRACT",
+            "WBLA_AUDIO_VOICEWIND1",
+            "WARE_AUDIO_VOICEWIND2",
+            "WTDA_AUDIO_JAM1",
+            "WSKD_AUDIO_JAM2",
+            "WTDB_AUDIO_JAM3",
+            "WRFB_AUDIO_JAM4",
+            "WARG_AUDIO_GROOVE",
+            "WAUA_TEXT_AUDIO_TALKSHOW",
+            "WMPA_TEXT_NOTIONOFSELF",
+            "WARB_TEXT_SECRET",
+            "WARC_TEXT_CONTEMPT",
+            "WARD_TEXT_STARDUST",
+            "WVWA_TEXT_KITESDAY",
+        };
+
         public static readonly string[] CraftableItems =
         {
             "FlareBomb",
@@ -549,6 +608,24 @@ namespace BingoMode.BingoChallenges
             "GooieDuck",
             "LillyPuck",
             "DandelionPeach"
+        };
+
+        public static readonly string[] SpinningTopSpots =
+        {
+            "WARF",
+            "WTDB",
+            "WBLA",
+            "WRFB",
+            "WTDA",
+            "WARE",
+            "WSKC",
+            "WVWA",
+            "WPTA",
+            "WARC",
+            "WARB",
+            "WVWB",
+            "WARA",
+            "WAUA"
         };
     }
 }

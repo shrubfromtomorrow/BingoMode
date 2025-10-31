@@ -12,40 +12,9 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoEnterRegionRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> region;
-
-        public override Challenge Random()
-        {
-            BingoEnterRegionChallenge challenge = new();
-            challenge.region.Value = region.Random();
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "EnterRegion").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            region = Randomizer<string>.InitDeserialize(dict["region"]);
-        }
-    }
-
-    public class BingoEnterRegionChallenge : BingoChallenge
+    public class WatcherBingoEnterRegionChallenge : BingoChallenge
     {
         public SettingBox<string> region;
-
-        public BingoEnterRegionChallenge()
-        {
-            region = new("", "Region", 0, listName: "regionsreal");
-        }
 
         public override void UpdateDescription()
         {
@@ -60,8 +29,8 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return (challenge is not BingoEnterRegionChallenge c || c.region.Value != region.Value) && 
-                (challenge is not BingoNoRegionChallenge ch || ch.region.Value != region.Value);
+            return (challenge is not WatcherBingoEnterRegionChallenge c || c.region.Value != region.Value) &&
+                (challenge is not WatcherBingoNoRegionChallenge ch || ch.region.Value != region.Value);
         }
 
         public override string ChallengeName()
@@ -73,7 +42,7 @@ namespace BingoMode.BingoChallenges
         {
             string[] regiones = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal");
 
-            BingoEnterRegionChallenge ch = new BingoEnterRegionChallenge
+            WatcherBingoEnterRegionChallenge ch = new WatcherBingoEnterRegionChallenge
             {
                 region = new(regiones[UnityEngine.Random.Range(0, regiones.Length)], "Region", 0, listName: "regionsreal")
             };
@@ -99,14 +68,14 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "BingoEnterRegionChallenge",
+                "WatcherBingoEnterRegionChallenge",
                 "~",
                 region.ToString(),
                 "><",
@@ -128,19 +97,19 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoEnterRegionChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoEnterRegionChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_EnterRegion;
+            On.Watcher.WarpPoint.ChangeState += Watcher_WarpPoint_ChangeState_EnterRegion;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_EnterRegion;
+            On.Watcher.WarpPoint.ChangeState -= Watcher_WarpPoint_ChangeState_EnterRegion;
         }
 
         public override List<object> Settings() => [region];

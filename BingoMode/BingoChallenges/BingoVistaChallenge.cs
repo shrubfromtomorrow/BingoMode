@@ -1,6 +1,7 @@
 ﻿using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
+using IL.Watcher;
 using Menu.Remix;
 using MoreSlugcats;
 using RWCustom;
@@ -67,7 +68,7 @@ namespace BingoMode.BingoChallenges
         {
             return new Phrase(
                 [[new Icon("vistaicon")],
-                [new Verse(room.Value.Substring(0, 2))]]);
+                [new Verse(room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2))]]);
         }
 
         public override void Update()

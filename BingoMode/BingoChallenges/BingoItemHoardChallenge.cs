@@ -127,6 +127,9 @@ namespace BingoMode.BingoChallenges
             if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
             {
                 liste.Remove("LillyPuck");
+                liste.Remove("EggBugEgg");
+                liste.Remove("SmallNeedleWorm");
+                liste.Remove("SSOracleSwarmer");
             }
             return new BingoItemHoardChallenge
             {

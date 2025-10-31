@@ -46,20 +46,28 @@ namespace BingoMode
                 ghostGrid = challengeGrid;
 
             challengeGrid = new Challenge[size, size];
-            for (int j = 0; j < size; j++)
+
+            if (UnityEngine.Random.value < 0.0005 && ExpeditionData.slugcatPlayer == SlugcatStats.Name.Red)
             {
-                for (int i = 0; i < size; i++)
+                BingoHooks.GlobalBoard.FromString(BingoData.normalBingoBoard);
+            }
+            else
+            {
+                for (int j = 0; j < size; j++)
                 {
-                    if (changeSize && !(i + 1 > ghostGrid.GetLength(0) || j + 1 > ghostGrid.GetLength(1)) && ghostGrid[i, j] != null)
+                    for (int i = 0; i < size; i++)
                     {
-                        challengeGrid[i, j] = ghostGrid[i, j];
-                        if (!ExpeditionData.challengeList.Contains(challengeGrid[i, j]))
-                            ExpeditionData.challengeList.Add(challengeGrid[i, j]);
-                        continue;
+                        if (changeSize && !(i + 1 > ghostGrid.GetLength(0) || j + 1 > ghostGrid.GetLength(1)) && ghostGrid[i, j] != null)
+                        {
+                            challengeGrid[i, j] = ghostGrid[i, j];
+                            if (!ExpeditionData.challengeList.Contains(challengeGrid[i, j]))
+                                ExpeditionData.challengeList.Add(challengeGrid[i, j]);
+                            continue;
+                        }
+                        if (challengeGrid[i, j] != null)
+                            continue;
+                        challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                     }
-                    if (challengeGrid[i, j] != null)
-                        continue;
-                    challengeGrid[i, j] = RandomBingoChallenge(x: i, y: j);
                 }
             }
             SteamTest.UpdateOnlineBingo();

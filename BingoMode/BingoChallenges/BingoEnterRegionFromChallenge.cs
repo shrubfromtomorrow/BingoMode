@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -67,7 +68,7 @@ namespace BingoMode.BingoChallenges
             //    [[new Verse(from.Value)],
             //    [new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 180f)],
             //    [new Verse(to.Value)]]);
-            return new Phrase([[new Verse(from.Value), new Icon("keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 90f), new Verse(to.Value)]]);
+            return new Phrase([[new Verse(from.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, new Color(66f / 255f, 135f / 255f, 1f), 90f), new Verse(to.Value)]]);
         }
 
         public override bool Duplicable(Challenge challenge)
