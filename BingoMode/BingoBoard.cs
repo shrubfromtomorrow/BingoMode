@@ -606,8 +606,12 @@ namespace BingoMode
                 return;
             }
 
-            string shelter = text.Substring(0, text.IndexOf(';'));
-            text = text.Substring(text.IndexOf(";") + 1);
+            string shelter = "random";
+            if (text.IndexOf(';') >= 0)
+            {
+                shelter = text.Substring(0, text.IndexOf(';'));
+                text = text.Substring(text.IndexOf(";") + 1);
+            }
             ExpeditionMenu self = BingoData.globalMenu;
             if (self != null && BingoHooks.bingoPage.TryGetValue(self, out var page))
             {
