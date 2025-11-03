@@ -585,7 +585,7 @@ namespace BingoMode
 
         public override string ToString()
         {
-            string text = ExpeditionData.slugcatPlayer.value + ";" + string.Join("bChG", ExpeditionData.challengeList);
+            string text = ExpeditionData.slugcatPlayer.value + ";" + BingoData.BingoDen + ";" + string.Join("bChG", ExpeditionData.challengeList);
             return text;
         }
         
@@ -594,7 +594,6 @@ namespace BingoMode
             if (string.IsNullOrEmpty(text) || !text.Contains("bChG") || !text.Contains(';')) return;
             string slug = text.Substring(0, text.IndexOf(';'));
             text = text.Substring(text.IndexOf(";") + 1);
-            
             if (slug.ToLowerInvariant() != ExpeditionData.slugcatPlayer.value.ToLowerInvariant())
             {
                 if (BingoData.globalMenu != null)
@@ -607,7 +606,14 @@ namespace BingoMode
                 return;
             }
 
-            string last = ToString();
+            string shelter = text.Substring(0, text.IndexOf(';'));
+            text = text.Substring(text.IndexOf(";") + 1);
+            ExpeditionMenu self = BingoData.globalMenu;
+            if (self != null && BingoHooks.bingoPage.TryGetValue(self, out var page))
+            {
+                page.Shelter = shelter;
+            }
+                string last = ToString();
             try
             {
                 if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();

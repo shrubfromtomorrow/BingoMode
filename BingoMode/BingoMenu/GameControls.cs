@@ -116,6 +116,11 @@ namespace BingoMode.BingoMenu
             }
         }
 
+        public string Shelter
+        {
+            get => shelterSetting.value; set => shelterSetting.value = value;
+        }
+
         public GameControls(Menu.Menu menu, MenuObject owner, Vector2 pos, float anchorX = 0f, float anchorY = 0f) : base(menu, owner, pos)
         {
             this.anchorX = anchorX;
