@@ -319,7 +319,7 @@ namespace BingoMode.BingoMenu
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
-                ccc.region = ccc.room.Value.Substring(0, 2);
+                ccc.region = ccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
                 
                 ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
                 BingoVistaChallenge.ModifyVistaPositions(ccc);

@@ -86,6 +86,8 @@ namespace BingoMode
                 Futile.atlasManager.LoadAtlas("Atlases/bingomode");
                 Futile.atlasManager.LoadAtlas("Atlases/bingoicons");
                 BingoEnums.Register();
+                // Passage screens
+                BingoEnums.LandscapeType.RegisterValues();
                 
                 BingoHooks.Apply();
                 ChallengeHooks.Apply();

@@ -39,7 +39,7 @@ namespace BingoMode.BingoChallenges
                 ChallengeTools.IGT.Translate("Visit Spinning Top in <location>" + (starve.Value ? " while starving" : ""))
                 .Replace("<location>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(spinner.Value, ExpeditionData.slugcatPlayer)))
                 :
-                ChallengeTools.IGT.Translate("Visit <amount> Echoes" + (starve.Value ? " while starving" : ""))
+                ChallengeTools.IGT.Translate("Visit Spinning Top <amount> times" + (starve.Value ? " while starving" : ""))
                 .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }

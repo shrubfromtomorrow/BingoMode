@@ -1,19 +1,20 @@
-﻿using Expedition;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Expedition;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
 using Steamworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Watcher;
 
 namespace BingoMode
 {
+    using System.IO;
     using BingoChallenges;
     using BingoHUD;
     using BingoMenu;
@@ -216,6 +217,10 @@ namespace BingoMode
             On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
             On.Menu.FastTravelScreen.Singal += FastTravelScreen_Singal;
+
+            // Get custom region arts (watcher)
+            On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
+            On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
 
             // Stop void win from happening
             On.Expedition.DepthsFinishScript.Update += DepthsFinishScript_Update;
@@ -1173,6 +1178,30 @@ namespace BingoMode
                 button.RemoveSprites();
                 button.RemoveSubObject(button);
                 newBingoButton.Remove(self);
+            }
+        }
+
+        public static MenuScene.SceneID Region_GetRegionLandscapeScene(On.Region.orig_GetRegionLandscapeScene orig, string regionAcro)
+        {
+            MenuScene.SceneID origReturn =  orig.Invoke(regionAcro);
+
+            if (origReturn == MenuScene.SceneID.Empty)
+            {
+                if (regionAcro == "WRFA")
+                {
+                    return BingoEnums.LandscapeType.Landscape_WRFA;
+                }
+            }
+            return origReturn;
+        }
+
+        private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
+        {
+            orig.Invoke(self);
+            if (self.sceneID == BingoEnums.LandscapeType.Landscape_WRFA)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WRFA";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WRFA - Flat", new Vector2(683f, 384f), false, true));
             }
         }
     }

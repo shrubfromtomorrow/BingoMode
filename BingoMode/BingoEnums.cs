@@ -1,4 +1,5 @@
-﻿namespace BingoMode
+﻿
+namespace BingoMode
 {
     public class BingoEnums
     {
@@ -19,6 +20,21 @@
             BINGO_FINAL_BONG = new("BINGO_FINAL_BONG", true);
 
             BingoCredits = new("BingoCredits", true);
+        }
+
+        public class LandscapeType
+        {
+            public static Menu.MenuScene.SceneID Landscape_WRFA;
+
+            public static void RegisterValues()
+            {
+                Landscape_WRFA = new Menu.MenuScene.SceneID("Landscape_WRFA", true);
+            }
+
+            public static void UnregisterValues()
+            {
+                if (Landscape_WRFA != null) { Landscape_WRFA.Unregister(); Landscape_WRFA = null; }
+            }
         }
     }
 }

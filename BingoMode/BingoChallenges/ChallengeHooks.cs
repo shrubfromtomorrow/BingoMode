@@ -213,10 +213,10 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void KarmaLadder_ctor(On.Menu.KarmaLadder.orig_ctor_Menu_MenuObject_Vector2_HUD_IntVector2_bool orig, KarmaLadder self, Menu.Menu menu, MenuObject owner, Vector2 pos, HUD.HUD hud, IntVector2 displayKarma, bool reinforced)
+        // we HATE constructors fuck them all we hate them, use this instead
+        public static void KarmaLadder_AddEndgameMeters(On.Menu.KarmaLadder.orig_AddEndgameMeters orig, KarmaLadder self)
         {
-            orig.Invoke(self, menu, owner, pos, hud, displayKarma, reinforced);
-
+            orig.Invoke(self);
             if (self.endGameMeters.Count == 0)
             {
                 return;
@@ -226,7 +226,7 @@ namespace BingoMode.BingoChallenges
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
-                    if (ExpeditionData.challengeList[j] is BingoAchievementChallenge c && 
+                    if (ExpeditionData.challengeList[j] is BingoAchievementChallenge c &&
                         meter.tracker.ID.value.ToUpperInvariant() == c.ID.Value.ToUpperInvariant() &&
                         meter.tracker.GoalFullfilled)
                     {
@@ -234,6 +234,7 @@ namespace BingoMode.BingoChallenges
                     }
                 }
             }
+
         }
 
         public static void Ghost_StartConversation(On.Ghost.orig_StartConversation orig, Ghost self)
