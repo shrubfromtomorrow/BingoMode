@@ -311,18 +311,22 @@ namespace BingoMode.BingoMenu
             {
                 c.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, c.foodType.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
-            else if (owner.challenge is BingoDontUseItemChallenge cc)
+            if (owner.challenge is WatcherBingoEatChallenge cc)
+            {
+                cc.isCreature = Array.IndexOf(ChallengeUtils.WFoodTypes, cc.foodType.Value) >= Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
+            }
+            else if (owner.challenge is BingoDontUseItemChallenge ccc)
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                cc.isFood = Array.IndexOf(l, cc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
-                if (cc.isFood) cc.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, cc.item.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+                ccc.isFood = Array.IndexOf(l, ccc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
+                if (ccc.isFood) ccc.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, ccc.item.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
-            else if (owner.challenge is BingoVistaChallenge ccc)
+            else if (owner.challenge is BingoVistaChallenge cccc)
             {
-                ccc.region = ccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
+                cccc.region = cccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
                 
-                ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
-                BingoVistaChallenge.ModifyVistaPositions(ccc);
+                cccc.location = ChallengeUtils.BingoVistaLocations[cccc.region][cccc.room.Value];
+                BingoVistaChallenge.ModifyVistaPositions(cccc);
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();

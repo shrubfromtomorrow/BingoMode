@@ -2,6 +2,7 @@
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using CreatureType = CreatureTemplate.Type;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
+using WatcherItemType = Watcher.WatcherEnums.AbstractObjectType;
 using DLCItemType = DLCSharedEnums.AbstractObjectType;
 using System.Collections.Generic;
 using MoreSlugcats;
@@ -11,6 +12,7 @@ using System;
 using System.IO;
 using RWCustom;
 using System.Data.SqlTypes;
+using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -135,11 +137,13 @@ namespace BingoMode.BingoChallenges
                 case "pin": return ["Any Creature", .. Pinnable];
                 case "tolls": return BombableOutposts;
                 case "food": return FoodTypes;
+                case "Wfood": return WFoodTypes;
                 case "weapons": return Weapons;
                 case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish")];
                 case "theft": return [.. StealableStolable, "DataPearl"];
                 case "ban": return Bannable;
                 case "friend": return Befriendable;
+                case "Wfriend": return WBefriendable;
                 case "pearls": return CollectablePearls;
                 case "Wpearls": return WCollectablePearls;
                 case "craft": return CraftableItems;
@@ -208,6 +212,7 @@ namespace BingoMode.BingoChallenges
             if (type == DLCItemType.DandelionPeach) return translator.Translate("Dandelion Peaches");
             if (type == DLCItemType.LillyPuck) return translator.Translate("Lillypucks");
             if (type == DLCItemType.GooieDuck) return translator.Translate("Gooieducks");
+            if (type == WatcherItemType.FireSpriteLarva) return translator.Translate("Fire Sprite Larvae");
 
             return orig.Invoke(type);
         }
@@ -221,6 +226,7 @@ namespace BingoMode.BingoChallenges
             creatureNames[(int)CreatureType.Salamander] = ChallengeTools.IGT.Translate("Salamanders");
             creatureNames[(int)CreatureType.Spider] = ChallengeTools.IGT.Translate("Coalescipedes");
             if (ModManager.MSC) creatureNames[(int)DLCSharedEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
+            if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.SandGrub] = ChallengeTools.IGT.Translate("Sand Grubs");
         }
 
         public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)
@@ -465,6 +471,33 @@ namespace BingoMode.BingoChallenges
             "SmallCentipede"
         };
 
+        public static readonly string[] WFoodTypes =
+        {
+            "DangleFruit",
+            "EggBugEgg",
+            "WaterNut",
+            "SlimeMold",
+            "JellyFish",
+            "Mushroom",
+            "GooieDuck",
+            "LillyPuck",
+            "DandelionPeach",
+            "GlowWeed",
+            "FireSpriteLarva",
+
+            // Crits
+            "VultureGrub",
+            "Hazer",
+            "SmallNeedleWorm",
+            "Fly",
+            "SmallCentipede",
+            "Rat",
+            "Tardigrade",
+            "SandGrub",
+            "Frog",
+            "Barnacle",
+        };
+
         public static readonly string[] Weapons =
         {
             "Any Weapon",
@@ -514,6 +547,28 @@ namespace BingoMode.BingoChallenges
             "SpitLizard",
             "ZoopLizard",
             "RedLizard"
+        };
+
+        public static readonly string[] WBefriendable =
+        {
+            "CicadaA",
+            "CicadaB",
+            "GreenLizard",
+            "PinkLizard",
+            "Salamander",
+            "YellowLizard",
+            "BlackLizard",
+            "CyanLizard",
+            "WhiteLizard",
+            "BlueLizard",
+            "EelLizard",
+            "SpitLizard",
+            "ZoopLizard",
+            "RedLizard",
+            "PeachLizard",
+            "IndigoLizard",
+            "BlizzardLizard",
+            "BasiliskLizard"
         };
 
         public static readonly string[] CollectablePearls =

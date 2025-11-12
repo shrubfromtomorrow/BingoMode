@@ -202,7 +202,7 @@ namespace BingoMode
             return list;
         }
 
-        //watchermethod
+        //watchermethod. Doing this here instead of per challenge to keep it more tidy and destructible
         public static void CullIllegalWatcherChallenges(List<Challenge> chals)
         {
             var illegals = new HashSet<Type>
@@ -216,6 +216,8 @@ namespace BingoMode
                 typeof(BingoEnterRegionChallenge),
                 typeof(BingoNoRegionChallenge),
                 typeof(BingoEchoChallenge),
+                typeof(BingoEatChallenge),
+                typeof(BingoTameChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));

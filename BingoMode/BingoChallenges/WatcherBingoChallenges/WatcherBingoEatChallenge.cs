@@ -3,6 +3,7 @@ using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using Watcher;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -16,43 +17,7 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoEatRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> foodType;
-        public Randomizer<int> amountRequired;
-        public Randomizer<bool> starve;
-
-        public override Challenge Random()
-        {
-            BingoEatChallenge challenge = new();
-            challenge.foodType.Value = foodType.Random();
-            challenge.amountRequired.Value = amountRequired.Random();
-            challenge.starve.Value = starve.Random();
-            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.foodType.Value);
-            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}foodType-{foodType.Serialize(surindent)}");
-            serializedContent.AppendLine($"{surindent}amountRequired-{amountRequired.Serialize(surindent)}");
-            serializedContent.AppendLine($"{surindent}starve-{starve.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "Eat").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            foodType = Randomizer<string>.InitDeserialize(dict["foodType"]);
-            amountRequired = Randomizer<int>.InitDeserialize(dict["amountRequired"]);
-            starve = Randomizer<bool>.InitDeserialize(dict["starve"]);
-        }
-    }
-
-    public class BingoEatChallenge : BingoChallenge
+    public class WatcherBingoEatChallenge : BingoChallenge
     {
         public SettingBox<string> foodType;
         public SettingBox<int> amountRequired;
@@ -60,9 +25,9 @@ namespace BingoMode.BingoChallenges
         public int currentEated;
         public bool isCreature;
 
-        public BingoEatChallenge()
+        public WatcherBingoEatChallenge()
         {
-            foodType = new("", "Food type", 0, "food");
+            foodType = new("", "Food type", 0, "Wfood");
             amountRequired = new(0, "Amount", 1);
             starve = new(false, "While Starving", 2);
         }
@@ -98,39 +63,29 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoEatChallenge c || c.foodType.Value != foodType.Value;
+            return challenge is not WatcherBingoEatChallenge c || c.foodType.Value != foodType.Value;
         }
 
         public override Challenge Generate()
         {
             bool c = UnityEngine.Random.value < 0.5f;
 
-            int critStart = Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
-            int foodCount = ChallengeUtils.FoodTypes.Length;
+            int critStart = Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
+            int foodCount = ChallengeUtils.WFoodTypes.Length;
             string randomFood;
             if (c)
             {
-                randomFood = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(critStart, foodCount)];
+                randomFood = ChallengeUtils.WFoodTypes[UnityEngine.Random.Range(critStart, foodCount)];
             }
             else
             {
-                List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
-                else if (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet &&
-                         ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint) foob.Remove("GlowWeed");
-                if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
-                {
-                    foob.Remove("EggBugEgg");
-                    foob.Remove("DandelionPeach");
-                    foob.Remove("SSOracleSwarmer");
-                    foob.Remove("SmallNeedleWorm");
-                }
+                List<string> foob = [.. ChallengeUtils.WFoodTypes];
                 randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
             }
 
-            return new BingoEatChallenge()
+            return new WatcherBingoEatChallenge()
             {
-                foodType = new(randomFood, "Food type", 0, listName: "food"),
+                foodType = new(randomFood, "Food type", 0, listName: "Wfood"),
                 isCreature = c,
                 starve = new(UnityEngine.Random.value < 0.1f, "While Starving", 2),
                 amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 3)
@@ -141,12 +96,12 @@ namespace BingoMode.BingoChallenges
         {
             return false;
         }
-    
+
         public override int Points()
         {
             return 20;// Mathf.RoundToInt(6 * FoodDifficultyMultiplier()) * amountRequired.Value * (hidden ? 2 : 1);
         }
-    
+
         //public float FoodDifficultyMultiplier()
         //{
         //    switch (foodType.Value)
@@ -161,9 +116,10 @@ namespace BingoMode.BingoChallenges
         //
         //    return 1f;
         //}
-    
+
         public void FoodEated(IPlayerEdible thisEdibleIsShit, Player playuh)
         {
+            Plugin.logger.LogInfo((thisEdibleIsShit as PhysicalObject).abstractPhysicalObject.type.value);
             if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)) && (!starve.Value || playuh.Malnourished))
             {
@@ -184,7 +140,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoEatChallenge",
+                "WatcherBingoEatChallenge",
                 "~",
                 amountRequired.ToString(),
                 "><",
@@ -201,55 +157,41 @@ namespace BingoMode.BingoChallenges
                 revealed ? "1" : "0",
             });
         }
-    
+
         public override void FromString(string args)
         {
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 7)
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                    completed = (array[5] == "1");
-                    revealed = (array[6] == "1");
-                }
-                // Legacy board eat challenge compatibility
-                else if (array.Length == 6)
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    completed = (array[4] == "1");
-                    revealed = (array[5] == "1");
-                    starve = SettingBoxFromString("System.Boolean|false|While Starving|2|NULL") as SettingBox<bool>;
-                }
+                amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                isCreature = (array[2] == "1");
+                foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                completed = (array[5] == "1");
+                revealed = (array[6] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoEatChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoEatChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return slugcat.value != "Spear";
+            return slugcat == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public override void AddHooks()
         {
-            On.Player.ObjectEaten += Player_ObjectEaten;
+            On.Player.ObjectEaten += Watcher_Player_ObjectEaten;
         }
 
         public override void RemoveHooks()
         {
-            On.Player.ObjectEaten -= Player_ObjectEaten;
+            On.Player.ObjectEaten -= Watcher_Player_ObjectEaten;
         }
 
         public override List<object> Settings() => [foodType, amountRequired, starve];

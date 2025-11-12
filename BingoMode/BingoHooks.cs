@@ -1191,6 +1191,23 @@ namespace BingoMode
                 {
                     return BingoEnums.LandscapeType.Landscape_WRFA;
                 }
+                if (regionAcro == "WARB")
+                {
+                    return BingoEnums.LandscapeType.Landscape_WARB;
+                }
+                if (regionAcro == "WBLA")
+                {
+                    return BingoEnums.LandscapeType.Landscape_WBLA;
+                }
+                if (regionAcro == "WSKC")
+                {
+                    return BingoEnums.LandscapeType.Landscape_WSKC;
+                }
+                if (regionAcro == "WTDA")
+                {
+                    return BingoEnums.LandscapeType.Landscape_WTDA;
+                }
+
             }
             return origReturn;
         }
@@ -1202,6 +1219,46 @@ namespace BingoMode
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WRFA";
                 self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WRFA - Flat", new Vector2(683f, 384f), false, true));
+
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WRFA_Shadow", new Vector2(0.01f, 0.01f), true, false));
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WRFA", new Vector2(0.01f, 0.01f), true, false));
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            }
+            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WBLA)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WBLA";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WBLA - Flat", new Vector2(683f, 384f), false, true));
+
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WBLA_Shadow", new Vector2(0.01f, 0.01f), true, false));
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WBLA", new Vector2(0.01f, 0.01f), true, false));
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            }
+            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WARB)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WARB";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WARB - Flat", new Vector2(683f, 384f), false, true));
+
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WARB_Shadow", new Vector2(0.01f, 0.01f), true, false));
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WARB", new Vector2(0.01f, 0.01f), true, false));
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            }
+            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WSKC)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WSKC";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WSKC - Flat", new Vector2(683f, 384f), false, true));
+
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WSKC_Shadow", new Vector2(0.01f, 0.01f), true, false));
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WSKC", new Vector2(0.01f, 0.01f), true, false));
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            }
+            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WTDA)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WTDA";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WTDA - Flat", new Vector2(683f, 384f), false, true));
+
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WTDA_Shadow", new Vector2(0.01f, 0.01f), true, false));
+                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WTDA", new Vector2(0.01f, 0.01f), true, false));
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
             }
         }
     }
