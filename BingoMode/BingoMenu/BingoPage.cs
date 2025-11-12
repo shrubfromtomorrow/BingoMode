@@ -37,6 +37,11 @@ namespace BingoMode.BingoMenu
         public BingoGrid grid;
         private BoardControls boardControls;
         private GameControls gameControls;
+        public string Shelter
+        {
+            get => gameControls.Shelter; set => gameControls.Shelter = value;
+        }
+
         public SymbolButton eggButton;
 
         #region Multiplayer
