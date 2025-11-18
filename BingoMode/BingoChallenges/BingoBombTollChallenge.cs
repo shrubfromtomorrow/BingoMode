@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using BingoMode.BingoRandomizer;
@@ -8,6 +9,7 @@ using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using UnityEngine.PlayerLoop;
 
 namespace BingoMode.BingoChallenges
 {
@@ -53,7 +55,8 @@ namespace BingoMode.BingoChallenges
 
     public class BingoBombTollChallenge : BingoChallenge
     {
-        public Dictionary<string, bool> bombed = [];
+        // First bool is the side when the bomb was thrown, the second bool is whether or not this toll has been properly dealt with
+        public Dictionary<string, bool[]> bombed = [];
         public SettingBox<bool> pass;
         public SettingBox<string> roomName;
         public SettingBox<bool> specific;
@@ -131,25 +134,76 @@ namespace BingoMode.BingoChallenges
                 roomName = new(toll, "Scavenger Toll", 3, listName: "tolls")
             };
         }
-
-        public void Boom(string room)
+        public override void Update()
         {
+            base.Update();
+
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
+            if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            {
+                bool flag = false;
+                foreach (var kvp in bombed)
+                {
+                    bool[] value = kvp.Value;
+
+                    // Only save passed tolls
+                    if (value.Length > 1 && !value[1])
+                    {
+                        flag = true;
+                        bombed.Remove(kvp.Key);
+                    }
+                }
+                if (flag)
+                {
+                    this.UpdateDescription();
+                    ChangeValue();
+                }
+                return;
+            }
+            if (this.game.cameras[0].room != null)
+            {
+                AbstractRoom room = this.game.cameras[0].room.abstractRoom;
+                string roomLower = room.name.ToLowerInvariant();
+                if (room.scavengerOutpost && bombed.ContainsKey(roomLower) && !bombed[roomLower][1])
+                {
+                    foreach (UpdatableAndDeletable obj in room.realizedRoom.updateList)
+                    {
+                        if (obj is ScavengerOutpost o)
+                        {
+                            for (int j = 0; j < o.playerTrackers.Count; j++)
+                            {
+                                if (bombed[roomLower][0] != o.playerTrackers[j].PlayerOnOtherSide)
+                                {
+                                    Pass(roomLower, o.playerTrackers[j].PlayerOnOtherSide);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Boom(string room, bool side)
+        {
+            string roomLower = room.ToLowerInvariant();
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
                 if (!pass.Value)
                 {
                     if (specific.Value)
                     {
-                        if (roomName.Value == room.ToLowerInvariant())
+                        if (roomName.Value == roomLower)
                         {
-                            bombed[room] = false;
+                            bombed[roomLower] = new bool[2];
+                            bombed[roomLower][0] = side;
+                            bombed[roomLower][1] = true;
                             CompleteChallenge();
                             return;
                         }
                     }
                     else
                     {
-                        if (!bombed.ContainsKey(room))
+                        if (!bombed.ContainsKey(roomLower))
                         {
                             current++;
                             UpdateDescription();
@@ -164,28 +218,31 @@ namespace BingoMode.BingoChallenges
                         }
                     }
                 }
-                if (!bombed.ContainsKey(room))
+                if (!bombed.ContainsKey(roomLower) || !bombed[roomLower][1])
                 {
-                    bombed[room] = false;
+                    bombed[roomLower] = new bool[2];
+                    bombed[roomLower][0] = side;
+                    bombed[roomLower][1] = false;
                 }
             }
         }
 
-        public void Pass(string room)
+        public void Pass(string room, bool side)
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && bombed.ContainsKey(room) && !bombed[room] && pass.Value)
+            string roomLower = room.ToLowerInvariant();
+            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && pass.Value)
             {
                 if (specific.Value)
                 {
-                    if (roomName.Value == room.ToLowerInvariant())
+                    if (roomName.Value == roomLower.ToLowerInvariant())
                     {
-                        bombed[room] = true;
+                        bombed[roomLower][1] = true;
                         CompleteChallenge();
                     }
                 }
                 else
                 {
-                    bombed[room] = true;
+                    bombed[roomLower][1] = true;
                     current++;
                     UpdateDescription();
                     if (current >= amount.Value)
@@ -224,29 +281,50 @@ namespace BingoMode.BingoChallenges
 
         public string BombedTollsToString()
         {
-            List<string> joinLater = [];
+            if (bombed.Count == 0)
+                return "empty";
+
+            List<string> entries = new();
+
             foreach (var kvp in bombed)
             {
-                joinLater.Add($"{kvp.Key}|{kvp.Value}");
+                bool[] value = kvp.Value;
+
+                // Only save passed tolls
+                if (value.Length > 1 && value[1])
+                {
+                    string boolArray = string.Join(",", value.Select(b => b ? "1" : "0"));
+                    entries.Add($"{kvp.Key}|{boolArray}");
+                }
             }
-            if (joinLater.Count == 0) return "empty";
-            return string.Join("%", joinLater);
+
+            if (entries.Count == 0)
+                return "empty";
+
+            return string.Join("%", entries);
         }
 
-        public Dictionary<string, bool> BombedTollsFromString(string input)
+        public Dictionary<string, bool[]> BombedTollsFromString(string input)
         {
-            Dictionary<string, bool> result = new();
+            Dictionary<string, bool[]> result = new();
+
             if (input == "empty") return result;
+
             string[] entries = input.Split('%');
+
             foreach (string entry in entries)
             {
                 string[] parts = entry.Split('|');
 
-                result[parts[0]] = bool.Parse(parts[1]);
-            }
+                string key = parts[0];
 
+                bool[] array = parts[1].Split(',').Select(s => s == "1").ToArray();
+
+                result[key] = array;
+            }
             return result;
         }
+
 
         public override string ToString()
         {
@@ -279,30 +357,14 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 8)
-                {
-                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    roomName = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    pass = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
-                    bombed = BombedTollsFromString(array[5]);
-                    completed = (array[6] == "1");
-                    revealed = (array[7] == "1");
-                }
-                // Legacy board bomb toll challenge compatibility
-                else
-                {
-                    roomName = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    pass = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                    completed = (array[2] == "1");
-                    revealed = (array[3] == "1");
-                    specific = SettingBoxFromString("System.Boolean|true|Specific toll|0|NULL") as SettingBox<bool>;
-                    current = 0;
-                    amount = SettingBoxFromString("System.Int32|2|Amount|1|NULL") as SettingBox<int>;
-                    bombed = [];
-                }
-                UpdateDescription();
+                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                roomName = SettingBoxFromString(array[1]) as SettingBox<string>;
+                pass = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                bombed = BombedTollsFromString(array[5]);
+                completed = (array[6] == "1");
+                revealed = (array[7] == "1");
             }
             catch (Exception ex)
             {
@@ -314,13 +376,11 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.ScavengerBomb.Explode += ScavengerBomb_Explode;
-            On.ScavengerOutpost.PlayerTracker.Update += PlayerTracker_Update2;
         }
 
         public override void RemoveHooks()
         {
             On.ScavengerBomb.Explode -= ScavengerBomb_Explode;
-            On.ScavengerOutpost.PlayerTracker.Update -= PlayerTracker_Update2;
         }
 
         public override List<object> Settings() => [specific, pass, amount, roomName];

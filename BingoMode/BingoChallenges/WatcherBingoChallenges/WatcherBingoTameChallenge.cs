@@ -75,6 +75,7 @@ namespace BingoMode.BingoChallenges
 
         public void Fren(CreatureTemplate.Type friend)
         {
+            Plugin.logger.LogInfo(friend.value);
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
@@ -163,12 +164,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.FriendTracker.Update += FriendTracker_Update;
+            On.FriendTracker.Update += Watcher_FriendTracker_Update;
         }
 
         public override void RemoveHooks()
         {
-            On.FriendTracker.Update -= FriendTracker_Update;
+            On.FriendTracker.Update -= Watcher_FriendTracker_Update;
         }
 
         public override List<object> Settings() => [crit, amount, specific];

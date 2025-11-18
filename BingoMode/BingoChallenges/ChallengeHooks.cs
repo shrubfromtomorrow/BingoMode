@@ -946,19 +946,6 @@ namespace BingoMode.BingoChallenges
             return orig.Invoke(self, result, eu);
         }
 
-        public static void PlayerTracker_Update2(On.ScavengerOutpost.PlayerTracker.orig_Update orig, ScavengerOutpost.PlayerTracker self)
-        {
-            orig.Invoke(self);
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (self.PlayerOnOtherSide && ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
-                {
-                    c.Pass(self.outpost.room.abstractRoom.name);
-                }
-            }
-        }
-
         public static List<Challenge> revealInMemory = [];
         private static void ClearBs(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
@@ -997,7 +984,13 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is BingoBombTollChallenge c)
                     {
-                        c.Boom(self.room.abstractRoom.name);
+                        for (int k = 0; k < outpost.playerTrackers.Count; k++)
+                        {
+                            if (outpost.playerTrackers[k] != null)
+                            {
+                                c.Boom(self.room.abstractRoom.name, outpost.playerTrackers[k].PlayerOnOtherSide);
+                            }
+                        }
                     }
                 }
             }
@@ -1653,20 +1646,6 @@ namespace BingoMode.BingoChallenges
             orig.Invoke(self, edible);
         }
 
-        public static void Watcher_Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
-        {
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is WatcherBingoEatChallenge c)
-                {
-                    c.FoodEated(edible, self);
-                }
-            }
-            // Invoke after so player malnourishment is correct
-            orig.Invoke(self, edible);
-        }
-
         public static void Player_ObjectEatenSeed(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
         {
             orig.Invoke(self, edible);
@@ -1938,6 +1917,52 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
+
+        public static void Watcher_Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoEatChallenge c)
+                {
+                    c.FoodEated(edible, self);
+                }
+            }
+            // Invoke after so player malnourishment is correct
+            orig.Invoke(self, edible);
+        }
+
+        public static void Watcher_FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
+        {
+            orig.Invoke(self);
+
+            // Copied from base game
+            if (self.AI.creature.state.socialMemory != null && self.AI.creature.state.socialMemory.relationShips != null && self.AI.creature.state.socialMemory.relationShips.Count > 0)
+            {
+                for (int j = 0; j < self.AI.creature.state.socialMemory.relationShips.Count; j++)
+                {
+                    if (self.AI.creature.state.socialMemory.relationShips[j].like > 0.5f && self.AI.creature.state.socialMemory.relationShips[j].tempLike > 0.5f)
+                    {
+                        for (int k = 0; k < self.AI.creature.Room.creatures.Count; k++)
+                        {
+                            if (self.AI.creature.Room.creatures[k].ID == self.AI.creature.state.socialMemory.relationShips[j].subjectID && self.AI.creature.Room.creatures[k].realizedCreature != null)
+                            {
+                                for (int p = 0; p < ExpeditionData.challengeList.Count; p++)
+                                {
+                                    if (ExpeditionData.challengeList[p] is WatcherBingoTameChallenge c)
+                                    {
+                                        c.Fren(self.AI.creature.creatureTemplate.type);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
 
         #endregion
     }
