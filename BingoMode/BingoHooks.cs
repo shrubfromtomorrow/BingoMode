@@ -218,9 +218,16 @@ namespace BingoMode
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
             On.Menu.FastTravelScreen.Singal += FastTravelScreen_Singal;
 
-            // Get custom region arts (watcher)
-            On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
-            On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+            if (ModManager.Watcher)
+            {
+                // Get custom region arts
+                On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
+                On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+
+                // Lock everyone but washa
+                On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
+
+            }
 
             // Stop void win from happening
             On.Expedition.DepthsFinishScript.Update += DepthsFinishScript_Update;
@@ -254,6 +261,7 @@ namespace BingoMode
 
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
+
         }
 
         private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
@@ -1181,6 +1189,20 @@ namespace BingoMode
             }
         }
 
+        #region watcher
+
+        public static bool ExpeditionData_CheckUnlocked(On.Expedition.ExpeditionProgression.orig_CheckUnlocked orig, ProcessManager manager, SlugcatStats.Name slugcat)
+        {
+            if (slugcat != WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public static MenuScene.SceneID Region_GetRegionLandscapeScene(On.Region.orig_GetRegionLandscapeScene orig, string regionAcro)
         {
             MenuScene.SceneID origReturn =  orig.Invoke(regionAcro);
@@ -1261,5 +1283,7 @@ namespace BingoMode
                 self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
             }
         }
+
+        #endregion
     }
 }

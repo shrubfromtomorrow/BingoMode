@@ -218,6 +218,7 @@ namespace BingoMode
                 typeof(BingoEchoChallenge),
                 typeof(BingoEatChallenge),
                 typeof(BingoTameChallenge),
+                typeof(BingoBombTollChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));

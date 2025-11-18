@@ -136,6 +136,7 @@ namespace BingoMode.BingoChallenges
                 case "transport": return Transportable;
                 case "pin": return ["Any Creature", .. Pinnable];
                 case "tolls": return BombableOutposts;
+                case "Wtolls": return WBombableOutposts;
                 case "food": return FoodTypes;
                 case "Wfood": return WFoodTypes;
                 case "weapons": return Weapons;
@@ -350,6 +351,13 @@ namespace BingoMode.BingoChallenges
             "gw_c11",
             "lf_e03",
             "ug_toll",
+        };
+
+        public static readonly string[] WBombableOutposts =
+        {
+            "warf_g01",
+            "wbla_f01",
+            "wskd_b41"
         };
 
         public static string NameForPearl(string pearl)

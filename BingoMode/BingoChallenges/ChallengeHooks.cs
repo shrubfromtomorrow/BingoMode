@@ -1963,6 +1963,28 @@ namespace BingoMode.BingoChallenges
             }
         }
 
+        public static void Watcher_ScavengerBomb_Explode(On.ScavengerBomb.orig_Explode orig, ScavengerBomb self, BodyChunk hitChunk)
+        {
+            orig.Invoke(self, hitChunk);
+
+            if (self.room.abstractRoom.scavengerOutpost && self.room.updateList.Find(x => x is ScavengerOutpost) is ScavengerOutpost outpost && Custom.DistLess(self.firstChunk.pos, outpost.placedObj.pos, 500f))
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoBombTollChallenge c)
+                    {
+                        for (int k = 0; k < outpost.playerTrackers.Count; k++)
+                        {
+                            if (outpost.playerTrackers[k] != null)
+                            {
+                                c.Boom(self.room.abstractRoom.name, outpost.playerTrackers[k].PlayerOnOtherSide);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         #endregion
     }
