@@ -103,6 +103,7 @@ namespace BingoMode.BingoChallenges
             return color;
         }
 
+        // watcher touches this
         private static int GetIconIntData(string thing) => thing switch
         {
             "Centipede" => 2,
@@ -110,6 +111,7 @@ namespace BingoMode.BingoChallenges
             "FireSpear" => 1,
             "ElectricSpear" => 2,
             "HellSpear" => 3,
+            "AltSkyWhale" => 4,
             _ => 0
         };
 
@@ -119,6 +121,7 @@ namespace BingoMode.BingoChallenges
             "FireSpear" => "Spear",
             "ElectricSpear" => "Spear",
             "HellSpear" => "Spear",
+            "AltSkyWhale" => "SkyWhale",
             _ => thing
         };
 
@@ -157,6 +160,7 @@ namespace BingoMode.BingoChallenges
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
+                case "Wunlocks": 
                 case "chatlogs": return [.. BingoData.possibleTokens[4]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
                 case "expobject": return Storable;

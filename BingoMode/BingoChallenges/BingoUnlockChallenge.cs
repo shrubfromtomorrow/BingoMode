@@ -133,7 +133,22 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             gibacj:
-            int type = UnityEngine.Random.Range(0, ModManager.MSC ? (SlugcatStats.IsSlugcatFromMSC(ExpeditionData.slugcatPlayer) ? 4 : 3) : 2);
+            int type;
+
+            if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                int[] allowed = { 0, 1, 3 };
+                type = allowed[UnityEngine.Random.Range(0, allowed.Length)];
+            }
+            else
+            {
+                type = UnityEngine.Random.Range(
+                    0,
+                    ModManager.MSC ?
+                        (SlugcatStats.IsSlugcatFromMSC(ExpeditionData.slugcatPlayer) ? 4 : 3)
+                        : 2
+                );
+            }
             string unl = "ERROR";
 
             unl = BingoData.possibleTokens[type][UnityEngine.Random.Range(0, BingoData.possibleTokens[type].Count)];

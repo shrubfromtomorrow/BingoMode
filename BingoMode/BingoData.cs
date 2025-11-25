@@ -304,78 +304,105 @@ namespace BingoMode
             possibleTokens[2] = []; // red
             possibleTokens[3] = []; // green
             possibleTokens[4] = []; // white
-            foreach (var kvp in Custom.rainWorld.regionBlueTokens)
+            if (slug == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                for (int n = 0; n < kvp.Value.Count; n++)
+                PopulateWatcherUnlocks();
+            }
+            else
+            {
+                foreach (var kvp in Custom.rainWorld.regionBlueTokens)
                 {
-
-                    if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
-                    if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
+                    for (int n = 0; n < kvp.Value.Count; n++)
                     {
-                        possibleTokens[0].Add(kvp.Value[n].value);
+
+                        if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
+                        if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
+                        {
+                            possibleTokens[0].Add(kvp.Value[n].value);
+                        }
                     }
                 }
-            }
-            foreach (var kvp in Custom.rainWorld.regionGoldTokens)
-            {
-                for (int n = 0; n < kvp.Value.Count; n++)
+                foreach (var kvp in Custom.rainWorld.regionGoldTokens)
                 {
-                    if (!Custom.rainWorld.regionGoldTokensAccessibility.ContainsKey(kvp.Key)) continue;
+                    for (int n = 0; n < kvp.Value.Count; n++)
+                    {
+                        if (!Custom.rainWorld.regionGoldTokensAccessibility.ContainsKey(kvp.Key)) continue;
+                        if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
+                        if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;
+                        if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
+                        if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
+                        {
+                            possibleTokens[1].Add(kvp.Value[n].value);
+                        }
+                    }
+                }
+                foreach (var kvp in Custom.rainWorld.regionRedTokens)
+                {
+                    if (!Custom.rainWorld.regionRedTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;
                     if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
-                    if (Custom.rainWorld.regionGoldTokensAccessibility[kvp.Key][n].Contains(slug))
-                    {
-                        possibleTokens[1].Add(kvp.Value[n].value);
-                    }
-                }
-            }
-            foreach (var kvp in Custom.rainWorld.regionRedTokens)
-            {
-                if (!Custom.rainWorld.regionRedTokensAccessibility.ContainsKey(kvp.Key)) continue;
-                if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
-                if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;
-                if (kvp.Key.ToLowerInvariant() == "rm" && slug != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
-                for (int n = 0; n < kvp.Value.Count; n++)
-                {
-                    if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
-                    {
-                        possibleTokens[2].Add(kvp.Value[n].value + "-safari");
-                    }
-                }
-            }
-            // Painfully hardcoded because greentokenaccessiblity sucks ass
-            if (SlugcatStats.IsSlugcatFromMSC(slug))
-            {
-                foreach (var kvp in Custom.rainWorld.regionGreenTokens)
-                {
                     for (int n = 0; n < kvp.Value.Count; n++)
                     {
-                        if ((slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet && kvp.Key.ToLowerInvariant() == "ms") || 
-                            (slug == MoreSlugcatsEnums.SlugcatStatsName.Gourmand && kvp.Key.ToLowerInvariant() == "oe") || 
-                            (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint && kvp.Key.ToLowerInvariant() == "cl") ||
-                            (slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer && kvp.Key.ToLowerInvariant() == "lc") ||
-                            (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear && kvp.Key.ToLowerInvariant() == "dm"))
+                        if (Custom.rainWorld.regionRedTokensAccessibility[kvp.Key][n].Contains(slug) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(kvp.Key.ToUpperInvariant()))
                         {
-                            
-                            possibleTokens[3].Add(kvp.Value[n].value);
+                            possibleTokens[2].Add(kvp.Value[n].value + "-safari");
                         }
                     }
                 }
-            }
-
-            if (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear)
-            {
-                foreach (var kvp in Custom.rainWorld.regionGreyTokens)
+                // Painfully hardcoded because greentokenaccessiblity sucks ass
+                if (SlugcatStats.IsSlugcatFromMSC(slug))
                 {
-                    for (int n = 0; n < kvp.Value.Count; n++)
+                    foreach (var kvp in Custom.rainWorld.regionGreenTokens)
                     {
-                        if (!kvp.Value[n].value.ToLowerInvariant().Contains("broadcast")) {
-                            possibleTokens[4].Add(kvp.Value[n].value);
+                        for (int n = 0; n < kvp.Value.Count; n++)
+                        {
+                            if ((slug == MoreSlugcatsEnums.SlugcatStatsName.Rivulet && kvp.Key.ToLowerInvariant() == "ms") || 
+                                (slug == MoreSlugcatsEnums.SlugcatStatsName.Gourmand && kvp.Key.ToLowerInvariant() == "oe") || 
+                                (slug == MoreSlugcatsEnums.SlugcatStatsName.Saint && kvp.Key.ToLowerInvariant() == "cl") ||
+                                (slug == MoreSlugcatsEnums.SlugcatStatsName.Artificer && kvp.Key.ToLowerInvariant() == "lc") ||
+                                (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear && kvp.Key.ToLowerInvariant() == "dm"))
+                            {
+                            
+                                possibleTokens[3].Add(kvp.Value[n].value);
+                            }
+                        }
+                    }
+                }
+
+                if (slug == MoreSlugcatsEnums.SlugcatStatsName.Spear)
+                {
+                    foreach (var kvp in Custom.rainWorld.regionGreyTokens)
+                    {
+                        for (int n = 0; n < kvp.Value.Count; n++)
+                        {
+                            if (!kvp.Value[n].value.ToLowerInvariant().Contains("broadcast")) {
+                                possibleTokens[4].Add(kvp.Value[n].value);
+                            }
                         }
                     }
                 }
             }
+        }
+
+        public static void PopulateWatcherUnlocks()
+        {
+            // GREAT GOOGLY MOOGLY HE'S REFLECTING
+            possibleTokens[0] = typeof(WatcherEnums.SandboxUnlockID)
+                .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Select(f => f.Name)
+                .ToList();
+            possibleTokens[1] = typeof(WatcherEnums.LevelUnlockID)
+                .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Select(f => f.Name)
+                .ToList();
+            possibleTokens[3] = typeof(WatcherEnums.SlugcatUnlockID)
+                .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Select(f => f.Name)
+                .ToList();
         }
     }
 }
