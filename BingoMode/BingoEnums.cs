@@ -29,23 +29,69 @@ namespace BingoMode
             public static Menu.MenuScene.SceneID Landscape_WBLA;
             public static Menu.MenuScene.SceneID Landscape_WSKC;
             public static Menu.MenuScene.SceneID Landscape_WTDA;
+            public static Menu.MenuScene.SceneID Landscape_WARF;
+            public static Menu.MenuScene.SceneID Landscape_WARA;
+            public static Menu.MenuScene.SceneID Landscape_WARC;
+            public static Menu.MenuScene.SceneID Landscape_WARD;
+            public static Menu.MenuScene.SceneID Landscape_WARE;
+            public static Menu.MenuScene.SceneID Landscape_WARG;
+            public static Menu.MenuScene.SceneID Landscape_WAUA;
+            public static Menu.MenuScene.SceneID Landscape_WDSR;
+            public static Menu.MenuScene.SceneID Landscape_WGWR;
+            public static Menu.MenuScene.SceneID Landscape_WHIR;
+            public static Menu.MenuScene.SceneID Landscape_WMPA;
+            public static Menu.MenuScene.SceneID Landscape_WORA;
+            public static Menu.MenuScene.SceneID Landscape_WPGA;
+            public static Menu.MenuScene.SceneID Landscape_WPTA;
+            public static Menu.MenuScene.SceneID Landscape_WRFB;
+            public static Menu.MenuScene.SceneID Landscape_WRRA;
+            public static Menu.MenuScene.SceneID Landscape_WRSA;
+            public static Menu.MenuScene.SceneID Landscape_WSKA;
+            public static Menu.MenuScene.SceneID Landscape_WSKB;
+            public static Menu.MenuScene.SceneID Landscape_WSKD;
+            public static Menu.MenuScene.SceneID Landscape_WSSR;
+            public static Menu.MenuScene.SceneID Landscape_WSUR;
+            public static Menu.MenuScene.SceneID Landscape_WTDB;
+            public static Menu.MenuScene.SceneID Landscape_WVWA;
+            public static Menu.MenuScene.SceneID Landscape_WVWB;
 
             public static void RegisterValues()
             {
-                Landscape_WRFA = new Menu.MenuScene.SceneID("Landscape_WRFA", true);
-                Landscape_WARB = new Menu.MenuScene.SceneID("Landscape_WARB", true);
-                Landscape_WBLA = new Menu.MenuScene.SceneID("Landscape_WBLA", true);
-                Landscape_WSKC = new Menu.MenuScene.SceneID("Landscape_WSKC", true);
-                Landscape_WTDA = new Menu.MenuScene.SceneID("Landscape_WTDA", true);
+                var fields = typeof(LandscapeType).GetFields(
+                    System.Reflection.BindingFlags.Static |
+                    System.Reflection.BindingFlags.Public);
+
+                foreach (var field in fields)
+                {
+                    if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
+                        field.Name.StartsWith("Landscape_"))
+                    {
+                        string name = field.Name;
+                        var instance = new Menu.MenuScene.SceneID(name, true);
+                        field.SetValue(null, instance);
+                    }
+                }
             }
 
             public static void UnregisterValues()
             {
-                if (Landscape_WRFA != null) { Landscape_WRFA.Unregister(); Landscape_WRFA = null; }
-                if (Landscape_WARB != null) { Landscape_WARB.Unregister(); Landscape_WARB = null; }
-                if (Landscape_WBLA != null) { Landscape_WBLA.Unregister(); Landscape_WBLA = null; }
-                if (Landscape_WSKC != null) { Landscape_WSKC.Unregister(); Landscape_WSKC = null; }
-                if (Landscape_WTDA != null) { Landscape_WTDA.Unregister(); Landscape_WTDA = null; }
+                var fields = typeof(LandscapeType).GetFields(
+                    System.Reflection.BindingFlags.Static |
+                    System.Reflection.BindingFlags.Public);
+
+                foreach (var field in fields)
+                {
+                    if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
+                        field.Name.StartsWith("Landscape_"))
+                    {
+                        var id = field.GetValue(null) as Menu.MenuScene.SceneID;
+                        if (id != null)
+                        {
+                            id.Unregister();
+                            field.SetValue(null, null);
+                        }
+                    }
+                }
             }
         }
     }

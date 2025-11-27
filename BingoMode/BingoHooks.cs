@@ -11,6 +11,7 @@ using RWCustom;
 using Steamworks;
 using UnityEngine;
 using Watcher;
+using System.Reflection;
 
 namespace BingoMode
 {
@@ -28,6 +29,10 @@ namespace BingoMode
 
         public static ConditionalWeakTable<ExpeditionMenu, BingoPage> bingoPage = new();
         public static ConditionalWeakTable<CharacterSelectPage, HoldButton> newBingoButton = new();
+
+        //watcher field
+        public static Dictionary<string, Menu.MenuScene.SceneID> landscapeLookup;
+        private static Dictionary<Menu.MenuScene.SceneID, string> sceneToRegion;
 
         public static float cantpresscounter;
 
@@ -1205,82 +1210,90 @@ namespace BingoMode
 
         public static MenuScene.SceneID Region_GetRegionLandscapeScene(On.Region.orig_GetRegionLandscapeScene orig, string regionAcro)
         {
-            MenuScene.SceneID origReturn =  orig.Invoke(regionAcro);
+            MenuScene.SceneID origReturn = orig.Invoke(regionAcro);
 
-            if (origReturn == MenuScene.SceneID.Empty)
-            {
-                if (regionAcro == "WRFA")
-                {
-                    return BingoEnums.LandscapeType.Landscape_WRFA;
-                }
-                if (regionAcro == "WARB")
-                {
-                    return BingoEnums.LandscapeType.Landscape_WARB;
-                }
-                if (regionAcro == "WBLA")
-                {
-                    return BingoEnums.LandscapeType.Landscape_WBLA;
-                }
-                if (regionAcro == "WSKC")
-                {
-                    return BingoEnums.LandscapeType.Landscape_WSKC;
-                }
-                if (regionAcro == "WTDA")
-                {
-                    return BingoEnums.LandscapeType.Landscape_WTDA;
-                }
+            if (origReturn != MenuScene.SceneID.Empty)
+                return origReturn;
 
-            }
+            if (landscapeLookup == null)
+                BuildLandscapeLookup();
+
+            if (landscapeLookup.TryGetValue(regionAcro, out var scene))
+                return scene;
+
             return origReturn;
         }
 
-        private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
+        private static void BuildLandscapeLookup()
+        {
+            landscapeLookup = new Dictionary<string, Menu.MenuScene.SceneID>();
+
+            var fields = typeof(BingoEnums.LandscapeType).GetFields(
+                BindingFlags.Public | BindingFlags.Static);
+
+            foreach (var field in fields)
+            {
+                if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
+                    field.Name.StartsWith("Landscape_"))
+                {
+                    string regionCode = field.Name.Substring("Landscape_".Length);
+                    var value = (Menu.MenuScene.SceneID)field.GetValue(null);
+
+                    if (value != null)
+                        landscapeLookup[regionCode] = value;
+                }
+            }
+        }
+
+        public static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
         {
             orig.Invoke(self);
-            if (self.sceneID == BingoEnums.LandscapeType.Landscape_WRFA)
-            {
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WRFA";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WRFA - Flat", new Vector2(683f, 384f), false, true));
 
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WRFA_Shadow", new Vector2(0.01f, 0.01f), true, false));
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WRFA", new Vector2(0.01f, 0.01f), true, false));
-                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
-            }
-            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WBLA)
-            {
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WBLA";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WBLA - Flat", new Vector2(683f, 384f), false, true));
+            if (sceneToRegion == null)
+                BuildSceneRegionMap();
 
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WBLA_Shadow", new Vector2(0.01f, 0.01f), true, false));
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WBLA", new Vector2(0.01f, 0.01f), true, false));
-                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
-            }
-            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WARB)
-            {
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WARB";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WARB - Flat", new Vector2(683f, 384f), false, true));
+            if (!sceneToRegion.TryGetValue(self.sceneID, out string region))
+                return;
 
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WARB_Shadow", new Vector2(0.01f, 0.01f), true, false));
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WARB", new Vector2(0.01f, 0.01f), true, false));
-                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
-            }
-            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WSKC)
-            {
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WSKC";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WSKC - Flat", new Vector2(683f, 384f), false, true));
+            string folder = $"Scenes{Path.DirectorySeparatorChar}Landscape - {region}";
+            string flatName = $"Landscape - {region} - Flat";
+            string shadowName = $"Title_{region}_Shadow";
+            string titleName = $"Title_{region}";
 
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WSKC_Shadow", new Vector2(0.01f, 0.01f), true, false));
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WSKC", new Vector2(0.01f, 0.01f), true, false));
-                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
-            }
-            else if (self.sceneID == BingoEnums.LandscapeType.Landscape_WTDA)
-            {
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "Landscape - WTDA";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "Landscape - WTDA - Flat", new Vector2(683f, 384f), false, true));
+            self.sceneFolder = folder;
 
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WTDA_Shadow", new Vector2(0.01f, 0.01f), true, false));
-                self.AddIllustration(new MenuIllustration(self.menu, self, "", "Title_WTDA", new Vector2(0.01f, 0.01f), true, false));
-                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            self.AddIllustration(
+                new MenuIllustration(self.menu, self, folder, flatName, new Vector2(683f, 384f), false, true));
+
+            self.AddIllustration(
+                new MenuIllustration(self.menu, self, "", shadowName, new Vector2(0.01f, 0.01f), true, false));
+
+            self.AddIllustration(
+                new MenuIllustration(self.menu, self, "", titleName, new Vector2(0.01f, 0.01f), true, false));
+
+            self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader =
+                self.menu.manager.rainWorld.Shaders["MenuText"];
+        }
+
+        private static void BuildSceneRegionMap()
+        {
+            sceneToRegion = new Dictionary<Menu.MenuScene.SceneID, string>();
+
+            var fields = typeof(BingoEnums.LandscapeType).GetFields(
+                BindingFlags.Public | BindingFlags.Static);
+
+            foreach (var field in fields)
+            {
+                if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
+                    field.Name.StartsWith("Landscape_"))
+                {
+                    var value = field.GetValue(null) as Menu.MenuScene.SceneID;
+                    if (value != null)
+                    {
+                        string region = field.Name.Substring("Landscape_".Length);
+                        sceneToRegion[value] = region;
+                    }
+                }
             }
         }
 

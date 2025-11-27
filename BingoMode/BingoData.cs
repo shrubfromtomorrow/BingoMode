@@ -219,6 +219,7 @@ namespace BingoMode
                 typeof(BingoEatChallenge),
                 typeof(BingoTameChallenge),
                 typeof(BingoBombTollChallenge),
+                typeof(BingoEnterRegionFromChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));
@@ -387,20 +388,39 @@ namespace BingoMode
 
         public static void PopulateWatcherUnlocks()
         {
+            var excludedItems = new[]
+            {
+                WatcherEnums.SandboxUnlockID.Millipede,
+                WatcherEnums.SandboxUnlockID.GrappleSnake,
+                WatcherEnums.SandboxUnlockID.WeirdToy,
+                WatcherEnums.SandboxUnlockID.SoftToy,
+                WatcherEnums.SandboxUnlockID.SpinToy,
+                WatcherEnums.SandboxUnlockID.BallToy,
+                WatcherEnums.SandboxUnlockID.Rattler,
+                WatcherEnums.SandboxUnlockID.RotDangleFruit,
+                WatcherEnums.SandboxUnlockID.RotLizard,
+                WatcherEnums.SandboxUnlockID.RotLoach,
+                WatcherEnums.SandboxUnlockID.RotSeedCob
+            };
+            var excludedLevels = new[]
+            {
+                WatcherEnums.LevelUnlockID.HP
+            };
+
             // GREAT GOOGLY MOOGLY HE'S REFLECTING
             possibleTokens[0] = typeof(WatcherEnums.SandboxUnlockID)
                 .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID) && !excludedItems.Contains((MultiplayerUnlocks.SandboxUnlockID)f.GetValue(null)))
                 .Select(f => f.Name)
                 .ToList();
             possibleTokens[1] = typeof(WatcherEnums.LevelUnlockID)
                 .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.LevelUnlockID) && !excludedLevels.Contains((MultiplayerUnlocks.LevelUnlockID)f.GetValue(null)))
                 .Select(f => f.Name)
                 .ToList();
             possibleTokens[3] = typeof(WatcherEnums.SlugcatUnlockID)
                 .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SandboxUnlockID))
+                .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SlugcatUnlockID))
                 .Select(f => f.Name)
                 .ToList();
         }
