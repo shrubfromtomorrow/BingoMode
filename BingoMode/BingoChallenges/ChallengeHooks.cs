@@ -1,4 +1,9 @@
-﻿using BingoMode.BingoSteamworks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using BingoMode.BingoChallenges.WatcherBingoChallenges;
+using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu;
 using Menu.Remix;
@@ -7,16 +12,12 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using RWCustom;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
+using Watcher;
 using CreatureType = CreatureTemplate.Type;
+using DLCItemType = DLCSharedEnums.AbstractObjectType;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
-using DLCItemType = DLCSharedEnums.AbstractObjectType;
-using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -1094,7 +1095,7 @@ namespace BingoMode.BingoChallenges
             // This one doesn't check if the game or world is null because I want to count the starting region (popular demand as well)
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is BingoAllRegionsExcept allExcept)
+                if (ExpeditionData.challengeList[j] is BingoAllRegionsExceptChallenge allExcept)
                 {
                     allExcept.Entered(worldName);
                 }
@@ -1885,7 +1886,7 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoEnterRegionChallenge wEnterRegion)
                     {
-                        wEnterRegion.Entered(self.Data.destRegion);
+                        wEnterRegion.Entered(self.Data.destRegion.ToUpperInvariant());
                     }
                 }
             }
@@ -1900,7 +1901,38 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoNoRegionChallenge wNoRegion)
                     {
-                        wNoRegion.Entered(self.Data.destRegion);
+                        wNoRegion.Entered(self.Data.destRegion.ToUpperInvariant());
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_WarpPoint_ChangeState_AllRegionsExcept(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
+        {
+            orig(self, state);
+            if (state == WarpPoint.State.ExitWarp)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoAllRegionsExceptChallenge wAllExcept)
+                    {
+                        wAllExcept.Entered(self.Data.destRegion.ToUpperInvariant());
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_WarpPoint_ChangeState_CreaturePortal(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
+        {
+            // Spawn items happens once the world is loaded so the current room is the one the player has just landed in
+            orig(self, state);
+            if (state == WarpPoint.State.SpawnItems)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoCreaturePortalChallenge wCreaturePortal)
+                    {
+                        wCreaturePortal.Entered(self, self.room.game.GetStorySession.pendingWarpPointTransferObjects);
                     }
                 }
             }
@@ -1985,6 +2017,56 @@ namespace BingoMode.BingoChallenges
             }
         }
 
+        public static void Watcher_Pomegranate_EnterSmashedMode(On.Pomegranate.orig_EnterSmashedMode orig, Pomegranate self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoOpenMelonsChallenge c)
+                {
+                    c.Open();
+                }
+            }
+        }
+
+        public static void Watcher_VoidSpawnEgg_Pop(On.VoidSpawnEgg.orig_Pop orig, VoidSpawnEgg self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoCollectRippleSpawnChallenge c)
+                {
+                    c.Pop();
+                }
+            }
+        }
+
+        public static void Watcher_PrinceBehavior_InitateConversation(On.Watcher.PrinceBehavior.orig_InitateConversation orig, PrinceBehavior self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoPrinceChallenge c)
+                {
+                    c.Meet();
+                }
+            }
+        }
+
+        public static void Watcher_VoidWeaver_DefaultBehavior_StartMonologue(On.Watcher.VoidWeaver.DefaultBehavior.orig_StartMonologue orig, VoidWeaver.DefaultBehavior self)
+        {
+            orig.Invoke(self);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c)
+                {
+                    c.Meet();
+                }
+            }
+        }
 
         #endregion
     }

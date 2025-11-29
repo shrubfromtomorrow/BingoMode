@@ -25,6 +25,9 @@ namespace BingoMode
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
         public static List<string>[] possibleTokens = new List<string>[5];
+        public static List<string> watcherRegions;
+        public static List<string> watcherSTSpots;
+        public static List<string> watcherPortals;
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
         // This prevents the same creatures being hit by the same sources multiple times
@@ -220,6 +223,11 @@ namespace BingoMode
                 typeof(BingoTameChallenge),
                 typeof(BingoBombTollChallenge),
                 typeof(BingoEnterRegionFromChallenge),
+                typeof(BingoCreatureGateChallenge),
+                typeof(BingoAllRegionsExceptChallenge),
+                typeof(BingoTransportChallenge),
+                // Temp
+                typeof(WatcherBingoWeaverChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));
@@ -423,6 +431,66 @@ namespace BingoMode
                 .Where(f => f.FieldType == typeof(MultiplayerUnlocks.SlugcatUnlockID))
                 .Select(f => f.Name)
                 .ToList();
+        }
+
+        public static void PopulateWatcherData()
+        {
+            watcherRegions = File.ReadAllLines(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt")).Select(s => s.Trim().ToLowerInvariant()).Where(s => s.Length == 4).ToList();
+            List<string> rawPortals = new List<string>();
+            List<string> rawSTSpots = new List<string>();
+            foreach (var region in watcherRegions)
+            {
+                if (Custom.rainWorld.regionWarpRooms.ContainsKey(region))
+                {
+                    foreach (var warp in Custom.rainWorld.regionWarpRooms[region])
+                    {
+                        rawPortals.Add(warp);
+                    }
+                }
+                if (Custom.rainWorld.regionSpinningTopRooms.ContainsKey(region))
+                {
+                    foreach (var st in Custom.rainWorld.regionSpinningTopRooms[region])
+                    {
+                        rawSTSpots.Add(st);
+                    }
+                }
+            }
+
+            watcherPortals = new List<string>();
+            foreach (var line in rawPortals)
+            {
+                var parts = line.Split(':');
+                if (parts.Length < 4) continue;
+
+                string origin = parts[0].ToLowerInvariant();
+                string dest = parts[3].ToLowerInvariant();
+
+                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                string portalKey = $"{ordered[0]}-{ordered[1]}";
+
+                if (!watcherPortals.Contains (portalKey))
+                {
+                    watcherPortals.Add(portalKey);
+                }
+            }
+
+            watcherSTSpots = new List<string>();
+            foreach (var line in rawSTSpots)
+            {
+                var parts = line.Split(':');
+                if (parts.Length < 3) continue;
+
+                string origin = parts[0].ToLowerInvariant();
+                string dest = parts[2].ToLowerInvariant();
+
+                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                string STKey = $"{ordered[0]}-{ordered[1]}";
+
+                if (!watcherSTSpots.Contains(STKey))
+                {
+                    watcherSTSpots.Add(STKey);
+                }
+            }
         }
     }
 }

@@ -54,7 +54,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([[new Icon("GuidanceNeuron", 1f, new Color(0f, 1f, 0.3f)), new Icon("singlearrow"), moon.Value ? Icon.MOON : Icon.PEBBLES]]);
+            return new Phrase([[new Icon("GuidanceNeuron", 1f, new Color(0f, 1f, 0.3f)), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), moon.Value ? Icon.MOON : Icon.PEBBLES]]);
         }
 
         public override bool Duplicable(Challenge challenge)

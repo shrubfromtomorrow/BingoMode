@@ -59,7 +59,7 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = new([[new Icon("Symbol_MoonCloak", 1f, new Color(0.8f, 0.8f, 0.8f))]]);
             if (deliver.Value)
             {
-                phrase.InsertWord(new Icon("singlearrow"));
+                phrase.InsertWord(new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90));
                 phrase.InsertWord(Icon.MOON);
             }
             return phrase;

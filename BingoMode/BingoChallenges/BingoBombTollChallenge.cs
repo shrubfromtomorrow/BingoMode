@@ -9,6 +9,7 @@ using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
+using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 namespace BingoMode.BingoChallenges
@@ -108,7 +109,7 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = new(
                 [[Icon.FromEntityName("ScavengerBomb"), Icon.SCAV_TOLL],
                 [specific.Value ? new Verse(roomName.Value.ToUpperInvariant()) : new Counter(current, amount.Value)]]);
-            if (pass.Value) phrase.InsertWord(new Icon("singlearrow"));
+            if (pass.Value) phrase.InsertWord(new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90));
             return phrase;
         }
 

@@ -11,43 +11,14 @@ using UnityEngine;
 namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
-    public class BingoAllRegionsExceptRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> region;
-        public Randomizer<int> required;
-
-        public override Challenge Random()
-        {
-            BingoAllRegionsExceptChallenge challenge = new();
-            challenge.region.Value = region.Random();
-            challenge.required.Value = required.Random();
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
-            serializedContent.AppendLine($"{surindent}required-{required.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "AllRegionExcept").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            region = Randomizer<string>.InitDeserialize(dict["region"]);
-            required = Randomizer<int>.InitDeserialize(dict["required"]);
-        }
-    }
-    public class BingoAllRegionsExceptChallenge : BingoChallenge
+    public class WatcherBingoAllRegionsExceptChallenge : BingoChallenge
     {
         public SettingBox<string> region;
         public SettingBox<int> required;
         public List<string> regionsToEnter = [];
         public int current;
 
-        public BingoAllRegionsExceptChallenge()
+        public WatcherBingoAllRegionsExceptChallenge()
         {
             region = new("", "Region", 0, listName: "regionsreal");
             regionsToEnter = [.. ChallengeUtils.AllEnterableRegions];
@@ -70,7 +41,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoAllRegionsExceptChallenge;
+            return challenge is not WatcherBingoAllRegionsExceptChallenge;
         }
 
         public override string ChallengeName()
@@ -90,7 +61,7 @@ namespace BingoMode.BingoChallenges
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
             int req = UnityEngine.Random.Range(3, regiones.Count - 4);
 
-            return new BingoAllRegionsExceptChallenge
+            return new WatcherBingoAllRegionsExceptChallenge
             {
                 region = new(regionn, "Region", 0, listName: "regionsreal"),
                 regionsToEnter = ChallengeUtils.AllEnterableRegions.ToList(),
@@ -142,7 +113,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoAllRegionsExceptChallenge",
+                "WatcherBingoAllRegionsExceptChallenge",
                 "~",
                 region.ToString(),
                 "><",
@@ -173,19 +144,19 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoAllRegionsExceptChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoAllRegionsExceptChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_AllRegionsExcept;
+            On.Watcher.WarpPoint.ChangeState += Watcher_WarpPoint_ChangeState_AllRegionsExcept;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_AllRegionsExcept;
+            On.Watcher.WarpPoint.ChangeState -= Watcher_WarpPoint_ChangeState_AllRegionsExcept;
         }
 
         public override List<object> Settings() => [region, required];

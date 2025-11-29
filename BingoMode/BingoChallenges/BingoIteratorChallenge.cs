@@ -56,7 +56,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase([[new Icon("singlearrow"), moon.Value ? Icon.MOON : Icon.PEBBLES]]);
+            return new Phrase([[new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), moon.Value ? Icon.MOON : Icon.PEBBLES]]);
         }
 
         public void MeetPebbles()

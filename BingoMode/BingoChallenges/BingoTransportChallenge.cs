@@ -80,7 +80,7 @@ namespace BingoMode.BingoChallenges
         {
             Phrase phrase = new(
                 [[Icon.FromEntityName(crit.Value)],
-                [new Icon("singlearrow")]]);
+                [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90)]]);
             if (from.Value != "Any Region") phrase.InsertWord(new Verse(from.Value), 1, 0);
             if (to.Value != "Any Region") phrase.InsertWord(new Verse(to.Value), 1);
             return phrase;

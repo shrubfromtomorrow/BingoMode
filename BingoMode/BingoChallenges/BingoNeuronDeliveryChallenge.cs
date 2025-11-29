@@ -71,7 +71,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("Symbol_Neuron"), new Icon("singlearrow"), Icon.MOON],
+                [[new Icon("Symbol_Neuron"), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), Icon.MOON],
                 [new Counter(delivered, neurons.Value)]]);
         }
 

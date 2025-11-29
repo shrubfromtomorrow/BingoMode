@@ -1,13 +1,16 @@
-﻿using BingoMode.BingoRandomizer;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using MoreSlugcats;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
+using Watcher;
 using CreatureType = CreatureTemplate.Type;
 using UnityEngine;
 
@@ -15,44 +18,14 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoCreatureGateRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<int> amount;
-        public Randomizer<string> crit;
-
-        public override Challenge Random()
-        {
-            BingoCreatureGateChallenge challenge = new();
-            challenge.amount.Value = amount.Random();
-            challenge.crit.Value = crit.Random();
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
-            serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "CreatureGate").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
-            crit = Randomizer<string>.InitDeserialize(dict["crit"]);
-        }
-    }
-
-    public class BingoCreatureGateChallenge : BingoChallenge
+    public class WatcherBingoCreaturePortalChallenge : BingoChallenge
     {
         public SettingBox<int> amount;
         public int current;
         public SettingBox<string> crit;
-        public Dictionary<EntityID, List<string>> creatureGates = [];
+        public Dictionary<EntityID, List<string>> creaturePortals = [];
 
-        public BingoCreatureGateChallenge()
+        public WatcherBingoCreaturePortalChallenge()
         {
             amount = new(0, "Amount", 0);
             crit = new("", "Creature Type", 1, listName: "transport");
@@ -64,7 +37,7 @@ namespace BingoMode.BingoChallenges
             {
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
-            this.description = ChallengeTools.IGT.Translate("Transport the same <crit> through [<current>/<amount>] gates")
+            this.description = ChallengeTools.IGT.Translate("Transport the same <crit> through [<current>/<amount>] portals")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureType(crit.Value).Index].TrimEnd('s'));
@@ -80,41 +53,65 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoCreatureGateChallenge g || (g.crit.Value != crit.Value && !(g.crit.Value.Contains("Cicada") && crit.Value.Contains("Cicada")));
+            return challenge is not WatcherBingoCreaturePortalChallenge g || (g.crit.Value != crit.Value && !(g.crit.Value.Contains("Cicada") && crit.Value.Contains("Cicada")));
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Transporting the same creature through gates");
+            return ChallengeTools.IGT.Translate("Transporting the same creature through portals");
         }
 
         public override Challenge Generate()
         {
             List<string> crits = [.. ChallengeUtils.Transportable];
-            if (ExpeditionData.slugcatPlayer.value != "Red") crits.Remove("JetFish");
-            else crits.Remove("Yeek");
-            return new BingoCreatureGateChallenge
+            crits.Remove("Yeek");
+            return new WatcherBingoCreaturePortalChallenge
             {
                 amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
-                crit = new(crits[UnityEngine.Random.Range(0, crits.Count - ((!ModManager.MSC || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) ? 1 : 0))], "Creature Type", 1, listName: "transport")
+                crit = new(crits[UnityEngine.Random.Range(0, crits.Count)], "Creature Type", 1, listName: "transport")
             };
         }
 
-        public void Gate(string roomName)
+        public void Entered(WarpPoint warpPoint, List<AbstractPhysicalObject> objects)
         {
             if (hidden || revealed || TeamsCompleted[SteamTest.team] || completed) return;
+            string to = warpPoint.room.abstractRoom.name.ToLowerInvariant();
+            string warp = "";
 
+            foreach (var portal in BingoData.watcherPortals)
+            {
+                var parts = portal.Split('-');
+                if (parts[0] == to || parts[1] == to)
+                    warp = portal;
+            }
+            
+
+            foreach (var spot in BingoData.watcherSTSpots)
+            {
+                var parts = spot.Split('-');
+                if (parts[0] == to || parts[1] == to)
+                    warp = spot;
+            }
+
+            if (warp == "")
+            {
+                warp = "null-" + to;
+            }
+
+            
             List<AbstractCreature> foundCreatures = [];
-            bool addedGateCreatures = false;
+            bool addedPortalCreatures = false;
 
+
+            // Player isn't real yet
             for (int i = 0; i < game.Players.Count; i++)
             {
-                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && player.room != null)
+                if (game.Players[i] != null && game.Players[i].realizedCreature is Player player && warpPoint.room != null)
                 {
-                    if (!addedGateCreatures)
+                    if (!addedPortalCreatures)
                     {
-                        foundCreatures.AddRange(player.room.abstractRoom.creatures.FindAll(x => x.creatureTemplate.type.value == crit.Value));
-                        addedGateCreatures = true;
+                        foundCreatures.AddRange(objects.Select(x => x).OfType<AbstractCreature>().Where(c => c.creatureTemplate.type.value == crit.Value));
+                        addedPortalCreatures = true;
                     }
                     if (player.objectInStomach is AbstractCreature stomacreature && stomacreature.creatureTemplate.type.value == crit.Value)
                     {
@@ -125,29 +122,29 @@ namespace BingoMode.BingoChallenges
 
             if (foundCreatures.Count == 0) return;
 
-            foreach (var gateCrit in foundCreatures)
+            foreach (var portalCrit in foundCreatures)
             {
-                EntityID id = gateCrit.ID;
-                if (!creatureGates.ContainsKey(id))
+                EntityID id = portalCrit.ID;
+                if (!creaturePortals.ContainsKey(id))
                 {
-                    creatureGates.Add(id, [roomName]);
+                    creaturePortals.Add(id, [warp]);
                 }
                 else
                 {
-                    if (!creatureGates[id].Contains(roomName))
+                    if (!creaturePortals[id].Contains(warp))
                     {
-                        creatureGates[id].Add(roomName);
+                        creaturePortals[id].Add(warp);
                     }
                 }
             }
-            foundCreatures.Sort(delegate(AbstractCreature one, AbstractCreature two)
+            foundCreatures.Sort(delegate (AbstractCreature one, AbstractCreature two)
             {
-                int count1 = creatureGates[one.ID].Count;
-                int count2 = creatureGates[two.ID].Count;
+                int count1 = creaturePortals[one.ID].Count;
+                int count2 = creaturePortals[two.ID].Count;
                 return count2.CompareTo(count1);
             });
             int last = current;
-            current = creatureGates[foundCreatures[0].ID].Count;
+            current = creaturePortals[foundCreatures[0].ID].Count;
             UpdateDescription();
             if (current >= amount.Value) CompleteChallenge();
             else if (last != current) ChangeValue();
@@ -157,8 +154,8 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
 
-            creatureGates?.Clear();
-            creatureGates = [];
+            creaturePortals?.Clear();
+            creaturePortals = [];
             current = 0;
         }
 
@@ -174,14 +171,14 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public string CreatureGatesToString()
         {
             List<string> joinLater = [];
 
-            foreach (var kvp in creatureGates)
+            foreach (var kvp in creaturePortals)
             {
                 joinLater.Add(kvp.Key.ToString() + "|" + string.Join("|", kvp.Value));
             }
@@ -217,7 +214,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoCreatureGateChallenge",
+                "WatcherBingoCreaturePortalChallenge",
                 "~",
                 crit.ToString(),
                 "><",
@@ -241,26 +238,26 @@ namespace BingoMode.BingoChallenges
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                creatureGates = CreatureGatesFromString(array[3]);
+                creaturePortals = CreatureGatesFromString(array[3]);
                 completed = (array[4] == "1");
                 revealed = (array[5] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoCreatureGateChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoCreaturePortalChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += WorldLoader_CreatureGate;
+            On.Watcher.WarpPoint.ChangeState += Watcher_WarpPoint_ChangeState_CreaturePortal;
         }
 
         public override void RemoveHooks()
         {
-            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues -= WorldLoader_CreatureGate;
+            On.Watcher.WarpPoint.ChangeState -= Watcher_WarpPoint_ChangeState_CreaturePortal;
         }
 
         public override List<object> Settings() => [amount, crit];

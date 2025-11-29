@@ -231,9 +231,9 @@ namespace BingoMode.BingoMenu
         // watchermethod
         public static string WExpeditionRandomStartsUnlocked()
         {
-            if (File.Exists(AssetManager.ResolveFilePath("wrandomstarts.txt")))
+            if (File.Exists(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar + "wrandomstarts.txt")))
             {
-                string[] shelters = File.ReadAllLines(AssetManager.ResolveFilePath("wrandomstarts.txt"));
+                string[] shelters = File.ReadAllLines(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar + "wrandomstarts.txt"));
                 System.Random random = new System.Random();
                 string shelter = shelters[random.Next(0, shelters.Length)];
                 return shelter;
@@ -385,7 +385,7 @@ namespace BingoMode.BingoMenu
                 foreach (var ch in ExpeditionData.challengeList)
                 {
                     if (ch is BingoNoRegionChallenge r) bannedRegions.Add(r.region.Value);
-                    if (ch is BingoAllRegionsExcept g) bannedRegions.Add(g.region.Value);
+                    if (ch is BingoAllRegionsExceptChallenge g) bannedRegions.Add(g.region.Value);
                     if (ch is BingoEnterRegionChallenge b) bannedRegions.Add(b.region.Value);
                     if (ch is BingoEnterRegionFromChallenge a) bannedRegions.Add(a.to.Value);
                 }
