@@ -137,6 +137,7 @@ namespace BingoMode.BingoChallenges
             switch (ln)
             {
                 case "transport": return Transportable;
+                case "Wtransport": return WTransportable;
                 case "pin": return ["Any Creature", .. Pinnable];
                 case "tolls": return BombableOutposts;
                 case "Wtolls": return WBombableOutposts;
@@ -145,6 +146,7 @@ namespace BingoMode.BingoChallenges
                 case "weapons": return Weapons;
                 case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish")];
                 case "theft": return [.. StealableStolable, "DataPearl"];
+                case "Wtheft": return [.. WStealableStolable, "DataPearl"];
                 case "ban": return Bannable;
                 case "friend": return Befriendable;
                 case "Wfriend": return WBefriendable;
@@ -163,6 +165,7 @@ namespace BingoMode.BingoChallenges
                 case "Wunlocks": 
                 case "chatlogs": return [.. BingoData.possibleTokens[4]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
+                case "Wpassage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand" && x != "Nomad" && x != "Pilgrim" && x != "Scholar" && x != "Traveller" && x != "Survivor")];
                 case "expobject": return Storable;
                 case "vista": // hate
                     List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
@@ -327,6 +330,18 @@ namespace BingoMode.BingoChallenges
             "CicadaA",
             "CicadaB",
             "Yeek"
+        };
+
+        public static readonly string[] WTransportable =
+        {
+            "JetFish",
+            "Hazer",
+            "VultureGrub",
+            "CicadaA",
+            "CicadaB",
+            "Tardigrade",
+            "Frog",
+            "Rat"
         };
 
         public static readonly string[] Pinnable =
@@ -526,6 +541,18 @@ namespace BingoMode.BingoChallenges
             "Spear",
             "Rock",
             "ScavengerBomb",
+            "Lantern",
+            "GooieDuck",
+            "GlowWeed"
+        };
+
+        public static readonly string[] WStealableStolable =
+        {
+            "Spear",
+            "Rock",
+            "ScavengerBomb",
+            "GraffitiBomb",
+            "Boomerang",
             "Lantern",
             "GooieDuck",
             "GlowWeed"

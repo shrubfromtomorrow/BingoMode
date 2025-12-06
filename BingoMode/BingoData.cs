@@ -226,6 +226,8 @@ namespace BingoMode
                 typeof(BingoCreatureGateChallenge),
                 typeof(BingoAllRegionsExceptChallenge),
                 typeof(BingoTransportChallenge),
+                typeof(BingoAchievementChallenge),
+                typeof(BingoStealChallenge),
                 // Temp
                 typeof(WatcherBingoWeaverChallenge),
             };
@@ -408,7 +410,8 @@ namespace BingoMode
                 WatcherEnums.SandboxUnlockID.RotDangleFruit,
                 WatcherEnums.SandboxUnlockID.RotLizard,
                 WatcherEnums.SandboxUnlockID.RotLoach,
-                WatcherEnums.SandboxUnlockID.RotSeedCob
+                WatcherEnums.SandboxUnlockID.RotSeedCob,
+                WatcherEnums.SandboxUnlockID.FireSprite,
             };
             var excludedLevels = new[]
             {

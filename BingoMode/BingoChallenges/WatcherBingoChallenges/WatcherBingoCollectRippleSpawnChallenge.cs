@@ -27,10 +27,10 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Collect [<current>/<amount>] ripplespawn eggs <oneCycle>")
+            description = ChallengeTools.IGT.Translate("Collect [<current>/<amount>] ripplespawn eggs <onecycle>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
-                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate(" in one cycle") : "");
+                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate("in one cycle") : "");
             base.UpdateDescription();
         }
 
@@ -39,7 +39,7 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
             Phrase phrase = new Phrase(
                 [[new Icon("ripplespawn", 1f)],
                 [new Counter(current, amount.Value)]]);
-            if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), 1);
+            if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), 0, 1);
             return phrase;
         }
 
@@ -119,6 +119,8 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
                 "><",
                 amount.ToString(),
                 "><",
+                oneCycle.ToString(),
+                "><",
                 completed ? "1" : "0",
                 "><",
                 revealed ? "1" : "0",
@@ -132,8 +134,9 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[1]) as SettingBox<int>;
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
+                oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                completed = (array[3] == "1");
+                revealed = (array[4] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -153,6 +156,6 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
             On.VoidSpawnEgg.Pop -= Watcher_VoidSpawnEgg_Pop;
         }
 
-        public override List<object> Settings() => [amount];
+        public override List<object> Settings() => [amount, oneCycle];
     }
 }

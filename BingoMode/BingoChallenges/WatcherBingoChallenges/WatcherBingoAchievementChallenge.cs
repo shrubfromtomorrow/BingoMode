@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -12,40 +13,14 @@ namespace BingoMode.BingoChallenges
     using System.Text;
     using static ChallengeHooks;
 
-    public class BingoAchievementRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> passage;
-
-        public override Challenge Random()
-        {
-            BingoAchievementChallenge challenge = new();
-            challenge.ID.Value = passage.Random();
-            return challenge;
-        }
-        
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}passage-{passage.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "Achievement").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            passage = Randomizer<string>.InitDeserialize(dict["passage"]);
-        }
-    }
-
-    // Taken from vanilla and modified
-    public class BingoAchievementChallenge : BingoChallenge
+    // Taken from nacu who took it from vanilla and modified
+    public class WatcherBingoAchievementChallenge : BingoChallenge
     {
         public SettingBox<string> ID; //WinState.EndgameID
 
-        public BingoAchievementChallenge()
+        public WatcherBingoAchievementChallenge()
         {
-            ID = new("", "Passage", 0, "passage");
+            ID = new("", "Passage", 0, "Wpassage");
         }
 
         public override void UpdateDescription()
@@ -68,7 +43,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoAchievementChallenge c || c.ID.Value != ID.Value;
+            return challenge is not WatcherBingoAchievementChallenge c || c.ID.Value != ID.Value;
         }
 
         public override int Points()
@@ -77,10 +52,6 @@ namespace BingoMode.BingoChallenges
             try
             {
                 num = ChallengeTools.achievementScores[new(ID.Value)];
-                if (ModManager.MSC && ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear && (ID.Value == "Saint" || ID.Value == "Monk"))
-                {
-                    num += 40;
-                }
                 num *= (int)(this.hidden ? 2f : 1f);
             }
             catch
@@ -93,7 +64,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public override Challenge Generate()
@@ -101,19 +72,21 @@ namespace BingoMode.BingoChallenges
             List<WinState.EndgameID> list = new List<WinState.EndgameID>();
             for (int i = 0; i < ChallengeTools.achievementScores.Count; i++)
             {
-                if (ModManager.MSC &&
-                    (ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Mother ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Gourmand ||
-                     (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint &&
-                      ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Scholar)))
+                if (ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Scholar ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Traveller ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Survivor ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Mother ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Nomad ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Pilgrim ||
+                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Gourmand)
                     continue;
 
                 list.Add(ChallengeTools.achievementScores.ElementAt(i).Key);
             }
             WinState.EndgameID id = list[Random.Range(0, list.Count)];
-            return new BingoAchievementChallenge
+            return new WatcherBingoAchievementChallenge
             {
-                ID = new(id.value, "Passage", 0, listName: "passage")
+                ID = new(id.value, "Passage", 0, listName: "Wpassage")
             };
         }
 
@@ -132,7 +105,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoAchievementChallenge",
+                "WatcherBingoAchievementChallenge",
                 "~",
                 ID.ToString(),
                 "><",
@@ -154,19 +127,19 @@ namespace BingoMode.BingoChallenges
             }
             catch (System.Exception ex)
             {
-                ExpLog.Log("ERROR: BingoAchievementChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoAchievementChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.Menu.KarmaLadder.AddEndgameMeters += KarmaLadder_AddEndgameMeters;
+            On.Menu.KarmaLadder.AddEndgameMeters += Watcher_KarmaLadder_AddEndgameMeters;
         }
 
         public override void RemoveHooks()
         {
-            On.Menu.KarmaLadder.AddEndgameMeters -= KarmaLadder_AddEndgameMeters;
+            On.Menu.KarmaLadder.AddEndgameMeters -= Watcher_KarmaLadder_AddEndgameMeters;
         }
 
         public override List<object> Settings() => [ID];

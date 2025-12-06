@@ -28,7 +28,7 @@ namespace BingoMode.BingoChallenges
         public WatcherBingoCreaturePortalChallenge()
         {
             amount = new(0, "Amount", 0);
-            crit = new("", "Creature Type", 1, listName: "transport");
+            crit = new("", "Creature Type", 1, listName: "Wtransport");
         }
 
         public override void UpdateDescription()
@@ -47,7 +47,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[Icon.FromEntityName(crit.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("ShortcutGate")],
+                [[Icon.FromEntityName(crit.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("portal")],
                 [new Counter(current, amount.Value)]]);
         }
 
@@ -63,12 +63,12 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<string> crits = [.. ChallengeUtils.Transportable];
+            List<string> crits = [.. ChallengeUtils.WTransportable];
             crits.Remove("Yeek");
             return new WatcherBingoCreaturePortalChallenge
             {
                 amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
-                crit = new(crits[UnityEngine.Random.Range(0, crits.Count)], "Creature Type", 1, listName: "transport")
+                crit = new(crits[UnityEngine.Random.Range(0, crits.Count)], "Creature Type", 1, listName: "Wtransport")
             };
         }
 

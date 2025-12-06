@@ -1313,8 +1313,8 @@ namespace BingoMode.BingoChallenges
                                 EntityID givenItem = self.scavenger.room.socialEventRecognizer.ownedItemsOnGround[i].item.abstractPhysicalObject.ID;
                                 EntityID receivedItem = item.abstractPhysicalObject.ID;
                                 string room = self.creature.Room.name;
-                                
-                                
+
+
 
                                 if (givenItem != receivedItem && !t.traderItems.ContainsKey(givenItem)) t.traderItems.Add(givenItem, room);
                                 //t.Traded(receivedItem, room);
@@ -2064,6 +2064,88 @@ namespace BingoMode.BingoChallenges
                 if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c)
                 {
                     c.Meet();
+                }
+            }
+        }
+
+        public static void Watcher_KarmaLadder_AddEndgameMeters(On.Menu.KarmaLadder.orig_AddEndgameMeters orig, KarmaLadder self)
+        {
+            orig.Invoke(self);
+            if (self.endGameMeters.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var meter in self.endGameMeters)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoAchievementChallenge c &&
+                        meter.tracker.ID.value.ToUpperInvariant() == c.ID.Value.ToUpperInvariant() &&
+                        meter.tracker.GoalFullfilled)
+                    {
+                        c.GetAchievement();
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_PlayerTracker_Update(On.ScavengerOutpost.PlayerTracker.orig_Update orig, ScavengerOutpost.PlayerTracker self)
+        {
+            orig.Invoke(self);
+
+            for (int j = 0; j < self.player.realizedCreature.grasps.Length; j++)
+            {
+                if (self.player.realizedCreature.grasps[j] != null)
+                {
+                    int k = 0;
+                    while (k < self.outpost.outPostProperty.Count)
+                    {
+                        if (self.player.realizedCreature.grasps[j].grabbed.abstractPhysicalObject.ID == self.outpost.outPostProperty[k].ID)
+                        {
+                            bool gruh = false;
+                            for (int w = 0; w < ExpeditionData.challengeList.Count; w++)
+                            {
+                                if (ExpeditionData.challengeList[w] is WatcherBingoStealChallenge c)
+                                {
+
+                                    c.Stoled(self.outpost.outPostProperty[k], true);
+                                    gruh = true;
+                                }
+                            }
+                            if (gruh) break;
+                        }
+                        k++;
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_SocialEventRecognizer_Theft(On.SocialEventRecognizer.orig_Theft orig, SocialEventRecognizer self, PhysicalObject item, Creature theif, Creature victim)
+        {
+            orig.Invoke(self, item, theif, victim);
+
+            if (theif is Player && victim is Scavenger)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoStealChallenge c)
+                    {
+                        c.Stoled(item.abstractPhysicalObject, false);
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_Player_SlugcatGrabNoStealExploit(On.Player.orig_SlugcatGrab orig, Player self, PhysicalObject obj, int graspUsed)
+        {
+            orig.Invoke(self, obj, graspUsed);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoStealChallenge c && !c.toll.Value)
+                {
+                    c.checkedIDs.Add(obj.abstractPhysicalObject.ID);
                 }
             }
         }
