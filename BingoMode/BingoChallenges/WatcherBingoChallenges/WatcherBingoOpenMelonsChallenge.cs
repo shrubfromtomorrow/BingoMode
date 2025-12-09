@@ -149,12 +149,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.Pomegranate.EnterSmashedMode += Watcher_Pomegranate_EnterSmashedMode;
+            On.Pomegranate.Smash += Watcher_Pomegranate_Smash;
         }
 
         public override void RemoveHooks()
         {
-            On.Pomegranate.EnterSmashedMode -= Watcher_Pomegranate_EnterSmashedMode;
+            On.Pomegranate.Smash -= Watcher_Pomegranate_Smash;
         }
 
         public override List<object> Settings() => [amount, oneCycle];

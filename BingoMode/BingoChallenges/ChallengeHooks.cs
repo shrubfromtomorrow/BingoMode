@@ -2017,7 +2017,7 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void Watcher_Pomegranate_EnterSmashedMode(On.Pomegranate.orig_EnterSmashedMode orig, Pomegranate self)
+        public static void Watcher_Pomegranate_Smash(On.Pomegranate.orig_Smash orig, Pomegranate self)
         {
             orig.Invoke(self);
 

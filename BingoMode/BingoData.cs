@@ -412,6 +412,8 @@ namespace BingoMode
                 WatcherEnums.SandboxUnlockID.RotLoach,
                 WatcherEnums.SandboxUnlockID.RotSeedCob,
                 WatcherEnums.SandboxUnlockID.FireSprite,
+                WatcherEnums.SandboxUnlockID.ScavengerDisciple,
+                WatcherEnums.SandboxUnlockID.SandGrub,
             };
             var excludedLevels = new[]
             {

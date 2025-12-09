@@ -111,7 +111,8 @@ namespace BingoMode.BingoChallenges
             "FireSpear" => 1,
             "ElectricSpear" => 2,
             "HellSpear" => 3,
-            "AltSkyWhale" => 4,
+            "AltSkyWhale" => 1,
+            "ProtoLizard" => 2,
             _ => 0
         };
 
@@ -122,6 +123,7 @@ namespace BingoMode.BingoChallenges
             "ElectricSpear" => "Spear",
             "HellSpear" => "Spear",
             "AltSkyWhale" => "SkyWhale",
+            "ProtoLizard" => "IndigoLizard",
             _ => thing
         };
 
