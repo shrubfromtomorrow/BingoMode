@@ -535,7 +535,10 @@ namespace BingoMode.BingoChallenges
             "ScavengerBomb",
             "JellyFish",
             "PuffBall",
-            "LillyPuck"
+            "LillyPuck",
+            "Boomerang",
+            "Frog",
+            "GraffitiBomb"
         };
 
         public static readonly string[] StealableStolable =

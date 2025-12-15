@@ -122,13 +122,17 @@ namespace BingoMode.BingoChallenges
         {
             List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value];
             bool oneCycle = UnityEngine.Random.value < 0.33f;
-            string wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
+
+            // watcher touches this
+            string wep = ChallengeUtils.Weapons[
+                UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))
+            ];
 
             string crit;
             if (UnityEngine.Random.value < 0.25f)
             {
                 crit = "Any Creature";
-                if (wep == "Any Weapon") wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.MSC ? 0 : 1))];
+                if (wep == "Any Weapon") wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))];
             }
             else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature.value;
             int amound = UnityEngine.Random.Range(2, 7);
@@ -160,7 +164,7 @@ namespace BingoMode.BingoChallenges
             else return true;
         }
 
-        public void Hit(AbstractPhysicalObject.AbstractObjectType weaponn, Creature victimm)
+        public void Hit(string weaponn, Creature victimm)
         {
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || !CritInLocation(victimm) || (victim.Value == "Any Creature" && victimm.Template.smallCreature)) return;
 
@@ -168,7 +172,7 @@ namespace BingoMode.BingoChallenges
             bool weaponCheck = false;
             if (victimm.Template.type.value.ToLowerInvariant() == victim.Value.ToLowerInvariant()) glug = true;
             if (victim.Value == "Any Creature" && victimm is not Player) glug = true;
-            if (weaponn.value.ToLowerInvariant() == weapon.Value.ToLowerInvariant()) weaponCheck = true;
+            if (weaponn.ToLowerInvariant() == weapon.Value.ToLowerInvariant()) weaponCheck = true;
             if (weapon.Value == "Any Weapon") weaponCheck = true;
 
             if (weaponCheck && glug)

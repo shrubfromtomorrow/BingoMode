@@ -1,4 +1,5 @@
 ﻿using BingoMode.BingoSteamworks;
+using Expedition;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
@@ -86,8 +87,8 @@ namespace BingoMode.BingoMenu
             perks = new CheckBox[3];
             burdens = new CheckBox[3];
             gamemode = new CheckBox[4];
-            string[] texts = { Translate("Allowed - "), Translate("Disabled - "), Translate("Host decides - ") };
             string[] gamemodes = { Translate("Bingo - "), Translate("Lockout (ties) - "), Translate("Lockout (no ties) - "), Translate("Blackout - ") };
+            string[] texts = { Translate("Allowed - "), Translate("Disabled - "), Translate("Host decides - ") };
             for (int i = 0; i < 3; i++)
             {
                 perks[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "PERJ" + i.ToString());
@@ -188,6 +189,7 @@ namespace BingoMode.BingoMenu
 
             float xPos = 670f;
             float yTop = 528f;
+
             friendsOnly.pos = new Vector2(xPos, yTop + 30f);
             hostMods.pos = new Vector2(xPos, yTop);
             maxPlayers.pos = new Vector2(xPos, yTop - 35f);
@@ -218,10 +220,12 @@ namespace BingoMode.BingoMenu
                 }
             }
 
+
             labels[0].SetPosition(pagePos + new Vector2(xPos, yTop - 115f));
             labels[1].SetPosition(pagePos + new Vector2(xPos, yTop - 165f)); 
             labels[2].SetPosition(pagePos + new Vector2(xPos, yTop - 19f));
             labels[3].SetPosition(pagePos + new Vector2(xPos, yTop - 65f));
+
 
             for (int i = 0; i < 2; i++)
             {

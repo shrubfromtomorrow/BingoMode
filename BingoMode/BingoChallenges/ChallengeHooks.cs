@@ -131,7 +131,7 @@ namespace BingoMode.BingoChallenges
         public static Hook tokenColorHook;
         public static Hook placeKarmaFlowerHook;
 
-        // Sporecloud fix for owner recognition
+        // Sporecloud/graffiticloud fix for owner recognition (UpdatableAndDeletable)
         public static Dictionary<UpdatableAndDeletable, EntityID> ownerOfUAD = [];
         public static ConditionalWeakTable<Room, List<EntityID>> playerTradeItems = new ConditionalWeakTable<Room, List<EntityID>>();
 
@@ -142,6 +142,7 @@ namespace BingoMode.BingoChallenges
             On.SaveState.SessionEnded += ClearBs;
 
             // For damage and kill challenges, i put them here since theres so many and both challenges would have to do the same hooks
+            // watcher touches this
             On.Spear.HitSomething += Spear_HitSomething;
             On.Rock.HitSomething += Rock_HitSomething;
             On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
@@ -150,6 +151,10 @@ namespace BingoMode.BingoChallenges
             IL.SporeCloud.Update += SporeCloud_Update;
             IL.JellyFish.Collide += JellyFish_Collide;
             IL.PuffBall.Explode += PuffBall_Explode;
+            On.Boomerang.HitSomething += Boomerang_HitSomething;
+            IL.GraffitiBomb.Explode += GraffitiBomb_Explode;
+            IL.GraffitiCloud.Update += GraffitiCloud_Update;
+            On.Watcher.Frog.Attach += Frog_Attach;
             //IL.FlareBomb.Update += FlareBomb_Update;
 
             // No need for unlocked slugs
@@ -764,7 +769,7 @@ namespace BingoMode.BingoChallenges
                     
                     if (BingoData.BingoMode && self.thrownBy != null && self.thrownBy.abstractCreature.creatureTemplate.type == CreatureType.Slugcat && self.room.abstractRoom.creatures[i].realizedCreature is Creature victim)
                     {
-                        ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID);
+                        ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID);
                     }
                 });
             }
@@ -817,17 +822,16 @@ namespace BingoMode.BingoChallenges
                 {
                     if (BingoData.BingoMode && explosion.sourceObject != null && explosion.killTagHolder is Player && explosion.room.physicalObjects[j][k] is Creature victim)
                     {
-                        if (!victim.dead) ReportHit(explosion.sourceObject.abstractPhysicalObject.type, victim, explosion.sourceObject.abstractPhysicalObject.ID);
+                        if (!victim.dead) ReportHit(explosion.sourceObject.abstractPhysicalObject.type.value, victim, explosion.sourceObject.abstractPhysicalObject.ID);
                     }
                 });
             }
             else Plugin.logger.LogError("Uh oh, Explosion_Update il fucked up " + il);
         }
 
-        public static void ReportHit(ItemType weapon, Creature victim, EntityID source, bool report = true)
+        public static void ReportHit(string weapon, Creature victim, EntityID source, bool report = true)
         {
             if (weapon == null || victim == null) return;
-            
 
             if (source != null && report)
             {
@@ -845,7 +849,7 @@ namespace BingoMode.BingoChallenges
             }
 
             EntityID id = victim.abstractCreature.ID;
-            if (!BingoData.hitTimeline.ContainsKey(id)) BingoData.hitTimeline.Add(id, []);  
+            if (!BingoData.hitTimeline.ContainsKey(id)) BingoData.hitTimeline.Add(id, []); 
             if (BingoData.hitTimeline.TryGetValue(id, out var gru) && (gru.Count == 0 || gru.Last() != weapon)) { gru.Remove(weapon); gru.Add(weapon);  }
         }
 
@@ -911,7 +915,7 @@ namespace BingoMode.BingoChallenges
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, false);
+                ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID, false);
             }
 
             return orig.Invoke(self, result, eu);
@@ -921,7 +925,7 @@ namespace BingoMode.BingoChallenges
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, true);
+                ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID, true);
             }
 
             return orig.Invoke(self, result, eu);
@@ -931,7 +935,7 @@ namespace BingoMode.BingoChallenges
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, false);
+                ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID, false);
             }
 
             return orig.Invoke(self, result, eu);
@@ -941,7 +945,7 @@ namespace BingoMode.BingoChallenges
         {
             if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
             {
-                ReportHit(self.abstractPhysicalObject.type, victim, self.abstractPhysicalObject.ID, false);
+                ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID, false);
             }
 
             return orig.Invoke(self, result, eu);
@@ -1401,7 +1405,8 @@ namespace BingoMode.BingoChallenges
                         Creature victim = self.room.abstractRoom.creatures[i].realizedCreature;
                         if (victim != null && !victim.dead && Custom.DistLess(self.pos, victim.mainBodyChunk.pos, self.rad + victim.mainBodyChunk.rad + 20f))
                         {
-                            ReportHit(ItemType.PuffBall, victim, ownerOfUAD[self]);
+                            // Make string
+                            ReportHit("PuffBall", victim, ownerOfUAD[self]);
                         }
                     }
                 });
@@ -1425,7 +1430,7 @@ namespace BingoMode.BingoChallenges
                 {
                     if (BingoData.BingoMode && self.thrownBy is Player)
                     {
-                        ReportHit(self.abstractPhysicalObject.type, obj as Creature, self.abstractPhysicalObject.ID, false);
+                        ReportHit(self.abstractPhysicalObject.type.value, obj as Creature, self.abstractPhysicalObject.ID, false);
                     }
                 });
             }
@@ -1594,12 +1599,10 @@ namespace BingoMode.BingoChallenges
                 c.EmitDelegate<Func<bool, Room, int, bool>>((orig, self, i) =>
                 {
                     PlacedObject obj = self.roomSettings.placedObjects[i];
-                    Plugin.logger.LogInfo(obj.ToString());
                     if (obj.type == PlacedObject.Type.UniqueDataPearl &&
                         self.game.session is StoryGameSession session && !session.saveState.ItemConsumed(self.world, false, self.abstractRoom.index, i) &&
                         (obj.data as PlacedObject.DataPearlData).pearlType == MoreSlugcatsEnums.DataPearlType.RM)
                     {
-                        Plugin.logger.LogInfo("Returning false");
                         return false;
                     }
                     return orig;
@@ -2108,7 +2111,6 @@ namespace BingoMode.BingoChallenges
                             {
                                 if (ExpeditionData.challengeList[w] is WatcherBingoStealChallenge c)
                                 {
-
                                     c.Stoled(self.outpost.outPostProperty[k], true);
                                     gruh = true;
                                 }
@@ -2149,6 +2151,76 @@ namespace BingoMode.BingoChallenges
                 }
             }
         }
+
+        public static bool Boomerang_HitSomething(On.Boomerang.orig_HitSomething orig, Boomerang self, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (BingoData.BingoMode && self.thrownBy is Player && result.obj is Creature victim && !victim.dead)
+            {
+                ReportHit(self.abstractPhysicalObject.type.value, victim, self.abstractPhysicalObject.ID, false);
+            }
+            return orig.Invoke(self, result, eu);
+        }
+
+        public static void GraffitiBomb_Explode(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchNewobj<GraffitiCloud>(),
+                x => x.MatchCallOrCallvirt<Room>("AddObject")
+                ))
+            {
+                c.Index++;
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<GraffitiCloud, GraffitiBomb, GraffitiCloud>>((orig, self) =>
+                {
+                    if (BingoData.BingoMode && self.thrownBy != null && self.thrownBy.abstractCreature.creatureTemplate.type == CreatureType.Slugcat)
+                    {
+                        ownerOfUAD[orig] = self.abstractPhysicalObject.ID;
+                    }
+
+                    return orig;
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, GraffitiBomb_Explode il fucked up " + il);
+        }
+
+        public static void GraffitiCloud_Update(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(
+                x => x.MatchCallOrCallvirt<AbstractCreature>("get_realizedCreature")
+                ))
+            {
+                c.Index += 3;
+                c.Emit(OpCodes.Ldarg_0);
+                c.Emit(OpCodes.Ldloc, 5);
+                c.EmitDelegate<Action<GraffitiCloud, int>>((self, i) =>
+                {
+                    if (!self.slatedForDeletetion && BingoData.BingoMode && ownerOfUAD.ContainsKey(self) && self != null && self.thrownBy != null && self.thrownBy.creatureTemplate.type == CreatureType.Slugcat)
+                    {
+                        Creature victim = self.room.abstractRoom.creatures[i].realizedCreature;
+                        if (victim != null && !victim.dead && Custom.DistLess(self.pos, victim.mainBodyChunk.pos, self.rad + victim.mainBodyChunk.rad + 20f))
+                        {
+                            ReportHit("GraffitiBomb", victim, ownerOfUAD[self]);
+                        }
+                    }
+                });
+            }
+            else Plugin.logger.LogError("Uh oh, GraffitiBomb_Update il fucked up " + il);
+        }
+
+        public static void Frog_Attach(On.Watcher.Frog.orig_Attach orig, Frog self, BodyChunk chunk, bool suckedFood = false)
+        {
+            if (BingoData.BingoMode && self.thrownBy is Player && self.throwLatch && chunk.owner is Creature victim && !victim.dead)
+            {
+                ReportHit(self.abstractCreature.creatureTemplate.name, victim, self.abstractPhysicalObject.ID, false);
+            }
+            orig.Invoke(self, chunk, suckedFood);
+        }
+
+        // ADD TO ITEMNAME
 
         #endregion
     }

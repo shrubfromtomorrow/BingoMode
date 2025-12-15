@@ -32,7 +32,7 @@ namespace BingoMode
         public static List<string> appliedChallenges = [];
         // This prevents the same creatures being hit by the same sources multiple times
         public static Dictionary<Creature, List<EntityID>> blacklist = [];
-        public static Dictionary<EntityID, List<ItemType>> hitTimeline = [];
+        public static Dictionary<EntityID, List<string>> hitTimeline = [];
         public static ExpeditionMenu globalMenu;
         public static LobbySettings globalSettings = new LobbySettings();
         public static string BingoDen = "random";

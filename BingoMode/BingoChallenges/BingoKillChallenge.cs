@@ -169,7 +169,8 @@ namespace BingoMode.BingoChallenges
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 2);
             num = Mathf.Max(2, num);
             List<string> clone = ChallengeUtils.Weapons.ToList();
-            clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish");
+            // watcher touches this
+            clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish" || x == "Boomerang" || x == "Frog" || x == "GraffitiBomb");
             bool doWeapon = UnityEngine.Random.value < 0.5f;
             bool doCreature = !doWeapon || UnityEngine.Random.value < 0.8f;
             string weapo = doWeapon ? "Any Weapon" : clone[UnityEngine.Random.Range(0, clone.Count - (ModManager.MSC ? 0 : 1))];
@@ -403,7 +404,7 @@ namespace BingoMode.BingoChallenges
             if (weapon.Value == "Any Weapon") return true;
             if (BingoData.hitTimeline.TryGetValue(c.abstractCreature.ID, out var list))
             {
-                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == new ItemType(weapon.Value)) return true;
+                if (list.Last(x => list.IndexOf(x) != -1 && list.IndexOf(x) > (list.Count - 2)) == weapon.Value) return true;
             }
             return false;
         }
