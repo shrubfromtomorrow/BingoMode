@@ -2,6 +2,7 @@
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
+using On.Watcher;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -125,7 +126,7 @@ namespace BingoMode.BingoChallenges
 
             // watcher touches this
             string wep = ChallengeUtils.Weapons[
-                UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))
+                UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))
             ];
 
             string crit;
@@ -166,7 +167,8 @@ namespace BingoMode.BingoChallenges
 
         public void Hit(string weaponn, Creature victimm)
         {
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || !CritInLocation(victimm) || (victim.Value == "Any Creature" && victimm.Template.smallCreature)) return;
+            // watcher touches this
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || !CritInLocation(victimm) || (victim.Value == "Any Creature" && (victimm.Template.smallCreature && !(ModManager.Watcher && victimm.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite)))) return;
 
             bool glug = false;
             bool weaponCheck = false;

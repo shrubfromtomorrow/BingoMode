@@ -141,7 +141,6 @@ namespace BingoMode.BingoChallenges
         public void Boom(string room, bool side)
         {
             string roomLower = room.ToLowerInvariant();
-            Plugin.logger.LogInfo("boom! " + roomLower);
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
                 if (!pass.Value)
@@ -186,7 +185,6 @@ namespace BingoMode.BingoChallenges
         public void Pass(string room, bool side)
         {
             string roomLower = room.ToLowerInvariant();
-            Plugin.logger.LogInfo("pass! " + roomLower);
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && pass.Value)
             {
                 if (specific.Value)

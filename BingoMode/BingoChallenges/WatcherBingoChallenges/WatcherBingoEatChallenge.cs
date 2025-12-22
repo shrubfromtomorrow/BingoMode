@@ -119,7 +119,6 @@ namespace BingoMode.BingoChallenges
 
         public void FoodEated(IPlayerEdible thisEdibleIsShit, Player playuh)
         {
-            Plugin.logger.LogInfo((thisEdibleIsShit as PhysicalObject).abstractPhysicalObject.type.value);
             if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
                 (isCreature ? (p.abstractPhysicalObject is AbstractCreature g && g.creatureTemplate.type.value == foodType.Value) : (p.abstractPhysicalObject.type.value == foodType.Value)) && (!starve.Value || playuh.Malnourished))
             {

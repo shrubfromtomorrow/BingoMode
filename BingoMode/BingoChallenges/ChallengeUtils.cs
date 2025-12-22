@@ -146,7 +146,7 @@ namespace BingoMode.BingoChallenges
                 case "food": return FoodTypes;
                 case "Wfood": return WFoodTypes;
                 case "weapons": return Weapons;
-                case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish")];
+                case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish" || x != "Frog")];
                 case "theft": return [.. StealableStolable, "DataPearl"];
                 case "Wtheft": return [.. WStealableStolable, "DataPearl"];
                 case "ban": return Bannable;
@@ -706,7 +706,12 @@ namespace BingoMode.BingoChallenges
             // MSC
             "GooieDuck",
             "LillyPuck",
-            "DandelionPeach"
+            "DandelionPeach",
+
+            // watcher
+            "FireSpriteLarva",
+            "GraffitiBomb",
+            "Boomerang",
         };
 
         public static readonly string[] SpinningTopSpots =

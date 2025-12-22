@@ -388,6 +388,11 @@ namespace BingoMode.BingoMenu
                     if (ch is BingoAllRegionsExceptChallenge g) bannedRegions.Add(g.region.Value);
                     if (ch is BingoEnterRegionChallenge b) bannedRegions.Add(b.region.Value);
                     if (ch is BingoEnterRegionFromChallenge a) bannedRegions.Add(a.to.Value);
+
+                    // watcher touches this
+                    if (ch is WatcherBingoEnterRegionChallenge c) bannedRegions.Add(c.region.Value);
+                    if (ch is WatcherBingoNoRegionChallenge d) bannedRegions.Add(d.region.Value);
+                    if (ch is WatcherBingoAllRegionsExceptChallenge e) bannedRegions.Add(e.region.Value);
                 }
                 if (BingoData.BingoDen.ToLowerInvariant() == "random")
                 {
@@ -407,6 +412,7 @@ namespace BingoMode.BingoMenu
                     {
                         foreach (var banned in bannedRegions)
                         {
+                            
                             if (bannedRegions.Count == ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)
                             {
                                 BingoData.BingoDen = "SU_S01";

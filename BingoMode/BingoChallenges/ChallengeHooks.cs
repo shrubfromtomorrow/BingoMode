@@ -1948,7 +1948,10 @@ namespace BingoMode.BingoChallenges
             {
                 if (ExpeditionData.challengeList[j] is WatcherBingoSpinningTopChallenge c)
                 {
-                    c.SeeSpin(self.room.world.region.name);
+                    for (int i = 0; i < self.room.game.Players.Count; i++)
+                    {
+                        c.SeeSpin(self.room.world.region.name, (self.room.game.Players[i].realizedCreature as Player).Malnourished);
+                    }
                 }
             }
         }

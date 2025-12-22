@@ -231,7 +231,6 @@ namespace BingoMode
 
                 // Lock everyone but washa
                 On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
-
             }
 
             // Stop void win from happening

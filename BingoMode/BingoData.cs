@@ -1,19 +1,20 @@
-﻿using Expedition;
-using Menu;
-using RWCustom;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System;
+using Expedition;
+using Menu;
+using RWCustom;
 using ItemType = AbstractPhysicalObject.AbstractObjectType;
 
 namespace BingoMode
 {
+    using System.IO;
+    using System.Text.RegularExpressions;
     using BingoChallenges;
     using BingoSteamworks;
     using MoreSlugcats;
     using Steamworks;
-    using System.IO;
     using UnityEngine;
     using Watcher;
 
@@ -28,6 +29,7 @@ namespace BingoMode
         public static List<string> watcherRegions;
         public static List<string> watcherSTSpots;
         public static List<string> watcherPortals;
+        //public static Dictionary<string, string> watcherMapPortals;
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
         // This prevents the same creatures being hit by the same sources multiple times
@@ -440,7 +442,7 @@ namespace BingoMode
 
         public static void PopulateWatcherData()
         {
-            watcherRegions = File.ReadAllLines(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt")).Select(s => s.Trim().ToLowerInvariant()).Where(s => s.Length == 4).ToList();
+            watcherRegions = SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher);
             List<string> rawPortals = new List<string>();
             List<string> rawSTSpots = new List<string>();
             foreach (var region in watcherRegions)

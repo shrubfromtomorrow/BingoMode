@@ -131,10 +131,13 @@ namespace BingoMode.BingoChallenges
                 liste.Remove("SmallNeedleWorm");
                 liste.Remove("SSOracleSwarmer");
             }
+
+            int mscIndex = liste.IndexOf("GooieDuck");
+            int watcherIndex = liste.IndexOf("FireSpriteLarva");
             return new BingoItemHoardChallenge
             {
                 amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 0),
-                target = new(liste[UnityEngine.Random.Range(0, liste.Count)], "Item", 1, listName: "expobject"),
+                target = new(liste[UnityEngine.Random.Range(0, ModManager.Watcher ? liste.Count : (ModManager.MSC ? watcherIndex : mscIndex))], "Item", 1, listName: "expobject"),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
                 region = new("Any Region", "Region", 4, listName: "regions"),
             };

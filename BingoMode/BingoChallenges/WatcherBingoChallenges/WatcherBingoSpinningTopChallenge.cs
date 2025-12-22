@@ -51,18 +51,18 @@ namespace BingoMode.BingoChallenges
             return phrase;
         }
 
-        public void SeeSpin(string spin)
+        public void SeeSpin(string spin, bool starved)
         {
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
-                if (spin != spinner.Value) return;
+                if (spin != spinner.Value || starve.Value && !starved) return;
                 UpdateDescription();
                 CompleteChallenge();
             }
             else
             {
-                if (visited.Contains(spin)) return;
+                if (visited.Contains(spin) || starve.Value && !starved) return;
                 current++;
                 visited.Add(spin);
                 UpdateDescription();

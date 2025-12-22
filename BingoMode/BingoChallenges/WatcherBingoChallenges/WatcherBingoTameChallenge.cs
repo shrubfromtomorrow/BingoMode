@@ -75,7 +75,6 @@ namespace BingoMode.BingoChallenges
 
         public void Fren(CreatureTemplate.Type friend)
         {
-            Plugin.logger.LogInfo(friend.value);
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
