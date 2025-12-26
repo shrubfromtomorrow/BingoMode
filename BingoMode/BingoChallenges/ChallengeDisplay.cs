@@ -70,7 +70,7 @@ namespace BingoMode.BingoChallenges
             foreach (Word word in WordsFlat)
             {
                 if (word.background != null) container.AddChild(word.background);
-                container.AddChild(word.display);
+                if (word.display != null) container.AddChild(word.display);
             }
         }
 
@@ -79,16 +79,16 @@ namespace BingoMode.BingoChallenges
             foreach (Word word in WordsFlat)
             {
                 word.background?.RemoveFromContainer();
-                word.display.RemoveFromContainer();
+                word.display?.RemoveFromContainer();
             }
         }
 
         public void SetAlpha(float alpha)
         {
-            foreach (Word word in WordsFlat)
+            foreach (Word word in WordsFlat) 
             {
                 if (word.background != null) word.background.alpha = alpha;
-                word.display.alpha = alpha;
+                if (word.display != null) word.display.alpha = alpha;
             }
         }
 
