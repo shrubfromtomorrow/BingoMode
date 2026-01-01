@@ -106,7 +106,7 @@ namespace BingoMode.BingoChallenges
             }
             else
             {
-                if (!BingoData.pinnableCreatureRegions.ContainsKey(c)) 
+                if (!BingoData.pinnableCreatureRegions.ContainsKey(c))
                 {
                     tries += 1;
                     goto shitGoBack;

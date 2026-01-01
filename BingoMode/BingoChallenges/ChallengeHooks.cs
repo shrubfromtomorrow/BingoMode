@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using BingoMode.BingoChallenges.WatcherBingoChallenges;
 using BingoMode.BingoSteamworks;
 using Expedition;
@@ -2067,7 +2068,7 @@ namespace BingoMode.BingoChallenges
             orig.Invoke(self);
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c)
+                if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c && c.region == self.owner.room.abstractRoom.world.name.ToUpperInvariant())
                 {
                     c.Meet();
                 }
@@ -2223,7 +2224,38 @@ namespace BingoMode.BingoChallenges
             orig.Invoke(self, chunk, suckedFood);
         }
 
-        // ADD TO ITEMNAME
+        public static void Watcher_Room_Loaded(On.Room.orig_Loaded orig, Room self)
+        {
+            orig(self);
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed && c.room.Value == self.abstractRoom.name.ToUpperInvariant())
+                {
+                    Vector2 pos = new Vector2(0, 0);
+
+                    foreach (var thing in self.roomSettings.placedObjects)
+                    {
+                        if (thing.type == PlacedObject.Type.DynamicWarpTarget)
+                        {
+                            pos = thing.pos;
+                        }
+                    }
+                    WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(null);
+                    warpPointData.cycleSpawnedOn = self.world.game.GetStorySession.saveState.cycleNumber - 6;
+                    warpPointData.cycleExpiry = 5;
+                    warpPointData.destPos = pos;
+                    warpPointData.destRoom = "NARNIA";
+                    warpPointData.destTimeline = self.world.game.TimelinePoint;
+
+                    PlacedObject po = new PlacedObject(PlacedObject.Type.WarpPoint, warpPointData);
+                    po.data.owner = po;
+                    po.pos = pos;
+                    WarpPoint warpPoint = new WarpPoint(self, po);
+                    self.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[WarpPoint.IdentifyingString(self.game, warpPoint.Data, self.abstractRoom)] = warpPoint.ToString();
+                    self.AddObject(warpPoint);
+                }
+            }
+        }
 
         #endregion
     }

@@ -29,7 +29,7 @@ namespace BingoMode
         public static List<string> watcherRegions;
         public static List<string> watcherSTSpots;
         public static List<string> watcherPortals;
-        //public static Dictionary<string, string> watcherMapPortals;
+        public static List<string> watcherDWTSpots;
         public static int[] heldItemsTime;
         public static List<string> appliedChallenges = [];
         // This prevents the same creatures being hit by the same sources multiple times
@@ -231,7 +231,7 @@ namespace BingoMode
                 typeof(BingoAchievementChallenge),
                 typeof(BingoStealChallenge),
                 // Temp
-                typeof(WatcherBingoWeaverChallenge),
+                //typeof(WatcherBingoWeaverChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));
@@ -442,9 +442,11 @@ namespace BingoMode
 
         public static void PopulateWatcherData()
         {
-            watcherRegions = SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher);
+            watcherRegions = SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Select(r => r.ToLowerInvariant()).ToList();
             List<string> rawPortals = new List<string>();
             List<string> rawSTSpots = new List<string>();
+            List<string> rawDWTSpots = new List<string>();
+
             foreach (var region in watcherRegions)
             {
                 if (Custom.rainWorld.regionWarpRooms.ContainsKey(region))
@@ -459,6 +461,13 @@ namespace BingoMode
                     foreach (var st in Custom.rainWorld.regionSpinningTopRooms[region])
                     {
                         rawSTSpots.Add(st);
+                    }
+                }
+                if (Custom.rainWorld.regionDynamicWarpTargets.ContainsKey(region))
+                {
+                    foreach (var dt in Custom.rainWorld.regionDynamicWarpTargets[region])
+                    {
+                        rawDWTSpots.Add(dt);
                     }
                 }
             }
@@ -496,6 +505,18 @@ namespace BingoMode
                 if (!watcherSTSpots.Contains(STKey))
                 {
                     watcherSTSpots.Add(STKey);
+                }
+            }
+
+            watcherDWTSpots = new List<string>();
+            foreach (var line in rawDWTSpots)
+            {
+                var parts = line.Split(':');
+                string DWTKey = parts[0].ToLowerInvariant();
+
+                if (!watcherDWTSpots.Contains(DWTKey))
+                {
+                    watcherDWTSpots.Add(DWTKey.ToUpperInvariant());
                 }
             }
         }

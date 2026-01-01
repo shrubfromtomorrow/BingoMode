@@ -16,6 +16,7 @@ using System.Reflection;
 namespace BingoMode
 {
     using System.IO;
+    using System.Text.RegularExpressions;
     using BingoChallenges;
     using BingoHUD;
     using BingoMenu;
@@ -231,6 +232,11 @@ namespace BingoMode
 
                 // Lock everyone but washa
                 On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
+
+                // Skip portal pair check for weaver for goal portal
+                IL.Watcher.WarpPoint.ActivateWeaver += WarpPoint_ActivateWeaver;
+                On.SaveState.ApplyCustomEndGame += SaveState_ApplyCustomEndGame;
+                On.Watcher.WarpPoint.ChooseDynamicWarpTarget += WarpPoint_ChooseDynamicWarpTarget;
             }
 
             // Stop void win from happening
@@ -265,8 +271,9 @@ namespace BingoMode
 
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
-
         }
+
+        
 
         private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
         {
@@ -1293,6 +1300,80 @@ namespace BingoMode
                         sceneToRegion[value] = region;
                     }
                 }
+            }
+        }
+
+        private static void WarpPoint_ActivateWeaver(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                    x => x.MatchLdloc(out _),
+                    x => x.MatchLdcI4(out _),
+                    x => x.MatchCeq(),
+                    x => x.MatchLdloc(out _),
+                    x => x.MatchOr()
+                ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<bool, WarpPoint, bool>>((cur, wp) =>
+                {
+                    if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && wp.Data != null && wp.Data.destRoom != null && wp.Data.destRoom == "NARNIA")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return cur;
+                    }
+                });
+            }
+            else Plugin.logger.LogError("WarpPoint_ActivateWeaver FAIULRE " + il);
+        }
+
+        private static void SaveState_ApplyCustomEndGame(On.SaveState.orig_ApplyCustomEndGame orig, SaveState self, RainWorldGame game, bool addFiveCycles)
+        {
+            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                self.deathPersistentSaveData.rippleLevel = 5;
+            }
+            orig(self, game, addFiveCycles);
+        }
+
+        private static string WarpPoint_ChooseDynamicWarpTarget(On.Watcher.WarpPoint.orig_ChooseDynamicWarpTarget orig, World world, string oldRoom, string targetRegion, bool badWarp, bool spreadingRot, bool playerCreated)
+        {
+            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                List<string> list;
+                if (targetRegion != null && targetRegion.ToLowerInvariant() == "wora")
+                {
+                    list = WarpPoint.GetAvailableOuterRimWarpTargets(world, oldRoom, false);
+                }
+                else if (badWarp)
+                {
+                    list = WarpPoint.GetAvailableBadWarpTargets(world, oldRoom);
+                }
+                else
+                {
+                    if (targetRegion != null)
+                    {
+                        list = BingoData.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant()).ToList();
+                    }
+                    else
+                    {
+                        list = BingoData.watcherDWTSpots;
+                    }
+                }
+                if (list.Count == 0)
+                {
+                    Plugin.logger.LogInfo("No available DWT for region: " + targetRegion);
+                    return null;
+                }
+                return list[UnityEngine.Random.Range(0, list.Count)];
+            }
+            else
+            {
+                return orig(world, oldRoom, targetRegion, badWarp, spreadingRot, playerCreated);
             }
         }
 

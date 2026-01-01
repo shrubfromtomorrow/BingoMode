@@ -18,19 +18,25 @@ namespace BingoMode.BingoChallenges
     {
         public int current;
         public SettingBox<int> amount;
+        public SettingBox<string> region;
+        public SettingBox<bool> differentRegions;
         public SettingBox<bool> oneCycle;
+        public List<string> openRegions = [];
 
         public WatcherBingoOpenMelonsChallenge()
         {
             amount = new(0, "Amount", 0);
-            oneCycle = new(false, "In one Cycle", 1);
+            region = new("", "Region", 1, listName: "Wpoms");
+            differentRegions = new(false, "Different Regions", 2);
+            oneCycle = new(false, "In one Cycle", 3);
         }
 
         public override void UpdateDescription()
         {
-            description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] pomegranates <onecycle>")
+            description = ChallengeTools.IGT.Translate("Open [<current>/<amount>] pomegranates <region> <onecycle>")
                 .Replace("<current>", current.ToString())
                 .Replace("<amount>", amount.Value.ToString())
+                .Replace("<region>", differentRegions.Value ? ChallengeTools.IGT.Translate("in different regions") : region.Value == "Any Region" ? "" : ChallengeTools.IGT.Translate("in ") + ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)))
                 .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate("in one cycle") : "");
             base.UpdateDescription();
         }
@@ -38,15 +44,39 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new Phrase(
-                [[new Icon("Symbol_Pomegranate", 1f, new Color(0.27f, 0.71f, 0.19f))],
-                [new Counter(current, amount.Value)]]);
-            if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), 0, 1);
+                [[new Icon("Symbol_Pomegranate", 1f, new Color(0.27f, 0.71f, 0.19f))]]);
+            if (differentRegions.Value)
+            {
+                phrase.InsertWord(new Icon("TravellerA"));
+                phrase.InsertWord(new Counter(current, amount.Value), 1);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 1);
+                }
+            }
+            else if (region.Value != "Any Region")
+            {
+                phrase.InsertWord(new Verse(region.Value), 1);
+                phrase.InsertWord(new Counter(current, amount.Value), 2);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 0);
+                }
+            }
+            else
+            {
+                phrase.InsertWord(new Counter(current, amount.Value), 1, 0);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 1);
+                }
+            }
             return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not WatcherBingoOpenMelonsChallenge;
+            return challenge is not WatcherBingoOpenMelonsChallenge c || (c.region.Value != region.Value && c.differentRegions.Value != differentRegions.Value) || c.oneCycle.Value != oneCycle.Value || c.differentRegions.Value != differentRegions.Value;
         }
 
         public override string ChallengeName()
@@ -57,8 +87,12 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             WatcherBingoOpenMelonsChallenge ch = new();
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("Wpoms")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("Wpoms").Length)] : "Any Region";
+
             ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
-            ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "In one Cycle", 1);
+            ch.region = new(r, "Region", 1, listName: "popcornRegions");
+            ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
+            ch.oneCycle = new(false, "In one Cycle", 3);
             return ch;
         }
 
@@ -66,12 +100,12 @@ namespace BingoMode.BingoChallenges
         {
             base.Update();
             if (revealed || completed) return;
-            if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (game.cameras[0].room.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
             {
-                if (this.current != 0 && this.oneCycle.Value)
+                if (current != 0 && oneCycle.Value)
                 {
-                    this.current = 0;
-                    this.UpdateDescription();
+                    Reset();
+                    UpdateDescription();
                     ChangeValue();
                 }
                 return;
@@ -80,13 +114,40 @@ namespace BingoMode.BingoChallenges
 
         public void Open()
         {
-            if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team])
+            if (completed || revealed || hidden || TeamsCompleted[SteamTest.team]) return;
+
+            foreach (var player in game.Players)
             {
-                current++;
-                UpdateDescription();
-                if (current >= (int)amount.Value) CompleteChallenge();
-                else ChangeValue();
+                if (!TryGetWorldName(player, out var world)) continue;
+
+                if (differentRegions.Value)
+                {
+                    if (openRegions.Contains(world)) continue;
+
+                    openRegions.Add(world);
+                    Progress();
+                }
+                else if (region.Value == "Any Region") Progress();
+                else if (region.Value == world) Progress();
             }
+        }
+
+        private bool TryGetWorldName(AbstractCreature p, out string world)
+        {
+            world = null;
+            if (p?.realizedCreature?.room?.world == null) return false;
+
+            world = p.realizedCreature.room.world.name.ToUpperInvariant();
+            return true;
+        }
+
+        private void Progress()
+        {
+            current++;
+            UpdateDescription();
+
+            if (current >= amount.Value) CompleteChallenge();
+            else ChangeValue();
         }
 
         public override int Points()
@@ -116,11 +177,17 @@ namespace BingoMode.BingoChallenges
             {
                 "WatcherBingoOpenMelonsChallenge",
                 "~",
+                region.ToString(),
+                "><",
+                differentRegions.ToString(),
+                "><",
+                oneCycle.ToString(),
+                "><",
                 current.ToString(),
                 "><",
                 amount.ToString(),
                 "><",
-                oneCycle.ToString(),
+                string.Join("|", openRegions),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -133,11 +200,14 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                region = SettingBoxFromString(array[0]) as SettingBox<string>;
+                differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                completed = (array[3] == "1");
-                revealed = (array[4] == "1");
+                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                openRegions = [.. array[5].Split('|')];
+                completed = (array[6] == "1");
+                revealed = (array[7] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -157,6 +227,6 @@ namespace BingoMode.BingoChallenges
             On.Pomegranate.Smash -= Watcher_Pomegranate_Smash;
         }
 
-        public override List<object> Settings() => [amount, oneCycle];
+        public override List<object> Settings() => [amount, region, differentRegions, oneCycle];
     }
 }

@@ -548,7 +548,7 @@ namespace BingoMode.BingoHUD
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
                     grid[i, j].Clear();
-                    grid[i, j].phrase.ClearAll();
+                    if (grid[i, j].phrase != null) grid[i, j].phrase.ClearAll();
                 }
             }
             bingoCompleteInfo.RemoveFromContainer();

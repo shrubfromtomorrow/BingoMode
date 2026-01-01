@@ -1,18 +1,19 @@
-﻿using Expedition;
-using ItemType = AbstractPhysicalObject.AbstractObjectType;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlTypes;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Expedition;
+using MoreSlugcats;
+using RWCustom;
+using UnityEngine;
+using Watcher;
 using CreatureType = CreatureTemplate.Type;
+using DLCItemType = DLCSharedEnums.AbstractObjectType;
+using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using WatcherItemType = Watcher.WatcherEnums.AbstractObjectType;
-using DLCItemType = DLCSharedEnums.AbstractObjectType;
-using System.Collections.Generic;
-using MoreSlugcats;
-using System.Linq;
-using UnityEngine;
-using System;
-using System.IO;
-using RWCustom;
-using System.Data.SqlTypes;
-using Watcher;
 
 namespace BingoMode.BingoChallenges
 {
@@ -157,14 +158,17 @@ namespace BingoMode.BingoChallenges
                 case "craft": return CraftableItems;
                 case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
+                case "popcornRegions": return [.. GetCorrectListForChallenge("regions").Where(x => !ExcludedPopcornRegions.Contains(x))];
+                case "Wpoms": return WpomegranateRegions;
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
-                case "spinners": return SpinningTopSpots;
+                case "spinners": return WspinningTopSpots;
+                case "WweaverRooms": return [.. BingoData.watcherDWTSpots.Where(room => Regex.Split(room, "_")[0] != "WORA")];
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
-                case "Wunlocks": 
+                case "Wunlocks":
                 case "chatlogs": return [.. BingoData.possibleTokens[4]];
                 case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
                 case "Wpassage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand" && x != "Nomad" && x != "Pilgrim" && x != "Scholar" && x != "Traveller" && x != "Survivor")];
@@ -273,10 +277,10 @@ namespace BingoMode.BingoChallenges
         private static void FetchAllEnterableRegions()
         {
             string path = AssetManager.ResolveFilePath(Path.Combine("world", "regions.txt"));
-            if (File.Exists(path)) 
+            if (File.Exists(path))
             {
                 AllEnterableRegions = File.ReadAllLines(path);
-            } 
+            }
         }
 
         private static void FetchGatesFromFile()
@@ -288,7 +292,7 @@ namespace BingoMode.BingoChallenges
                 string[] lines = File.ReadAllLines(path);
                 foreach (string line in lines)
                 {
-                    try 
+                    try
                     {
                         string actualLine = line;
                         if (line.StartsWith("MSC-"))
@@ -313,7 +317,7 @@ namespace BingoMode.BingoChallenges
         public static string[] AllGates = [];
         public static string[] AllEnterableRegions = [];
 
-        public static readonly string[] Depthable = 
+        public static readonly string[] Depthable =
         {
             "Hazer",
             "VultureGrub",
@@ -714,7 +718,7 @@ namespace BingoMode.BingoChallenges
             "Boomerang",
         };
 
-        public static readonly string[] SpinningTopSpots =
+        public static readonly string[] WspinningTopSpots =
         {
             "WARF",
             "WTDB",
@@ -730,6 +734,22 @@ namespace BingoMode.BingoChallenges
             "WVWB",
             "WARA",
             "WAUA"
+        };
+
+        public static readonly string[] WpomegranateRegions =
+        {
+            "WTDB",
+            "WARC",
+            "WVWB",
+            "WPGA",
+            "WRRA",
+            "WTDA",
+            "WVWA"
+        };
+
+        public static readonly string[] ExcludedPopcornRegions =
+        {
+            "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR"
         };
     }
 }

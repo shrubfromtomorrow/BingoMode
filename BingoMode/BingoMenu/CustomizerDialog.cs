@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoMenu
 {
@@ -327,6 +328,10 @@ namespace BingoMode.BingoMenu
                 
                 cccc.location = ChallengeUtils.BingoVistaLocations[cccc.region][cccc.room.Value];
                 BingoVistaChallenge.ModifyVistaPositions(cccc);
+            }
+            else if (owner.challenge is WatcherBingoWeaverChallenge ccccc)
+            {
+                ccccc.region = Regex.Split(ccccc.room.Value, "_")[0];
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();

@@ -19,30 +19,31 @@ namespace BingoMode.BingoChallenges
 
     public class WatcherBingoWeaverChallenge : BingoChallenge
     {
-        public int current;
-        public SettingBox<int> amount;
+        public SettingBox<string> room;
+        public string region;
         public WatcherBingoWeaverChallenge()
         {
+            room = new("", "Portal Room", 0, listName: "WweaverRooms");
         }
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Visit The Weaver");
+            this.description = ChallengeTools.IGT.Translate("Visit The Weaver in <region>").Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer)));
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([[new Icon("weaver"), new Verse("WTDA")]]);
+            Phrase phrase = new Phrase([[new Icon("weaver")],
+            [new Verse(region)]]);
             return phrase;
         }
 
         public void Meet()
         {
-            current++;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             UpdateDescription();
-            if (current >= amount.Value) CompleteChallenge();
-            else ChangeValue();
+            CompleteChallenge();
         }
 
         public override int Points()
@@ -52,9 +53,12 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
+            string[] rooms = ChallengeUtils.GetSortedCorrectListForChallenge("WweaverRooms");
+            string room = rooms[UnityEngine.Random.Range(0, rooms.Length)];
             return new WatcherBingoWeaverChallenge
             {
-                amount = new(Random.Range(2, 7), "Amount", 2),
+                region = Regex.Split(room, "_")[0],
+                room = new(room, "Portal Room", 0, listName: "WweaverRooms"),
             };
         }
 
@@ -76,7 +80,6 @@ namespace BingoMode.BingoChallenges
         public override void Reset()
         {
             base.Reset();
-            current = 0;
         }
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
@@ -90,9 +93,9 @@ namespace BingoMode.BingoChallenges
             [
                 "WatcherBingoWeaverChallenge",
                 "~",
-                current.ToString(),
+                region,
                 "><",
-                amount.ToString(),
+                room.ToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -105,8 +108,8 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                region = array[0];
+                room = SettingBoxFromString(array[1]) as SettingBox<string>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");
                 UpdateDescription();
@@ -121,13 +124,15 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.Watcher.VoidWeaver.DefaultBehavior.StartMonologue += Watcher_VoidWeaver_DefaultBehavior_StartMonologue;
+            On.Room.Loaded += Watcher_Room_Loaded;
         }
 
         public override void RemoveHooks()
         {
             On.Watcher.VoidWeaver.DefaultBehavior.StartMonologue -= Watcher_VoidWeaver_DefaultBehavior_StartMonologue;
+            On.Room.Loaded -= Watcher_Room_Loaded;
         }
 
-        public override List<object> Settings() => [amount];
+        public override List<object> Settings() => [room];
     }
 }

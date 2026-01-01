@@ -81,7 +81,7 @@ namespace BingoMode.BingoChallenges
             return new WatcherBingoSpinningTopChallenge
             {
                 specific = new SettingBox<bool>(Random.value < 0.5f, "Specific location", 0),
-                spinner = new(ChallengeUtils.SpinningTopSpots[Random.Range(0, ChallengeUtils.SpinningTopSpots.Length)], "Region", 1, listName: "spinners"),
+                spinner = new(ChallengeUtils.WspinningTopSpots[Random.Range(0, ChallengeUtils.WspinningTopSpots.Length)], "Region", 1, listName: "spinners"),
                 amount = new(Random.Range(2, 7), "Amount", 2),
                 starve = new(Random.value < 0.1f, "While Starving", 3)
             };
