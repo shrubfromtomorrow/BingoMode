@@ -78,7 +78,7 @@ namespace BingoMode.BingoChallenges
             string to = warpPoint.room.abstractRoom.name.ToLowerInvariant();
             string warp = "";
 
-            foreach (var portal in BingoData.watcherPortals)
+            foreach (var portal in ChallengeUtils.watcherPortals)
             {
                 var parts = portal.Split('-');
                 if (parts[0] == to || parts[1] == to)
@@ -86,7 +86,7 @@ namespace BingoMode.BingoChallenges
             }
             
 
-            foreach (var spot in BingoData.watcherSTSpots)
+            foreach (var spot in ChallengeUtils.watcherSTSpots)
             {
                 var parts = spot.Split('-');
                 if (parts[0] == to || parts[1] == to)

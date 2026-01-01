@@ -41,10 +41,6 @@ namespace BingoMode
             BingoRandomizationProfile.Reset();
             Challenge[,] ghostGrid = new Challenge[size, size];
             BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
-            if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
-            {
-                BingoData.PopulateWatcherData();
-            }
             ExpeditionData.ClearActiveChallengeList();
             if (changeSize)
                 ghostGrid = challengeGrid;

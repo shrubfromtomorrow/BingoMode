@@ -2251,7 +2251,6 @@ namespace BingoMode.BingoChallenges
                     po.data.owner = po;
                     po.pos = pos;
                     WarpPoint warpPoint = new WarpPoint(self, po);
-                    self.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[WarpPoint.IdentifyingString(self.game, warpPoint.Data, self.abstractRoom)] = warpPoint.ToString();
                     self.AddObject(warpPoint);
                 }
             }

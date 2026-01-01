@@ -111,15 +111,28 @@ namespace BingoMode.BingoMenu
             BingoData.TeamsInBingo = [0];
 
             Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
-            title = new("bingotitle")
+            if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
-                anchorX = 0.5f,
-                anchorY = 1f,
-                x = topCenter.x,
-                y = topCenter.y,
-                shader = menu.manager.rainWorld.Shaders["MenuText"]
-            };
-            Container.AddChild(title);
+                title = new("bingotitlewatcher")
+                {
+                    anchorX = 0.5f,
+                    anchorY = 1f,
+                    x = topCenter.x,
+                    y = topCenter.y,
+                };
+            }
+            else
+            {
+                title = new("bingotitle")
+                {
+                    anchorX = 0.5f,
+                    anchorY = 1f,
+                    x = topCenter.x,
+                    y = topCenter.y,
+                    shader = menu.manager.rainWorld.Shaders["MenuText"]
+                };
+            }
+                Container.AddChild(title);
 
             back = new(
                     menu,

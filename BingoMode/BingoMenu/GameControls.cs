@@ -99,6 +99,7 @@ namespace BingoMode.BingoMenu
                 plusButton.buttonBehav.greyedOut = !value;
                 minusButton.buttonBehav.greyedOut = !value;
                 pasteBoard.buttonBehav.greyedOut = !value;
+                copyBoard.buttonBehav.greyedOut = !value;
                 startGame.signalText = value ? "STARTBINGO" : "GETREADY";
                 startGame.menuLabel.text = value ? menu.Translate("BEGIN") : menu.Translate("I'M<LINE>READY").Replace("<LINE>", "\r\n");
             }

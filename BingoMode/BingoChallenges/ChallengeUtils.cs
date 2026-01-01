@@ -20,14 +20,30 @@ namespace BingoMode.BingoChallenges
     public static class ChallengeUtils
     {
         public static Dictionary<string, Dictionary<string, Vector2>> BingoVistaLocations;
+        public static string[] AllGates = [];
+        public static string[] AllEnterableRegions = [];
+        public static List<string> watcherRegions;
+        public static List<string> watcherSTSpots;
+        public static List<string> watcherPortals;
+        public static List<string> watcherDWTSpots;
 
         public static void Apply()
         {
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
             On.Menu.ExpeditionMenu.ExpeditionSetup += ExpeditionMenu_ExpeditionSetup;
+            On.RainWorld.ReadTokenCache += RainWorld_ReadTokenCache;
             FetchGatesFromFile();
             FetchAllEnterableRegions();
+        }
+
+        private static void RainWorld_ReadTokenCache(On.RainWorld.orig_ReadTokenCache orig, RainWorld self)
+        {
+            orig.Invoke(self);
+            if (watcherRegions == null)
+            {
+                PopulateWatcherData();
+            }
         }
 
         private static void ExpeditionMenu_ExpeditionSetup(On.Menu.ExpeditionMenu.orig_ExpeditionSetup orig, Menu.ExpeditionMenu self)
@@ -163,7 +179,7 @@ namespace BingoMode.BingoChallenges
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
                 case "spinners": return WspinningTopSpots;
-                case "WweaverRooms": return [.. BingoData.watcherDWTSpots.Where(room => Regex.Split(room, "_")[0] != "WORA")];
+                case "WweaverRooms": return [.. watcherDWTSpots.Where(room => Regex.Split(room, "_")[0] != "WORA")];
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
@@ -313,9 +329,6 @@ namespace BingoMode.BingoChallenges
             }
             AllGates = gatesToAdd.ToArray();
         }
-
-        public static string[] AllGates = [];
-        public static string[] AllEnterableRegions = [];
 
         public static readonly string[] Depthable =
         {
@@ -751,5 +764,86 @@ namespace BingoMode.BingoChallenges
         {
             "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR"
         };
+
+        public static void PopulateWatcherData()
+        {
+            watcherRegions = SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Select(r => r.ToLowerInvariant()).ToList();
+            List<string> rawPortals = new List<string>();
+            List<string> rawSTSpots = new List<string>();
+            List<string> rawDWTSpots = new List<string>();
+
+            foreach (var region in watcherRegions)
+            {
+                if (Custom.rainWorld.regionWarpRooms.ContainsKey(region))
+                {
+                    foreach (var warp in Custom.rainWorld.regionWarpRooms[region])
+                    {
+                        rawPortals.Add(warp);
+                    }
+                }
+                if (Custom.rainWorld.regionSpinningTopRooms.ContainsKey(region))
+                {
+                    foreach (var st in Custom.rainWorld.regionSpinningTopRooms[region])
+                    {
+                        rawSTSpots.Add(st);
+                    }
+                }
+                if (Custom.rainWorld.regionDynamicWarpTargets.ContainsKey(region))
+                {
+                    foreach (var dt in Custom.rainWorld.regionDynamicWarpTargets[region])
+                    {
+                        rawDWTSpots.Add(dt);
+                    }
+                }
+            }
+
+            watcherPortals = new List<string>();
+            foreach (var line in rawPortals)
+            {
+                var parts = line.Split(':');
+                if (parts.Length < 4) continue;
+
+                string origin = parts[0].ToLowerInvariant();
+                string dest = parts[3].ToLowerInvariant();
+
+                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                string portalKey = $"{ordered[0]}-{ordered[1]}";
+
+                if (!watcherPortals.Contains(portalKey))
+                {
+                    watcherPortals.Add(portalKey);
+                }
+            }
+
+            watcherSTSpots = new List<string>();
+            foreach (var line in rawSTSpots)
+            {
+                var parts = line.Split(':');
+                if (parts.Length < 3) continue;
+
+                string origin = parts[0].ToLowerInvariant();
+                string dest = parts[2].ToLowerInvariant();
+
+                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                string STKey = $"{ordered[0]}-{ordered[1]}";
+
+                if (!watcherSTSpots.Contains(STKey))
+                {
+                    watcherSTSpots.Add(STKey);
+                }
+            }
+
+            watcherDWTSpots = new List<string>();
+            foreach (var line in rawDWTSpots)
+            {
+                var parts = line.Split(':');
+                string DWTKey = parts[0].ToUpperInvariant();
+
+                if (!watcherDWTSpots.Contains(DWTKey))
+                {
+                    watcherDWTSpots.Add(DWTKey);
+                }
+            }
+        }
     }
 }

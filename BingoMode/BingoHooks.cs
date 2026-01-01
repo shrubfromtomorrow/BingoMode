@@ -378,7 +378,14 @@ namespace BingoMode
         {
             if (!self.muted && Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && self.currentPage == 4 && (self.manager.musicPlayer.song == null || self.manager.musicPlayer.song.name == ExpeditionData.menuSong))
             {
-                self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 1f);
+                if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                {
+                    self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the fast guy", 1f, 1f);
+                }
+                else
+                {
+                    self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 1f);
+                }
             }
 
             orig.Invoke(self);
@@ -1344,7 +1351,7 @@ namespace BingoMode
         {
             if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                List<string> list;
+                List<string> list = [];
                 if (targetRegion != null && targetRegion.ToLowerInvariant() == "wora")
                 {
                     list = WarpPoint.GetAvailableOuterRimWarpTargets(world, oldRoom, false);
@@ -1357,16 +1364,24 @@ namespace BingoMode
                 {
                     if (targetRegion != null)
                     {
-                        list = BingoData.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant()).ToList();
+                        list = ChallengeUtils.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant()).ToList();
                     }
                     else
                     {
-                        list = BingoData.watcherDWTSpots;
+                        foreach (string spot in ChallengeUtils.watcherDWTSpots)
+                        {
+                            string region = Regex.Split(spot, "_")[0];
+                            // no same region or rotted or wora
+                            if (region != world.name && region != "WORA" && region != "WHIR" && region != "WSUR" && region != "WDSR" && region != "WGWR")
+                            {
+                                list.Add(spot);
+                            }
+                        }
                     }
                 }
                 if (list.Count == 0)
                 {
-                    Plugin.logger.LogInfo("No available DWT for region: " + targetRegion);
+                    Plugin.logger.LogInfo("List count is 0, target region was: " + targetRegion);
                     return null;
                 }
                 return list[UnityEngine.Random.Range(0, list.Count)];

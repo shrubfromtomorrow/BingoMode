@@ -90,7 +90,7 @@ namespace BingoMode.BingoChallenges
             string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("Wpoms")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("Wpoms").Length)] : "Any Region";
 
             ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
-            ch.region = new(r, "Region", 1, listName: "popcornRegions");
+            ch.region = new(r, "Region", 1, listName: "Wpoms");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(false, "In one Cycle", 3);
             return ch;
