@@ -20,6 +20,7 @@ namespace BingoMode
         public readonly Configurable<bool> PlayMenuSong;
         public readonly Configurable<bool> PlayEndingSong;
         public readonly Configurable<bool> PlayDangerSong;
+        public readonly Configurable<bool> DiscordRichPresence;
 
         private UIelement[] optionse;
         private bool greyedOut;
@@ -40,6 +41,7 @@ namespace BingoMode
             PlayMenuSong = config.Bind<bool>("PlayMenuSong", true);
             PlayEndingSong = config.Bind<bool>("PlayEndingSong", true);
             PlayDangerSong = config.Bind<bool>("PlayDangerSong", true);
+            DiscordRichPresence = config.Bind<bool>("DiscordRichPresence", true);
         }
 
         public override void Initialize()
@@ -85,6 +87,9 @@ namespace BingoMode
 
                 new OpLabel(10f, 103f, Translate("Fill icon sprites:")) {alignment = FLabelAlignment.Left, description = Translate("Fill the crosses and arrows on certain goals")},
                 new OpCheckBox(FillIcons, 288f, 100f),
+
+                new OpLabel(10f, 63f, Translate("Discord Rich Presence:")) {alignment = FLabelAlignment.Left, description = Translate("Show Bingo Mode as your Discord activity (restart to take effect)")},
+                new OpCheckBox(DiscordRichPresence, 288f, 60f),
             };
             tab.AddItems(optionse);
         }

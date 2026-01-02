@@ -111,7 +111,7 @@ namespace BingoMode.BingoHUD
             }
 
             ChallengeHooks.revealInMemory = [];
-            bingoCompleteTitle = new FSprite(ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? "watcherbingotitle" : "bingotitle")
+            bingoCompleteTitle = new FSprite(ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? "bingotitlewatcher" : "bingotitle")
             {
                 x = hud.rainWorld.screenSize.x * 0.5f,
                 y = hud.rainWorld.screenSize.y * 0.92f,

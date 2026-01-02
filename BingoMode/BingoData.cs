@@ -12,6 +12,7 @@ namespace BingoMode
     using System.IO;
     using System.Text.RegularExpressions;
     using BingoChallenges;
+    using BingoMode.DiscordSDK;
     using BingoSteamworks;
     using MoreSlugcats;
     using Steamworks;
@@ -255,6 +256,7 @@ namespace BingoMode
             heldItemsTime = new int[ExtEnum<ItemType>.values.Count];
             blacklist = [];
             hitTimeline = [];
+            BingoRichPresence.bingoRPTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
 
         public static void RedoTokens()

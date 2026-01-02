@@ -24,7 +24,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomodebeta", "Watcher Bingo Beta", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "1.311";
+        public const string VERSION = "1.32";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
@@ -92,9 +92,11 @@ namespace BingoMode
                 BingoHooks.Apply();
                 ChallengeHooks.Apply();
                 ChallengeUtils.Apply();
+                DiscordSDK.DiscordInit.Init();
 
                 // Timeline fix
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
+
 
                 MachineConnector.SetRegisteredOI("nacu.bingomodebeta", PluginInstance.BingoConfig);
             }
