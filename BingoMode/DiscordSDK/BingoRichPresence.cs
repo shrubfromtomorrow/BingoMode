@@ -147,11 +147,11 @@ namespace BingoMode.DiscordSDK
 
             if (BingoData.MultiplayerGame)
             {
-                details = $"The {ExpeditionData.slugcatPlayer} (with friends!)";
+                details = $"The {ExpeditionData.slugcatPlayer} | With friends!";
             }
             else
             {
-                details = $"The {ExpeditionData.slugcatPlayer} (solo)";
+                details = $"The {ExpeditionData.slugcatPlayer} | Solo";
             }
 
             activityManager.UpdateActivity(new Activity
@@ -177,15 +177,15 @@ namespace BingoMode.DiscordSDK
                 {
                     sesh = "Arena";
                 }
-                discordActivity.State = $"Playing: {sesh}";
                 discordActivity.Details = $"Not Bingoing";
+                discordActivity.State = $"Playing: {sesh}";
                 discordActivity.Assets.LargeImage = "bingosquarethumb";
                 discordActivity.Assets.LargeText = "Bingo Mode";
             }
             else if (player.abstractCreature?.world?.game?.session is StoryGameSession sesh)
             {
+                discordActivity.Details = $"The {SlugcatStats.getSlugcatName(player.slugcatStats.name)} | " +$"{(BingoData.MultiplayerGame ? "Multiplayer" : "Solo")}";
                 discordActivity.State = GetBingoDetails(player, sesh);
-                discordActivity.Details = $"Playing: The {player.slugcatStats.name}";
                 discordActivity.Assets.LargeImage = "bingosquarethumb";
                 discordActivity.Assets.LargeText = "Bingo Mode";
             }
@@ -210,7 +210,7 @@ namespace BingoMode.DiscordSDK
                 gameMode = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].gamemode.ToString();
                 if (gameMode == "LockoutNoTies") gameMode = "Lockout";
             }
-            return $"{multiplayer}: {size}x{size} {gameMode} | \n" +
+            return $"{size}x{size} {gameMode} | \n" +
                 $"{squares}/{size*size} | Team {BingoPage.TeamName[team]}";
         }
 
