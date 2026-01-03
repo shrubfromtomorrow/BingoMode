@@ -140,9 +140,10 @@ namespace BingoMode.BingoChallenges
             base.Update();
 
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
-            if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
-                bool flag = false;
+                var keysToRemove = new List<string>();
+
                 foreach (var kvp in bombed)
                 {
                     bool[] value = kvp.Value;
@@ -150,14 +151,13 @@ namespace BingoMode.BingoChallenges
                     // Only save passed tolls
                     if (value.Length > 1 && !value[1])
                     {
-                        flag = true;
-                        bombed.Remove(kvp.Key);
+                        keysToRemove.Add(kvp.Key);
                     }
                 }
-                if (flag)
+
+                foreach (var key in keysToRemove)
                 {
-                    this.UpdateDescription();
-                    ChangeValue();
+                    bombed.Remove(key);
                 }
                 return;
             }

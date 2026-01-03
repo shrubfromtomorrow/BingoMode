@@ -193,7 +193,6 @@ namespace BingoMode.BingoMenu
         {
             gameControls.HostPrivilege = isHost;
             boardControls.HostPrivilege = isHost;
-            randomizerButton.buttonBehav.greyedOut = !isHost;
             grid.Switch(!isHost);
 
             multiplayerPanel.UpdateLobbyHost(isHost);

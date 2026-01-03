@@ -1,12 +1,13 @@
-﻿using BingoMode.BingoRandomizer;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace BingoMode.BingoChallenges
 {
@@ -21,7 +22,7 @@ namespace BingoMode.BingoChallenges
         {
             BingoHatchNoodleChallenge challenge = new();
             challenge.amount.Value = amount.Random();
-            challenge.atOnce.Value = atOnce.Random();
+            challenge.oneCycle.Value = atOnce.Random();
             return challenge;
         }
 
@@ -44,36 +45,67 @@ namespace BingoMode.BingoChallenges
 
     public class BingoHatchNoodleChallenge : BingoChallenge
     {
-        public SettingBox<int> amount;
         public int current;
-        public SettingBox<bool> atOnce;
+        public SettingBox<int> amount;
+        public SettingBox<string> region;
+        public SettingBox<bool> differentRegions;
+        public SettingBox<bool> oneCycle;
+        public List<string> hatchRegions = [];
 
         public BingoHatchNoodleChallenge()
         {
-            atOnce = new(false, "At Once", 0);
-            amount = new(0, "Amount", 1);
+            amount = new(0, "Amount", 0);
+            region = new("", "Region", 1, listName: "regions");
+            differentRegions = new(false, "Different Regions", 2);
+            oneCycle = new(false, "At once", 3);
         }
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] noodlefly eggs" + (atOnce.Value ? " in one cycle" : ""))
-                .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
+            description = ChallengeTools.IGT.Translate("Hatch [<current>/<amount>] Noodlefly eggs <region> <onecycle>")
+                .Replace("<current>", current.ToString())
+                .Replace("<amount>", amount.Value.ToString())
+                .Replace("<region>", differentRegions.Value ? ChallengeTools.IGT.Translate("in different regions") : region.Value == "Any Region" ? "" : ChallengeTools.IGT.Translate("in ") + ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)))
+                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate("in one cycle") : "");
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new(
-                [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))],
-                [new Counter((atOnce.Value && completed) ? amount.Value : current, amount.Value)]]);
-            if (atOnce.Value) phrase.InsertWord(new Icon("cycle_limit"));
+                [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))]]);
+            if (differentRegions.Value)
+            {
+                phrase.InsertWord(new Icon("TravellerA"));
+                phrase.InsertWord(new Counter(current, amount.Value), 1);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 1);
+                }
+            }
+            else if (region.Value != "Any Region")
+            {
+                phrase.InsertWord(new Verse(region.Value), 1);
+                phrase.InsertWord(new Counter(current, amount.Value), 2);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 0);
+                }
+            }
+            else
+            {
+                phrase.InsertWord(new Counter(current, amount.Value), 1, 0);
+                if (oneCycle.Value)
+                {
+                    phrase.InsertWord(new Icon("cycle_limit"), 1);
+                }
+            }
             return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoHatchNoodleChallenge;
+            return challenge is not BingoHatchNoodleChallenge c || c.region.Value != region.Value || c.oneCycle.Value != oneCycle.Value || c.differentRegions.Value != differentRegions.Value;
         }
 
         public override string ChallengeName()
@@ -83,23 +115,68 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            bool onc = UnityEngine.Random.value < 0.33f;
-            return new BingoHatchNoodleChallenge
+            BingoHatchNoodleChallenge ch = new();
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").ToArray()[UnityEngine.Random.Range(0, ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)] : "Any Region";
+
+            ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
+            ch.region = new(r, "Region", 1, listName: "regions");
+            ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
+            ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "At once", 3);
+            return ch;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (revealed || completed) return;
+            if (game?.cameras[0]?.room?.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
             {
-                atOnce = new(onc, "At Once", 0),
-                amount = new(UnityEngine.Random.Range(onc ? 2 : 1, onc ? 4 : 6), "Amount", 1),
-            };
+                if (current != 0 && oneCycle.Value)
+                {
+                    Reset();
+                    UpdateDescription();
+                    ChangeValue();
+                }
+                return;
+            }
         }
 
         public void Hatch()
         {
-            if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
+            if (completed || revealed || hidden || TeamsCompleted[SteamTest.team]) return;
+
+            foreach (var player in game.Players)
             {
-                current++;
-                UpdateDescription();
-                if (current >= amount.Value) CompleteChallenge();
-                else ChangeValue();
+                if (!TryGetWorldName(player, out var world)) continue;
+
+                if (differentRegions.Value)
+                {
+                    if (hatchRegions.Contains(world)) continue;
+
+                    hatchRegions.Add(world);
+                    Progress();
+                }
+                else if (region.Value == "Any Region") Progress();
+                else if (region.Value == world) Progress();
             }
+        }
+
+        private bool TryGetWorldName(AbstractCreature p, out string world)
+        {
+            world = null;
+            if (p?.realizedCreature?.room?.world == null) return false;
+
+            world = p.realizedCreature.room.world.name.ToUpperInvariant();
+            return true;
+        }
+
+        private void Progress()
+        {
+            current++;
+            UpdateDescription();
+
+            if (current >= amount.Value) CompleteChallenge();
+            else ChangeValue();
         }
 
         public override int Points()
@@ -121,20 +198,26 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
+            hatchRegions = [];
         }
 
         public override string ToString()
         {
-            if (atOnce.Value) current = 0;
             return string.Concat(new string[]
             {
                 "BingoHatchNoodleChallenge",
                 "~",
+                region.ToString(),
+                "><",
+                differentRegions.ToString(),
+                "><",
+                oneCycle.ToString(),
+                "><",
                 current.ToString(),
                 "><",
                 amount.ToString(),
                 "><",
-                atOnce.ToString(),
+                string.Join("|", hatchRegions),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -147,11 +230,14 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                atOnce = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                current = (atOnce.Value && !completed) ? 0 : int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
-                completed = (array[3] == "1");
-                revealed = (array[4] == "1");
+                region = SettingBoxFromString(array[0]) as SettingBox<string>;
+                differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
+                oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                hatchRegions = [.. array[5].Split('|')];
+                completed = (array[6] == "1");
+                revealed = (array[7] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -171,7 +257,6 @@ namespace BingoMode.BingoChallenges
             On.ShelterDoor.Close -= ShelterDoor_Close;
         }
 
-        public override List<object> Settings() => [atOnce, amount];
-        public List<string> SettingNames() => ["At Once", "Amount"];
+        public override List<object> Settings() => [amount, region, differentRegions, oneCycle];
     }
 }

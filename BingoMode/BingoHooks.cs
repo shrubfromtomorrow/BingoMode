@@ -1351,6 +1351,15 @@ namespace BingoMode
         {
             if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
+                List<string> weaverGoalRooms = [];
+                for (int i = 0; i < ExpeditionData.challengeList.Count; i++)
+                {
+                    if (ExpeditionData.challengeList[i] is WatcherBingoWeaverChallenge c && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed)
+                    {
+                        weaverGoalRooms.Add(c.room.Value.ToUpperInvariant());
+                    }
+                }
+
                 List<string> list = [];
                 if (targetRegion != null && targetRegion.ToLowerInvariant() == "wora")
                 {
@@ -1364,7 +1373,7 @@ namespace BingoMode
                 {
                     if (targetRegion != null)
                     {
-                        list = ChallengeUtils.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant()).ToList();
+                        list = ChallengeUtils.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant() && !weaverGoalRooms.Contains(x.ToUpperInvariant())).ToList();
                     }
                     else
                     {
@@ -1374,7 +1383,7 @@ namespace BingoMode
                             // no same region or rotted or wora
                             if (region != world.name && region != "WORA" && region != "WHIR" && region != "WSUR" && region != "WDSR" && region != "WGWR")
                             {
-                                list.Add(spot);
+                                if (!weaverGoalRooms.Contains(spot.ToUpperInvariant())) list.Add(spot);
                             }
                         }
                     }

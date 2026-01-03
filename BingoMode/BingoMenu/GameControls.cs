@@ -96,6 +96,7 @@ namespace BingoMode.BingoMenu
             set
             {
                 shelterSetting.greyedOut = !value;
+                shelterSetting.label.alpha = !value ? 0f : 1f;
                 plusButton.buttonBehav.greyedOut = !value;
                 minusButton.buttonBehav.greyedOut = !value;
                 pasteBoard.buttonBehav.greyedOut = !value;

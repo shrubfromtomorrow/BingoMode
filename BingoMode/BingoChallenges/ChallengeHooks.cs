@@ -1890,6 +1890,8 @@ namespace BingoMode.BingoChallenges
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoEnterRegionChallenge wEnterRegion)
                     {
+                        if (self.Data == null) Plugin.logger.LogInfo("Change state enter region portal data is null");
+                        if (self.Data?.destRegion == null) Plugin.logger.LogInfo("Change state enter region portal dest region is null");
                         wEnterRegion.Entered(self.Data.destRegion.ToUpperInvariant());
                     }
                 }
@@ -2241,6 +2243,7 @@ namespace BingoMode.BingoChallenges
                         }
                     }
                     WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(null);
+
                     warpPointData.cycleSpawnedOn = self.world.game.GetStorySession.saveState.cycleNumber - 6;
                     warpPointData.cycleExpiry = 5;
                     warpPointData.destPos = pos;
@@ -2248,7 +2251,7 @@ namespace BingoMode.BingoChallenges
                     warpPointData.destTimeline = self.world.game.TimelinePoint;
 
                     PlacedObject po = new PlacedObject(PlacedObject.Type.WarpPoint, warpPointData);
-                    po.data.owner = po;
+                    warpPointData.owner = po;
                     po.pos = pos;
                     WarpPoint warpPoint = new WarpPoint(self, po);
                     self.AddObject(warpPoint);

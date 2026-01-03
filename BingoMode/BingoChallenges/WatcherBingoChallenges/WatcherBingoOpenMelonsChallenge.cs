@@ -100,7 +100,7 @@ namespace BingoMode.BingoChallenges
         {
             base.Update();
             if (revealed || completed) return;
-            if (game.cameras[0].room.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
+            if (game?.cameras[0]?.room?.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (current != 0 && oneCycle.Value)
                 {

@@ -139,7 +139,7 @@ namespace BingoMode.BingoChallenges
         {
             base.Update();
             if (revealed || completed) return;
-            if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.score != 0)
                 {

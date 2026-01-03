@@ -65,7 +65,7 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
         {
             base.Update();
             if (revealed || completed) return;
-            if (this.game.cameras[0].room.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
+            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.current != 0 && this.oneCycle.Value)
                 {
