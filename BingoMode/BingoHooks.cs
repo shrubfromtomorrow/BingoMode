@@ -256,7 +256,7 @@ namespace BingoMode
             On.Menu.ExpeditionMenu.Update += ExpeditionMenu_Update;
             if (!ModManager.ActiveMods.Any(x => x.id == "crs"))
             {
-                Plugin.logger.LogMessage("No CRS. Applying async audio loading");
+                //Plugin.logger.LogMessage("No CRS. Applying async audio loading");
                 IL.Music.MusicPiece.SubTrack.Update += SubTrack_Update;
             }
 
@@ -272,8 +272,6 @@ namespace BingoMode
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
         }
-
-        
 
         private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
         {

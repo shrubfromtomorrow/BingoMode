@@ -2229,6 +2229,7 @@ namespace BingoMode.BingoChallenges
         public static void Watcher_Room_Loaded(On.Room.orig_Loaded orig, Room self)
         {
             orig(self);
+            if (self.game == null) return;
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed && c.room.Value == self.abstractRoom.name.ToUpperInvariant())
@@ -2242,17 +2243,17 @@ namespace BingoMode.BingoChallenges
                             pos = thing.pos;
                         }
                     }
-                    WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(null);
+                    PlacedObject po = new PlacedObject(PlacedObject.Type.WarpPoint, null);
 
-                    warpPointData.cycleSpawnedOn = self.world.game.GetStorySession.saveState.cycleNumber - 6;
-                    warpPointData.cycleExpiry = 5;
-                    warpPointData.destPos = pos;
-                    warpPointData.destRoom = "NARNIA";
-                    warpPointData.destTimeline = self.world.game.TimelinePoint;
-
-                    PlacedObject po = new PlacedObject(PlacedObject.Type.WarpPoint, warpPointData);
-                    warpPointData.owner = po;
+                    WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(po);
+                    po.data = warpPointData;
                     po.pos = pos;
+
+                    (warpPointData).cycleSpawnedOn = self.world.game.GetStorySession.saveState.cycleNumber - 6;
+                    (warpPointData).cycleExpiry = 5;
+                    (warpPointData).destRoom = "NARNIA";
+                    (warpPointData).destTimeline = self.world.game.TimelinePoint;
+
                     WarpPoint warpPoint = new WarpPoint(self, po);
                     self.AddObject(warpPoint);
                 }
