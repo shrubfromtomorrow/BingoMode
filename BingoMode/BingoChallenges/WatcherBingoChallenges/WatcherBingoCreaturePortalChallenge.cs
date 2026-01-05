@@ -93,9 +93,10 @@ namespace BingoMode.BingoChallenges
                     warp = spot;
             }
 
+            // dynamic warp
             if (warp == "")
             {
-                warp = "null-" + to;
+                warp = "DYNAMICENTRY-" + to;
             }
 
             
@@ -174,7 +175,7 @@ namespace BingoMode.BingoChallenges
             return slugcat == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
-        public string CreatureGatesToString()
+        public string CreatureportalsToString()
         {
             List<string> joinLater = [];
 
@@ -188,11 +189,11 @@ namespace BingoMode.BingoChallenges
             return string.Join("%", joinLater);
         }
 
-        public Dictionary<EntityID, List<string>> CreatureGatesFromString(string from)
+        public Dictionary<EntityID, List<string>> CreatureportalsFromString(string from)
         {
-            Dictionary<EntityID, List<string>> gates = [];
+            Dictionary<EntityID, List<string>> portals = [];
 
-            if (from == "empty") return gates;
+            if (from == "empty") return portals;
 
             string[] gateCrits = from.Split('%');
             for (int i = 0; i < gateCrits.Length; i++)
@@ -204,10 +205,10 @@ namespace BingoMode.BingoChallenges
                 {
                     rooms.Add(split[r]);
                 }
-                gates[id] = rooms;
+                portals[id] = rooms;
             }
 
-            return gates;
+            return portals;
         }
 
         public override string ToString()
@@ -222,7 +223,7 @@ namespace BingoMode.BingoChallenges
                 "><",
                 amount.ToString(),
                 "><",
-                CreatureGatesToString(),
+                CreatureportalsToString(),
                 "><",
                 completed ? "1" : "0",
                 "><",
@@ -238,7 +239,7 @@ namespace BingoMode.BingoChallenges
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                creaturePortals = CreatureGatesFromString(array[3]);
+                creaturePortals = CreatureportalsFromString(array[3]);
                 completed = (array[4] == "1");
                 revealed = (array[5] == "1");
                 UpdateDescription();

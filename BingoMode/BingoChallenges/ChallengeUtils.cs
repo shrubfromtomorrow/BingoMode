@@ -166,7 +166,6 @@ namespace BingoMode.BingoChallenges
                 case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish" || x != "Frog")];
                 case "theft": return [.. StealableStolable, "DataPearl"];
                 case "Wtheft": return [.. WStealableStolable, "DataPearl"];
-                case "ban": return Bannable;
                 case "friend": return Befriendable;
                 case "Wfriend": return WBefriendable;
                 case "pearls": return CollectablePearls;
@@ -183,6 +182,7 @@ namespace BingoMode.BingoChallenges
                 case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
                 case "depths": return Depthable;
                 case "banitem": return [.. FoodTypes, .. Bannable];
+                case "Wbanitem": return [.. WFoodTypes, .. WBannable];
                 case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
                 case "Wunlocks":
                 case "chatlogs": return [.. BingoData.possibleTokens[4]];
@@ -590,6 +590,20 @@ namespace BingoMode.BingoChallenges
             "BubbleGrass",
             "Rock",
             "DataPearl"
+        };
+
+        public static readonly string[] WBannable =
+        {
+            "Lantern",
+            "PuffBall",
+            "VultureMask",
+            "ScavengerBomb",
+            "FirecrackerPlant",
+            "BubbleGrass",
+            "Rock",
+            "DataPearl",
+            "Boomerang",
+            "GraffitiBomb"
         };
 
         public static readonly string[] Befriendable =

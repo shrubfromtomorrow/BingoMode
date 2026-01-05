@@ -11,45 +11,16 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoDontUseItemRandomizer : ChallengeRandomizer
-    {
-        public Randomizer<string> item;
-
-        public override Challenge Random()
-        {
-            BingoDontUseItemChallenge challenge = new();
-            challenge.item.Value = item.Random();
-            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.item.Value);
-            challenge.isFood = index >= 0;
-            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
-            return challenge;
-        }
-
-        public override StringBuilder Serialize(string indent)
-        {
-            string surindent = indent + INDENT_INCREMENT;
-            StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}item-{item.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "DontUseItem").Replace("__Content__", serializedContent.ToString());
-        }
-
-        public override void Deserialize(string serialized)
-        {
-            Dictionary<string, string> dict = ToDict(serialized);
-            item = Randomizer<string>.InitDeserialize(dict["item"]);
-        }
-    }
-
     //Using counts as either throwing an item, or holding it for more than 5 seconds
-    public class BingoDontUseItemChallenge : BingoChallenge
+    public class WatcherBingoDontUseItemChallenge : BingoChallenge
     {
         public SettingBox<string> item;
         public bool isFood;
         public bool isCreature;
 
-        public BingoDontUseItemChallenge()
+        public WatcherBingoDontUseItemChallenge()
         {
-            item = new("", "Item type", 0, listName: "banitem");
+            item = new("", "Item type", 0, listName: "Wbanitem");
         }
 
         public override void UpdateDescription()
@@ -66,7 +37,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoDontUseItemChallenge c || (c.item.Value != item.Value);
+            return challenge is not WatcherBingoDontUseItemChallenge c || (c.item.Value != item.Value);
         }
 
         public override string ChallengeName()
@@ -81,16 +52,14 @@ namespace BingoMode.BingoChallenges
             bool c = false;
             if (edible)
             {
-                List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
-                if (ExpeditionData.slugcatPlayer.value != "Rivulet" && ExpeditionData.slugcatPlayer.value != "Saint") foob.Remove("GlowWeed");
+                List<string> foob = [.. ChallengeUtils.WFoodTypes];
                 type = foob[UnityEngine.Random.Range(0, foob.Count)];
                 c = ChallengeUtils.FoodTypes.IndexOf(type) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
             else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
-            BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge
+            WatcherBingoDontUseItemChallenge ch = new WatcherBingoDontUseItemChallenge
             {
-                item = new(type, "Item type", 0, listName: "banitem"),
+                item = new(type, "Item type", 0, listName: "Wbanitem"),
                 isFood = edible,
                 isCreature = c
             };
@@ -124,7 +93,7 @@ namespace BingoMode.BingoChallenges
             if (isFood) return;
             for (int i = 0; i < BingoData.heldItemsTime.Length; i++)
             {
-                if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value)); 
+                if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value));
             }
             for (int i = 0; i < game.Players.Count; i++)
             {
@@ -150,14 +119,14 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
         {
-            return true;
+            return slugcat == Watcher.WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public override string ToString()
         {
             return string.Concat(new string[]
             {
-                "BingoDontUseItemChallenge",
+                "WatcherBingoDontUseItemChallenge",
                 "~",
                 item.ToString(),
                 "><",
@@ -185,23 +154,23 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoDontUseItemChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: WatcherBingoDontUseItemChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
 
         public override void AddHooks()
         {
-            On.Player.ThrowObject += Player_ThrowObject;
-            On.Player.GrabUpdate += Player_GrabUpdate;
-            On.Player.ObjectEaten += Player_ObjectEaten2;
+            On.Player.ThrowObject += Watcher_Player_ThrowObject;
+            On.Player.GrabUpdate += Watcher_Player_GrabUpdate;
+            On.Player.ObjectEaten += Watcher_Player_ObjectEaten2;
         }
 
         public override void RemoveHooks()
         {
-            On.Player.ThrowObject -= Player_ThrowObject;
-            On.Player.GrabUpdate -= Player_GrabUpdate;
-            On.Player.ObjectEaten -= Player_ObjectEaten2;
+            On.Player.ThrowObject -= Watcher_Player_ThrowObject;
+            On.Player.GrabUpdate -= Watcher_Player_GrabUpdate;
+            On.Player.ObjectEaten -= Watcher_Player_ObjectEaten2;
         }
 
         public override List<object> Settings() => [item];

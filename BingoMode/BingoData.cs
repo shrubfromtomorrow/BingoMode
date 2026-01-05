@@ -227,8 +227,7 @@ namespace BingoMode
                 typeof(BingoTransportChallenge),
                 typeof(BingoAchievementChallenge),
                 typeof(BingoStealChallenge),
-                // Temp
-                //typeof(WatcherBingoWeaverChallenge),
+                typeof(BingoDontUseItemChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));

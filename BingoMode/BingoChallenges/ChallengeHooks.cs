@@ -1884,15 +1884,13 @@ namespace BingoMode.BingoChallenges
         {
             orig(self, state);
             // This is the state transition, so understand that we are not yet in the room, so destination region is appropriate
-            if (state == WarpPoint.State.ExitWarp)
+            if (state == WarpPoint.State.SpawnItems)
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoEnterRegionChallenge wEnterRegion)
                     {
-                        if (self.Data == null) Plugin.logger.LogInfo("Change state enter region portal data is null");
-                        if (self.Data?.destRegion == null) Plugin.logger.LogInfo("Change state enter region portal dest region is null");
-                        wEnterRegion.Entered(self.Data.destRegion.ToUpperInvariant());
+                        wEnterRegion.Entered(self.room.world.name.ToUpperInvariant());
                     }
                 }
             }
@@ -1901,13 +1899,13 @@ namespace BingoMode.BingoChallenges
         public static void Watcher_WarpPoint_ChangeState_NoRegion(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
         {
             orig(self, state);
-            if (state == WarpPoint.State.ExitWarp)
+            if (state == WarpPoint.State.SpawnItems)
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoNoRegionChallenge wNoRegion)
                     {
-                        wNoRegion.Entered(self.Data.destRegion.ToUpperInvariant());
+                        wNoRegion.Entered(self.room.world.name.ToUpperInvariant());
                     }
                 }
             }
@@ -1916,13 +1914,13 @@ namespace BingoMode.BingoChallenges
         public static void Watcher_WarpPoint_ChangeState_AllRegionsExcept(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
         {
             orig(self, state);
-            if (state == WarpPoint.State.ExitWarp)
+            if (state == WarpPoint.State.SpawnItems)
             {
                 for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                 {
                     if (ExpeditionData.challengeList[j] is WatcherBingoAllRegionsExceptChallenge wAllExcept)
                     {
-                        wAllExcept.Entered(self.Data.destRegion.ToUpperInvariant());
+                        wAllExcept.Entered(self.room.world.name.ToUpperInvariant());
                     }
                 }
             }
@@ -2256,6 +2254,54 @@ namespace BingoMode.BingoChallenges
 
                     WarpPoint warpPoint = new WarpPoint(self, po);
                     self.AddObject(warpPoint);
+                }
+            }
+        }
+
+        public static void Watcher_Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
+        {
+            if (self.grasps[grasp] != null && self.grasps[grasp].grabbed is not Creature)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoDontUseItemChallenge c && !c.isFood && self.grasps[grasp].grabbed is Weapon)
+                    {
+                        c.Used(self.grasps[grasp].grabbed.abstractPhysicalObject.type);
+                    }
+                }
+            }
+            orig.Invoke(self, grasp, eu);
+        }
+
+        public static void Watcher_Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            // This is so if you dual wield something it doesnt add time twice
+            ItemType ignore = null;
+            for (int i = 0; i < self.grasps.Length; i++)
+            {
+                if (self.grasps[i] != null)
+                {
+                    ItemType heldType = self.grasps[i].grabbed.abstractPhysicalObject.type;
+                    if (heldType != ignore)
+                    {
+                        ignore = heldType;
+                        BingoData.heldItemsTime[(int)heldType]++;
+                    }
+                }
+            }
+        }
+
+        public static void Watcher_Player_ObjectEaten2(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+            orig.Invoke(self, edible);
+
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoDontUseItemChallenge g && g.isFood)
+                {
+                    g.Eated(edible);
                 }
             }
         }

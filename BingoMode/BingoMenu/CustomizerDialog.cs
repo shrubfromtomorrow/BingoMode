@@ -322,16 +322,22 @@ namespace BingoMode.BingoMenu
                 ccc.isFood = Array.IndexOf(l, ccc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
                 if (ccc.isFood) ccc.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, ccc.item.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
             }
-            else if (owner.challenge is BingoVistaChallenge cccc)
+            else if (owner.challenge is WatcherBingoDontUseItemChallenge cccc)
             {
-                cccc.region = cccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
-                
-                cccc.location = ChallengeUtils.BingoVistaLocations[cccc.region][cccc.room.Value];
-                BingoVistaChallenge.ModifyVistaPositions(cccc);
+                var l = ChallengeUtils.GetCorrectListForChallenge("Wbanitem");
+                cccc.isFood = Array.IndexOf(l, cccc.item.Value) < (l.Length - ChallengeUtils.WBannable.Length);
+                if (cccc.isFood) cccc.isCreature = Array.IndexOf(ChallengeUtils.WFoodTypes, cccc.item.Value) >= Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
             }
-            else if (owner.challenge is WatcherBingoWeaverChallenge ccccc)
+            else if (owner.challenge is BingoVistaChallenge ccccc)
             {
-                ccccc.region = Regex.Split(ccccc.room.Value, "_")[0];
+                ccccc.region = ccccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
+                
+                ccccc.location = ChallengeUtils.BingoVistaLocations[ccccc.region][ccccc.room.Value];
+                BingoVistaChallenge.ModifyVistaPositions(ccccc);
+            }
+            else if (owner.challenge is WatcherBingoWeaverChallenge cccccc)
+            {
+                cccccc.region = Regex.Split(cccccc.room.Value, "_")[0];
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();
