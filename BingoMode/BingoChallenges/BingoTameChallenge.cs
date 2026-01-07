@@ -51,7 +51,8 @@ namespace BingoMode.BingoChallenges
     public class BingoTameChallenge : BingoChallenge
     {
         public SettingBox<string> crit;
-        public List<string> tamed = [];
+        public List<string> tamedTypes = [];
+        public List<string> tamedIDs = [];
         public int current;
         public SettingBox<int> amount;
         public SettingBox<bool> specific;
@@ -61,24 +62,24 @@ namespace BingoMode.BingoChallenges
             specific = new(false, "Specific Creature Type", 0);
             crit = new("", "Creature Type", 1, listName: "friend");
             amount = new(0, "Amount", 2);
-            tamed = [];
+            tamedTypes = [];
+            tamedIDs = [];
         }
 
         public override void UpdateDescription()
         {
-            this.description = specific.Value ? ChallengeTools.IGT.Translate("Befriend a <crit>")
-                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index].TrimEnd('s'))
+            this.description = specific.Value ? ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] <crit>")
+                .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index])
                 : ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] unique creature types")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", specific.Value ? "1" : ValueConverter.ConvertToString(amount.Value));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new([[new Icon("FriendB")]]);
-            if (specific.Value) phrase.InsertWord(Icon.FromEntityName(crit.Value));
-            else phrase.InsertWord(new Counter(current, amount.Value), 1);
+            Phrase phrase = new([[new Icon("FriendB")], [new Counter(current, amount.Value)]]);
+            if (specific.Value) phrase.InsertWord(Icon.FromEntityName(crit.Value), 0);
             return phrase;
         }
 
@@ -102,25 +103,28 @@ namespace BingoMode.BingoChallenges
                 specific = new SettingBox<bool>(specific, "Specific Creature Type", 0),
                 crit = new(crug, "Creature Type", 1, listName: "friend"),
                 amount = new(UnityEngine.Random.Range(2, 7), "Amount", 2),
-                tamed = []
+                tamedTypes = [],
+                tamedIDs = []
             };
         }
 
-        public void Fren(CreatureTemplate.Type friend)
+        public void Fren(AbstractCreature friend)
         {
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
-                if (friend.value != crit.Value) return;
-                current = 1;
+                if (friend.creatureTemplate.type.value != crit.Value || tamedIDs.Contains(friend.ID.ToString())) return;
+                current++;
+                tamedIDs.Add(friend.ID.ToString());
                 UpdateDescription();
-                CompleteChallenge();
+                if (current >= amount.Value) CompleteChallenge();
+                else ChangeValue();
             }
             else
             {
-                if (tamed.Contains(friend.value)) return;
+                if (tamedTypes.Contains(friend.creatureTemplate.type.value)) return;
                 current++;
-                tamed.Add(friend.value);
+                tamedTypes.Add(friend.creatureTemplate.type.value);
                 UpdateDescription();
                 if (current >= amount.Value) CompleteChallenge();
                 else ChangeValue();
@@ -146,8 +150,10 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
-            tamed?.Clear();
-            tamed = [];
+            tamedTypes?.Clear();
+            tamedTypes = [];
+            tamedIDs?.Clear();
+            tamedIDs = [];
         }
 
         public override string ToString()
@@ -168,7 +174,8 @@ namespace BingoMode.BingoChallenges
                 "><",
                 revealed ? "1" : "0",
                 "><",
-                string.Join("cLtD", tamed),
+                string.Join("cLtDT", tamedTypes),
+                string.Join("cLtDID", tamedIDs),
             });
         }
 
@@ -177,29 +184,16 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 7)
-                {
-                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    crit = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                    completed = (array[4] == "1");
-                    revealed = (array[5] == "1");
-                    string[] arr = Regex.Split(array[6], @"cLtD");
-                    tamed = [.. arr];
-                }
-                // Legacy board tame challenge compatibility
-                else if (array.Length == 3)
-                {
-                    crit = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    completed = (array[1] == "1");
-                    revealed = (array[2] == "1");
-                    specific = SettingBoxFromString("System.Boolean|true|Specific Creature Type|0|NULL") as SettingBox<bool>;
-                    current = 0;
-                    amount = SettingBoxFromString("System.Int32|3|Amount|2|NULL") as SettingBox<int>;
-                    tamed = [];
-                }
-                
+                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                crit = SettingBoxFromString(array[1]) as SettingBox<string>;
+                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                completed = (array[4] == "1");
+                revealed = (array[5] == "1");
+                string[] arr = Regex.Split(array[6], @"cLtDT");
+                tamedTypes = [.. arr];
+                string[] arr2 = Regex.Split(array[7], @"cLtDID");
+                tamedIDs = [.. arr2];
                 UpdateDescription();
             }
             catch (Exception ex)

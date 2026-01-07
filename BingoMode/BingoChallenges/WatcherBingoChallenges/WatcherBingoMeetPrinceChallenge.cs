@@ -70,6 +70,11 @@ namespace BingoMode.BingoChallenges
             return ChallengeTools.IGT.Translate("Visiting The Prince");
         }
 
+        public override bool ValidForThisSlugcat(SlugcatStats.Name slugcat)
+        {
+            return slugcat == Watcher.WatcherEnums.SlugcatStatsName.Watcher;
+        }
+
         public override string ToString()
         {
             return string.Concat(

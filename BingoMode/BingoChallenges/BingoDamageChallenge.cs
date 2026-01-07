@@ -64,6 +64,7 @@ namespace BingoMode.BingoChallenges
         public SettingBox<int> amount;
         public SettingBox<bool> inOneCycle;
         public SettingBox<string> region;
+        public List<string> frogsThrown;
         public int current;
 
         public BingoDamageChallenge()
@@ -73,6 +74,7 @@ namespace BingoMode.BingoChallenges
             amount = new(0, "Amount", 2);
             inOneCycle = new(false, "In One Cycle", 3);
             region = new("", "Region", 4, listName: "regions");
+            frogsThrown = [];
         }
 
         public override void UpdateDescription()
@@ -145,6 +147,7 @@ namespace BingoMode.BingoChallenges
                 amount = new(amound, "Amount", 2),
                 inOneCycle = new(oneCycle, "In One Cycle", 3),
                 region = new("Any Region", "Region", 5, listName: "regions"),
+                frogsThrown = []
             };
         }
 
@@ -295,14 +298,22 @@ namespace BingoMode.BingoChallenges
         {
             base.Reset();
             current = 0;
+            frogsThrown?.Clear();
+            frogsThrown = [];
         }
 
         public override void AddHooks()
         {
+            On.Watcher.Frog.Thrown += Frog_Thrown;
+            On.Watcher.Frog.Jump += Frog_Jump;
+            On.Watcher.Frog.Attach += Frog_Attach;
         }
 
         public override void RemoveHooks()
         {
+            On.Watcher.Frog.Thrown -= Frog_Thrown;
+            On.Watcher.Frog.Jump -= Frog_Jump;
+            On.Watcher.Frog.Attach -= Frog_Attach;
         }
 
         public override List<object> Settings() => [weapon, victim, amount, inOneCycle, region];

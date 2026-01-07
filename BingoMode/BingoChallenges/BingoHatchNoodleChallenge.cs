@@ -116,7 +116,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoHatchNoodleChallenge ch = new();
-            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").ToArray()[UnityEngine.Random.Range(0, ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)] : "Any Region";
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").ToArray()[UnityEngine.Random.Range(0, ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").Count())] : "Any Region";
 
             ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "regions");

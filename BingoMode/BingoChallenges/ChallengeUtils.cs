@@ -821,7 +821,7 @@ namespace BingoMode.BingoChallenges
                 string dest = parts[3].ToLowerInvariant();
 
                 var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
-                string portalKey = $"{ordered[0]}-{ordered[1]}";
+                string portalKey = $"{ordered[0]}-{ordered[1]}".ToUpperInvariant();
 
                 if (!watcherPortals.Contains(portalKey))
                 {
@@ -839,7 +839,7 @@ namespace BingoMode.BingoChallenges
                 string dest = parts[2].ToLowerInvariant();
 
                 var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
-                string STKey = $"{ordered[0]}-{ordered[1]}";
+                string STKey = $"{ordered[0]}-{ordered[1]}".ToUpperInvariant();
 
                 if (!watcherSTSpots.Contains(STKey))
                 {

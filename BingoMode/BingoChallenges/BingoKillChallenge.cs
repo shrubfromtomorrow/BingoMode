@@ -210,7 +210,7 @@ namespace BingoMode.BingoChallenges
         public void DeathPit(Creature c, Player p)
         {
             // watcher touches this
-            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite)) || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
+            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite || c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub)) || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
             if (starve.Value && !p.Malnourished || shrooms.Value && p.mushroomCounter == 0) return;
             string type = c.abstractCreature.creatureTemplate.type.value;
             bool flag = crit != null && (
@@ -379,7 +379,7 @@ namespace BingoMode.BingoChallenges
         public override void CreatureKilled(Creature c, int playerNumber)
         {
             // watcher touches this
-            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite)) || deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
+            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite || c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub)) || deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
             if (!CreatureHitByDesired(c)) return;
             if (!CritInLocation(c)) return;
             if (game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && ((starve.Value && !p.Malnourished) || (shrooms.Value && p.mushroomCounter == 0))) return;

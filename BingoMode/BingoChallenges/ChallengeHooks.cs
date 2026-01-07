@@ -155,7 +155,6 @@ namespace BingoMode.BingoChallenges
             On.Boomerang.HitSomething += Boomerang_HitSomething;
             IL.GraffitiBomb.Explode += GraffitiBomb_Explode;
             IL.GraffitiCloud.Update += GraffitiCloud_Update;
-            On.Watcher.Frog.Attach += Frog_Attach;
             //IL.FlareBomb.Update += FlareBomb_Update;
 
             // No need for unlocked slugs
@@ -1021,7 +1020,7 @@ namespace BingoMode.BingoChallenges
                                 {
                                     if (ExpeditionData.challengeList[p] is BingoTameChallenge c)
                                     {
-                                        c.Fren(self.AI.creature.creatureTemplate.type);
+                                        c.Fren(self.AI.creature);
                                     }
                                 }
                                 break;
@@ -1990,7 +1989,7 @@ namespace BingoMode.BingoChallenges
                                 {
                                     if (ExpeditionData.challengeList[p] is WatcherBingoTameChallenge c)
                                     {
-                                        c.Fren(self.AI.creature.creatureTemplate.type);
+                                        c.Fren(self.AI.creature);
                                     }
                                 }
                                 break;
@@ -2215,11 +2214,39 @@ namespace BingoMode.BingoChallenges
             else Plugin.logger.LogError("Uh oh, GraffitiBomb_Update il fucked up " + il);
         }
 
+        public static void Frog_Thrown(On.Watcher.Frog.orig_Thrown orig, Frog self, Creature thrownBy, Vector2 thrownPos, Vector2? firstFrameTraceFromPos, IntVector2 throwDir, float frc, bool eu)
+        {
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoDamageChallenge c && c.weapon.Value == "Frog" && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed && !c.frogsThrown.Contains(self.abstractCreature.ID.ToString()))
+                {
+                    c.frogsThrown.Add(self.abstractCreature.ID.ToString());
+                }
+            }
+            orig.Invoke(self, thrownBy, thrownPos, firstFrameTraceFromPos, throwDir, frc, eu);
+        }
+
+        public static void Frog_Jump(On.Watcher.Frog.orig_Jump orig, Watcher.Frog self, Vector2 jumpDir, bool ignoreNoJumps)
+        {
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoDamageChallenge c && c.weapon.Value == "Frog" && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed && c.frogsThrown.Contains(self.abstractCreature.ID.ToString()))
+                {
+                    c.frogsThrown.Remove(self.abstractCreature.ID.ToString());
+                }
+            }
+            orig.Invoke(self, jumpDir, ignoreNoJumps);
+        }
+
         public static void Frog_Attach(On.Watcher.Frog.orig_Attach orig, Frog self, BodyChunk chunk, bool suckedFood = false)
         {
-            if (BingoData.BingoMode && self.thrownBy is Player && self.throwLatch && chunk.owner is Creature victim && !victim.dead)
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
-                ReportHit(self.abstractCreature.creatureTemplate.name, victim, self.abstractPhysicalObject.ID, false);
+                if (ExpeditionData.challengeList[j] is BingoDamageChallenge c && c.weapon.Value == "Frog" && chunk.owner is Creature victim && !victim.dead && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed && c.frogsThrown.Contains(self.abstractCreature.ID.ToString()))
+                {
+                    ReportHit(self.abstractCreature.creatureTemplate.name, victim, self.abstractPhysicalObject.ID, false);
+                    c.frogsThrown.Remove(self.abstractCreature.ID.ToString());
+                }
             }
             orig.Invoke(self, chunk, suckedFood);
         }
@@ -2302,6 +2329,34 @@ namespace BingoMode.BingoChallenges
                 if (ExpeditionData.challengeList[j] is WatcherBingoDontUseItemChallenge g && g.isFood)
                 {
                     g.Eated(edible);
+                }
+            }
+        }
+
+        public static void Watcher_ShelterDoor_Close(On.ShelterDoor.orig_Close orig, ShelterDoor self)
+        {
+            orig.Invoke(self);
+
+            if (self.Broken || self.closedFac != 0f) return;
+            int grubbies = 0;
+
+            foreach (var entity in self.room.abstractRoom.entities)
+            {
+                if (entity is AbstractCreature c && c.creatureTemplate.type == WatcherEnums.CreatureTemplateType.MothGrub)
+                {
+                    grubbies++;
+                }
+            }
+
+            if (grubbies == 0) return;
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is WatcherBingoHatchMothGrubChallenge c)
+                {
+                    for (int e = 0; e < grubbies; e++)
+                    {
+                        c.Hatch();
+                    }
                 }
             }
         }

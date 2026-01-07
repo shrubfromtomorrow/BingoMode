@@ -75,7 +75,7 @@ namespace BingoMode.BingoChallenges
         public void Entered(WarpPoint warpPoint, List<AbstractPhysicalObject> objects)
         {
             if (hidden || revealed || TeamsCompleted[SteamTest.team] || completed) return;
-            string to = warpPoint.room.abstractRoom.name.ToLowerInvariant();
+            string to = warpPoint.room.abstractRoom.name.ToUpperInvariant();
             string warp = "";
 
             foreach (var portal in ChallengeUtils.watcherPortals)
@@ -128,12 +128,14 @@ namespace BingoMode.BingoChallenges
                 EntityID id = portalCrit.ID;
                 if (!creaturePortals.ContainsKey(id))
                 {
+                    Plugin.logger.LogInfo("Adding new creature to dict + " + id + " " + warp);
                     creaturePortals.Add(id, [warp]);
                 }
                 else
                 {
                     if (!creaturePortals[id].Contains(warp))
                     {
+                        Plugin.logger.LogInfo("Adding new warp to creature in dict + " + id + " " + warp);
                         creaturePortals[id].Add(warp);
                     }
                 }

@@ -157,8 +157,9 @@ namespace BingoMode
             {
                 bannedChallenges[slug] = new List<string>
                 {
-                    nameof(BingoHellChallenge)
+                    nameof(BingoHellChallenge),
                 };
+                if (slug == WatcherEnums.SlugcatStatsName.Watcher) bannedChallenges[slug].Add(nameof(WatcherBingoHatchMothGrubChallenge));
             }
         }
 
