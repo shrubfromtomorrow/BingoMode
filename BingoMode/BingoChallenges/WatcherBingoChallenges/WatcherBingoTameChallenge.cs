@@ -145,6 +145,7 @@ namespace BingoMode.BingoChallenges
                 revealed ? "1" : "0",
                 "><",
                 string.Join("cLtDT", tamedTypes),
+                "><",
                 string.Join("cLtDID", tamedIDs),
             });
         }

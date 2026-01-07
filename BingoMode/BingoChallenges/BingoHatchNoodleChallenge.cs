@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
+using UnityEngine;
 using Menu.Remix;
 
 namespace BingoMode.BingoChallenges
@@ -73,11 +74,11 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new(
-                [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))]]);
+                [[new Icon("needleEggSymbol", 1f, ChallengeUtils.ItemOrCreatureIconColor("needleEggSymbol")), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("Kill_SmallNeedleWorm", 1f, ChallengeUtils.ItemOrCreatureIconColor("SmallNeedleWorm"))]]);
             if (differentRegions.Value)
             {
-                phrase.InsertWord(new Icon("TravellerA"));
-                phrase.InsertWord(new Counter(current, amount.Value), 1);
+                phrase.InsertWord(new Icon("TravellerA"), 1);
+                phrase.InsertWord(new Counter(current, amount.Value), 2);
                 if (oneCycle.Value)
                 {
                     phrase.InsertWord(new Icon("cycle_limit"), 1);
@@ -89,15 +90,19 @@ namespace BingoMode.BingoChallenges
                 phrase.InsertWord(new Counter(current, amount.Value), 2);
                 if (oneCycle.Value)
                 {
-                    phrase.InsertWord(new Icon("cycle_limit"), 0);
+                    phrase.InsertWord(new Icon("cycle_limit"), 2);
                 }
             }
             else
             {
-                phrase.InsertWord(new Counter(current, amount.Value), 1, 0);
                 if (oneCycle.Value)
                 {
+                    phrase.InsertWord(new Counter(current, amount.Value), 2);
                     phrase.InsertWord(new Icon("cycle_limit"), 1);
+                }
+                else
+                {
+                    phrase.InsertWord(new Counter(current, amount.Value), 1);
                 }
             }
             return phrase;
