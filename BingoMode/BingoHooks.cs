@@ -227,8 +227,8 @@ namespace BingoMode
             if (ModManager.Watcher)
             {
                 // Get custom region arts
-                On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
-                On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+                //On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
+                //On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
 
                 // Lock everyone but washa
                 On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;

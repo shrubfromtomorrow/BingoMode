@@ -160,7 +160,6 @@ namespace BingoMode.BingoRandomizer
                 case "CollectPearl": return new BingoCollectPearlRandomizer() as Randomizer<T>;
                 case "Craft": return new BingoCraftRandomizer() as Randomizer<T>;
                 case "CreatureGate": return new BingoCreatureGateRandomizer() as Randomizer<T>;
-                case "CycleScore": return new BingoCycleScoreRandomizer() as Randomizer<T>;
                 case "Damage": return new BingoDamageRandomizer() as Randomizer<T>;
                 case "Depths": return new BingoDepthsRandomizer() as Randomizer<T>;
                 case "DodgeLeviathan": return new BingoDodgeLeviathanRandomizer() as Randomizer<T>;
@@ -171,7 +170,7 @@ namespace BingoMode.BingoRandomizer
                 case "Echo": return new BingoEchoRandomizer() as Randomizer<T>;
                 case "EnterRegion": return new BingoEnterRegionRandomizer() as Randomizer<T>;
                 case "EnterRegionFrom": return new BingoEnterRegionFromRandomizer() as Randomizer<T>;
-                case "GlobalScore": return new BingoGlobalScoreRandomizer() as Randomizer<T>;
+                case "GlobalScore": return new BingoScoreRandomizer() as Randomizer<T>;
                 case "GourmandCrush": return new BingoGourmandCrushRandomizer() as Randomizer<T>;
                 case "GreenNeuron": return new BingoGreenNeuronRandomizer() as Randomizer<T>;
                 case "HatchNoodle": return new BingoHatchNoodleRandomizer() as Randomizer<T>;

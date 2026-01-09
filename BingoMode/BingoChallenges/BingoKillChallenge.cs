@@ -3,6 +3,7 @@ using BingoMode.BingoSteamworks;
 using Expedition;
 using MoreSlugcats;
 using On;
+using On.Watcher;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -83,6 +84,8 @@ namespace BingoMode.BingoChallenges
         public SettingBox<bool> oneCycle;
         public SettingBox<bool> shrooms;
 
+        public List<CreatureTemplate.Type> allowedSmallCrits;
+
         public BingoKillChallenge()
         {
             crit = new("", "Creature Type", 0, listName: "creatures");
@@ -93,6 +96,13 @@ namespace BingoMode.BingoChallenges
             weapon = new("", "Weapon Used", 6, listName: "weaponsnojelly");
             deathPit = new(false, "Via a Death Pit", 7);
             shrooms = new(false, "While under mushroom effect", 8);
+
+            allowedSmallCrits = new List<CreatureType>
+            {
+                Watcher.WatcherEnums.CreatureTemplateType.SandGrub,
+                Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub,
+                Watcher.WatcherEnums.CreatureTemplateType.FireSprite
+            };
         }
 
         public override void UpdateDescription()
@@ -209,8 +219,7 @@ namespace BingoMode.BingoChallenges
 
         public void DeathPit(Creature c, Player p)
         {
-            // watcher touches this
-            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite || c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub)) || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
+            if ((c.Template.smallCreature && !(allowedSmallCrits.Contains(c.Template.type))) || !deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed || !CritInLocation(c)) return;
             if (starve.Value && !p.Malnourished || shrooms.Value && p.mushroomCounter == 0) return;
             string type = c.abstractCreature.creatureTemplate.type.value;
             bool flag = crit != null && (
@@ -378,8 +387,7 @@ namespace BingoMode.BingoChallenges
 
         public override void CreatureKilled(Creature c, int playerNumber)
         {
-            // watcher touches this
-            if ((c.Template.smallCreature && !(ModManager.Watcher && c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.FireSprite || c.Template.type == Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub)) || deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
+            if ((c.Template.smallCreature && !(allowedSmallCrits.Contains(c.Template.type))) || deathPit.Value || TeamsCompleted[SteamTest.team] || hidden || completed || game == null || c == null || revealed) return;
             if (!CreatureHitByDesired(c)) return;
             if (!CritInLocation(c)) return;
             if (game.Players != null && game.Players.Count > 0 && game.Players[playerNumber].realizedCreature is Player p && ((starve.Value && !p.Malnourished) || (shrooms.Value && p.mushroomCounter == 0))) return;

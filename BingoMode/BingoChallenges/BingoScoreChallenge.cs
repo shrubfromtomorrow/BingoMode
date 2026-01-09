@@ -5,6 +5,7 @@ using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -13,14 +14,16 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class BingoCycleScoreRandomizer : ChallengeRandomizer
+    public class BingoScoreRandomizer : ChallengeRandomizer
     {
         public Randomizer<int> target;
+        public Randomizer<bool> oneCycle;
 
         public override Challenge Random()
         {
-            BingoCycleScoreChallenge challenge = new();
+            BingoScoreChallenge challenge = new();
             challenge.target.Value = target.Random();
+            challenge.oneCycle.Value = oneCycle.Random();
             return challenge;
         }
 
@@ -29,68 +32,76 @@ namespace BingoMode.BingoChallenges
             string surindent = indent + INDENT_INCREMENT;
             StringBuilder serializedContent = new();
             serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
-            return base.Serialize(indent).Replace("__Type__", "CycleScore").Replace("__Content__", serializedContent.ToString());
+            serializedContent.AppendLine($"{surindent}oneCycle-{oneCycle.Serialize(surindent)}");
+            return base.Serialize(indent).Replace("__Type__", "Score").Replace("__Content__", serializedContent.ToString());
         }
 
         public override void Deserialize(string serialized)
         {
             Dictionary<string, string> dict = ToDict(serialized);
             target = Randomizer<int>.InitDeserialize(dict["target"]);
+            oneCycle = Randomizer<bool>.InitDeserialize(dict["oneCycle"]);
         }
     }
 
-    public class BingoCycleScoreChallenge : BingoChallenge
+    public class BingoScoreChallenge : BingoChallenge
     {
         public SettingBox<int> target;
+        public SettingBox<bool> oneCycle;
+
         public int score;
 
-        public BingoCycleScoreChallenge()
+        public BingoScoreChallenge()
         {
             target = new(0, "Target Score", 0);
+            oneCycle = new(false, "In one Cycle", 1);
         }
 
         public override void UpdateDescription()
         {
-            int value = completed ? target.Value : score;
-            description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills in one cycle").Replace("<score_target>", target.Value.ToString()).Replace("<current_score>", ValueConverter.ConvertToString<int>(value));
+            this.description = ChallengeTools.IGT.Translate("Earn [<current_score>/<score_target>] points from creature kills <onecycle>")
+                .Replace("<score_target>", ValueConverter.ConvertToString<int>(target.Value)).Replace("<current_score>", ValueConverter.ConvertToString<int>(this.score))
+                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate("in one cycle") : "");
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
-            return new Phrase(
-                [[new Icon("Multiplayer_Star"), new Icon("cycle_limit")],
+            Phrase phrase = new Phrase(
+                [[new Icon("Multiplayer_Star")],
                 [new Counter(score, target.Value)]]);
+            if (oneCycle.Value)
+            {
+                phrase.InsertWord(new Icon("cycle_limit"), 0);
+            }
+            return phrase;
         }
 
         public override bool Duplicable(Challenge challenge)
         {
-            return !(challenge is BingoCycleScoreChallenge);
-        }
-
-        public override void Reset()
-        {
-            this.score = 0;
-            base.Reset();
+            return challenge is not BingoScoreChallenge c || c.oneCycle.Value != oneCycle.Value;
         }
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Scoring cycle points");
+            return ChallengeTools.IGT.Translate("Scoring points");
         }
 
         public override Challenge Generate()
         {
-            int num = UnityEngine.Random.Range(20, 151);
-            return new BingoCycleScoreChallenge
+            bool oneCycle = UnityEngine.Random.value < 0.5f;
+            int num = oneCycle ? UnityEngine.Random.Range(20, 151) : UnityEngine.Random.Range(80, 301);
+            return new BingoScoreChallenge
             {
-                target = new(num, "Target Score", 0)
+                target = new(num, "Target Score", 0),
+                oneCycle = new(oneCycle, "In one Cycle", 1)
             };
         }
 
-        public override bool CombatRequired()
+        public override void Reset()
         {
-            return true;
+            score = 0;
+            base.Reset();
         }
 
         public override int Points()
@@ -100,7 +111,12 @@ namespace BingoMode.BingoChallenges
             {
                 num = 1.35f;
             }
-            return (int)((float)(this.target.Value / 3) * num) * (int)(this.hidden ? 2f : 1f);
+            return (int)((float)(this.target.Value / 4) * num) * (int)(this.hidden ? 2f : 1f);
+        }
+
+        public override bool CombatRequired()
+        {
+            return true;
         }
 
         public override bool RespondToCreatureKill()
@@ -138,7 +154,7 @@ namespace BingoMode.BingoChallenges
         public override void Update()
         {
             base.Update();
-            if (revealed || completed) return;
+            if (revealed || completed || !oneCycle.Value) return;
             if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
             {
                 if (this.score != 0)
@@ -155,13 +171,17 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoCycleScoreChallenge",
+                "BingoGlobalScoreChallenge",
                 "~",
+                ValueConverter.ConvertToString<int>(score),
+                "><",
                 target.ToString(),
                 "><",
-                this.completed ? "1" : "0",
+                oneCycle.ToString(),
                 "><",
-                this.revealed ? "1" : "0",
+                completed ? "1" : "0",
+                "><",
+                revealed ? "1" : "0",
             });
         }
 
@@ -170,19 +190,15 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                this.target = SettingBoxFromString(array[0]) as SettingBox<int>;
-                this.completed = (array[1] == "1");
-                this.revealed = (array[2] == "1");
-                if (revealed || completed)
-                {
-                    score = target.Value;
-                }
-                else score = 0;
-                this.UpdateDescription();
+                score = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                target = SettingBoxFromString(array[1]) as SettingBox<int>;
+                completed = (array[2] == "1");
+                revealed = (array[3] == "1");
+                UpdateDescription();
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoCycleScoreChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoGlobalScoreChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }
@@ -195,6 +211,6 @@ namespace BingoMode.BingoChallenges
         {
         }
 
-        public override List<object> Settings() => [target];
+        public override List<object> Settings() => [target, oneCycle];
     }
 }
