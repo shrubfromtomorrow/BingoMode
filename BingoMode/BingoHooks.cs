@@ -163,6 +163,9 @@ namespace BingoMode
             On.Menu.ExpeditionMenu.Singal += ExpeditionMenu_Singal;
             On.Menu.ExpeditionMenu.UpdatePage += ExpeditionMenu_UpdatePage;
 
+            // Add bingo to intro roll
+            IL.Menu.IntroRoll.ctor += IntroRoll_ctor;
+
             // Adding new bingo button to the character select page
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
@@ -1121,6 +1124,18 @@ namespace BingoMode
             }
 
             orig.Invoke(self, pageIndex);
+        }
+
+        private static void IntroRoll_ctor(MonoMod.Cil.ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchLdstr("Intro_Roll_A")))
+            {
+                c.Next.Operand = "Intro_Roll_Bingo";
+            }
+            else Plugin.logger.LogError("BingoIntroReplacement broked " + il);
         }
 
         // Creating butone

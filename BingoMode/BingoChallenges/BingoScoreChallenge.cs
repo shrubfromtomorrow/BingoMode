@@ -192,8 +192,9 @@ namespace BingoMode.BingoChallenges
                 string[] array = Regex.Split(args, "><");
                 score = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
                 target = SettingBoxFromString(array[1]) as SettingBox<int>;
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
+                oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                completed = (array[3] == "1");
+                revealed = (array[4] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

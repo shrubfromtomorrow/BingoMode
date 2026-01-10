@@ -207,27 +207,13 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 7)
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                    completed = (array[5] == "1");
-                    revealed = (array[6] == "1");
-                }
-                // Legacy board eat challenge compatibility
-                else if (array.Length == 6)
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    completed = (array[4] == "1");
-                    revealed = (array[5] == "1");
-                    starve = SettingBoxFromString("System.Boolean|false|While Starving|2|NULL") as SettingBox<bool>;
-                }
+                amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                isCreature = (array[2] == "1");
+                foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                completed = (array[5] == "1");
+                revealed = (array[6] == "1");
                 UpdateDescription();
             }
             catch (Exception ex)

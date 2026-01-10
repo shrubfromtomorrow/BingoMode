@@ -262,30 +262,16 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                if (array.Length == 8)
-                {
-                    common = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    anyShelter = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                    region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                    completed = (array[5] == "1");
-                    revealed = (array[6] == "1");
-                    string[] arr = Regex.Split(array[7], "cLtD");
-                    collected = [.. arr];
-                }
-                // Legacy board pearl hoard challenge compatibility
-                else
-                {
-                    common = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    amount = SettingBoxFromString(array[1]) as SettingBox<int>;
-                    region = SettingBoxFromString(array[2]) as SettingBox<string>;
-                    completed = (array[3] == "1");
-                    revealed = (array[4] == "1");
-                    anyShelter = SettingBoxFromString("System.Boolean|false|Any Shelter|2|NULL") as SettingBox<bool>;
-                    collected = [];
-                }
-                    UpdateDescription();
+                common = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                anyShelter = SettingBoxFromString(array[1]) as SettingBox<bool>;
+                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                region = SettingBoxFromString(array[4]) as SettingBox<string>;
+                completed = (array[5] == "1");
+                revealed = (array[6] == "1");
+                string[] arr = Regex.Split(array[7], "cLtD");
+                collected = [.. arr];
+                UpdateDescription();
             }
             catch (Exception ex)
             {
