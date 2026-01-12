@@ -174,7 +174,7 @@ namespace BingoMode.BingoChallenges
                 case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
                 case "popcornRegions": return [.. GetCorrectListForChallenge("regions").Where(x => !ExcludedPopcornRegions.Contains(x))];
-                case "Wpoms": return WpomegranateRegions;
+                case "Wpoms": return ["Any Region", .. WpomegranateRegions];
                 case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
                 //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
                 case "spinners": return WspinningTopSpots;
@@ -817,10 +817,10 @@ namespace BingoMode.BingoChallenges
                 var parts = line.Split(':');
                 if (parts.Length < 4) continue;
 
-                string origin = parts[0].ToLowerInvariant();
-                string dest = parts[3].ToLowerInvariant();
+                string origin = parts[0].ToUpperInvariant();
+                string dest = parts[3].ToUpperInvariant();
 
-                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                var ordered = new[] { origin, dest };
                 string portalKey = $"{ordered[0]}-{ordered[1]}".ToUpperInvariant();
 
                 if (!watcherPortals.Contains(portalKey))
@@ -835,10 +835,10 @@ namespace BingoMode.BingoChallenges
                 var parts = line.Split(':');
                 if (parts.Length < 3) continue;
 
-                string origin = parts[0].ToLowerInvariant();
-                string dest = parts[2].ToLowerInvariant();
+                string origin = parts[0].ToUpperInvariant();
+                string dest = parts[2].ToUpperInvariant();
 
-                var ordered = new[] { origin, dest }.OrderBy(s => s).ToArray();
+                var ordered = new[] { origin, dest };
                 string STKey = $"{ordered[0]}-{ordered[1]}".ToUpperInvariant();
 
                 if (!watcherSTSpots.Contains(STKey))

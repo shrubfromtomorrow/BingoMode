@@ -24,7 +24,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomodebeta", "Watcher Bingo Beta", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "1.326";
+        public const string VERSION = "1.33";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
@@ -87,8 +87,8 @@ namespace BingoMode
                 Futile.atlasManager.LoadAtlas("Atlases/bingoicons");
                 BingoEnums.Register();
                 // Passage screens
-                //BingoEnums.LandscapeType.RegisterValues();
-                
+                BingoEnums.LandscapeType.RegisterValues();
+
                 BingoHooks.Apply();
                 ChallengeHooks.Apply();
                 ChallengeUtils.Apply();

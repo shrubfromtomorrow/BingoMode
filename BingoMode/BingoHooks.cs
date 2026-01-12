@@ -31,10 +31,6 @@ namespace BingoMode
         public static ConditionalWeakTable<ExpeditionMenu, BingoPage> bingoPage = new();
         public static ConditionalWeakTable<CharacterSelectPage, HoldButton> newBingoButton = new();
 
-        //watcher field
-        public static Dictionary<string, Menu.MenuScene.SceneID> landscapeLookup;
-        private static Dictionary<Menu.MenuScene.SceneID, string> sceneToRegion;
-
         public static float cantpresscounter;
 
         public static void EarlyApply()
@@ -129,6 +125,12 @@ namespace BingoMode
                     catch (Exception ex)
                     {
                         Plugin.logger.LogError("Error while regenerating broken challenge, call that shit inception fr how did this happen: " + ex);
+                        string combined = "";
+                        foreach (string s in array11)
+                        {
+                            combined += s;
+                        }
+                        Plugin.logger.LogInfo(combined);
                         Challenge challenge = (Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoEatChallenge").GetType()) as Challenge).Generate();
                         //challenge.FromString(array11[1]);
                         if (challenge != null)
@@ -157,6 +159,7 @@ namespace BingoMode
 
         public static void Apply()
         {
+            if (ModManager.Watcher) WatcherBingoHooks.Apply();
             // Adding the bingo page to exp menu
             On.Menu.ExpeditionMenu.ctor += ExpeditionMenu_ctor;
             On.Menu.ExpeditionMenu.InitMenuPages += ExpeditionMenu_InitMenuPages;
@@ -226,21 +229,6 @@ namespace BingoMode
             On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
             IL.Menu.FastTravelScreen.Update += FastTravelScreen_Update;
             On.Menu.FastTravelScreen.Singal += FastTravelScreen_Singal;
-
-            if (ModManager.Watcher)
-            {
-                // Get custom region arts
-                //On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
-                //On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
-
-                // Lock everyone but washa
-                On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
-
-                // Skip portal pair check for weaver for goal portal
-                IL.Watcher.WarpPoint.ActivateWeaver += WarpPoint_ActivateWeaver;
-                On.SaveState.ApplyCustomEndGame += SaveState_ApplyCustomEndGame;
-                On.Watcher.WarpPoint.ChooseDynamicWarpTarget += WarpPoint_ChooseDynamicWarpTarget;
-            }
 
             // Stop void win from happening
             On.Expedition.DepthsFinishScript.Update += DepthsFinishScript_Update;
@@ -1004,7 +992,6 @@ namespace BingoMode
             bingoPage.TryGetValue(self, out var page);
             self.pages[4].subObjects.Add(page);
             self.pages[4].pos.x -= 1500f;
-            // 
         }
 
         public static void ExpeditionMenu_Singal(On.Menu.ExpeditionMenu.orig_Singal orig, ExpeditionMenu self, MenuObject sender, string message)
@@ -1150,7 +1137,6 @@ namespace BingoMode
                 bool isSpectator = BingoData.BingoSaves[ExpeditionData.slugcatPlayer].team == 8;
                 if (saveGameData == null)
                 {
-
                     BingoData.BingoSaves.Remove(ExpeditionData.slugcatPlayer);
                     goto invok;
                 }
@@ -1169,11 +1155,27 @@ namespace BingoMode
             orig.Invoke(self);
 
             if (saveGameData != null) return;
-            self.confirmExpedition.pos.x += 90;
-
-            if (!newBingoButton.TryGetValue(self, out _))
+            if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                newBingoButton.Add(self, new HoldButton(self.menu, self, self.menu.Translate("PLAY<LINE>BINGO").Replace("<LINE>", "\r\n"), "NEWBINGO", new Vector2(590f, 180f), 30f));
+                if (self.confirmExpedition != null)
+                {
+                    self.confirmExpedition.RemoveSprites();
+                    self.confirmExpedition.RemoveSubObject(self.confirmExpedition);
+                }
+
+                if (!newBingoButton.TryGetValue(self, out _))
+                {
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, self.menu.Translate("PLAY<LINE>BINGO").Replace("<LINE>", "\r\n"), "NEWBINGO", new Vector2(680f, 180f), 30f));
+                }
+            }
+            else
+            {
+                self.confirmExpedition.pos.x += 90;
+
+                if (!newBingoButton.TryGetValue(self, out _))
+                {
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, self.menu.Translate("PLAY<LINE>BINGO").Replace("<LINE>", "\r\n"), "NEWBINGO", new Vector2(590f, 180f), 30f));
+                }
             }
             newBingoButton.TryGetValue(self, out var button);
             self.subObjects.Add(button);
@@ -1219,201 +1221,5 @@ namespace BingoMode
                 newBingoButton.Remove(self);
             }
         }
-
-        #region watcher
-
-        public static bool ExpeditionData_CheckUnlocked(On.Expedition.ExpeditionProgression.orig_CheckUnlocked orig, ProcessManager manager, SlugcatStats.Name slugcat)
-        {
-            if (slugcat != WatcherEnums.SlugcatStatsName.Watcher)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        public static MenuScene.SceneID Region_GetRegionLandscapeScene(On.Region.orig_GetRegionLandscapeScene orig, string regionAcro)
-        {
-            MenuScene.SceneID origReturn = orig.Invoke(regionAcro);
-
-            if (origReturn != MenuScene.SceneID.Empty)
-                return origReturn;
-
-            if (landscapeLookup == null)
-                BuildLandscapeLookup();
-
-            if (landscapeLookup.TryGetValue(regionAcro, out var scene))
-                return scene;
-
-            return origReturn;
-        }
-
-        private static void BuildLandscapeLookup()
-        {
-            landscapeLookup = new Dictionary<string, Menu.MenuScene.SceneID>();
-
-            var fields = typeof(BingoEnums.LandscapeType).GetFields(
-                BindingFlags.Public | BindingFlags.Static);
-
-            foreach (var field in fields)
-            {
-                if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
-                    field.Name.StartsWith("Landscape_"))
-                {
-                    string regionCode = field.Name.Substring("Landscape_".Length);
-                    var value = (Menu.MenuScene.SceneID)field.GetValue(null);
-
-                    if (value != null)
-                        landscapeLookup[regionCode] = value;
-                }
-            }
-        }
-
-        public static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
-        {
-            orig.Invoke(self);
-
-            if (sceneToRegion == null)
-                BuildSceneRegionMap();
-
-            if (!sceneToRegion.TryGetValue(self.sceneID, out string region))
-                return;
-
-            string folder = $"Scenes{Path.DirectorySeparatorChar}Landscape - {region}";
-            string flatName = $"Landscape - {region} - Flat";
-            string shadowName = $"Title_{region}_Shadow";
-            string titleName = $"Title_{region}";
-
-            self.sceneFolder = folder;
-
-            self.AddIllustration(
-                new MenuIllustration(self.menu, self, folder, flatName, new Vector2(683f, 384f), false, true));
-
-            self.AddIllustration(
-                new MenuIllustration(self.menu, self, "", shadowName, new Vector2(0.01f, 0.01f), true, false));
-
-            self.AddIllustration(
-                new MenuIllustration(self.menu, self, "", titleName, new Vector2(0.01f, 0.01f), true, false));
-
-            self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader =
-                self.menu.manager.rainWorld.Shaders["MenuText"];
-        }
-
-        private static void BuildSceneRegionMap()
-        {
-            sceneToRegion = new Dictionary<Menu.MenuScene.SceneID, string>();
-
-            var fields = typeof(BingoEnums.LandscapeType).GetFields(
-                BindingFlags.Public | BindingFlags.Static);
-
-            foreach (var field in fields)
-            {
-                if (field.FieldType == typeof(Menu.MenuScene.SceneID) &&
-                    field.Name.StartsWith("Landscape_"))
-                {
-                    var value = field.GetValue(null) as Menu.MenuScene.SceneID;
-                    if (value != null)
-                    {
-                        string region = field.Name.Substring("Landscape_".Length);
-                        sceneToRegion[value] = region;
-                    }
-                }
-            }
-        }
-
-        private static void WarpPoint_ActivateWeaver(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.After,
-                    x => x.MatchLdloc(out _),
-                    x => x.MatchLdcI4(out _),
-                    x => x.MatchCeq(),
-                    x => x.MatchLdloc(out _),
-                    x => x.MatchOr()
-                ))
-            {
-                c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Func<bool, WarpPoint, bool>>((cur, wp) =>
-                {
-                    if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && wp.Data != null && wp.Data.destRoom != null && wp.Data.destRoom == "NARNIA")
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return cur;
-                    }
-                });
-            }
-            else Plugin.logger.LogError("WarpPoint_ActivateWeaver FAIULRE " + il);
-        }
-
-        private static void SaveState_ApplyCustomEndGame(On.SaveState.orig_ApplyCustomEndGame orig, SaveState self, RainWorldGame game, bool addFiveCycles)
-        {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
-            {
-                self.deathPersistentSaveData.rippleLevel = 5;
-            }
-            orig(self, game, addFiveCycles);
-        }
-
-        private static string WarpPoint_ChooseDynamicWarpTarget(On.Watcher.WarpPoint.orig_ChooseDynamicWarpTarget orig, World world, string oldRoom, string targetRegion, bool badWarp, bool spreadingRot, bool playerCreated)
-        {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
-            {
-                List<string> weaverGoalRooms = [];
-                for (int i = 0; i < ExpeditionData.challengeList.Count; i++)
-                {
-                    if (ExpeditionData.challengeList[i] is WatcherBingoWeaverChallenge c && !c.completed && !c.TeamsCompleted[SteamTest.team] && !c.revealed)
-                    {
-                        weaverGoalRooms.Add(c.room.Value.ToUpperInvariant());
-                    }
-                }
-
-                List<string> list = [];
-                if (targetRegion != null && targetRegion.ToLowerInvariant() == "wora")
-                {
-                    list = WarpPoint.GetAvailableOuterRimWarpTargets(world, oldRoom, false);
-                }
-                else if (badWarp)
-                {
-                    list = WarpPoint.GetAvailableBadWarpTargets(world, oldRoom);
-                }
-                else
-                {
-                    if (targetRegion != null)
-                    {
-                        list = ChallengeUtils.watcherDWTSpots.Where(x => Regex.Split(x, "_")[0] == targetRegion.ToUpperInvariant() && !weaverGoalRooms.Contains(x.ToUpperInvariant())).ToList();
-                    }
-                    else
-                    {
-                        foreach (string spot in ChallengeUtils.watcherDWTSpots)
-                        {
-                            string region = Regex.Split(spot, "_")[0];
-                            // no same region or rotted or wora
-                            if (region != world.name && region != "WORA" && region != "WHIR" && region != "WSUR" && region != "WDSR" && region != "WGWR")
-                            {
-                                if (!weaverGoalRooms.Contains(spot.ToUpperInvariant())) list.Add(spot);
-                            }
-                        }
-                    }
-                }
-                if (list.Count == 0)
-                {
-                    Plugin.logger.LogInfo("List count is 0, target region was: " + targetRegion);
-                    return null;
-                }
-                return list[UnityEngine.Random.Range(0, list.Count)];
-            }
-            else
-            {
-                return orig(world, oldRoom, targetRegion, badWarp, spreadingRot, playerCreated);
-            }
-        }
-
-        #endregion
     }
 }

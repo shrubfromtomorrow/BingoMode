@@ -240,27 +240,14 @@ namespace BingoMode.BingoMenu
 
         public void UnlocksDialogClose() => gameControls.UnlocksDialogClose();
 
-        // watchermethod
-        public static string WExpeditionRandomStartsUnlocked()
-        {
-            if (File.Exists(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar + "wrandomstarts.txt")))
-            {
-                string[] shelters = File.ReadAllLines(AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar + "wrandomstarts.txt"));
-                System.Random random = new System.Random();
-                string shelter = shelters[random.Next(0, shelters.Length)];
-                return shelter;
-            }
-            return "WSKB_S06";
-        }
-
         public static string ExpeditionRandomStartsUnlocked(RainWorld rainWorld, SlugcatStats.Name slug)
         {
             Dictionary<string, int> dictionary = new Dictionary<string, int>();
             Dictionary<string, List<string>> dictionary2 = new Dictionary<string, List<string>>();
             List<string> list2 = SlugcatStats.SlugcatStoryRegions(slug);
-            if (File.Exists(AssetManager.ResolveFilePath("randomstarts.txt")))
+            if (File.Exists(AssetManager.ResolveFilePath("bingorandomstarts.txt")))
             {
-                string[] array = File.ReadAllLines(AssetManager.ResolveFilePath("randomstarts.txt"));
+                string[] array = File.ReadAllLines(AssetManager.ResolveFilePath("bingorandomstarts.txt"));
                 for (int i = 0; i < array.Length; i++)
                 {
                     if (!array[i].StartsWith("//") && array[i].Length > 0)
@@ -319,7 +306,7 @@ namespace BingoMode.BingoMenu
                 }));
                 return text2;
             }
-            return "SU_S01";
+            return slug == WatcherEnums.SlugcatStatsName.Watcher ? "WSKB_S06" : "SU_S01";
         }
 
         public override void GrafUpdate(float timeStacker)
@@ -410,14 +397,7 @@ namespace BingoMode.BingoMenu
                 {
                     int tries = 0;
                 reset:
-                    if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
-                    {
-                        ExpeditionData.startingDen = WExpeditionRandomStartsUnlocked();
-                    }
-                    else
-                    {
-                        ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
-                    }
+                    ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
 
                     if (bannedRegions.Count > 0)

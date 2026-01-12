@@ -1925,6 +1925,23 @@ namespace BingoMode.BingoChallenges
             }
         }
 
+        // copied from room.loaded
+        public static void Watcher_Room_Loaded_AllRegionsExcept(On.Room.orig_Loaded orig, Room self)
+        {
+            if (self.game == null) return;
+            if (self.abstractRoom.firstTimeRealized && ModManager.Expedition && self.game.rainWorld.ExpeditionMode && self.abstractRoom.shelter && self.abstractRoom.name == ExpeditionData.startingDen && self.game.rainWorld.progression.currentSaveState.cycleNumber == 0 && self.game.world.rainCycle.CycleProgression <= 0f)
+            {
+                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+                {
+                    if (ExpeditionData.challengeList[j] is WatcherBingoAllRegionsExceptChallenge c)
+                    {
+                        c.Entered(self.world.name.ToUpperInvariant());
+                    }
+                }
+            }
+            orig(self);
+        }
+
         public static void Watcher_WarpPoint_ChangeState_CreaturePortal(On.Watcher.WarpPoint.orig_ChangeState orig, WarpPoint self, WarpPoint.State state)
         {
             // Spawn items happens once the world is loaded so the current room is the one the player has just landed in

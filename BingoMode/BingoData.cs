@@ -437,5 +437,73 @@ namespace BingoMode
                 .Select(f => f.Name)
                 .ToList();
         }
+
+        public static Dictionary<string, string> FillWatcherMapRegions()
+        {
+            Dictionary<string, string> portalsRaw = new Dictionary<string, string>();
+
+            foreach (var region in SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).ConvertAll(s => s.ToLowerInvariant()))
+            {
+                if (Custom.rainWorld.regionWarpRooms.ContainsKey(region))
+                {
+                    foreach (var warp in Custom.rainWorld.regionWarpRooms[region])
+                    {
+                        string room = warp.Split(':')[0].ToLowerInvariant();
+
+                        string settingsPath = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar + region + "-rooms" + Path.DirectorySeparatorChar + room + "_settings.txt");
+
+                        if (!File.Exists(settingsPath))
+                        {
+                            continue;
+                        }
+
+                        foreach (string line in File.ReadLines(settingsPath))
+                        {
+                            if (!line.StartsWith("PlacedObjects:"))
+                                continue;
+
+                            string raw = line.Substring("PlacedObjects:".Length);
+
+                            string validated = Custom.ValidateSpacedDelimiter(raw, ",");
+                            string[] objects = Regex.Split(validated, ", ");
+
+                            foreach (string obj in objects)
+                            {
+                                string trimmed = obj.Trim();
+                                if (trimmed.StartsWith("WarpPoint>"))
+                                {
+                                    portalsRaw[trimmed] = room.ToUpperInvariant();
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            Dictionary<string, string> watcherMapPortals = new Dictionary<string, string>();
+            foreach (var portal in portalsRaw)
+            {
+                string[] array = Regex.Split(portal.Key, "><");
+
+                PlacedObject obj = new PlacedObject(PlacedObject.Type.None, null);
+                obj.FromString(array);
+
+                var data = obj.data as WarpPoint.WarpPointData;
+                if (data == null) continue;
+
+                string key = NewWarpPointIdentifyingString(data, portal.Value);
+                watcherMapPortals[key] = obj.data.owner.ToString();
+            }
+            return watcherMapPortals;
+        }
+
+        // ripoff of WarpPointIdentifyingString but don't use game for timeline because ew
+        private static string NewWarpPointIdentifyingString(WarpPoint.WarpPointData data, string sourceRoom)
+        {
+            var timeline = data.sourceTimeline ?? SlugcatStats.Timeline.Watcher;
+
+            return $"{sourceRoom}:{timeline}:{data.uuidPair}";
+        }
     }
 }

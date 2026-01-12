@@ -152,11 +152,13 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.Watcher.WarpPoint.ChangeState += Watcher_WarpPoint_ChangeState_AllRegionsExcept;
+            On.Room.Loaded += Watcher_Room_Loaded_AllRegionsExcept;
         }
 
         public override void RemoveHooks()
         {
             On.Watcher.WarpPoint.ChangeState -= Watcher_WarpPoint_ChangeState_AllRegionsExcept;
+            On.Room.Loaded -= Watcher_Room_Loaded_AllRegionsExcept;
         }
 
         public override List<object> Settings() => [region, required];

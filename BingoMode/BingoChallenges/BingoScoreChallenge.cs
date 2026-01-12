@@ -171,7 +171,7 @@ namespace BingoMode.BingoChallenges
         {
             return string.Concat(new string[]
             {
-                "BingoGlobalScoreChallenge",
+                "BingoScoreChallenge",
                 "~",
                 ValueConverter.ConvertToString<int>(score),
                 "><",
@@ -199,7 +199,7 @@ namespace BingoMode.BingoChallenges
             }
             catch (Exception ex)
             {
-                ExpLog.Log("ERROR: BingoGlobalScoreChallenge FromString() encountered an error: " + ex.Message);
+                ExpLog.Log("ERROR: BingoScoreChallenge FromString() encountered an error: " + ex.Message);
                 throw ex;
             }
         }

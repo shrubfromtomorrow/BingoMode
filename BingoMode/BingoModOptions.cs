@@ -22,7 +22,11 @@ namespace BingoMode
         public readonly Configurable<bool> PlayDangerSong;
         public readonly Configurable<bool> DiscordRichPresence;
 
+        public readonly Configurable<bool> DialCharged;
+        public readonly Configurable<int> DialAmount;
+
         private UIelement[] optionse;
+        private UIelement[] optionse1;
         private bool greyedOut;
 
         public BingoModOptions(Plugin plugin)
@@ -42,18 +46,23 @@ namespace BingoMode
             PlayEndingSong = config.Bind<bool>("PlayEndingSong", true);
             PlayDangerSong = config.Bind<bool>("PlayDangerSong", true);
             DiscordRichPresence = config.Bind<bool>("DiscordRichPresence", true);
+
+
+            DialCharged = config.Bind<bool>("DialCharged", true);
+            DialAmount = config.Bind<int>("DialAmount", 50, new ConfigurableInfo("", new ConfigAcceptableRange<int>(1, 100)));
         }
 
         public override void Initialize()
         {
             base.Initialize();
 
-            OpTab tab = new OpTab(this, "Config");
-            Tabs = new[] { tab };
+            OpTab tab = new OpTab(this, Translate("Main"));
+            OpTab tab1 = new OpTab(this, Translate("Gameplay"));
+            Tabs = new[] { tab, tab1 };
 
             optionse = new UIelement[]
             {
-                new OpLabel(10f, 560f, Translate("Bingo Mod Config"), true),
+                new OpLabel(10f, 560f, Translate("Bingo Mode Config"), true),
                 new OpLabel(10f, 512f, Translate("Open Bingo HUD keybind:")) {alignment = FLabelAlignment.Left, description = Translate("Which button opens/closes the Bingo grid in game")},
                 new OpLabel(320f, 510f, Translate("-  Keyboard")) {alignment = FLabelAlignment.Left},
                 new OpKeyBinder(HUDKeybindKeyboard, new Vector2(170f, 505f), new Vector2(140f, 20f), false, OpKeyBinder.BindController.AnyController) {description = Translate("Which button opens/closes the Bingo grid in game")},
@@ -92,6 +101,18 @@ namespace BingoMode
                 new OpCheckBox(DiscordRichPresence, 288f, 60f),
             };
             tab.AddItems(optionse);
+
+            optionse1 = new UIelement[]
+            {
+                new OpLabel(10f, 560f, Translate("Bingo Mode Gameplay Config"), true),
+
+                new OpLabel(10f, 512f, Translate("Start with the Dial Warp perk fully charged:")) {alignment = FLabelAlignment.Left},
+                new OpCheckBox(DialCharged, 258f, 509f),
+
+                new OpLabel(10f, 472f, Translate("Ripple eggs required for dial warp:")) {alignment = FLabelAlignment.Left},
+                new OpUpdown(DialAmount, new Vector2(210f, 466f), 60f),
+            };
+            tab1.AddItems(optionse1);
         }
 
         public override void Update()
