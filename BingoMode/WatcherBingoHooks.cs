@@ -54,9 +54,7 @@ namespace BingoMode
             On.Watcher.SpinningTop.StartConversation += SpinningTop_StartConversation;
             // Prevent st from increasing min max ripple
             On.Watcher.SpinningTop.NextMinMaxRippleLevel += SpinningTop_NextMinMaxRippleLevel;
-            // Add passage button when normal sleep screen
-            On.Menu.SleepAndDeathScreen.AddExpeditionPassageButton += SleepAndDeathScreen_AddExpeditionPassageButton;
-            // Create mapdata
+            // Prevent mapdata from being set to null for passages and Load map data in expedition mode for dial warp
             IL.Menu.FastTravelScreen.ctor += FastTravelScreen_ctor;
             // Fix foodmeter pos for warp map
             On.Menu.SleepAndDeathScreen.FoodMeterXPos += SleepAndDeathScreen_FoodMeterXPos;
@@ -65,23 +63,29 @@ namespace BingoMode
             // Functional egg :(
             On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
             On.Menu.StatsDialog.ResetAll_OnPressDone += StatsDialog_ResetAll_OnPressDone;
-            ExpeditionGame.ePos.Add("V0FSQV9QMTc=", new Vector2(90f, 629f));
+            if (!ExpeditionGame.ePos.ContainsKey("V0FSQV9QMTc=")) ExpeditionGame.ePos.Add("V0FSQV9QMTc=", new Vector2(90f, 629f));
             // Spawn toys
             IL.Room.Loaded += Room_Loaded;
+            // Karma flowers always
+            IL.Room.Loaded += Room_Loaded1;
             // Fill map
             On.PlayerProgression.GetOrInitiateSaveState += PlayerProgression_GetOrInitiateSaveState;
             // Consider all regions visited on map
             IL.Watcher.WarpMap.LoadWarpConnections += WarpMap_LoadWarpConnections;
 
             // Stop things from breaking when expedition tries to make challenges for watcher
+            On.Expedition.Challenge.ValidForThisSlugcat += Challenge_ValidForThisSlugcat;
+            On.Expedition.EchoChallenge.Generate += EchoChallenge_Generate;
             On.Expedition.NeuronDeliveryChallenge.ValidForThisSlugcat += NeuronDeliveryChallenge_ValidForThisSlugcat;
             On.Expedition.PearlDeliveryChallenge.ValidForThisSlugcat += PearlDeliveryChallenge_ValidForThisSlugcat;
             On.Expedition.AchievementChallenge.ValidForThisSlugcat += AchievementChallenge_ValidForThisSlugcat;
-            On.Expedition.Challenge.ValidForThisSlugcat += Challenge_ValidForThisSlugcat;
 
             // Get custom region arts
             On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
             On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+            // Watcher select screen background
+            On.Menu.MenuScene.BuildVoidBathScene += MenuScene_BuildVoidBathScene;
+            On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
             // Lock everyone but washa
             On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
             // Skip portal pair check for weaver for goal portal
@@ -105,6 +109,29 @@ namespace BingoMode
                 var hookMethod = RegionState_RippleSpawnEggState_WarpEggThreshold;
 
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
+            }
+
+            // Temp fix for warp points that are sealed near landing locations (ONLY NARNIA)
+            IL.Watcher.WarpPoint.Update += WarpPoint_Update;
+        }
+
+        private static void WarpPoint_Update(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdarg(0),
+                x => x.MatchCallOrCallvirt("Watcher.WarpPoint", "get_warpSequenceInProgress")))
+            {
+                c.Emit(OpCodes.Pop);
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<WarpPoint, bool>>((wp) =>
+                {
+                    if (wp?.Data?.destRoom != null && wp.Data.destRoom == "NARNIA")
+                    {
+                        return false;
+                    }
+                    return true;
+                });
             }
         }
 
@@ -470,18 +497,25 @@ namespace BingoMode
             return orig(room);
         }
 
-        private static void SleepAndDeathScreen_AddExpeditionPassageButton(On.Menu.SleepAndDeathScreen.orig_AddExpeditionPassageButton orig, SleepAndDeathScreen self)
-        {
-            if (self.RippleLadderMode)
-            {
-                return;
-            }
-            orig(self);
-        }
-
         public static void FastTravelScreen_ctor(ILContext il)
         {
             ILCursor c = new(il);
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchLdsfld(typeof(ModManager), nameof(ModManager.Expedition))))
+            {
+                c.EmitDelegate<Func<bool, bool>>(expedition =>
+                {
+                    if (BingoData.BingoMode &&
+                        ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                    {
+                        return false;
+                    }
+
+                    return expedition;
+                });
+            }
+            else Plugin.logger.LogError("FastTravelScreen_ctor dial warp FAIULRE " + il);
+
             if (c.TryGotoNext(MoveType.Before,
                 x => x.MatchCall("Menu.FastTravelScreen", "get_WarpPointModeActive")))
             {
@@ -497,7 +531,7 @@ namespace BingoMode
                     return self;
                 });
             }
-            else Plugin.logger.LogError("FastTravelScreen_ctor FAIULRE " + il);
+            else Plugin.logger.LogError("FastTravelScreen_ctor passage FAIULRE " + il);
         }
 
         public static float SleepAndDeathScreen_FoodMeterXPos(On.Menu.SleepAndDeathScreen.orig_FoodMeterXPos orig, SleepAndDeathScreen self, float down)
@@ -620,6 +654,29 @@ namespace BingoMode
             }
         }
 
+        public static void Room_Loaded1(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            bool one = c.TryGotoNext(MoveType.Before,
+                x => x.MatchLdstr("Preventing natural KarmaFlower spawn"));
+
+            if (one && c.TryGotoPrev(MoveType.After,
+                x => x.MatchLdsfld("ModManager", "Expedition")))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<bool, Room, bool>>((karma, room) =>
+                {
+                    if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                    {
+                        return false;
+                    }
+                    return karma;
+                });
+            }
+            else Plugin.logger.LogError("WarpMap_LoadWarpConnections FAIULRE " + il);
+        }
+
         private static SaveState PlayerProgression_GetOrInitiateSaveState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self, SlugcatStats.Name saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
         {
             SaveState saveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
@@ -678,6 +735,18 @@ namespace BingoMode
                 }
             }
             return orig(self, slugcat);
+        }
+        private static Challenge EchoChallenge_Generate(On.Expedition.EchoChallenge.orig_Generate orig, EchoChallenge self)
+        {
+            if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                //fuck you
+                return new EchoChallenge
+                {
+                    ghost = GhostWorldPresence.GhostID.CC
+                };
+            }
+            return orig(self);
         }
         private static bool AchievementChallenge_ValidForThisSlugcat(On.Expedition.AchievementChallenge.orig_ValidForThisSlugcat orig, AchievementChallenge self, SlugcatStats.Name slugcat)
         {
@@ -805,6 +874,44 @@ namespace BingoMode
                         sceneToRegion[value] = region;
                     }
                 }
+            }
+        }
+
+        private static void MenuScene_BuildVoidBathScene(On.Menu.MenuScene.orig_BuildVoidBathScene orig, MenuScene self, int index)
+        {
+            if (BingoData.BingoMode)
+            {
+                if (index != 2)
+                {
+                    return;
+                }
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "outro void bath " + index.ToString();
+                string str = "outro void bath " + index.ToString();
+                if (self.flatMode)
+                {
+                    self.useFlatCrossfades = true;
+                    self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, str + " - flat - b", new Vector2(683f, 384f), false, true));
+                }
+                else
+                {
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " background - 9", new Vector2(0f, 0f), 8f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " pillars distort - 8", new Vector2(0f, 0f), 6.2f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " candle row - 7", new Vector2(0f, 0f), 3.4f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " big candles - 6", new Vector2(0f, 0f), 3.2f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " echo remains - 2b", new Vector2(0f, 0f), 3.2f, MenuDepthIllustration.MenuShader.Basic));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " slugcat watching - 1", new Vector2(0f, 0f), 1.8f, MenuDepthIllustration.MenuShader.Normal));
+                    return;
+                }
+                return;
+            }
+            orig(self, index);
+        }
+        private static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
+        {
+            orig(self, num);
+            if (ModManager.Watcher && ExpeditionGame.playableCharacters[num] == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                self.slugcatScene = WatcherEnums.MenuSceneID.Ending_VoidBath2;
             }
         }
 

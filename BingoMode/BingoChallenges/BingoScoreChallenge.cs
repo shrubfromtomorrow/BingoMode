@@ -126,7 +126,6 @@ namespace BingoMode.BingoChallenges
 
         public override void CreatureKilled(Creature crit, int playerNumber)
         {
-            
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || game == null || crit == null)
             {
                 return;

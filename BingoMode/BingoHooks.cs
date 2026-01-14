@@ -264,11 +264,6 @@ namespace BingoMode
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
         }
 
-        private static void HUD_InitFastTravelHud1(On.HUD.HUD.orig_InitFastTravelHud orig, HUD.HUD self, HUD.Map.MapData mapData)
-        {
-            throw new NotImplementedException();
-        }
-
         private static void Menu_ShutDownProcess(On.Menu.Menu.orig_ShutDownProcess orig, Menu.Menu self)
         {
             orig.Invoke(self);
@@ -550,6 +545,7 @@ namespace BingoMode
 
         private static void SleepAndDeathScreen_AddExpeditionPassageButton(On.Menu.SleepAndDeathScreen.orig_AddExpeditionPassageButton orig, SleepAndDeathScreen self)
         {
+            if (self.RippleLadderMode) return;
             if (BingoData.BingoMode)
             {
                 bool available = false;
