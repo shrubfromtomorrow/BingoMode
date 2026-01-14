@@ -87,7 +87,7 @@ namespace BingoMode
             On.Menu.MenuScene.BuildVoidBathScene += MenuScene_BuildVoidBathScene;
             On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
             // Lock everyone but washa
-            On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
+            //On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
             // Skip portal pair check for weaver for goal portal
             IL.Watcher.WarpPoint.ActivateWeaver += WarpPoint_ActivateWeaver;
             // Ripple 5 on passage
