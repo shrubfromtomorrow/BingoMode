@@ -136,18 +136,10 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<string> list = [];
-            for (int i = 0; i < ExtEnum<GhostWorldPresence.GhostID>.values.entries.Count; i++)
-            {
-                if (ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] != "NoGhost" && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "MS")) && (!ModManager.MSC || !(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i] == "SL") || !(ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint)) && ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]))
-                {
-                    list.Add(ExtEnum<GhostWorldPresence.GhostID>.values.entries[i]);
-                }
-            }
             return new BingoEchoChallenge
             {
                 specific = new SettingBox<bool>(Random.value < 0.5f, "Specific Echo", 0),
-                ghost = new(list[Random.Range(0, list.Count)], "Region", 1, listName: "echoes"),
+                ghost = new(ChallengeUtils.GetCorrectListForChallenge("echoes")[Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("echoes").Length)], "Region", 1, listName: "echoes"),
                 amount = new(Random.Range(2, 7), "Amount", 2),
                 starve = new(Random.value < 0.1f, "While Starving", 3)
             };

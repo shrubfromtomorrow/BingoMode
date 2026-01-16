@@ -121,7 +121,7 @@ namespace BingoMode.BingoChallenges
             foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in ChallengeUtils.BingoVistaLocations)
             {
                 if (keyValuePair.Key.ToUpperInvariant() == "MS" && ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet) continue;
-                if (ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
+                if (ChallengeUtils.GetCorrectListForChallenge("regionsreal", true).Contains(keyValuePair.Key))
                 {
                     foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
                     {

@@ -310,23 +310,23 @@ namespace BingoMode.BingoMenu
         {
             if (owner.challenge is BingoEatChallenge c)
             {
-                c.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, c.foodType.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+                c.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), c.foodType.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
             if (owner.challenge is WatcherBingoEatChallenge cc)
             {
-                cc.isCreature = Array.IndexOf(ChallengeUtils.WFoodTypes, cc.foodType.Value) >= Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
+                cc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), cc.foodType.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
             else if (owner.challenge is BingoDontUseItemChallenge ccc)
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                ccc.isFood = Array.IndexOf(l, ccc.item.Value) < (l.Length - ChallengeUtils.Bannable.Length);
-                if (ccc.isFood) ccc.isCreature = Array.IndexOf(ChallengeUtils.FoodTypes, ccc.item.Value) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+                ccc.isFood = Array.IndexOf(l, ccc.item.Value) < (l.Length - ChallengeUtils.GetCorrectListForChallenge("banitem").Length);
+                if (ccc.isFood) ccc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), ccc.item.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
             else if (owner.challenge is WatcherBingoDontUseItemChallenge cccc)
             {
                 var l = ChallengeUtils.GetCorrectListForChallenge("Wbanitem");
-                cccc.isFood = Array.IndexOf(l, cccc.item.Value) < (l.Length - ChallengeUtils.WBannable.Length);
-                if (cccc.isFood) cccc.isCreature = Array.IndexOf(ChallengeUtils.WFoodTypes, cccc.item.Value) >= Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
+                cccc.isFood = Array.IndexOf(l, cccc.item.Value) < (l.Length - ChallengeUtils.GetCorrectListForChallenge("banitem").Length);
+                if (cccc.isFood) cccc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), cccc.item.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
             else if (owner.challenge is BingoVistaChallenge ccccc)
             {
@@ -492,7 +492,7 @@ namespace BingoMode.BingoMenu
                 {
                     this.value = s;
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<string>("_ChallengeSetting", s.Value, (ConfigAcceptableBase)null);
-                    field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetSortedCorrectListForChallenge(s.listName) : ["Whoops errore"]);
+                    field = new OpComboBox(conf as Configurable<string>, pos, 140f, s.listName != null ? ChallengeUtils.GetCorrectListForChallenge(s.listName, true) : ["Whoops errore"]);
                     field.OnValueUpdate += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
                     (field as OpComboBox).OnListClose += UnfocusThing;

@@ -179,7 +179,7 @@ namespace BingoMode.BingoChallenges
             bool starvv = UnityEngine.Random.value < 0.1f;
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 2);
             num = Mathf.Max(2, num);
-            List<string> clone = ChallengeUtils.Weapons.ToList();
+            List<string> clone = ChallengeUtils.GetCorrectListForChallenge("weapons").ToList();
             // watcher touches this
             clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish" || x == "Boomerang" || x == "Frog" || x == "GraffitiBomb");
             bool doWeapon = UnityEngine.Random.value < 0.5f;

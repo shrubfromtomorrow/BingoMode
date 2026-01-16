@@ -53,7 +53,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] rooms = ChallengeUtils.GetSortedCorrectListForChallenge("WweaverRooms");
+            string[] rooms = ChallengeUtils.GetCorrectListForChallenge("WweaverRooms", true);
             string room = rooms[UnityEngine.Random.Range(0, rooms.Length)];
             return new WatcherBingoWeaverChallenge
             {

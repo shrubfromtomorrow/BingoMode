@@ -28,8 +28,8 @@ namespace BingoMode.BingoChallenges
             challenge.foodType.Value = foodType.Random();
             challenge.amountRequired.Value = amountRequired.Random();
             challenge.starve.Value = starve.Random();
-            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.foodType.Value);
-            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+            int index = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), challenge.foodType.Value);
+            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             return challenge;
         }
 
@@ -105,27 +105,16 @@ namespace BingoMode.BingoChallenges
         {
             bool c = UnityEngine.Random.value < 0.5f;
 
-            int critStart = Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
-            int foodCount = ChallengeUtils.FoodTypes.Length;
+            int critStart = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
+            int foodCount = ChallengeUtils.GetCorrectListForChallenge("food").Length;
             string randomFood;
             if (c)
             {
-                randomFood = ChallengeUtils.FoodTypes[UnityEngine.Random.Range(critStart, foodCount)];
+                randomFood = ChallengeUtils.GetCorrectListForChallenge("food")[UnityEngine.Random.Range(critStart, foodCount)];
             }
             else
             {
-                List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
-                else if (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Rivulet &&
-                         ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint) foob.Remove("GlowWeed");
-                if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint)
-                {
-                    foob.Remove("EggBugEgg");
-                    foob.Remove("DandelionPeach");
-                    foob.Remove("SSOracleSwarmer");
-                    foob.Remove("SmallNeedleWorm");
-                }
-                randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
+                randomFood = ChallengeUtils.GetCorrectListForChallenge("food")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("food").Length - (foodCount - critStart))];
             }
 
             return new BingoEatChallenge()

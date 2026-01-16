@@ -97,7 +97,7 @@ namespace BingoMode.BingoChallenges
             {
                 itme = UnityEngine.Random.value < 0.5f ? "Spear": "DataPearl";
             }
-            else itme = ChallengeUtils.StealableStolable[UnityEngine.Random.Range(0, ChallengeUtils.StealableStolable.Length - (ModManager.MSC ? 0 : 2))];
+            else itme = ChallengeUtils.GetCorrectListForChallenge("theft")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("theft").Length)];
 
             return new BingoStealChallenge
             {

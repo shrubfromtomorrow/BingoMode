@@ -75,7 +75,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoBroadcastChallenge
             {
-                chatlog = new(BingoData.possibleTokens[4][UnityEngine.Random.Range(0, BingoData.possibleTokens[4].Count)], "Broadcast", 0, listName: "chatlogs"),
+                chatlog = new(ChallengeUtils.GetCorrectListForChallenge("chatlogs")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("chatlogs").Length)], "Broadcast", 0, listName: "chatlogs"),
             };
         }
 

@@ -98,11 +98,11 @@ namespace BingoMode.BingoChallenges
             int tries = 0;
             List<string> regions = [];
         shitGoBack:
-            string c = Random.value < 0.3f ? "Any Creature" : ChallengeUtils.Pinnable[Random.Range(0, ChallengeUtils.Pinnable.Length)];
+            string c = Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("pin")[0] : ChallengeUtils.GetCorrectListForChallenge("pin")[Random.Range(1, ChallengeUtils.GetCorrectListForChallenge("pin").Length)];
 
             if (BingoData.pinnableCreatureRegions == null || tries > 10)
             {
-                regions = ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList();
+                regions = ChallengeUtils.GetCorrectListForChallenge("regionsreal", true).ToList();
             }
             else
             {

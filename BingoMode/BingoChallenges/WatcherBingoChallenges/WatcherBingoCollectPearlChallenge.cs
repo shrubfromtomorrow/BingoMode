@@ -115,7 +115,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             bool specifi = UnityEngine.Random.value < 0.5f;
-            List<string> fromList = ChallengeUtils.WCollectablePearls.ToList();
+            List<string> fromList = ChallengeUtils.GetCorrectListForChallenge("pearls").ToList();
 
             string p = fromList[UnityEngine.Random.Range(0, fromList.Count)];
             WatcherBingoCollectPearlChallenge chal = new()

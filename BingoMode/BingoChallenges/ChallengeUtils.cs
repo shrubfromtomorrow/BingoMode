@@ -32,67 +32,18 @@ namespace BingoMode.BingoChallenges
             On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
             On.Expedition.ChallengeTools.CreatureName += ChallengeTools_CreatureName;
             On.Menu.ExpeditionMenu.ExpeditionSetup += ExpeditionMenu_ExpeditionSetup;
-            On.RainWorld.ReadTokenCache += RainWorld_ReadTokenCache;
             FetchGatesFromFile();
             FetchAllEnterableRegions();
-        }
-
-        private static void RainWorld_ReadTokenCache(On.RainWorld.orig_ReadTokenCache orig, RainWorld self)
-        {
-            orig.Invoke(self);
-            if (watcherRegions == null)
-            {
-                PopulateWatcherData();
-            }
         }
 
         private static void ExpeditionMenu_ExpeditionSetup(On.Menu.ExpeditionMenu.orig_ExpeditionSetup orig, Menu.ExpeditionMenu self)
         {
             orig.Invoke(self);
 
-            GenerateBingoVistaLocations();
-        }
-
-        public static void GenerateBingoVistaLocations()
-        {
             BingoVistaLocations = ChallengeTools.VistaLocations.ToDictionary(x => x.Key, x => x.Value);
-            foreach (string text in Custom.rainWorld.progression.regionNames)
+            if (watcherRegions == null)
             {
-                if (!BingoVistaLocations.ContainsKey(text))
-                {
-                    BingoVistaLocations[text] = new Dictionary<string, Vector2>();
-                }
-                string path = AssetManager.ResolveFilePath(Path.Combine("world", text, "bingovistas.txt"));
-                //if (File.Exists(path))
-                //{
-                //    string[] lines = File.ReadAllLines(path);
-                //    for (int i = 0; i < lines.Length; i++)
-                //    {
-                //        string text2 = lines[i];
-                //        if (string.IsNullOrEmpty(text2.Trim())) continue;
-                //        if (text2.StartsWith("(MSC)"))
-                //        {
-                //            if (!ModManager.MSC) continue;
-                //            text2 = text2.Substring(5);
-                //        }
-
-                //        string[] array2 = text2.Split(',');
-                //        if (array2.Length >= 3)
-                //        {
-                //            string text3 = array2[0];
-                //            int num;
-                //            int num2;
-                //            if (string.IsNullOrEmpty(text3) || !int.TryParse(array2[1], out num) || !int.TryParse(array2[2], out num2))
-                //            {
-                //                Custom.LogWarning("Failed to parse bingo vista " + text2);
-                //            }
-                //            else
-                //            {
-                //                BingoVistaLocations[text][text3] = new Vector2((float)num, (float)num2);
-                //            }
-                //        }
-                //    }
-                //}
+                PopulateWatcherData();
             }
         }
 
@@ -144,7 +95,7 @@ namespace BingoMode.BingoChallenges
             _ => thing
         };
 
-        public static string[] GetCorrectListForChallenge(string listName)
+        public static string[] GetCorrectListForChallenge(string listName, bool sorted = false)
         {
             string ln = listName;
             //bool addEmpty = false;
@@ -155,72 +106,43 @@ namespace BingoMode.BingoChallenges
             //}
             switch (ln)
             {
-                case "transport": return Transportable;
-                case "Wtransport": return WTransportable;
-                case "pin": return ["Any Creature", .. Pinnable];
-                case "tolls": return BombableOutposts;
-                case "Wtolls": return WBombableOutposts;
-                case "food": return FoodTypes;
-                case "Wfood": return WFoodTypes;
-                case "weapons": return Weapons;
-                case "weaponsnojelly": return [.. Weapons.Where(x => x != "JellyFish" || x != "Frog")];
-                case "theft": return [.. StealableStolable, "DataPearl"];
-                case "Wtheft": return [.. WStealableStolable, "DataPearl"];
-                case "friend": return Befriendable;
-                case "Wfriend": return WBefriendable;
-                case "pearls": return CollectablePearls;
-                case "Wpearls": return WCollectablePearls;
-                case "craft": return CraftableItems;
-                case "regions": return ["Any Region", .. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
-                case "regionsreal": return [.. SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"), .. SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)];
-                case "popcornRegions": return [.. GetCorrectListForChallenge("regions").Where(x => !ExcludedPopcornRegions.Contains(x))];
-                case "Wpoms": return ["Any Region", .. WpomegranateRegions];
-                case "echoes": return [.. GhostWorldPresence.GhostID.values.entries.Where(x => x != "NoGhost")];
+                case "transport": return ChallengeUtilsFiltering.GetFilteredList("transport", Transportable, sorted);
+                case "pin": return ChallengeUtilsFiltering.GetFilteredList("pin", Pinnable, sorted);
+                case "tolls": return ChallengeUtilsFiltering.GetFilteredList("tolls", BombableOutposts, sorted);
+                case "Wtolls": return ChallengeUtilsFiltering.GetFilteredList("tolls", BombableOutposts, sorted);
+                case "food": return ChallengeUtilsFiltering.GetFilteredList("food", FoodTypes, sorted);
+                case "Wfood": return ChallengeUtilsFiltering.GetFilteredList("food", FoodTypes, sorted);
+                case "weapons": return ChallengeUtilsFiltering.GetFilteredList("weapons", Weapons, sorted);
+                case "weaponsnojelly": return ChallengeUtilsFiltering.GetFilteredList("weaponsnojelly", GetCorrectListForChallenge("weapons"), sorted);
+                case "theft": return ChallengeUtilsFiltering.GetFilteredList("theft", StealableStolable, sorted);
+                case "Wtheft": return ChallengeUtilsFiltering.GetFilteredList("theft", StealableStolable, sorted);
+                case "friend": return ChallengeUtilsFiltering.GetFilteredList("friend", Befriendable, sorted);
+                case "Wfriend": return ChallengeUtilsFiltering.GetFilteredList("friend", Befriendable, sorted);
+                case "pearls": return ChallengeUtilsFiltering.GetFilteredList("pearls", CollectablePearls, sorted);
+                case "Wpearls": return ChallengeUtilsFiltering.GetFilteredList("pearls", CollectablePearls, sorted);
+                case "craft": return ChallengeUtilsFiltering.GetFilteredList("craft", CraftableItems, sorted);
+                case "regions": return ChallengeUtilsFiltering.GetFilteredList("regions", null, sorted);
+                case "regionsreal": return ChallengeUtilsFiltering.GetFilteredList("regionsreal", null, sorted);
+                case "nootregions": return ChallengeUtilsFiltering.GetFilteredList("nootregions", GetCorrectListForChallenge("regions"), sorted);
+                case "popcornRegions": return ChallengeUtilsFiltering.GetFilteredList("popcornRegions", GetCorrectListForChallenge("regionsreal"), sorted);
+                case "Wpoms": return ChallengeUtilsFiltering.GetFilteredList("pomegranateRegions", PomegranateRegions, sorted);
+                case "echoes": return ChallengeUtilsFiltering.GetFilteredList("echoes", null, sorted);
                 //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
-                case "spinners": return WspinningTopSpots;
-                case "WweaverRooms": return [.. watcherDWTSpots.Where(room => Regex.Split(room, "_")[0] != "WORA")];
-                case "creatures": return ["Any Creature", .. CreatureType.values.entries.Where(x => ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Any(g => g.creature.value == x))];
-                case "depths": return Depthable;
-                case "banitem": return [.. FoodTypes, .. Bannable];
-                case "Wbanitem": return [.. WFoodTypes, .. WBannable];
-                case "unlocks": return [.. BingoData.possibleTokens[0], .. BingoData.possibleTokens[1], .. BingoData.possibleTokens[2], .. BingoData.possibleTokens[3]];
-                case "Wunlocks":
-                case "chatlogs": return [.. BingoData.possibleTokens[4]];
-                case "passage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand")];
-                case "Wpassage": return [.. WinState.EndgameID.values.entries.Where(x => x != "Mother" && x != "Gourmand" && x != "Nomad" && x != "Pilgrim" && x != "Scholar" && x != "Traveller" && x != "Survivor")];
-                case "expobject": return Storable;
-                case "vista": // hate
-                    List<ValueTuple<string, string>> list = new List<ValueTuple<string, string>>();
-                    foreach (KeyValuePair<string, Dictionary<string, Vector2>> keyValuePair in BingoVistaLocations)
-                    {
-                        if (GetSortedCorrectListForChallenge("regionsreal").Contains(keyValuePair.Key))
-                        {
-                            foreach (KeyValuePair<string, Vector2> keyValuePair2 in keyValuePair.Value)
-                            {
-                                list.Add(new ValueTuple<string, string>(keyValuePair.Key, keyValuePair2.Key));
-                            }
-                        }
-                    }
-                    List<string> strings = [];
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        strings.Add(list[i].Item2);
-                    }
-                    return strings.ToArray();
+                case "spinners": return ChallengeUtilsFiltering.GetFilteredList("spinners", null, sorted);
+                case "WweaverRooms": return ChallengeUtilsFiltering.GetFilteredList("weavers", null, sorted);
+                case "creatures": return ChallengeUtilsFiltering.GetFilteredList("creatures", null, sorted);
+                case "depths": return ChallengeUtilsFiltering.GetFilteredList("depths", Depthable, sorted);
+                case "banitem": return ChallengeUtilsFiltering.GetFilteredList("banitem", Bannable, sorted);
+                case "Wbanitem": return ChallengeUtilsFiltering.GetFilteredList("banitem", Bannable, sorted);
+                // this one fucking sucks
+                case "unlocks": return ChallengeUtilsFiltering.GetFilteredList("unlocks", null, sorted);
+                case "chatlogs": return ChallengeUtilsFiltering.GetFilteredList("chatlogs", null, sorted);
+                case "passage": return ChallengeUtilsFiltering.GetFilteredList("passage", null, sorted);
+                case "Wpassage": return ChallengeUtilsFiltering.GetFilteredList("passage", null, sorted);
+                case "expobject": return ChallengeUtilsFiltering.GetFilteredList("storable", Storable, sorted);
+                case "vista": return ChallengeUtilsFiltering.GetFilteredList("vista", null, sorted);
             }
             return ["Whoops something went wrong"];
-        }
-
-        public static string[] GetSortedCorrectListForChallenge(string listName)
-        {
-            return GetCorrectListForChallenge(listName).Distinct().ToArray().SortArray();
-        }
-
-        private static string[] SortArray(this string[] array)
-        {
-            List<string> list = array.ToList();
-            list.Sort();
-            return list.ToArray();
         }
 
         public static string ChallengeTools_ItemName(On.Expedition.ChallengeTools.orig_ItemName orig, ItemType type)
@@ -231,6 +153,8 @@ namespace BingoMode.BingoChallenges
             if (type == ItemType.Rock) return translator.Translate("Rocks");
             if (type == ItemType.SporePlant) return translator.Translate("Bee Hives");
             if (type == ItemType.DataPearl) return translator.Translate("Pearls");
+            if (type == ItemType.GraffitiBomb) return translator.Translate("Graffiti Bombs");
+            if (type == WatcherItemType.Boomerang) return translator.Translate("Boomerangs");
             // Food items
             if (type == ItemType.DangleFruit) return translator.Translate("Blue Fruit");
             if (type == ItemType.SSOracleSwarmer) return translator.Translate("Pebbles' Neurons");
@@ -243,6 +167,7 @@ namespace BingoMode.BingoChallenges
             if (type == DLCItemType.LillyPuck) return translator.Translate("Lillypucks");
             if (type == DLCItemType.GooieDuck) return translator.Translate("Gooieducks");
             if (type == WatcherItemType.FireSpriteLarva) return translator.Translate("Fire Sprite Larvae");
+            
 
             return orig.Invoke(type);
         }
@@ -348,16 +273,7 @@ namespace BingoMode.BingoChallenges
             "VultureGrub",
             "CicadaA",
             "CicadaB",
-            "Yeek"
-        };
-
-        public static readonly string[] WTransportable =
-        {
-            "JetFish",
-            "Hazer",
-            "VultureGrub",
-            "CicadaA",
-            "CicadaB",
+            "Yeek",
             "Tardigrade",
             "Frog",
             "Rat"
@@ -384,113 +300,65 @@ namespace BingoMode.BingoChallenges
 
         public static readonly string[] BombableOutposts =
         {
-            "su_c02",
-            "gw_c05",
-            "gw_c11",
-            "lf_e03",
-            "ug_toll",
-        };
-
-        public static readonly string[] WBombableOutposts =
-        {
-            "warf_g01",
-            "wbla_f01",
-            "wskd_b41"
+            "SU_C02",
+            "GW_C05",
+            "GW_C11",
+            "LF_E03",
+            "UG_TOLL",
+            "WARF_G01",
+            "WBLA_F01",
+            "WSKD_B41"
         };
 
         public static string NameForPearl(string pearl)
         {
             switch (pearl)
             {
-                case "SU":
-                    return "Light Blue";
-                case "UW":
-                    return "Pale Green";
-                case "SH":
-                    return "Deep Magenta";
-                case "LF_bottom":
-                    return "Bright Red";
-                case "LF_west":
-                    return "Deep Pink";
-                case "SL_moon":
-                    return "Pale Yellow";
-                case "SL_chimney":
-                    return "Bright Magenta";
-                case "SL_bridge":
-                    return "Bright Purple";
-                case "DS":
-                    return "Bright Green";
-                case "GW":
-                    return "Viridian";
-                case "CC":
-                    return "Gold";
-                case "HI":
-                    return "Bright Blue";
-                case "SB_filtration":
-                    return "Teal";
-                case "SB_ravine":
-                    return "Dark Magenta";
-                case "SI_top":
-                    return "Dark Blue";
-                case "SI_west":
-                    return "Dark Green";
-                case "SI_chat3":
-                    return "Dark Purple";
-                case "SI_chat4":
-                    return "Olive Green";
-                case "SI_chat5":
-                    return "Dark Magenta";
-                case "VS":
-                    return "Deep Purple";
-                case "OE":
-                    return "Light Purple";
-                case "DM":
-                    return "Light Yellow";
-                case "LC":
-                    return "Deep Green";
-                case "LC_second":
-                    return "Bronze";
-                case "SU_filt":
-                    return "Light Pink";
-                case "MS":
-                    return "Dull Yellow";
-                case "WARG_AUDIO_GROOVE":
-                    return "Pink";
-                case "WSKD_AUDIO_JAM2":
-                    return "audio";
-                case "WSKC_ABSTRACT":
-                    return "Dark Teal";
-                case "WBLA_AUDIO_VOICEWIND1":
-                    return "audio";
-                case "WARD_TEXT_STARDUST":
-                    return "Bright Viridian";
-                case "WARE_AUDIO_VOICEWIND2":
-                    return "audio";
-                case "WARB_TEXT_SECRET":
-                    return "Dark Purple";
-                case "WARC_TEXT_CONTEMPT":
-                    return "Pale Pink";
-                case "WPTA_DRONE":
-                    return "Beige";
-                case "WRFB_AUDIO_JAM4":
-                    return "audio";
-                case "WTDA_AUDIO_JAM1":
-                    return "audio";
-                case "WTDB_AUDIO_JAM3":
-                    return "audio";
-                case "WVWA_TEXT_KITESDAY":
-                    return "Amber";
-                case "WMPA_TEXT_NOTIONOFSELF":
-                    return "Pale Viridian";
-                case "WORA_WORA":
-                    return "Light Green";
-                case "WAUA_WAUA":
-                    return "Orange";
-                case "WAUA_TEXT_AUDIO_TALKSHOW":
-                    return "Light Magenta";
+                case "SU": return "Light Blue";
+                case "UW": return "Pale Green";
+                case "SH": return "Deep Magenta";
+                case "LF_bottom": return "Bright Red";
+                case "LF_west": return "Deep Pink";
+                case "SL_moon": return "Pale Yellow";
+                case "SL_chimney": return "Bright Magenta";
+                case "SL_bridge": return "Bright Purple";
+                case "DS": return "Bright Green";
+                case "GW": return "Viridian";
+                case "CC": return "Gold";
+                case "HI": return "Bright Blue";
+                case "SB_filtration": return "Teal";
+                case "SB_ravine": return "Dark Magenta";
+                case "SI_top": return "Dark Blue";
+                case "SI_west": return "Dark Green";
+                case "SI_chat3": return "Dark Purple";
+                case "SI_chat4": return "Olive Green";
+                case "SI_chat5": return "Dark Magenta";
+                case "VS": return "Deep Purple";
+                case "OE": return "Light Purple";
+                case "DM": return "Light Yellow";
+                case "LC": return "Deep Green";
+                case "LC_second": return "Bronze";
+                case "SU_filt": return "Light Pink";
+                case "MS": return "Dull Yellow";
+                case "WARG_AUDIO_GROOVE": return "Pink";
+                case "WSKD_AUDIO_JAM2": return "audio";
+                case "WSKC_ABSTRACT": return "Dark Teal";
+                case "WBLA_AUDIO_VOICEWIND1": return "audio";
+                case "WARD_TEXT_STARDUST": return "Bright Viridian";
+                case "WARE_AUDIO_VOICEWIND2": return "audio";
+                case "WARB_TEXT_SECRET": return "Dark Purple";
+                case "WARC_TEXT_CONTEMPT": return "Pale Pink";
+                case "WPTA_DRONE": return "Beige";
+                case "WRFB_AUDIO_JAM4": return "audio";
+                case "WTDA_AUDIO_JAM1": return "audio";
+                case "WTDB_AUDIO_JAM3": return "audio";
+                case "WVWA_TEXT_KITESDAY": return "Amber";
+                case "WMPA_TEXT_NOTIONOFSELF": return "Pale Viridian";
+                case "WORA_WORA": return "Light Green";
+                case "WAUA_WAUA": return "Orange";
+                case "WAUA_TEXT_AUDIO_TALKSHOW": return "Light Magenta";
+                default: return "Erm, pearl colored pearl";
             }
-
-            return "NULL";
         }
 
         public static readonly string[] FoodTypes =
@@ -502,34 +370,13 @@ namespace BingoMode.BingoChallenges
             "JellyFish",
             "Mushroom",
             "SSOracleSwarmer",
+            "FireSpriteLarva",
 
             // MSC
             "GooieDuck",
             "LillyPuck",
             "DandelionPeach",
             "GlowWeed",
-
-            // Crits
-            "VultureGrub",
-            "Hazer",
-            "SmallNeedleWorm",
-            "Fly",
-            "SmallCentipede"
-        };
-
-        public static readonly string[] WFoodTypes =
-        {
-            "DangleFruit",
-            "EggBugEgg",
-            "WaterNut",
-            "SlimeMold",
-            "JellyFish",
-            "Mushroom",
-            "GooieDuck",
-            "LillyPuck",
-            "DandelionPeach",
-            "GlowWeed",
-            "FireSpriteLarva",
 
             // Crits
             "VultureGrub",
@@ -563,16 +410,6 @@ namespace BingoMode.BingoChallenges
             "Spear",
             "Rock",
             "ScavengerBomb",
-            "Lantern",
-            "GooieDuck",
-            "GlowWeed"
-        };
-
-        public static readonly string[] WStealableStolable =
-        {
-            "Spear",
-            "Rock",
-            "ScavengerBomb",
             "GraffitiBomb",
             "Boomerang",
             "Lantern",
@@ -581,18 +418,6 @@ namespace BingoMode.BingoChallenges
         };
 
         public static readonly string[] Bannable =
-        {
-            "Lantern",
-            "PuffBall",
-            "VultureMask",
-            "ScavengerBomb",
-            "FirecrackerPlant",
-            "BubbleGrass",
-            "Rock",
-            "DataPearl"
-        };
-
-        public static readonly string[] WBannable =
         {
             "Lantern",
             "PuffBall",
@@ -621,30 +446,14 @@ namespace BingoMode.BingoChallenges
             "EelLizard",
             "SpitLizard",
             "ZoopLizard",
-            "RedLizard"
-        };
-
-        public static readonly string[] WBefriendable =
-        {
-            "CicadaA",
-            "CicadaB",
-            "GreenLizard",
-            "PinkLizard",
-            "Salamander",
-            "YellowLizard",
-            "BlackLizard",
-            "CyanLizard",
-            "WhiteLizard",
-            "BlueLizard",
-            "EelLizard",
-            "SpitLizard",
-            "ZoopLizard",
             "RedLizard",
             "PeachLizard",
             "IndigoLizard",
             "BlizzardLizard",
             "BasiliskLizard"
         };
+
+        public static readonly string[] PomegranateRegions = { "WTDB", "WARC", "WVWB", "WPGA", "WRRA", "WTDA", "WVWA" };
 
         public static readonly string[] CollectablePearls =
         {
@@ -673,12 +482,7 @@ namespace BingoMode.BingoChallenges
             "DM",
             "LC_second",
             "SU_filt",
-            "MS"
-        };
-
-        // watcherlist
-        public static readonly string[] WCollectablePearls =
-        {
+            "MS",
             "WORA_WORA",
             "WAUA_WAUA",
             "WPTA_DRONE",
@@ -743,40 +547,6 @@ namespace BingoMode.BingoChallenges
             "FireSpriteLarva",
             "GraffitiBomb",
             "Boomerang",
-        };
-
-        public static readonly string[] WspinningTopSpots =
-        {
-            "WARF",
-            "WTDB",
-            "WBLA",
-            "WRFB",
-            "WTDA",
-            "WARE",
-            "WSKC",
-            "WVWA",
-            "WPTA",
-            "WARC",
-            "WARB",
-            "WVWB",
-            "WARA",
-            "WAUA"
-        };
-
-        public static readonly string[] WpomegranateRegions =
-        {
-            "WTDB",
-            "WARC",
-            "WVWB",
-            "WPGA",
-            "WRRA",
-            "WTDA",
-            "WVWA"
-        };
-
-        public static readonly string[] ExcludedPopcornRegions =
-        {
-            "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR"
         };
 
         public static void PopulateWatcherData()

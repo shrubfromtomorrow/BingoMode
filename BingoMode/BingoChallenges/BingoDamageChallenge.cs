@@ -127,15 +127,13 @@ namespace BingoMode.BingoChallenges
             bool oneCycle = UnityEngine.Random.value < 0.33f;
 
             // watcher touches this
-            string wep = ChallengeUtils.Weapons[
-                UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))
-            ];
+            string wep = ChallengeUtils.GetCorrectListForChallenge("weapons")[UnityEngine.Random.Range(1, ChallengeUtils.GetCorrectListForChallenge("weapons").Length)];
 
             string crit;
             if (UnityEngine.Random.value < 0.25f)
             {
                 crit = "Any Creature";
-                if (wep == "Any Weapon") wep = ChallengeUtils.Weapons[UnityEngine.Random.Range(1, ChallengeUtils.Weapons.Length - (ModManager.Watcher ? (ModManager.MSC ? 0 : 3) : (ModManager.MSC ? 3 : 4)))];
+                if (wep == "Any Weapon") wep = ChallengeUtils.GetCorrectListForChallenge("weapons")[UnityEngine.Random.Range(1, ChallengeUtils.GetCorrectListForChallenge("weapons").Length)];
             }
             else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature.value;
             int amound = UnityEngine.Random.Range(2, 7);

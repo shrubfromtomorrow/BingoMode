@@ -32,7 +32,7 @@ namespace BingoMode.BingoChallenges
             specific = new(false, "Specific toll", 0);
             amount = new(0, "Amount", 1);
             pass = new(false, "Pass the Toll", 2);
-            roomName = new("", "Scavenger Toll", 3, listName: "tolls");
+            roomName = new("", "Scavenger Toll", 3, listName: "Wtolls");
             bombed = [];
         }
 
@@ -79,7 +79,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string toll = ChallengeUtils.WBombableOutposts[UnityEngine.Random.Range(0, ChallengeUtils.WBombableOutposts.Length)];
+            string toll = ChallengeUtils.GetCorrectListForChallenge("tolls")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("tolls").Length)];
 
             return new WatcherBingoBombTollChallenge
             {
@@ -118,8 +118,8 @@ namespace BingoMode.BingoChallenges
             if (this.game.cameras[0].room != null)
             {
                 AbstractRoom room = this.game.cameras[0].room.abstractRoom;
-                string roomLower = room.name.ToLowerInvariant();
-                if (room.scavengerOutpost && bombed.ContainsKey(roomLower) && !bombed[roomLower][1])
+                string roomUpper = room.name.ToUpperInvariant();
+                if (room.scavengerOutpost && bombed.ContainsKey(roomUpper) && !bombed[roomUpper][1])
                 {
                     foreach (UpdatableAndDeletable obj in room.realizedRoom.updateList)
                     {
@@ -127,9 +127,9 @@ namespace BingoMode.BingoChallenges
                         {
                             for (int j = 0; j < o.playerTrackers.Count; j++)
                             {
-                                if (bombed[roomLower][0] != o.playerTrackers[j].PlayerOnOtherSide)
+                                if (bombed[roomUpper][0] != o.playerTrackers[j].PlayerOnOtherSide)
                                 {
-                                    Pass(roomLower, o.playerTrackers[j].PlayerOnOtherSide);
+                                    Pass(roomUpper, o.playerTrackers[j].PlayerOnOtherSide);
                                 }
                             }
                         }
@@ -140,25 +140,25 @@ namespace BingoMode.BingoChallenges
 
         public void Boom(string room, bool side)
         {
-            string roomLower = room.ToLowerInvariant();
+            string roomUpper = room.ToUpperInvariant();
             if (!completed && !revealed && !TeamsCompleted[SteamTest.team] && !hidden)
             {
                 if (!pass.Value)
                 {
                     if (specific.Value)
                     {
-                        if (roomName.Value == roomLower)
+                        if (roomName.Value == roomUpper)
                         {
-                            bombed[roomLower] = new bool[2];
-                            bombed[roomLower][0] = side;
-                            bombed[roomLower][1] = true;
+                            bombed[roomUpper] = new bool[2];
+                            bombed[roomUpper][0] = side;
+                            bombed[roomUpper][1] = true;
                             CompleteChallenge();
                             return;
                         }
                     }
                     else
                     {
-                        if (!bombed.ContainsKey(roomLower))
+                        if (!bombed.ContainsKey(roomUpper))
                         {
                             current++;
                             UpdateDescription();
@@ -173,31 +173,31 @@ namespace BingoMode.BingoChallenges
                         }
                     }
                 }
-                if (!bombed.ContainsKey(roomLower) || !bombed[roomLower][1])
+                if (!bombed.ContainsKey(roomUpper) || !bombed[roomUpper][1])
                 {
-                    bombed[roomLower] = new bool[2];
-                    bombed[roomLower][0] = side;
-                    bombed[roomLower][1] = false;
+                    bombed[roomUpper] = new bool[2];
+                    bombed[roomUpper][0] = side;
+                    bombed[roomUpper][1] = false;
                 }
             }
         }
 
         public void Pass(string room, bool side)
         {
-            string roomLower = room.ToLowerInvariant();
+            string roomUpper = room.ToUpperInvariant();
             if (!completed && !revealed && !hidden && !TeamsCompleted[SteamTest.team] && pass.Value)
             {
                 if (specific.Value)
                 {
-                    if (roomName.Value == roomLower.ToLowerInvariant())
+                    if (roomName.Value == roomUpper.ToUpperInvariant())
                     {
-                        bombed[roomLower][1] = true;
+                        bombed[roomUpper][1] = true;
                         CompleteChallenge();
                     }
                 }
                 else
                 {
-                    bombed[roomLower][1] = true;
+                    bombed[roomUpper][1] = true;
                     current++;
                     UpdateDescription();
                     if (current >= amount.Value)

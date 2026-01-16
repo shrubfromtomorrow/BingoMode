@@ -147,11 +147,11 @@ namespace BingoMode.DiscordSDK
 
             if (BingoData.MultiplayerGame)
             {
-                details = $"The {ExpeditionData.slugcatPlayer} | With friends!";
+                details = $"The {SlugcatStats.getSlugcatName(ExpeditionData.slugcatPlayer)} | With friends!";
             }
             else
             {
-                details = $"The {ExpeditionData.slugcatPlayer} | Solo";
+                details = $"The {SlugcatStats.getSlugcatName(ExpeditionData.slugcatPlayer)} | Solo";
             }
 
             activityManager.UpdateActivity(new Activity

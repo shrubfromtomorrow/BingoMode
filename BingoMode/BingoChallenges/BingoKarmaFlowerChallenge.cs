@@ -113,7 +113,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoKarmaFlowerChallenge ch = new();
-            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList()[UnityEngine.Random.Range(0, ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)] : "Any Region";
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("regionsreal")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("regionsreal").Length)] : "Any Region";
 
             ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "regions");

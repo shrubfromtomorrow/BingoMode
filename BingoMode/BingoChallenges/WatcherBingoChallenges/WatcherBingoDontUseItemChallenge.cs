@@ -52,11 +52,11 @@ namespace BingoMode.BingoChallenges
             bool c = false;
             if (edible)
             {
-                List<string> foob = [.. ChallengeUtils.WFoodTypes];
+                List<string> foob = [.. ChallengeUtils.GetCorrectListForChallenge("food")];
                 type = foob[UnityEngine.Random.Range(0, foob.Count)];
-                c = ChallengeUtils.FoodTypes.IndexOf(type) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+                c = ChallengeUtils.GetCorrectListForChallenge("food").IndexOf(type) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
-            else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
+            else type = ChallengeUtils.GetCorrectListForChallenge("banitem")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("banitem").Length)];
             WatcherBingoDontUseItemChallenge ch = new WatcherBingoDontUseItemChallenge
             {
                 item = new(type, "Item type", 0, listName: "Wbanitem"),

@@ -56,7 +56,7 @@ namespace BingoMode.BingoChallenges
         public BingoHatchNoodleChallenge()
         {
             amount = new(0, "Amount", 0);
-            region = new("", "Region", 1, listName: "regions");
+            region = new("", "Region", 1, listName: "nootregions");
             differentRegions = new(false, "Different Regions", 2);
             oneCycle = new(false, "At once", 3);
         }
@@ -121,10 +121,10 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoHatchNoodleChallenge ch = new();
-            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").ToArray()[UnityEngine.Random.Range(0, ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").ToList().Where(x => x != "WRSA").Count())] : "Any Region";
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("nootregions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("nootregions").Length)] : "Any Region";
 
             ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
-            ch.region = new(r, "Region", 1, listName: "regions");
+            ch.region = new(r, "Region", 1, listName: "nootregions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "At once", 3);
             return ch;

@@ -405,7 +405,7 @@ namespace BingoMode.BingoMenu
                         foreach (var banned in bannedRegions)
                         {
                             
-                            if (bannedRegions.Count == ChallengeUtils.GetSortedCorrectListForChallenge("regionsreal").Length)
+                            if (bannedRegions.Count == ChallengeUtils.GetCorrectListForChallenge("regionsreal", true).Length)
                             {
                                 BingoData.BingoDen = "SU_S01";
                                 ExpeditionData.startingDen = "SU_S01";

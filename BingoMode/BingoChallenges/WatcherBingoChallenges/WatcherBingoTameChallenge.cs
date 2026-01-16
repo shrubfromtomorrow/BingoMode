@@ -66,7 +66,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             bool specific = UnityEngine.Random.value < 0.5f;
-            var crug = ChallengeUtils.WBefriendable[UnityEngine.Random.Range(0, ChallengeUtils.WBefriendable.Length)];
+            var crug = ChallengeUtils.GetCorrectListForChallenge("friend")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("friend").Length)];
 
             return new WatcherBingoTameChallenge
             {

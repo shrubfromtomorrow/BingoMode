@@ -19,9 +19,9 @@ namespace BingoMode.BingoChallenges
         {
             BingoDontUseItemChallenge challenge = new();
             challenge.item.Value = item.Random();
-            int index = Array.IndexOf(ChallengeUtils.FoodTypes, challenge.item.Value);
+            int index = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), challenge.item.Value);
             challenge.isFood = index >= 0;
-            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+            challenge.isCreature = index >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             return challenge;
         }
 
@@ -81,13 +81,10 @@ namespace BingoMode.BingoChallenges
             bool c = false;
             if (edible)
             {
-                List<string> foob = [.. ChallengeUtils.FoodTypes];
-                if (!ModManager.MSC) foob.RemoveRange(Array.IndexOf(ChallengeUtils.FoodTypes, "GooieDuck"), 4);
-                if (ExpeditionData.slugcatPlayer.value != "Rivulet" && ExpeditionData.slugcatPlayer.value != "Saint") foob.Remove("GlowWeed");
-                type = foob[UnityEngine.Random.Range(0, foob.Count)];
-                c = ChallengeUtils.FoodTypes.IndexOf(type) >= Array.IndexOf(ChallengeUtils.FoodTypes, "VultureGrub");
+                type = ChallengeUtils.GetCorrectListForChallenge("food")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("food").Length)];
+                c = ChallengeUtils.GetCorrectListForChallenge("food").IndexOf(type) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
-            else type = ChallengeUtils.Bannable[UnityEngine.Random.Range(0, ChallengeUtils.Bannable.Length)];
+            else type = ChallengeUtils.GetCorrectListForChallenge("banitem")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("banitem").Length)];
             BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge
             {
                 item = new(type, "Item type", 0, listName: "banitem"),

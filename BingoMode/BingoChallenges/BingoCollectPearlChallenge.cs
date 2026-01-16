@@ -149,14 +149,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             bool specifi = UnityEngine.Random.value < 0.5f;
-            List<string> fromList = ChallengeUtils.CollectablePearls.ToList();
-            if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear)
-            {
-                fromList.Remove("SL_chimney");
-                fromList.Remove("SL_bridge");
-                fromList.Remove("SL_moon");
-            }
-            string p = fromList[UnityEngine.Random.Range(0, fromList.Count - (ModManager.MSC ? 6 : 10))];
+            string p = ChallengeUtils.GetCorrectListForChallenge("pearls")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("pearls").Length)];
             BingoCollectPearlChallenge chal = new()
             {
                 specific = new SettingBox<bool>(specifi, "Specific Pearl", 0),

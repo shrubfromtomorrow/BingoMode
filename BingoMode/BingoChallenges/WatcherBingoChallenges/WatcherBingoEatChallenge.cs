@@ -70,16 +70,16 @@ namespace BingoMode.BingoChallenges
         {
             bool c = UnityEngine.Random.value < 0.5f;
 
-            int critStart = Array.IndexOf(ChallengeUtils.WFoodTypes, "VultureGrub");
-            int foodCount = ChallengeUtils.WFoodTypes.Length;
+            int critStart = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
+            int foodCount = ChallengeUtils.GetCorrectListForChallenge("food").Length;
             string randomFood;
             if (c)
             {
-                randomFood = ChallengeUtils.WFoodTypes[UnityEngine.Random.Range(critStart, foodCount)];
+                randomFood = ChallengeUtils.GetCorrectListForChallenge("food")[UnityEngine.Random.Range(critStart, foodCount)];
             }
             else
             {
-                List<string> foob = [.. ChallengeUtils.WFoodTypes];
+                List<string> foob = [.. ChallengeUtils.GetCorrectListForChallenge("food")];
                 randomFood = foob[UnityEngine.Random.Range(0, foob.Count - (foodCount - critStart))];
             }
 

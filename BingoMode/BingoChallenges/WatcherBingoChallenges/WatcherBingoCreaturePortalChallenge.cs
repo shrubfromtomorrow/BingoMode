@@ -28,7 +28,7 @@ namespace BingoMode.BingoChallenges
         public WatcherBingoCreaturePortalChallenge()
         {
             amount = new(0, "Amount", 0);
-            crit = new("", "Creature Type", 1, listName: "Wtransport");
+            crit = new("", "Creature Type", 1, listName: "transport");
         }
 
         public override void UpdateDescription()
@@ -63,12 +63,11 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<string> crits = [.. ChallengeUtils.WTransportable];
-            crits.Remove("Yeek");
+            string[] crits = ChallengeUtils.GetCorrectListForChallenge("transport");
             return new WatcherBingoCreaturePortalChallenge
             {
                 amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
-                crit = new(crits[UnityEngine.Random.Range(0, crits.Count)], "Creature Type", 1, listName: "Wtransport")
+                crit = new(crits[UnityEngine.Random.Range(0, crits.Length)], "Creature Type", 1, listName: "transport")
             };
         }
 

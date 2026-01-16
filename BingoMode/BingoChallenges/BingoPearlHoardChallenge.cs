@@ -115,13 +115,7 @@ namespace BingoMode.BingoChallenges
             {
                 flag = true;
             }
-            string[] array = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
-            if (array.Contains("HR"))
-            {
-                List<string> list = array.ToList<string>();
-                list.Remove("HR");
-                array = list.ToArray();
-            }
+            string[] array = ChallengeUtils.GetCorrectListForChallenge("regionsreal");
             bool spec = UnityEngine.Random.value < 0.5f;
             string region = spec ? "Any Region" : array[UnityEngine.Random.Range(0, array.Length)];
             return new BingoPearlHoardChallenge

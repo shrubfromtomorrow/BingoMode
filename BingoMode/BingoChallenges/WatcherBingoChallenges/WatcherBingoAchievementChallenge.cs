@@ -69,24 +69,10 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<WinState.EndgameID> list = new List<WinState.EndgameID>();
-            for (int i = 0; i < ChallengeTools.achievementScores.Count; i++)
-            {
-                if (ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Scholar ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Traveller ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == WinState.EndgameID.Survivor ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Mother ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Nomad ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Pilgrim ||
-                     ChallengeTools.achievementScores.ElementAt(i).Key == MoreSlugcatsEnums.EndgameID.Gourmand)
-                    continue;
-
-                list.Add(ChallengeTools.achievementScores.ElementAt(i).Key);
-            }
-            WinState.EndgameID id = list[Random.Range(0, list.Count)];
+            string id = ChallengeUtils.GetCorrectListForChallenge("Wpassage")[Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("Wpassage").Length)];
             return new WatcherBingoAchievementChallenge
             {
-                ID = new(id.value, "Passage", 0, listName: "Wpassage")
+                ID = new(id, "Passage", 0, listName: "Wpassage")
             };
         }
 

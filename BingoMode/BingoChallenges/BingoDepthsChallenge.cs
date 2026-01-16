@@ -78,7 +78,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoDepthsChallenge
             {
-                crit = new(ChallengeUtils.Depthable[UnityEngine.Random.Range(0, ChallengeUtils.Depthable.Length - 2)], "Creature Type", 0, listName: "depths")
+                crit = new(ChallengeUtils.GetCorrectListForChallenge("depths")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("depths").Length - 2)], "Creature Type", 0, listName: "depths")
             };
         }
 

@@ -70,6 +70,8 @@ namespace BingoMode.BingoChallenges
         {
             this.description = specific.Value ? ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] <crit>")
                 .Replace("<crit>", ChallengeTools.creatureNames[new CreatureTemplate.Type(crit.Value).Index])
+                .Replace("<current>", ValueConverter.ConvertToString(current))
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
                 : ChallengeTools.IGT.Translate("Befriend [<current>/<amount>] unique creature types")
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
@@ -96,7 +98,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             bool specific = UnityEngine.Random.value < 0.5f;
-            var crug = ChallengeUtils.Befriendable[UnityEngine.Random.Range(0, ChallengeUtils.Befriendable.Length - (ModManager.MSC ? (ExpeditionData.slugcatPlayer != MoreSlugcatsEnums.SlugcatStatsName.Saint ? 2 : 1) : 4))];
+            var crug = ChallengeUtils.GetCorrectListForChallenge("friend")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("friend").Length)];
 
             return new BingoTameChallenge
             {

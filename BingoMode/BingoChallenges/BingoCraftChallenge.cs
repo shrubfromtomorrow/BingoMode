@@ -84,7 +84,7 @@ namespace BingoMode.BingoChallenges
             int thingies = UnityEngine.Random.Range(2, 6);
             return new BingoCraftChallenge
             {
-                craftee = new(ChallengeUtils.CraftableItems[UnityEngine.Random.Range(0, ChallengeUtils.CraftableItems.Length)], "Item to Craft", 0, listName: "craft"),
+                craftee = new(ChallengeUtils.GetCorrectListForChallenge("craft")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("craft").Length)], "Item to Craft", 0, listName: "craft"),
                 amount = new(thingies, "Amount", 1)
             };
         }
