@@ -7,6 +7,7 @@ namespace BingoMode
         public static Menu.Slider.SliderID MultiplayerSlider;
         public static Menu.Slider.SliderID RandomizerSlider;
 
+
         public static SoundID BINGO_FINAL_BONG;
 
         public static ProcessManager.ProcessID BingoCredits;

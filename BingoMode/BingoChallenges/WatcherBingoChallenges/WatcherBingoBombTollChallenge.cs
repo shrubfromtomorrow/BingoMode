@@ -44,7 +44,7 @@ namespace BingoMode.BingoChallenges
 
             if (specific.Value)
             {
-                string region = roomName.Value.Substring(0, 4);
+                string region = Regex.Split(roomName.Value, "_")[0];
                 string regionName = ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer));
 
                 tollPart = ChallengeTools.IGT.Translate("the <toll> toll").Replace("<toll>", regionName);

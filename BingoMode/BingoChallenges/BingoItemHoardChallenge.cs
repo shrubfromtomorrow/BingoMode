@@ -87,8 +87,8 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = anyShelter.Value ?
-                new Phrase([[Icon.FromEntityName(target.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("doubleshelter")]]):
-                new Phrase([[new Icon("ShelterMarker"), Icon.FromEntityName(target.Value)]]);
+                new Phrase([[target.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(target.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("doubleshelter")]]):
+                new Phrase([[new Icon("ShelterMarker"), target.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(target.Value)]]);
             int lastLine = 1;
             if (region.Value != "Any Region")
             {

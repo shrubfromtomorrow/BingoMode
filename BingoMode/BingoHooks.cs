@@ -169,6 +169,11 @@ namespace BingoMode
             // Add bingo to intro roll
             IL.Menu.IntroRoll.ctor += IntroRoll_ctor;
 
+            // HOLY EGO (replace expedition button with bingo)
+            IL.Menu.MainMenu.ctor += MainMenu_ctor;
+            // HOLY EGO 2 (replace expedition word with bingo word)
+            On.Menu.CharacterSelectPage.ctor += CharacterSelectPage_ctor;
+
             // Adding new bingo button to the character select page
             //On.Menu.ChallengeSelectPage.Singal += ChallengeSelectPage_Singal;
             On.Menu.CharacterSelectPage.UpdateStats += CharacterSelectPage_UpdateStats;
@@ -216,6 +221,9 @@ namespace BingoMode
 
             // No red karma 1 + vanilla echo fix
             IL.Menu.KarmaLadder.KarmaSymbol.Update += KarmaSymbol_UpdateIL;
+
+            // All cats unlocked because you're adults or smth
+            On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
 
             // Shift the position of the kills in menu
             On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
@@ -708,6 +716,11 @@ namespace BingoMode
             //else Plugin.logger.LogError("KarmaSymbol_UpdateIL 2 FAILURE " + il);
         }
 
+        public static bool ExpeditionData_CheckUnlocked(On.Expedition.ExpeditionProgression.orig_CheckUnlocked orig, ProcessManager manager, SlugcatStats.Name slugcat)
+        {
+            return true;
+        }
+
         private static void ShelterDoor_UpdatePathfindingCreatures(On.ShelterDoor.orig_UpdatePathfindingCreatures orig, ShelterDoor self)
         {
             orig.Invoke(self);
@@ -1119,6 +1132,27 @@ namespace BingoMode
                 c.Next.Operand = "Intro_Roll_Bingo";
             }
             else Plugin.logger.LogError("BingoIntroReplacement broked " + il);
+        }
+
+        private static void MainMenu_ctor(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchLdstr("EXPEDITION"),
+                x => x.MatchCallOrCallvirt("Menu.Menu", "Translate")))
+            {
+                c.Next.Operand = "BINGO";
+            }
+            else Plugin.logger.LogError("BingoExpeditionButtonReplacement broked " + il);
+        }
+
+        private static void CharacterSelectPage_ctor(On.Menu.CharacterSelectPage.orig_ctor orig, CharacterSelectPage self, Menu.Menu menu, MenuObject owner, Vector2 pos)
+        {
+            orig.Invoke(self, menu, owner, pos);
+
+            FAtlasElement title = Futile.atlasManager.GetElementWithName("bingotitle");
+            self.pageTitle.element = title;
         }
 
         // Creating butone

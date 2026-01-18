@@ -1,0 +1,641 @@
+// UI
+
+Bingo Mod Config|빙고모드 설정
+Open Bingo HUD keybind:|빙고 HUD 키 바인딩:
+Which button opens/closes the Bingo grid in game|빙고 HUD를 인게임에서 활성화/비활성화 시키는 버튼
+-  Keyboard|- 키보드
+-  Controller 1|- 컨트롤러 1
+-  Controller 2|- 컨트롤러 2
+-  Controller 3|- 컨트롤러 3
+-  Controller 4|- 컨트롤러 4
+Use map input instead:|맵을 볼 때 활성화:
+Quick reset keybind:|빠른 초기화 키 바인딩:
+Play custom music in bingo menu:|빙고 메뉴에서 커스텀 음악 재생:
+Play custom music when game ends:|게임이 끝나면 커스텀 음악 재생:
+Play custom music when your team is losing:|팀이 지고 있을 때 커스텀 음악 재생:
+Singleplayer team color:|싱글플레이 팀 색상:
+
+AVAILABLE: 1|사용 가능: 1
+AVAILABLE: 0|사용 가능: 0
+AVAILABLE: |사용 가능: 
+CLOSE|취소
+CANCEL|확인
+MANUAL|설명서
+Multiplayer|멀티 플레이
+Refresh|리로드
+Profiles|프로필
+Config|설정
+I'M<LINE>READY|준비<LINE>완료
+BEGIN|시작
+CREATE|만들기
+STARTBINGO|빙고 시작
+End Session|종료
+Tally up|집계
+JOIN|참가
+UNLOAD|언로드
+unloaded|언로드
+Bingo - Scheming|빙고 - 계획
+<LINE>Save the game to Complete|<LINE>저장하고 완료하세요
+Cycle complete, saving run data|사이클 완료, 실행 데이터를 저장합니다
+perkList|특전 목록
+burdenList|부담 목록
+unl-|특전-
+bur-|목록-
+PLAY<LINE>BINGO|새로운<LINE>빙고
+NEWBINGO|새로운<LINE>빙고
+CREDITS|크레딧
+Copy board|보드 복사
+Paste board|붙여넣기
+QUITGAEM|그만두기
+lobbysettings|로비 설정
+createlobby|로비 만들기
+FRIENDS|친구
+Friends only: |친구만 가능: 
+Friends only: Yes|친구만 가능: Yes
+Friends only: No|친구만 가능: No
+Require host's mods: |호스트의 모드 필요: 
+Perks: |특전: 
+Burdens: |부담: 
+Max Players: |최대 인원 수: 
+Game mode: |게임 모드: 
+Slugcat: |슬러그캣: 
+Host decides|호스트 정의
+Allowed|허용
+Disabled|불가능
+HOSTMODS|호스트 모드
+Allowed - |사용 가능 - 
+Disabled - |사용 불가능 - 
+Host decides - |호스트 선택 사용 - 
+Bingo - |빙고 - 
+Lockout (ties) - |록아웃 (구) - 
+Lockout (no ties) - |록아웃 (중복) - 
+Blackout - |블랙아웃 - 
+Perks:|특전:
+Burdens:| 부담:
+Max Players: |최대 참가 인원: 
+Game mode:|게임 모드:
+Leave Lobby|로비로 가기
+CONTINUE<LINE>BINGO|빙고<LINE>이어하기
+CONTINUE<LINE>MULTIPLAYER|멀티플레이<LINE>이어하기
+Shelter: |피난처: 
+The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'|시작 피난처를 설정합니다. 유효한 피난처의 방 이름(대소문자 구분) 또는 'random'을 입력하세요
+Slugcat mismatch!<LINE><LINE>|슬러그캣 일치하지 않음!<LINE><LINE>
+Selected slugcat: White<LINE>|선택된 슬러그캣: 생존자<LINE>
+Selected slugcat: Yellow<LINE>|선택된 슬러그캣: 수도승<LINE>
+Selected slugcat: Red<LINE>|선택된 슬러그캣: 사냥꾼<LINE>
+Selected slugcat: Rivulet<LINE>|선택된 슬러그캣: 물살이<LINE>
+Selected slugcat: Artificer<LINE>|선택된 슬러그캣: 기술병<LINE>
+Selected slugcat: Saint<LINE>|선택된 슬러그캣: 성자<LINE>
+Selected slugcat: Spear<LINE>|선택된 슬러그캣: 창술가<LINE>
+Selected slugcat: Gourmand<LINE>|선택된 슬러그캣: 대식가<LINE>
+Selected slugcat: Inv<LINE>|선택된 슬러그캣: Inv<LINE>
+Selected slugcat: Watcher<LINE>|선택된 슬러그캣: 관찰자<LINE>
+Provided Slugcat: White<LINE><LINE>|클립보드의 슬러그캣: 생존자<LINE><LINE>
+Provided Slugcat: Yellow<LINE><LINE>|클립보드의 슬러그캣: 수도승<LINE><LINE>
+Provided Slugcat: Red<LINE><LINE>|클립보드의 슬러그캣: 사냥꾼<LINE><LINE>
+Provided Slugcat: Rivulet<LINE><LINE>|클립보드의 슬러그캣: 물살이<LINE><LINE>
+Provided Slugcat: Artificer<LINE><LINE>|클립보드의 슬러그캣: 기술병<LINE><LINE>
+Provided Slugcat: Saint<LINE><LINE>|클립보드의 슬러그캣: 성자<LINE><LINE>
+Provided Slugcat: Spear<LINE><LINE>|클립보드의 슬러그캣: 창술가<LINE><LINE>
+Provided Slugcat: Gourmand<LINE><LINE>|클립보드의 슬러그캣: 대식가<LINE><LINE>
+Provided Slugcat: Inv<LINE><LINE>|클립보드의 슬러그캣:<LINE> Inv<LINE>
+Provided Slugcat: Watcher<LINE><LINE>|클립보드의 슬러그캣: 관찰자<LINE><LINE>
+Please paste a board from the same slugcat that's currently selected.|복사된 보드의 슬러그캣과 일치하는 슬러그캣 보드를 붙여넣으세요.
+Not all players are ready !|모든 플레이어가 준비되지 않았습니다!
+Trying to reconnect to the host.|호스트에 다시 연결을 시도합니다.
+Cannot reconnect to host.|호스트에 다시 연결할 수 없습니다.
+Lost connection to host.|호스트와의 연결이 끊어졌습니다.
+
+Team <team_name> won!|팀 <team_name>의 승리!
+
+You won!|당신의 승리!
+We have a tie!|무승부!
+Press the button in the bingo HUD or abandon the save to end the bingo session.|빙고 HUD의 종료 버튼을 누르거나 저장을 포기하면 빙고 매칭이 종료됩니다.
+Press the button in the bingo HUD to end the bingo session for everyone.|빙고 HUD의 종료 버튼을 눌러 빙고 매칭을 종료하세요.
+Exit the game and abandon the save or wait for host to end the session.|게임을 종료하고 저장을 포기하거나 호스트가 세션을 종료할 때까지 기다리세요.
+Game concluded!|게임 종료!
+Number of challenges completed: |완료된 도전과제 수: 
+Number of challenges completed for each team: |각 팀이 완료한 도전과제 수: 
+<LINE>Completed by: |<LINE>완료한 팀: 
+<LINE>Failed by: |<LINE>실패한 팀:
+
+
+// Words used for tokens or missions (Complete)
+BlueFruit|푸른 열매
+Blue Fruit|푸른 열매
+Dangle Fruits|푸른 열매
+DangleFruits|푸른 열매
+DangleFruit|푸른 열매
+SlimeMolds|곰팡이
+SlimeMold|곰팡이
+Slime Mold|곰팡이
+Slime Molds|곰팡이
+Bubble Grass|공기 풀
+BubbleGrass|공기 풀
+FirecrackerPlant|폭죽 식물
+WaterNut|물떡
+Bubble Fruit|물떡
+PuffBall|포자 열매
+FlareBomb|섬광탄
+FlyLure|박쥐 풀
+SporePlant|벌집
+Bee Hives|벌집
+ScavengerBomb|스캐빈저 폭탄
+FireEgg|불벌레 알
+FireSpear|폭발 창
+Rock|돌
+Rocks|돌
+Pearls|진주
+Pearl|진주
+Mushroom|버섯
+Lantern|스캐빈저 등불
+Eggbug Eggs|알벌레 알
+Glow Weed|발광 해초
+GlowWeed|발광 해초
+LillyPuck|연꽃 창
+LillyPucks|연꽃 창
+Lillypucks|연꽃 창
+Gooieducks|찐덕이
+Gooie Ducks|찐덕이
+GooieDuck|찐덕이
+ElectricSpear|전기 창
+EnergyCell|희박화 전지
+JellyFish|해파리
+JokeRifle|우스개 소총
+VultureMask|독수리 가면
+SingularityBomb|특이점 폭탄
+HellSpear|지옥 창
+FireEgg|불벌레 알
+DandelionPeaches|민들레 복숭아
+Dandelion Peaches|민들레 복숭아
+Dandelion Peache|민들레 복숭아
+Dandelion Peach|민들레 복숭아
+DandelionPeach|민들레 복숭아
+Pebbles' Neurons|조약돌의 신경
+Pebbles Neurons|조약돌의 신경
+Pebbles Neuron|조약돌의 신경
+SSOracleSwarmer|조약돌의 신경
+
+
+0GreenLizard|초록 도마뱀
+PinkLizard|분홍색 도마뱀
+BlueLizard|파랑 도마뱀
+WhiteLizard|하양 도마뱀
+BlackLizard|검정 도마뱀
+YellowLizard|노랑 도마뱀
+CyanLizard|시안 도마뱀
+RedLizard|빨강 도마뱀
+BigEel|레비아탄
+Leech|거머리
+SeaLeech|바다 거머리
+EggBug|알벌레
+JetFish|제트 물고기
+Small Noodleflie|새끼 국수파리
+Small Noodleflies|새끼 국수파리
+SmallNoodleflies|새끼 국수파리
+SmallNoodleWorm|새끼 국수파리
+BigNeedleWorm|어미 국수파리
+Fly|박쥐 파리
+Bat Fly|박쥐 파리
+Hazer|오징어
+Hazers|오징어
+CicadaA|하얀 오징어 매미
+CicadaB|검은 오징어 매미
+PoleMimic|장대 식물
+TentaclePlant|괴물 해초
+Vulture Grub|독수리 애벌레
+VultureGrub|독수리 애벌레
+Vulture Grubs|독수리 애벌레
+Vulture|독수리
+KingVulture|왕 독수리
+SmallCentipede|유체 지네
+MediumCentipede|작은 지네
+BigCentipede|큰 지네
+RedCentipede|빨간 지네
+TubeWorm|끈끈이 벌레
+LanternMouse|등불 쥐
+DropBug|집게 벌레
+DaddyLongLegs|대디 롱 레그
+BrotherLongLegs|브라더 롱 레그
+MirosBird|가위새
+Salamanders|도롱뇽
+Yeeks|이크
+Spider|지네거미
+SpitterSpider|스피터 거미
+BigSpider|늑대 거미
+ZoopLizard|딸기 도마뱀
+StowawayBug|빈디 벌레
+JungleLeech|정글 거머리
+BigJelly|거대 해파리
+ScavengerElite|정예 스캐빈저
+SlugNPC|아기 슬러그캣
+FireBug|불벌레
+AquaCenti|물지네
+TerrorLongLegs|공포의 롱 레그
+MotherSpider|어미 거미
+EelLizard|장어 도마뱀
+SpitLizard|카라멜 도마뱀
+MirosVulture|가위 독수리
+Snail|달팽이
+Centiwing|날개 지네
+Scavenger|스캐빈저
+Inspector|감독관
+
+filter|여과 시스템 아레나
+gutter|홈통 아레나
+GWold|쓰레기 처리장 아레나
+LM|수변 시설 아레나
+VS|파이프 공장 아레나
+CL|고요한 구조 아레나
+RM|부패 아레나
+OE|바깥 광야 아레나
+DM|달을 향해 보라 아레나
+HR|루비콘 아레나
+UG|지하 수림 아레나
+MS|침수된 상부 구조물 아레나
+LC|대도시 아레나
+SS|다섯 조약돌 아레나
+SB|지하 아레나
+UW|외부 아레나
+LF|농장 배열지 아레나
+SI|하늘 제도 아레나
+SH|그늘진 성채 아레나
+SL|연안선 아레나
+GW|쓰레기 폐기장 아레나
+CC|굴뚝 덮개 아레나
+HI|산업 단지 아레나
+SU|교외 아레나
+DS|배수 처리시설 아레나
+LM-safari|수변 시설 사파리
+VS-safari|파이프공장 사파리
+CL-safari|고요한 구조 사파리
+RM-safari|부패 사파리
+OE-safari|바깥 광야 사파리
+DM-safari|달을 향해 보라 사파리
+HR-safari|루비콘 사파리
+UG-safari|지하 수림 사파리
+MS-safari|침수된 상부구조물 사파리
+LC-safari|대도시 사파리
+SS-safari|다섯 조약돌 사파리
+SB-safari|지하 사파리
+UW-safari|외부 사파리
+LF-safari|농장 배열지 사파리
+SI-safari|하늘 제도 사파리
+SH-safari|그늘진 성채 사파리
+SL-safari|연안선 사파리
+GW-safari|쓰레기 폐기장 사파리
+CC-safari|굴뚝 덮개 사파리
+HI-safari|산업 단지 사파리
+SU-safari|교외 사파리
+DS-safari|배수 처리시설 사파리
+Any Region|모든 지역
+Any Creature|모든 생물
+
+
+// Text briefly described on the Mission Selection screen (Complete)
+Click on a challenge type to block it from generating|챌린지 유형을 클릭해서 배치를 차단할 수 있습니다
+Transporting the same creature through gates|게이트를 통해 동일한 생물 운반
+Visiting echoes|메아리 조우
+Visiting iterators|반복자 조우
+Transporting creatures|생명체 운반
+Killing creatures|생명체 죽이기
+Obtaining passages|통행권 획득
+Collecting broadcasts|방송 노드 수집
+Entering regions without visiting one|특정 지역에 방문하지 않고 지역 도달
+Entering a region|지역 진입
+Scoring cycle points|주기 안에 점수 획득
+Stealing items|아이템을 도둑질
+Crafting items|아이템 제작
+Dropping a creature in the depth pit|심층에 생물을 떨어트리기
+Throwing grenades at scavenger tolls|스캐빈저 요금소에 폭탄 던지기
+Trading items to merchants|스캐빈저 상인과 거래
+Befriending creatures|생물과 친구되기
+Hitting creatures with items|아이템으로 생물을 명중
+Collecting pearls|진주 수집
+Consuming karma flowers|카르마 꽃 소비하기
+Avoiding items|특정 아이템 회피
+Avoiding a region|특정 지역 방문 금지
+Entering a region from another region|특정 지역에서 지역으로 이동
+Popping popcorn plants|팝콘 식물 오픈
+Avoiding death before completing challenges|도전을 완수하기 전에 죽지 않기
+Avoiding giving Needles to Scavengers|스캐빈저에게 바늘 선물 금지
+Avoiding killing creatures|생물 죽이는 것을 피하기
+Collecting arena unlocks|아레나 언락 수집
+Collecting vistas|전망지점 수집
+Delivering colored pearls|색 진주 배달
+Dodging a Leviathan|레비아탄 회피
+Dodging Noodlefly attacks|국수파리 공격 회피
+Getting licked by lizards|도마뱀 혀 접촉
+Hatching Noodlefly eggs|국수파리 알 부화
+Pinning creatures|생물을 벽에 고정
+Putting items in shelters|피난처에 물건 수집
+Putting pearls in shelters|피난처에 진주 수집
+Scoring total points|총 득점
+Eating specific food|특정 음식 섭취
+Collecting or delivering Moon's cloak|달의 망토를 수집하거나 배달
+Crushing creatures|생물을 짖누르기
+Delivering neurons|뉴런 배달
+Trading same items between merchants|다른 상인의 물건을 거래
+Mauling creatures a certain amount of times|생물을 깨물기
+Mauling different of creatures|다양한 생물을 깨물기
+Delivering the green neuron|초록색 신경 배달
+Feeding the Rarefaction Cell to a Leviathan|레비아탄에게 희박화 전지를 먹이로 주기
+Eating popcorn plant seeds|팝콘식물 씨앗 섭취
+Delivering the music pearl to Five Pebbles|다섯 조약돌에게 음악 진주 배달
+
+
+// Completely translated text
+Visit the <echo_location> Echo while starving|굶주린 상태로 <echo_location> 메아리 만나기
+Visit <amount> Echoes|메아리를 <amount>번 조우하기
+Visit <amount> Echoes while starving|굶주린 상태로 메아리를 <amount>번 조우하기
+Never eat <item>|<item> 음식을 먹지 않기
+Never use <item>|<item> 물건을 사용하지 않기
+Hatch [<current>/<amount>] noodlefly eggs in one cycle|한 주기 안에 일정 수의 국수파리 알을 부화 시키기 [<current>/<amount>]
+Hatch [<current>/<amount>] noodlefly eggs|일정 수의 국수파리 알을 부화 시키기 [<current>/<amount>]
+Collect the <pearl> pearl from <region>|<region> 지역의 <pearl> 진주를 수집하기
+Collect Moon's Cloak|달의 망토를 수집하기
+Deliver the Cloak to Moon|달에게 망토를 배달하기
+Trade [<current>/<amount>] |스캐빈저 상인의 물건을 다른 스캐빈저 상인과 거래하기 [<current>/<amount>]
+Trade [<current>/<amount>] item from Scavenger Merchants to other Scavenger Merchants|스캐빈저 상인의 물건을 다른 스캐빈저 상인과 거래하기 [<current>/<amount>]
+Trade [<current>/<amount>] items from Scavenger Merchants to other Scavenger Merchants|스캐빈저 상인의 물건들을 다른 스캐빈저 상인과 거래하기 [<current>/<amount>]
+Steal [<current>/<amount>] <item> from a Scavenger toll|스캐빈저 요금소의 <item> 물건을 도둑질하기 [<current>/<amount>] 
+Steal [<current>/<amount>] <item> from Scavengers|스캐빈저의 <item> 물건을 도둑질하기 [<current>/<amount>] 
+Earn [<current_score>/<score_target>] points from creature kills in one cycle|한 주기 안에 생물을 죽여 점수 획득하기 [<current_score>/<score_target>]
+Earn [<current_score>/<score_target>] points from creature kills|생물을 죽여 점수 획득하기 [<current_score>/<score_target>]
+Dodge a Leviathan's bite|레비아탄의 물림을 피하기
+Deliver the music pearl to Five Pebbles|다섯 조약돌에게 음악 진주를 배달하기
+Feed the Rarefaction Cell to a Leviathan (completes if you die)|희박화 전지와 함께 레비아탄에게 잡아먹히기 (죽으면 달성)
+Open [<current>/<amount>] popcorn plants|팝콘 식물을 오픈하기 [<current>/<amount>]
+Eat [<current>/<amount>] popcorn plant seeds|씨앗을 일정 수 섭취하기 [<current>/<amount>]
+Deliver the <region> colored pearl to <iterator>|<region> 색 진주를 <iterator>에게 배달하기
+Maul creatures [<current>/<amount>] times|일정 횟수 생물을 깨물기 [<current>/<amount>]
+Do not gift Needles to Scavengers|바늘을 스캐빈저에게 선물하지 않기
+Collect the <chatlog> broadcast|<chatlog> 방송 토큰을 수집하기
+Trade [<current>/<amount>] worth of value to Scavenger Merchants|스캐빈저 상인과 일정 가치만큼 거래하기 [<current>/<amount>]
+Consume [<current>/<amount>] Karma Flowers|카르마 꽃을 소비하기 [<current>/<amount>]
+Dodge [<current>/<amount>] Noodlefly attacks|국수파리의 공격을 피하기 [<current>/<amount>]
+Visit <iterator>|<iterator> 반복자를 조우하기
+Drop a <crit> into the depths drop room (SB_D06)|<crit>를 심층 방에 떨어트리기 (SB_D06)
+Maul [<current>/<amount>] unique creature types|일정 수의 다른 유형 생물을 깨물기 [<current>/<amount>]
+Reactivate Looks to the Moon|달을 소생하기
+Deliver the green neuron to Five Pebbles|다섯 조약돌에게 초록색 신경을 배달하기
+Collect [<current>/<amount>] colored pearls|일정 수의 색 진주 수집하기 [<current>/<amount>]
+Collect the vista in <region_name>|<region_name> 전망지점을 방문하기
+Transport the same <crit> through [<current>/<amount>] gates|<crit> 한 마리와 함께 일정 수의 관문을 통과하기 [<current>/<amount>]
+Befriend [<current>/<amount>] unique creature types|일정 수 만큼의 고유 생물과 친구 되기 [<current>/<amount>]
+Befriend a <crit>|<crit> 하고 친구 되기
+Crush [<current>/<amount>] unique creatures by falling|각각 고유 생물을 짓누르기 [<current>/<amount>]
+Complete [<current>/<amount>] bingo challenges in a row without dying|죽지 않고 연속으로 빙고 미션을 완료하기 [<current>/<amount>]
+Deliver <progress> neurons to Looks to the Moon|달을 향해 보라에게 신경 배달하기 <progress>
+Get licked by [<current>/<amount>] unique lizards|각각 고유 도마뱀에게 핥히기 [<current>/<amount>]
+Eat [<current>/<amount>] <food_type> <food_type>|<food_type> 섭취하기 [<current>/<amount>]
+creatures|살아있는
+while starving|굶주린 상태로
+ while starving| 굶주린 상태로
+ in one cycle| 한 주기 안에
+ while under mushroom effect| 버섯을 먹은 상태에서
+ with |<LINE>지정 물건 사용 - 
+ with a death pit|<LINE>죽이는 방식 - 추락사
+Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>|<location><crit> 생물을<starving><shrooms><onecycle> 죽이기<pitorweapon> [<current>/<amount>] 
+First time entering <to> must be from <from>|<from>에서 <to> 지역으로 지역을 처음 진입하기
+Transport a <crit><from><to>|<from> <crit> 생물을<to> 지역으로 운반하기
+Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>|<crit> 생물을<region> 벽에 고정하기 [<current_pin>/<pin_amount>]
+Hit <crit> with <weapon> [<current>/<amount>] times<location>|<location> <weapon> 아이템을 이용해 <crit> 생물을 명중하기 [<current>/<amount>]
+Hit <crit> with <weapon> [<current>/<amount>] times<location> in one cycle|한 주기 안에 <weapon> 아이템을 이용해 <crit> 생물을 적중하기 
+ underground| 지하
+ surface| 외부
+a grenade|폭탄을
+grenades|폭탄을
+in | 
+ in | 
+ to | 
+ out of | 
+ from | 
+ and then pass them|하고 무단으로 통행
+ and then pass it|하고 무단으로 통행
+the <toll> toll|<toll> 요금소에 폭탄을 투척<pass>하기
+Throw <action> at <toll><pass>|<toll>
+Bring| 
+Hoard| 
+to any| 
+in the same| 하나의 
+in | 
+[<current>/<amount>] unique tolls|요금소에 폭탄을 투척<pass>하기 [<current>/<amount>]
+<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>|<target_item> 아이템을<location><shelter_type>피난처에 저장하기 [<current>/<amount>]<action>
+Bring [<current>/<amount>] to any shelter <location>|하나의 피난처에 <action> 저장하기 [<current>/<amount>]
+Hoard [<current>/<amount>] in the same shelter <location>|피난처에 <action> 물건을 일정 수 만큼 저장하기 [<current>/<amount>]
+Throw a grenade at the <toll> scavenger toll|<toll> 스캐빈저 요금소에 폭탄 던지기
+Throw a grenade at [<current>/<amount>] unique tolls|일정 수의 스캐빈저 요금소에 폭탄 던지기 [<current>/<amount>]
+Collect the <unlock> unlock|<unlock> 토큰을 수집하기
+Never kill <victim>|<victim> 생물을 죽이지 않기
+Eat [<current>/<amount>] <food_type> <starved>|<starved> <food_type> 섭취하기 [<current>/<amount>]
+ in different regions| 각각 다른 지역의
+
+
+//Can't correct grammar, completely........... hand translated... things.  (OH......................................)
+Enter Outskirts|교외에 진입하기
+Enter Industrial Complex|산업 단지에 진입하기
+Enter Chimney Canopy|굴뚝 덮개에 진입하기
+Enter Drainage System|배수 처리시설에 진입하기
+Enter Garbage Wastes|쓰레기 폐기장에 진입하기
+Enter Shaded Citadel|그늘진 성채에 진입하기
+Enter Shoreline|연안선에 진입하기
+Enter Sky Islands|하늘 제도에 진입하기
+Enter Farm Arrays|농장 배열지에 진입하기
+Enter The Exterior|외부에 진입하기
+Enter Five Pebbles|다섯 조약돌에 진입하기
+Enter Subterranean|지하에 진입하기
+Enter Pipeyard|파이프 공장에 진입하기
+Enter Submerged Superstructure|침수된 상부구조물에 진입하기
+Enter Outer Expanse|바깥 광야에 진입하기
+Enter Waterfront Facility|수변 시설에 진입하기
+Enter Metropolis|대도시에 진입하기
+Enter The Rot|부패에 진입하기
+Enter Looks to the Moon|달을 향해 보라에 진입하기
+Enter Suburban Drifts|근교 갱도에 진입하기
+Enter Icy Monument|얼은 기념물에 진입하기
+Enter Undergrowth|지하 수림에 진입하기
+Enter Solitary Towers|고립된 탑세에 진입하기
+Enter Glacial Wasteland|냉랭한 황폐지에 진입하기
+Enter Frigid Coast|싸늘한 물가에 진입하기
+Enter Silent Construct|고요한 구조에 진입하기
+Enter Windswept Spires|바람받이 첩탑에 진입하기
+Enter Desolate Fields|황폐한 들판에 진입하기
+Enter Barren Conduits|버려진 도관에 진입하기
+Enter Primordial Underground|원시 지하에 진입하기
+Enter Rubicon|루비콘에 진입하기
+
+Do not enter 교외|교외에 진입하지 않기
+Do not enter 산업 단지|산업 단지에 진입하지 않기
+Do not enter 굴뚝 덮개|굴뚝 덮개에 진입하지 않기
+Do not enter 배수 처리시설|배수 처리시설에 진입하지 않기
+Do not enter 쓰레기 폐기장|쓰레기 폐기장에 진입하지 않기
+Do not enter 그늘진 성채|그늘진 성채에 진입하지 않기
+Do not enter 연안선|연안선에 진입하지 않기
+Do not enter 하늘 제도|하늘 제도에 진입하지 않기
+Do not enter 농장 배열지|농장 배열지에 진입하지 않기
+Do not enter 외부|외부에 진입하지 않기
+Do not enter 다섯 조약돌|다섯 조약돌에 진입하지 않기
+Do not enter 지하|지하에 진입하지 않기
+Do not enter 파이프 공장|파이프 공장에 진입하지 않기
+Do not enter 침수된 상부구조물|침수된 상부구조물에 진입하지 않기
+Do not enter 바깥 광야|바깥 광야에 진입하지 않기
+Do not enter 수변 시설|수변 시설에 진입하지 않기
+Do not enter 대도시|대도시에 진입하지 않기
+Do not enter 부패|부패에 진입하지 않기
+Do not enter 달을 향해 보라|달을 향해 보라에 진입하지 않기
+Do not enter 근교 갱도|근교 갱도에 진입하지 않기
+Do not enter 얼은 기념물|얼은 기념물에 진입하지 않기
+Do not enter 지하 수림|지하 수림에 진입하지 않기
+Do not enter 고립된 탑세|고립된 탑세에 진입하지 않기
+Do not enter 냉랭한 황폐지|냉랭한 황폐지에 진입하지 않기
+Do not enter 싸늘한 물가|싸늘한 물가에 진입하지 않기
+Do not enter 고요한 구조|고요한 구조에 진입하지 않기
+Do not enter 바람받이 첩탑|바람받이 첩탑에 진입하지 않기
+Do not enter 황폐한 들판|황폐한 들판에 진입하지 않기
+Do not enter 버려진 도관|버려진 도관에 진입하지 않기
+Do not enter 원시 지하|원시 지하에 진입하지 않기
+Do not enter 루비콘|루비콘에 진입하지 않기
+
+Craft [0/1] <item>|<item> 아이템을 제작하기 [0/1]
+Craft [0/2] <item>|<item> 아이템을 제작하기 [0/2]
+Craft [0/3] <item>|<item> 아이템을 제작하기 [0/3]
+Craft [0/4] <item>|<item> 아이템을 제작하기 [0/4]
+Craft [0/5] <item>|<item> 아이템을 제작하기 [0/5]
+Craft [0/6] <item>|<item> 아이템을 제작하기 [0/6]
+Craft [0/7] <item>|<item> 아이템을 제작하기 [0/7]
+Craft [0/8] <item>|<item> 아이템을 제작하기 [0/8]
+Craft [0/9] <item>|<item> 아이템을 제작하기 [0/9]
+Craft [0/10] <item>|<item> 아이템을 제작하기 [0/10]
+Craft [1/1] <item>|<item> 아이템을 제작하기 [1/1]
+Craft [1/2] <item>|<item> 아이템을 제작하기 [1/2]
+Craft [1/3] <item>|<item> 아이템을 제작하기 [1/3]
+Craft [1/4] <item>|<item> 아이템을 제작하기 [1/4]
+Craft [1/5] <item>|<item> 아이템을 제작하기 [1/5]
+Craft [1/6] <item>|<item> 아이템을 제작하기 [1/6]
+Craft [1/7] <item>|<item> 아이템을 제작하기 [1/7]
+Craft [1/8] <item>|<item> 아이템을 제작하기 [1/8]
+Craft [1/9] <item>|<item> 아이템을 제작하기 [1/9]
+Craft [1/10] <item>|<item> 아이템을 제작하기 [1/10]
+Craft [2/1] <item>|<item> 아이템을 제작하기 [2/1]
+Craft [2/2] <item>|<item> 아이템을 제작하기 [2/2]
+Craft [2/3] <item>|<item> 아이템을 제작하기 [2/3]
+Craft [2/4] <item>|<item> 아이템을 제작하기 [2/4]
+Craft [2/5] <item>|<item> 아이템을 제작하기 [2/5]
+Craft [2/6] <item>|<item> 아이템을 제작하기 [2/6]
+Craft [2/7] <item>|<item> 아이템을 제작하기 [2/7]
+Craft [2/8] <item>|<item> 아이템을 제작하기 [2/8]
+Craft [2/9] <item>|<item> 아이템을 제작하기 [2/9]
+Craft [2/10] <item>|<item> 아이템을 제작하기 [2/10]
+Craft [3/1] <item>|<item> 아이템을 제작하기 [3/1]
+Craft [3/2] <item>|<item> 아이템을 제작하기 [3/2]
+Craft [3/3] <item>|<item> 아이템을 제작하기 [3/3]
+Craft [3/4] <item>|<item> 아이템을 제작하기 [3/4]
+Craft [3/5] <item>|<item> 아이템을 제작하기 [3/5]
+Craft [3/6] <item>|<item> 아이템을 제작하기 [3/6]
+Craft [3/7] <item>|<item> 아이템을 제작하기 [3/7]
+Craft [3/8] <item>|<item> 아이템을 제작하기 [3/8]
+Craft [3/9] <item>|<item> 아이템을 제작하기 [3/9]
+Craft [3/10] <item>|<item> 아이템을 제작하기 [3/10]
+Craft [4/1] <item>|<item> 아이템을 제작하기 [4/1]
+Craft [4/2] <item>|<item> 아이템을 제작하기 [4/2]
+Craft [4/3] <item>|<item> 아이템을 제작하기 [4/3]
+Craft [4/4] <item>|<item> 아이템을 제작하기 [4/4]
+Craft [4/5] <item>|<item> 아이템을 제작하기 [4/5]
+Craft [4/6] <item>|<item> 아이템을 제작하기 [4/6]
+Craft [4/7] <item>|<item> 아이템을 제작하기 [4/7]
+Craft [4/8] <item>|<item> 아이템을 제작하기 [4/8]
+Craft [4/9] <item>|<item> 아이템을 제작하기 [4/9]
+Craft [4/10] <item>|<item> 아이템을 제작하기 [4/10]
+Craft [5/1] <item>|<item> 아이템을 제작하기 [5/1]
+Craft [5/2] <item>|<item> 아이템을 제작하기 [5/2]
+Craft [5/3] <item>|<item> 아이템을 제작하기 [5/3]
+Craft [5/4] <item>|<item> 아이템을 제작하기 [5/4]
+Craft [5/5] <item>|<item> 아이템을 제작하기 [5/5]
+Craft [5/6] <item>|<item> 아이템을 제작하기 [5/6]
+Craft [5/7] <item>|<item> 아이템을 제작하기 [5/7]
+Craft [5/8] <item>|<item> 아이템을 제작하기 [5/8]
+Craft [5/9] <item>|<item> 아이템을 제작하기 [5/9]
+Craft [5/10] <item>|<item> 아이템을 제작하기 [5/10]
+Craft [6/1] <item>|<item> 아이템을 제작하기 [6/1]
+Craft [6/2] <item>|<item> 아이템을 제작하기 [6/2]
+Craft [6/3] <item>|<item> 아이템을 제작하기 [6/3]
+Craft [6/4] <item>|<item> 아이템을 제작하기 [6/4]
+Craft [6/5] <item>|<item> 아이템을 제작하기 [6/5]
+Craft [6/6] <item>|<item> 아이템을 제작하기 [6/6]
+Craft [6/7] <item>|<item> 아이템을 제작하기 [6/7]
+Craft [6/8] <item>|<item> 아이템을 제작하기 [6/8]
+Craft [6/9] <item>|<item> 아이템을 제작하기 [6/9]
+Craft [6/10] <item>|<item> 아이템을 제작하기 [6/10]
+Craft [7/1] <item>|<item> 아이템을 제작하기 [7/1]
+Craft [7/2] <item>|<item> 아이템을 제작하기 [7/2]
+Craft [7/3] <item>|<item> 아이템을 제작하기 [7/3]
+Craft [7/4] <item>|<item> 아이템을 제작하기 [7/4]
+Craft [7/5] <item>|<item> 아이템을 제작하기 [7/5]
+Craft [7/6] <item>|<item> 아이템을 제작하기 [7/6]
+Craft [7/7] <item>|<item> 아이템을 제작하기 [7/7]
+Craft [7/8] <item>|<item> 아이템을 제작하기 [7/8]
+Craft [7/9] <item>|<item> 아이템을 제작하기 [7/9]
+Craft [7/10] <item>|<item> 아이템을 제작하기 [7/10]
+Craft [8/1] <item>|<item> 아이템을 제작하기 [8/1]
+Craft [8/2] <item>|<item> 아이템을 제작하기 [8/2]
+Craft [8/3] <item>|<item> 아이템을 제작하기 [8/3]
+Craft [8/4] <item>|<item> 아이템을 제작하기 [8/4]
+Craft [8/5] <item>|<item> 아이템을 제작하기 [8/5]
+Craft [8/6] <item>|<item> 아이템을 제작하기 [8/6]
+Craft [8/7] <item>|<item> 아이템을 제작하기 [8/7]
+Craft [8/8] <item>|<item> 아이템을 제작하기 [8/8]
+Craft [8/9] <item>|<item> 아이템을 제작하기 [8/9]
+Craft [8/10] <item>|<item> 아이템을 제작하기 [8/10]
+Craft [9/1] <item>|<item> 아이템을 제작하기 [9/1]
+Craft [9/2] <item>|<item> 아이템을 제작하기 [9/2]
+Craft [9/3] <item>|<item> 아이템을 제작하기 [9/3]
+Craft [9/4] <item>|<item> 아이템을 제작하기 [9/4]
+Craft [9/5] <item>|<item> 아이템을 제작하기 [9/5]
+Craft [9/6] <item>|<item> 아이템을 제작하기 [9/6]
+Craft [9/7] <item>|<item> 아이템을 제작하기 [9/7]
+Craft [9/8] <item>|<item> 아이템을 제작하기 [9/8]
+Craft [9/9] <item>|<item> 아이템을 제작하기 [9/9]
+Craft [9/10] <item>|<item> 아이템 제작하기 [9/10]
+Craft [10/1] <item>|<item> 아이템 제작하기 [10/1]
+Craft [10/2] <item>|<item> 아이템을 제작하기 [10/2]
+Craft [10/3] <item>|<item> 아이템을 제작하기 [10/3]
+Craft [10/4] <item>|<item> 아이템을 제작하기 [10/4]
+Craft [10/5] <item>|<item> 아이템을 제작하기 [10/5]
+Craft [10/6] <item>|<item> 아이템을 제작하기 [10/6]
+Craft [10/7] <item>|<item> 아이템을 제작하기 [10/7]
+Craft [10/8] <item>|<item> 아이템을 제작하기 [10/8]
+Craft [10/9] <item>|<item> 아이템을 제작하기 [10/9]
+Craft [10/10] <item>|<item> 아이템을 제작하기 [10/10]
+
+Enter [<current>/<required>] regions without entering 교외|교외를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 산업 단지|산업 단지를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 굴뚝 덮개|굴뚝 덮개를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 배수 처리시설|배수 처리시설을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 쓰레기 폐기장|쓰레기 폐기장을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 그늘진 성채|그늘진 성채 지역을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 연안선|연안선을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 하늘 제도|하늘 제도를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 농장 배열지|농장 배열지를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 외부|외부를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 다섯 조약돌|다섯 조약돌을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 지하|지하를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 파이프 공장|파이프 공장을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 침수된 상부구조물|침수된 상부구조물을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 바깥 광야|바깥 광야를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 수변 시설|수변 시설을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 대도시|대도시를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 부패|부패를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 달을 향해 보라|달을 향해 보라를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 근교 갱도|근교 갱도를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 얼은 기념물|얼은 기념물을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 지하 수림|지하 수림을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 고립된 탑세|고립된 탑세를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 냉랭한 황폐지|냉랭한 황폐지를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 싸늘한 물가|싸늘한 물가를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 고요한 구조|고요한 구조를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 바람받이 첩탑|바람받이 첩탑을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 황폐한 들판|황폐한 들판을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 버려진 도관|버려진 도관을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 원시 지하|원시 지하를 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]
+Enter [<current>/<required>] regions without entering 루비콘|루비콘을 일정 수의 지역을 방문할 때까지 진입하지 않기 [<current>/<required>]

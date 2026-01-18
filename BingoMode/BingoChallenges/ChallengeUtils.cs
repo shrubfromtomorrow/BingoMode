@@ -167,7 +167,9 @@ namespace BingoMode.BingoChallenges
             if (type == DLCItemType.LillyPuck) return translator.Translate("Lillypucks");
             if (type == DLCItemType.GooieDuck) return translator.Translate("Gooieducks");
             if (type == WatcherItemType.FireSpriteLarva) return translator.Translate("Fire Sprite Larvae");
-            
+            // Other
+            if (type == ItemType.KarmaFlower) return translator.Translate("Karma Flowers");
+
 
             return orig.Invoke(type);
         }
@@ -305,6 +307,9 @@ namespace BingoMode.BingoChallenges
             "GW_C11",
             "LF_E03",
             "UG_TOLL",
+            "LC_C10",
+            "LC_STRIPMALLNEW",
+            "LC_TEMPLETOLL",
             "WARF_G01",
             "WBLA_F01",
             "WSKD_B41"
@@ -414,7 +419,16 @@ namespace BingoMode.BingoChallenges
             "Boomerang",
             "Lantern",
             "GooieDuck",
-            "GlowWeed"
+            "GlowWeed",
+            "DataPearl",
+            "FirecrackerPlant",
+            "KarmaFlower",
+            "SporePlant",
+            "FlareBomb",
+            "Lillypuck",
+            "KarmaFlower",
+            "PuffBall",
+            "FlyLure"
         };
 
         public static readonly string[] Bannable =
@@ -519,6 +533,7 @@ namespace BingoMode.BingoChallenges
             "GlowWeed",
             "GooieDuck",
             "FireEgg",
+            "KarmaFlower"
         };
 
         public static readonly string[] Storable =
@@ -537,6 +552,7 @@ namespace BingoMode.BingoChallenges
             "SlimeMold",
             "BubbleGrass",
             "EggBugEgg",
+            "KarmaFlower",
 
             // MSC
             "GooieDuck",

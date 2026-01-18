@@ -119,35 +119,32 @@ namespace BingoMode
                 text);
         }
 
-        public static void LoadAllBannedChallengeLists()
+        public static void LoadAllBannedChallengeLists(SlugcatStats.Name slug)
         {
-            foreach (SlugcatStats.Name slug in ExpeditionData.GetPlayableCharacters())
+            try
             {
-                try
+                string path = Application.persistentDataPath +
+                Path.DirectorySeparatorChar.ToString() +
+                "Bingo" +
+                Path.DirectorySeparatorChar.ToString() +
+                "blacklist-" +
+                slug.value +
+                ".txt";
+
+                if (!File.Exists(path))
                 {
-                    string path = Application.persistentDataPath +
-                    Path.DirectorySeparatorChar.ToString() +
-                    "Bingo" +
-                    Path.DirectorySeparatorChar.ToString() +
-                    "blacklist-" +
-                    slug.value +
-                    ".txt";
-
-                    if (!File.Exists(path))
-                    {
-                        SaveChallengeBlacklistFor(slug);
-                        continue;
-                    }
-
-                    string data = File.ReadAllText(path);
-
-                    bannedChallenges[slug] = string.IsNullOrEmpty(data) ? [] : data.Split(';').ToList();
-                }
-                catch
-                {
-                    Plugin.logger.LogError("Failed to load banned challenge list for " + slug.value);
                     SaveChallengeBlacklistFor(slug);
+                    return;
                 }
+
+                string data = File.ReadAllText(path);
+
+                bannedChallenges[slug] = string.IsNullOrEmpty(data) ? [] : data.Split(';').ToList();
+            }
+            catch
+            {
+                Plugin.logger.LogError("Failed to load banned challenge list for " + slug.value);
+                SaveChallengeBlacklistFor(slug);
             }
         }
 

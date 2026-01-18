@@ -1,0 +1,222 @@
+//----------------------------------Random-Starts-----------------------------------
+//SU - Outskirts                (All)
+SU_S05
+SU_S04
+SU_S01
+SU_S03
+
+//HI - Industrial Complex       (All)
+HI_S02
+HI_S04
+HI_S01
+HI_S05
+HI_S06
+
+//DS - Drainage System          (All but Saint)
+DS_S01r
+DS_S02l
+DS_S04
+
+//CC - Chimney Canopy (All)
+CC_S01
+CC_S03
+CC_S04
+
+//GW - Garbage Wastes           (All)
+GW_S02
+GW_S06
+GW_S07
+
+//SH - Shaded Citadel           (All but Saint)
+SH_S10
+SH_S08
+SH_S02
+SH_S04
+
+//SL - Shoreline                (All but Spearmaster and Artificer)
+SL_S05
+SL_S03
+SL_S04
+SL_S07
+SL_S08
+SL_S09
+SL_S10
+
+//SI - Sky Islands              (All)
+SI_S05
+SI_S04
+SI_S03
+
+//LF - Farm Arrays              (All)
+LF_S01
+LF_S02
+LF_S03
+LF_S05
+LF_S07
+
+//UW - The Exterior             (Survivor, Monk, Hunter, Artificer, Gourmand, Rivulet)
+UW_S07
+UW_S04
+UW_S01
+UW_S02
+UW_S05
+UW_S06
+
+//SS - Five Pebbles             (Survivor, Monk, Hunter, Artificer, Gourmand)
+SS_S02
+SS_S01
+SS_S04
+
+//SB - Subterreanean            (All)
+SB_S04
+SB_S02
+SB_S05
+SB_S06
+SB_S07
+
+//VS - Pipeyard                 (All)
+VS_S05
+VS_S08
+VS_S01
+VS_S04
+
+//RM - The Rot                  (Rivulet)
+RM_S01
+RM_LCS2
+RM_LCS1
+
+//MS - Submerged Superstructure (Rivulet - All others optional but Spearmaster and Artificer)
+
+//LC - Metropolis               (Artificer, Survivor, Monk)
+LC_S01
+LC_A05
+LC_S03
+LC_S04
+LC_shelter_above
+LC_ShelterTrain1
+
+//DM - Looks To The Moon        (Spearmaster)
+DM_STOP
+DM_S14
+DM_S01
+DM_S02
+DM_S11
+DM_S13
+
+//OE - Outer Expanse            (Gourmand, Survivor, Monk)
+OE_S04
+OE_S06
+OE_S01
+OE_EXSHELTER
+
+//UG - Undergrowth              (Saint)
+UG_S01r
+UG_S02l
+UG_S04
+
+//CL - Silent Construct         (Saint)
+CL_S10
+CL_S12
+CL_LCS2
+CL_S02
+CL_S05
+CL_S14
+
+//LM - Waterfront Facility (Artificer, Spearmaster)
+LM_S05
+LM_S06
+LM_S11
+LM_S13
+
+//----------------------------------Watcher-----------------------------------
+WARB_S11
+WARB_S15
+WARB_S17
+WARB_S29
+WARB_S31
+WARC_S01
+WARC_S02
+WARC_S03
+WARC_S04
+WARC_S05
+WARC_S06
+WARC_S07
+WARD_S07
+WARD_S09
+WARD_S13
+WARD_S19
+WARD_S23
+WARE_S05
+WARE_S12
+WARE_S25
+WARE_S28
+WARE_S30
+WARF_S01
+WARF_S02
+WARF_S03
+WARF_S04
+WARF_S06
+WARF_S08
+WARF_S14
+WARF_S18
+WARF_S32
+WARG_S10
+WARG_S16
+WARG_S20
+WARG_S21
+WARG_S26
+WARG_S27
+WBLA_S01
+WBLA_S02
+WBLA_S03
+WPTA_S01
+WPTA_S02
+WPTA_S03
+WRFA_S01
+WRFA_S02
+WRFA_S07
+WRFA_S08
+WRFB_S03
+WRFB_S04
+WRFB_S06
+WRRA_S01
+WRRA_S02
+WRRA_S03
+WRRA_S04
+WRRA_S05
+WRRA_S06
+WSKA_S07
+WSKA_S08
+WSKA_S09
+WSKA_S0N
+WSKB_S06
+WSKB_S0N
+WSKC_S01
+WSKC_S02
+WSKD_S03
+WSKD_S04
+WSKD_S05
+WTDA_S02
+WTDA_S03
+WTDA_S04
+WTDB_S01
+WTDB_S02
+WTDB_S03
+WTDB_S04
+WVWA_S01
+WVWA_S02
+WVWA_S03
+WVWB_S01
+WVWB_S02
+WMPA_S01
+WMPA_S02
+WMPA_S03
+WMPA_S04
+WMPA_S05
+WPGA_S01
+WPGA_S02
+WPGA_S03
+WPGA_S04
+WPTA_S01
+WPTA_S02
+WPTA_S03

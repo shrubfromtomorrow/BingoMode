@@ -286,6 +286,6 @@ namespace BingoMode.BingoChallenges
             On.Watcher.Frog.Attach -= Frog_Attach;
         }
 
-        public override List<object> Settings() => [weapon, victim, amount, inOneCycle, region];
+        public override List<object> Settings() => [weapon, amount, region, victim, inOneCycle];
     }
 }

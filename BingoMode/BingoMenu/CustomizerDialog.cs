@@ -318,15 +318,19 @@ namespace BingoMode.BingoMenu
             }
             else if (owner.challenge is BingoDontUseItemChallenge ccc)
             {
-                var l = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                ccc.isFood = Array.IndexOf(l, ccc.item.Value) < (l.Length - ChallengeUtils.GetCorrectListForChallenge("banitem").Length);
-                if (ccc.isFood) ccc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), ccc.item.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
+                var bans = ChallengeUtils.GetCorrectListForChallenge("banitem");
+                var foods = ChallengeUtils.GetCorrectListForChallenge("food");
+
+                ccc.isFood = Array.IndexOf(bans, ccc.item.Value) <= Array.IndexOf(bans, "SmallCentipede");
+                if (ccc.isFood) ccc.isCreature = Array.IndexOf(foods, ccc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
             }
             else if (owner.challenge is WatcherBingoDontUseItemChallenge cccc)
             {
-                var l = ChallengeUtils.GetCorrectListForChallenge("Wbanitem");
-                cccc.isFood = Array.IndexOf(l, cccc.item.Value) < (l.Length - ChallengeUtils.GetCorrectListForChallenge("banitem").Length);
-                if (cccc.isFood) cccc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), cccc.item.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
+                var bans = ChallengeUtils.GetCorrectListForChallenge("banitem");
+                var foods = ChallengeUtils.GetCorrectListForChallenge("food");
+
+                cccc.isFood = Array.IndexOf(bans, cccc.item.Value) <= Array.IndexOf(bans, "SmallCentipede");
+                if (cccc.isFood) cccc.isCreature = Array.IndexOf(foods, cccc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
             }
             else if (owner.challenge is BingoVistaChallenge ccccc)
             {

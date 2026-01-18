@@ -75,7 +75,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("steal_item"), Icon.FromEntityName(subject.Value), toll.Value ? Icon.SCAV_TOLL : Icon.FromEntityName("Scavenger")],
+                [[new Icon("steal_item"), subject.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(subject.Value), toll.Value ? Icon.SCAV_TOLL : Icon.FromEntityName("Scavenger")],
                 [new Counter(current, amount.Value)]]);
         }
 

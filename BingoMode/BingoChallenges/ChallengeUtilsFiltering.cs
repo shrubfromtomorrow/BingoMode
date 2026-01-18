@@ -15,11 +15,14 @@ using ItemType = AbstractPhysicalObject.AbstractObjectType;
 using MSCItemType = MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType;
 using WatcherItemType = Watcher.WatcherEnums.AbstractObjectType;
 using SlugName = SlugcatStats.Name;
+using System.Threading;
 
 namespace BingoMode.BingoChallenges
 {
     public static class ChallengeUtilsFiltering
     {
+        private static readonly Dictionary<(string listname, SlugName slug, bool sorted), string[]> cache = new();
+
         public static readonly SlugName watchername = WatcherEnums.SlugcatStatsName.Watcher;
         public static readonly SlugName survivorname = SlugName.White;
         public static readonly SlugName monkname = SlugName.Yellow;
@@ -30,12 +33,23 @@ namespace BingoMode.BingoChallenges
         public static readonly SlugName rivname = MoreSlugcatsEnums.SlugcatStatsName.Rivulet;
         public static readonly SlugName saintname = MoreSlugcatsEnums.SlugcatStatsName.Saint;
 
-        
+        public static void ClearCache()
+        {
+            cache.Clear();
+        }
+
         public static string[] GetFilteredList(string listname, string[] origList, bool sorted)
         {
+            var key = (listname, ExpeditionData.slugcatPlayer, sorted);
+
+            if (cache.TryGetValue(key, out var cached)) return cached;
+
             string[] result = ListRules[listname](ExpeditionData.slugcatPlayer, origList);
 
-            return sorted ? result.Distinct().OrderBy(x => x).ToArray() : result;
+            if (sorted) result = result.Distinct().OrderBy(x => x).ToArray();
+
+            cache[key] = result;
+            return result;
         }
 
         private static readonly Dictionary<string, Func<SlugName, string[], string[]>> ListRules = new()
@@ -48,23 +62,19 @@ namespace BingoMode.BingoChallenges
                     string[] watcherForbid = { "Yeek" };
                     string[] saintForbid = { "CicadaA", "CicadaB" };
                     string[] mscCreatures = { "Yeek" };
-                    string[] hunterAllow = { "Jetfish" };
+                    string[] strongAllow = { "JetFish" };
                     string[] spearHunterArtiForbid = { "Yeek" };
 
                     // mb lmao
-                    return baselist
-                        .Where(x =>
-                            (slug == watchername ? !watcherForbid.Contains(x) : !watcherCreatures.Contains(x))
+                    baselist = baselist.Where(x =>
+                        (slug == watchername ? !watcherForbid.Contains(x) : !watcherCreatures.Contains(x))
+                        && (ModManager.MSC || !mscCreatures.Contains(x))
+                        && (slug != saintname || !saintForbid.Contains(x))
+                        && (slug == huntername || slug == gourname || slug == artiname || slug == watchername || !strongAllow.Contains(x))
+                        && !((slug == huntername || slug == spearname || slug == artiname) && spearHunterArtiForbid.Contains(x))
+                    ).ToArray();
 
-                            && (ModManager.MSC || !mscCreatures.Contains(x))
-
-                            && (slug != saintname || !saintForbid.Contains(x))
-
-                            && (slug == huntername || !hunterAllow.Contains(x))
-
-                            && !( (slug == huntername || slug == spearname || slug == artiname)
-                                  && spearHunterArtiForbid.Contains(x))
-                        ).ToArray();
+                    return baselist;
                 }
             },
             {
@@ -78,13 +88,21 @@ namespace BingoMode.BingoChallenges
                 "tolls",
                 (slug, baseList) =>
                 {
-                    if (slug == watchername) return baseList.Skip(baseList.Length - 3).ToArray();
+                    List<string> mutableBase = baseList.ToList();
 
-                    int end = baseList.Length - 3;
+                    string[] watcherTolls = { "WARF_G01", "WBLA_F01", "WSKD_B41" };
+                    string[] artiTolls = { "LC_C10", "LC_STRIPMALLNEW", "LC_TEMPLETOLL" };
+                    string[] saintTolls = { "UG_TOLL" };
 
-                    if (!(ModManager.MSC && slug == saintname)) end -= 1;
 
-                    return baseList.Take(end).ToArray();
+                    // check how toll names are done! #####################################
+                    return baseList
+                        .Where(x =>
+                            (slug == watchername || !watcherTolls.Contains(x))
+                            && (slug == artiname || !artiTolls.Contains(x))
+                            && (slug == saintname || !saintTolls.Contains(x))
+                        )
+                        .ToArray();
                 }
             },
             {
@@ -117,7 +135,8 @@ namespace BingoMode.BingoChallenges
                             x != "EggBugEgg" &&
                             x != "DandelionPeach" &&
                             x != "SSOracleSwarmer" &&
-                            x != "SmallNeedleWorm").ToList();
+                            x != "SmallNeedleWorm" &&
+                            x != "DandelionPeach").ToList();
 
                     return mutableBase.ToArray();
                 }
@@ -160,11 +179,22 @@ namespace BingoMode.BingoChallenges
                     List<string> mutableBase = baselist.ToList();
 
                     string[] watcherItems = { "Boomerang", "GraffitiBomb" };
-                    string[] mscItms = { "GooieDuck", "GlowWeed" };
+                    string[] watcherForbid = { "GooieDuck", "GlowWeed" };
+                    string[] mscItems = { "GooieDuck", "GlowWeed", "LillyPuck" };
 
-                    if (slug != watchername) mutableBase = mutableBase.Where(x => !watcherItems.Contains(x)).ToList();
-                    
-                    if (!ModManager.MSC) mutableBase = mutableBase.Where(x => !mscItms.Contains(x) || slug == watchername).ToList();
+                    if (slug != watchername)
+                    {
+                        mutableBase = mutableBase.Where(x => !watcherItems.Contains(x)).ToList();
+
+                        if (!ModManager.MSC)
+                        {
+                            mutableBase = mutableBase.Where(x => !mscItems.Contains(x)).ToList();
+                        }
+                    }
+                    else
+                    {
+                        mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
+                    }
 
                     return mutableBase.ToArray();
                 }
@@ -300,12 +330,11 @@ namespace BingoMode.BingoChallenges
                             ghost != "NoGhost"
                             && ghost != "SpinningTop"
 
-                            && (ModManager.MSC || ghost != "MS")
-
-                            && (ghost != "SL" || (ModManager.MSC && slug == saintname))
+                            && (slug == saintname || (ghost != "SL" && ghost != "MS"))
 
                             && allowedRegions.Contains(ghost)
-                        ).ToArray();
+                        )
+                        .ToArray();
                 }
             },
             {
@@ -388,12 +417,13 @@ namespace BingoMode.BingoChallenges
                 (slug, baseList) =>
                 {
                     string[] watcherItems = { "Boomerang", "GraffitiBomb", "FireSpriteLarva" };
-                    string[] mscItems     = { "GooieDuck", "LillyPuck", "DandelionPeach" };
+                    string[] mscItems = { "GooieDuck", "LillyPuck", "DandelionPeach" };
+
 
                     return baseList
                         .Where(x =>
                             (ModManager.MSC || !mscItems.Contains(x)) &&
-                            (ModManager.Watcher || !watcherItems.Contains(x))
+                            (slug == watchername || !watcherItems.Contains(x))
 
                             && !(ModManager.MSC &&
                                  (slug == artiname || slug == spearname) &&
@@ -403,7 +433,8 @@ namespace BingoMode.BingoChallenges
                                  (x == "LillyPuck" ||
                                   x == "EggBugEgg" ||
                                   x == "SmallNeedleWorm" ||
-                                  x == "SSOracleSwarmer"))
+                                  x == "SSOracleSwarmer") ||
+                                  x == "DandelionPeach")
                         )
                         .ToArray();
                 }

@@ -71,7 +71,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new([[new Icon("foodSymbol"), new Icon("FlowerMarker", 1f, RainWorld.SaturatedGold)]]);
+            Phrase phrase = new([[new Icon("foodSymbol"), Icon.KARMA_FLOWER]]);
             if (differentRegions.Value) {
                 phrase.InsertWord(new Icon("TravellerA"));
                 phrase.InsertWord(new Counter(current, amount.Value), 1);

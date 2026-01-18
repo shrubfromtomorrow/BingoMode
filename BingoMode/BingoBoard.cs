@@ -469,6 +469,9 @@ namespace BingoMode
 
             List<Challenge> list = [];
             list.AddRange(BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer));
+
+            if (!BingoData.bannedChallenges.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.LoadAllBannedChallengeLists(ExpeditionData.slugcatPlayer);
+
             list.RemoveAll(x => (type == null || x.GetType() != type.GetType()) && BingoData.bannedChallenges[ExpeditionData.slugcatPlayer].Contains(x.GetType().Name));
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
             int tries = 0;

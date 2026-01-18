@@ -132,6 +132,7 @@ namespace BingoMode.BingoChallenges
         public static Icon PEARL_HOARD_COLOR => new("pearlhoard_color", 1f, new Color(0.7f, 0.7f, 0.7f));
         public static Icon PEARL_HOARD_NORMAL => new("pearlhoard_normal", 1f, new Color(0.7f, 0.7f, 0.7f));
         public static Icon DATA_PEARL => new("Symbol_Pearl", 1f, new Color(0.7f, 0.7f, 0.7f));
+        public static Icon KARMA_FLOWER => new("karmaflower", 1f, RainWorld.SaturatedGold);
 
         public Icon(string element, float scale = 1f, Color? color = null, float rotation = 0f) : base()
         {

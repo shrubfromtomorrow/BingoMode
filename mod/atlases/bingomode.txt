@@ -1,0 +1,68 @@
+{"frames": {
+
+"bingotitle.png":
+{
+	"frame": {"x":40,"y":0,"w":164,"h":52},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":164,"h":52},
+	"sourceSize": {"w":164,"h":52}
+},
+"bingotitlewatcher.png":
+{
+	"frame": {"x":204,"y":0,"w":168,"h":52},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":168,"h":52},
+	"sourceSize": {"w":168,"h":52}
+},
+"createlobby.png":
+{
+	"frame": {"x":0,"y":52,"w":168,"h":103},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":168,"h":103},
+	"sourceSize": {"w":168,"h":103}
+},
+"customizer.png":
+{
+	"frame": {"x":0,"y":155,"w":323,"h":109},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":323,"h":109},
+	"sourceSize": {"w":323,"h":109}
+},
+"lobbysettings.png":
+{
+	"frame": {"x":168,"y":52,"w":231,"h":103},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":231,"h":103},
+	"sourceSize": {"w":231,"h":103}
+},
+"settingscog.png":
+{
+	"frame": {"x":0,"y":0,"w":20,"h":20},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":20},
+	"sourceSize": {"w":20,"h":20}
+},
+"switchteams.png":
+{
+	"frame": {"x":20,"y":0,"w":20,"h":20},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":20},
+	"sourceSize": {"w":20,"h":20}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "bingomode.png",
+	"format": "RGBA8888",
+	"size": {"w":399,"h":264},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:cf6e3ad020c28ba157475259cea138e6:36d549abec153b1857b86285d4341608:1917879ed32937b6c56fd12bc8a76877$"
+}
+}

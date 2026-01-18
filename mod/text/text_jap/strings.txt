@@ -1,0 +1,637 @@
+<DOCUMENT filename="strings.txt">
+// UI
+
+Bingo Mod Config|ビンゴMOD設定
+Open Bingo HUD keybind:|ビンゴボード
+Which button opens/closes the Bingo grid in game|ゲーム中のビンゴボード表示切替ボタン
+-  Keyboard|- キーボード
+-  Controller 1|- コントローラー1
+-  Controller 2|- コントローラー2
+-  Controller 3|- コントローラー3
+-  Controller 4|- コントローラー4
+Use map input instead:|マップ表示で有効
+Quick reset keybind:|クイックリセット
+Play custom music in bingo menu:|ビンゴメニューで音楽を再生
+Play custom music when game ends:|ゲーム終了時に音楽を再生
+Play custom music when your team is losing:|負けた時に時に音楽を再生
+Singleplayer team color:|シングルプレイカラー
+
+AVAILABLE: 1|利用可能:1
+AVAILABLE: 0|利用可能:0
+AVAILABLE: |利用可能:
+CLOSE|閉じる
+CANCEL|キャンセル
+MANUAL|マニュアル
+Multiplayer|マルチプレイ
+Refresh|ﾘﾌﾚｯｼｭ
+Profiles|プロフィール
+Config|設定
+I'M<LINE>READY|準備<LINE>完了
+BEGIN|開始
+CREATE|作成
+STARTBINGO|ビンゴ開始
+End Session|ｾｯｼｮﾝ終了
+Tally up|集計
+JOIN|参加
+UNLOAD|アンロード
+unloaded|アンロード済み
+Bingo - Scheming|ビンゴ - 策略
+<LINE>Save the game to Complete|<LINE>ゲームを保存して完了
+Cycle complete, saving run data|サイクル完了、実行データを保存
+perkList|特典リスト
+burdenList|負担リスト
+unl-|特典-
+bur-|負担-
+PLAY<LINE>BINGO|ビンゴ<LINE>で遊ぶ
+NEWBINGO|新しい<LINE>ビンゴ
+CREDITS|クレジット
+Copy board|コピー
+Paste board|ペースト
+QUITGAEM|ゲーム終了
+lobbysettings|ロビー設定
+createlobby|ロビー作成
+FRIENDS|フレンド
+Friends only: |フレンドのみ 
+Friends only: Yes|ﾌﾚﾝドのみ:ﾊｲ
+Friends only: No|ﾌﾚﾝドのみ:ｲｲｴ
+Require host's mods: |ホストのMOD必須 
+Perks: |特典:
+Burdens: |負担:
+Max Players: |最大プレイヤー数 
+Game mode: |ゲームモード:
+Slugcat: |ｷｬﾗｸﾀｰ:
+Host decides|ホストが決定
+Allowed|許可
+Disabled|無効
+HOSTMODS|ホストMOD
+Allowed - |許可 
+Disabled - |無効 
+Host decides - |ホストが決定 
+Bingo - |ビンゴ 
+Lockout (ties) - |ﾛｯｸｱｳﾄ:ﾋｷﾜｹｱﾘ 
+Lockout (no ties) - |ﾛｯｸｱｳﾄ:ﾋｷﾜｹﾅｼ 
+Blackout - |ブラｯｸｱｳﾄ 
+Perks:|特典
+Burdens:|負担
+Game mode:|ゲームモード
+Leave Lobby|ロビーを退出
+CONTINUE<LINE>BINGO|ソロプレイ<LINE>続行
+CONTINUE<LINE>MULTIPLAYER|マルチプレイ<LINE>続行
+Shelter: |シェルター 
+The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'|プレイヤーが開始するシェルター。シェルターの部屋名（大文字小文字を区別）を入力するか、「random」を入力してください
+Slugcat mismatch!<LINE><LINE>|スラッグキャットが一致しません！<LINE><LINE>
+Selected slugcat: White<LINE>|選択されたスラッグキャット:生存者<LINE>
+Selected slugcat: Yellow<LINE>|選択されたスラッグキャット:僧侶<LINE>
+Selected slugcat: Red<LINE>|選択されたスラッグキャット:ハンター<LINE>
+Selected slugcat: Rivulet<LINE>|選択されたスラッグキャット:ストリーム<LINE>
+Selected slugcat: Artificer<LINE>|選択されたスラッグキャット:発明家<LINE>
+Selected slugcat: Saint<LINE>|選択されたスラッグキャット:聖人<LINE>
+Selected slugcat: Spear<LINE>|選択されたスラッグキャット:槍マスター<LINE>
+Selected slugcat: Gourmand<LINE>|選択されたスラッグキャット:食いしん坊<LINE>
+Selected slugcat: Inv<LINE>|選択されたスラッグキャット:Inv<LINE>
+Selected slugcat: Watcher<LINE>|選択されたスラッグキャット:ウォッチャー<LINE>
+Provided Slugcat: White<LINE><LINE>|提供されたスラッグキャット:生存者<LINE><LINE>
+Provided Slugcat: Yellow<LINE><LINE>|提供されたスラッグキャット:僧侶<LINE><LINE>
+Provided Slugcat: Red<LINE><LINE>|提供されたスラッグキャット:ハンター<LINE><LINE>
+Provided Slugcat: Rivulet<LINE><LINE>|提供されたスラッグキャット:ストリーム<LINE><LINE>
+Provided Slugcat: Artificer<LINE><LINE>|提供されたスラッグキャット:発明家<LINE><LINE>
+Provided Slugcat: Saint<LINE><LINE>|提供されたスラッグキャット:聖人<LINE><LINE>
+Provided Slugcat: Spear<LINE><LINE>|提供されたスラッグキャット:槍マスター<LINE><LINE>
+Provided Slugcat: Gourmand<LINE><LINE>|提供されたスラッグキャット:食いしん坊<LINE><LINE>
+Provided Slugcat: Inv<LINE><LINE>|提供されたスラッグキャット:Inv<LINE><LINE>
+Provided Slugcat: Watcher<LINE><LINE>|提供されたスラッグキャット:ウォッチャー<LINE><LINE>
+Please paste a board from the same slugcat that's currently selected.|現在選択されているスラッグキャットと同じスラッグキャットのボードを貼り付けてください
+Not all players are ready !|すべてのプレイヤーが準備できていません！
+Trying to reconnect to the host.|ホストへの再接続を試みています
+Cannot reconnect to host.|ホストに再接続できません
+Lost connection to host.|ホストとの接続が切れました
+
+Team <team_name> won!|<team_name>チームの勝利！
+
+You won!|あなたの勝利！
+We have a tie!|引き分けです！
+Press the button in the bingo HUD or abandon the save to end the bingo session.|ビンゴHUDのボタンを押すか、セーブを放棄してセッションを終了してください
+Press the button in the bingo HUD to end the bingo session for everyone.|ビンゴHUDのボタンを押して全員のビンゴセッションを終了してください
+Exit the game and abandon the save or wait for host to end the session.|ゲームを終了してセーブを放棄するか、ホストがセッションを終了するのを待ってください
+Game concluded!|ゲーム終了！
+Number of challenges completed: |完了したチャレンジの数:
+Number of challenges completed for each team: |各チームが完了したチャレンジの数:
+<LINE>Completed by: |<LINE>完了したチーム:
+<LINE>Failed by: |<LINE>失敗したチーム:
+
+// Words used for tokens or missions (Complete)
+BlueFruit|青い果実
+Blue Fruit|青い果実
+Dangle Fruits|青い果実
+DangleFruits|青い果実
+DangleFruit|青い果実
+SlimeMolds|スライムモールド
+SlimeMold|スライムモールド
+Slime Mold|スライムモールド
+Slime Molds|スライムモールド
+Bubble Grass|バブルウィード
+BubbleGrass|バブルウィード
+FirecrackerPlant|チェリーボム
+WaterNut|ウォーターナッツ
+Bubble Fruit|バブルフルーツ
+PuffBall|パフボール
+FlareBomb|閃光玉
+FlyLure|コウモリ草
+SporePlant|ハチの巣
+Bee Hives|ハチの巣
+ScavengerBomb|スカベンジャー爆弾
+FireEgg|火虫の卵
+FireSpear|爆発槍
+Rock|岩
+Rocks|岩
+Pearls|パール
+Pearl|パール
+Mushroom|キノコ
+Lantern|ランタン
+Eggbug Eggs|タマゴ虫の卵
+Glow Weed|グロウウィード
+GlowWeed|グロウウィード
+LillyPuck|リリーパック
+LillyPucks|リリーパック
+Lillypucks|リリーパック
+Gooieducks|グーイダック
+Gooie Ducks|グーイダック
+GooieDuck|グーイダック
+ElectricSpear|電気槍
+EnergyCell|エネルギーセル
+JellyFish|クラゲ
+JokeRifle|ジョークライフル
+VultureMask|ハゲタカマスク
+SingularityBomb|シンギュラリティーボム
+HellSpear|地獄の槍
+FireEgg|火虫の卵
+DandelionPeaches|タンポポピーチ
+Dandelion Peaches|タンポポピーチ
+Dandelion Peache|タンポポピーチ
+Dandelion Peach|タンポポピーチ
+DandelionPeach|タンポポピーチ
+Pebbles' Neurons|小石男のニューロン
+Pebbles Neurons|小石男のニューロン
+Pebbles Neuron|小石男のニューロン
+SSOracleSwarmer|小石の男ニューロン
+
+0GreenLizard|緑トカゲ
+PinkLizard|ピンクトカゲ
+BlueLizard|青トカゲ
+WhiteLizard|白トカゲ
+BlackLizard|黒トカゲ
+YellowLizard|黄トカゲ
+CyanLizard|シアントカゲ
+RedLizard|赤トカゲ
+BigEel|リヴァイアサン
+Leech|ヒル
+SeaLeech|海ヒル
+EggBug|タマゴ虫
+JetFish|ジェットフィッシュ
+Small Noodleflie|幼虫ヌードルフライ
+Small Noodleflies|幼虫ヌードルフライ
+SmallNoodleflies|幼虫ヌードルフライ
+SmallNoodleWorm|幼虫ヌードルフライ
+BigNeedleWorm|ヌードルフライ
+Fly|コウモリバエ
+Bat Fly|コウモリバエ
+Hazer|ヘイザー
+Hazers|ヘイザー
+CicadaA|白セミ
+CicadaB|黒セミ
+PoleMimic|ポールミミック
+TentaclePlant|怪物昆布
+Vulture Grub|ハゲタカ幼虫
+VultureGrub|ハゲタカ幼虫
+Vulture Grubs|ハゲタカ幼虫
+Vulture|ハゲタカ
+KingVulture|キングハゲタカ
+SmallCentipede|幼体ムカデ
+MediumCentipede|成体ムカデ
+BigCentipede|成体ムカデ
+RedCentipede|赤ムカデ
+TubeWorm|チューブワーム
+LanternMouse|ランタンマウス
+DropBug|ドロップウィグ
+DaddyLongLegs|ダディロングレッグ
+BrotherLongLegs|ブラザーロングレッグ
+MirosBird|ミロスバード
+Salamanders|サラマンダー
+Yeeks|イーク
+Spider|小クモ
+SpitterSpider|赤グモ
+BigSpider|クモ
+ZoopLizard|イチゴトカゲ
+StowawayBug|ストウアウェイ
+JungleLeech|ジャングルヒル
+BigJelly|大クラゲ
+ScavengerElite|エリートスカベンジャー
+SlugNPC|子スラッグキャット
+FireBug|火虫
+AquaCenti|水ムカデ
+TerrorLongLegs|テラーロングレッグ
+MotherSpider|母クモ
+EelLizard|ウナギトカゲ
+SpitLizard|キャラメルトカゲ
+MirosVulture|ミロスハゲタカ
+Snail|カタツムリ
+Centiwing|翼ムカデ
+Scavenger|スカベンジャー
+Inspector|検査官
+
+filter|濾過システム アリーナ
+gutter|排水溝 アリーナ
+GWold|生ゴミ アリーナ
+LM|臨海施設 アリーナ
+VS|パイプヤード アリーナ
+CL|静かな建築物 アリーナ
+RM|腐敗 アリーナ
+OE|外部拡張 アリーナ
+DM|月 アリーナ
+HR|ルビコン アリーナ
+UG|やぶ アリーナ
+MS|水中上部構造 アリーナ
+LC|首都 アリーナ
+SS|小石男 アリーナ
+SB|地下 アリーナ
+UW|外観 アリーナ
+LF|農場アレイ アリーナ
+SI|スカイアイランド アリーナ
+SH|影の城塞 アリーナ
+SL|海岸線 アリーナ
+GW|生ゴミ アリーナ
+CC|煙突キャノピー アリーナ
+HI|工業団地 アリーナ
+SU|郊外 アリーナ
+DS|排水システム アリーナ
+LM-safari|臨海施設 サファリ
+VS-safari|パイプヤード サファリ
+CL-safari|静かな建築物 サファリ
+RM-safari|腐敗 サファリ
+OE-safari|外部拡張 サファリ
+DM-safari|月 サファリ
+HR-safari|ルビコン サファリ
+UG-safari|やぶ サファリ
+MS-safari|水中上部構造 サファリ
+LC-safari|首都 サファリ
+SS-safari|小石男 サファリ
+SB-safari|地下 サファリ
+UW-safari|外観 サファリ
+LF-safari|農場アレイ サファリ
+SI-safari|スカイアイランド サファリ
+SH-safari|影の城塞 サファリ
+SL-safari|海岸線 サファリ
+GW-safari|生ゴミ サファリ
+CC-safari|煙突キャノピー サファリ
+HI-safari|工業団地 サファリ
+SU-safari|郊外 サファリ
+DS-safari|排水システム サファリ
+Any Region|任意の地域
+Any Creature|任意の生物
+
+// Text briefly described on the Mission Selection screen (Complete)
+Click on a challenge type to block it from generating|チャレンジの種類をクリックして生成をブロック
+Transporting the same creature through gates|同じ生物をゲートを通じて運ぶ
+Visiting echoes|エコーに遭遇
+Visiting iterators|イテレーターに会う
+Transporting creatures|生物を運ぶ
+Killing creatures|生物をキル
+Obtaining passages|通路を取得
+Collecting broadcasts|放送ノードを収集
+Entering regions without visiting one|特定の地域に入らずに地域に到達
+Entering a region|地域に進入
+Scoring cycle points|サイクルキルポイントの獲得
+Stealing items|アイテムを盗む
+Crafting items|アイテムをクラフト
+Dropping a creature in the depth pit|生物を深淵に落とす
+Throwing grenades at scavenger tolls|スカベンジャーの料金所に爆弾を投げる
+Trading items to merchants|スカベンジャー商人と取引
+Befriending creatures|生物と友達になる
+Hitting creatures with items|アイテムで生物を攻撃
+Collecting pearls|カラーパールに触れる
+Consuming karma flowers|カルマフラワーを食べる
+Avoiding items|使用禁止アイテム
+Avoiding a region|特定地域への進入禁止
+Entering a region from another region|特定地域から指定地域へ移動
+Popping popcorn plants|ポップコーンを破裂させる
+Avoiding death before completing challenges|死なずにチャレンジをクリア
+Avoiding giving Needles to Scavengers|スカベンジャーに針を渡さない
+Avoiding killing creatures|生物をキルしない
+Collecting arena unlocks|アリーナの収集
+Collecting vistas|展望台の収集
+Delivering colored pearls|カラーパール配達
+Dodging a Leviathan|リヴァイアサンの噛みつき回避
+Dodging Noodlefly attacks|ヌードルフライの刺突回避
+Getting licked by lizards|トカゲに舐められる
+Hatching Noodlefly eggs|ヌードルフライの卵を孵化
+Pinning creatures|生物を壁に固定
+Putting items in shelters|シェルターにアイテムを保管
+Putting pearls in shelters|シェルターにパールを保管
+Scoring total points|キルポイントの獲得
+Eating specific food|指定の食べ物を食べる
+Collecting or delivering Moon's cloak|月のマントを収集または届ける
+Crushing creatures|生物を踏みつぶす
+Delivering neurons|ニューロン配達
+Trading same items between merchants|商人スカベンジャーの品物を取引
+Mauling creatures a certain amount of times|生物を噛む
+Mauling different of creatures|異なる生物を噛む
+Delivering the green neuron|緑ニューロン配達
+Feeding the Rarefaction Cell to a Leviathan|リヴァイアサンにエネルギーセルを食べさせる
+Eating popcorn plant seeds|ポップコーンの種を食べる
+Delivering the music pearl to Five Pebbles|小石男に音楽パールを届ける
+
+// Completely translated text
+Visit the <echo_location> Echo while starving|飢えた状態で<echo_location>のエコーに遭遇
+Visit <amount> Echoes|<amount>回エコーに遭遇
+Visit <amount> Echoes while starving|飢えた状態で<amount>回エコーに遭遇
+Never eat <item>|<item>を食べない
+Never use <item>|<item>を使用しない
+Hatch [<current>/<amount>] noodlefly eggs in one cycle|1サイクルで<amount>個のヌードルフライの卵を孵化
+Hatch [<current>/<amount>] noodlefly eggs|<amount>個のヌードルフライの卵を孵化
+Collect the <pearl> pearl from <region>|<region>で<pearl>パールに触れる
+Collect Moon's Cloak|月のマントに触れる
+Deliver the Cloak to Moon|月にマントを着せる
+Trade [<current>/<amount>] |[<current>/<amount>]スカベンジャー商人と取引
+Trade [<current>/<amount>] item from Scavenger Merchants to other Scavenger Merchants|スカベンジャー商人の品物を<LINE>他のスカベンジャー商人に<amount>個届ける
+Trade [<current>/<amount>] items from Scavenger Merchants to other Scavenger Merchants|スカベンジャー商人の品物を<LINE>他のスカベンジャー商人に<amount>個届ける
+Steal [<current>/<amount>] <item> from a Scavenger toll|スカベンジャーの料金所から<item>を<amount>個を盗む
+Steal [<current>/<amount>] <item> from Scavengers|スカベンジャーから<item>を<amount>個を盗む
+Earn [<current_score>/<score_target>] points from creature kills in one cycle|1サイクルで生物をキルして<score_target>ポイント獲得
+Earn [<current_score>/<score_target>] points from creature kills|生物をキルして<score_target>ポイント獲得
+Dodge a Leviathan's bite|リヴァイアサンの噛みつき回避
+Deliver the music pearl to Five Pebbles|小石男に音楽パールを届ける
+Feed the Rarefaction Cell to a Leviathan (completes if you die)|リヴァイアサンにエネルギーセルを食べさせる（死ぬと達成）
+Open [<current>/<amount>] popcorn plants|ポップコーンを<amount>個破裂させる
+Eat [<current>/<amount>] popcorn plant seeds|ポップコーンの種を<amount>個食べる
+Deliver the <region> colored pearl to <iterator>|<region>のカラーパールを<iterator>に届ける
+Maul creatures [<current>/<amount>] times|生物を<amount>回噛む
+Do not gift Needles to Scavengers|スカベンジャーに針を渡さない
+Collect the <chatlog> broadcast|放送ノード「<chatlog>」を収集
+Trade [<current>/<amount>] worth of value to Scavenger Merchants|<amount>の価値をスカベンジャー商人と取引
+Consume [<current>/<amount>] Karma Flowers|<amount>個のカルマフラワーを食べる
+Dodge [<current>/<amount>] Noodlefly attacks|ヌードルフライの刺突を<amount>回かわす
+Visit <iterator>|<iterator>に会う
+Drop a <crit> into the depths drop room (SB_D06)|<crit>を深淵（SB_D06）に落とす
+Maul [<current>/<amount>] unique creature types|<amount>種類の生物を噛む
+Reactivate Looks to the Moon|月を蘇生
+Deliver the green neuron to Five Pebbles|小石男に緑ニューロンを届ける
+Collect [<current>/<amount>] colored pearls|<amount>個のカラーパールに触れる
+Collect the vista in <region_name>|<region_name>の展望台を収集
+Transport the same <crit> through [<current>/<amount>] gates|同じ<crit>を連れて<amount>個のゲートを通過
+Befriend [<current>/<amount>] unique creature types|<amount>種類の生物と友達になる
+Befriend a <crit>|<crit>と友達になる
+Crush [<current>/<amount>] unique creatures by falling|異なる生物を<amount>回踏みつぶす
+Complete [<current>/<amount>] bingo challenges in a row without dying|死なずに<amount>個のビンゴチャレンジをクリア
+Deliver <progress> neurons to Looks to the Moon|月にニューロンを届ける
+Get licked by [<current>/<amount>] unique lizards|<amount>種類のトカゲに舐められる
+Eat [<current>/<amount>] <food_type> <food_type>|<food_type>を<amount>個食べる
+Do not die before completing [<current>/<amount>] bingo challenges|チャレンジを<amount>個クリアするまで死なない
+creatures|生物
+while starving|飢えた状態で
+ while starving|飢えた状態で
+ in one cycle|1サイクルで
+ while under mushroom effect| <LINE>キノコの効果中に
+ with |使用アイテム:
+ with a death pit|「深淵」
+Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>|<location><crit>を<starving><onecycle><shrooms><amount>匹キル<LINE><pitorweapon>
+First time entering <to> must be from <from>|<to>は初回のみ<from>から入る
+Transport a <crit><from><to>|<from>の<crit>を<to>に運ぶ
+Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>|<region>で<crit>を<pin_amount>匹壁か床に固定
+Hit <crit> with <weapon> [<current>/<amount>] times<location>|<location>で<weapon>を使って<LINE><crit>を<amount>回攻撃
+Hit <crit> with <weapon> [<current>/<amount>] times<location> in one cycle|1サイクルで<location>で<weapon>を使って<LINE><crit>を<amount>回攻撃
+ underground| 地下
+ surface| 地上
+a grenade|爆弾
+grenades|爆弾
+in | 
+ in | 
+ to | 
+ out of | 
+ from | 
+ and then pass them|<LINE>そして通過する
+ and then pass it|<LINE>そして通過する
+the <toll> toll|<toll>の料金所
+Throw <action> at <toll><pass>|<toll>に<action>を投げる<pass>
+Bring|個保管
+Hoard|個保管
+to any|任意の
+in the same|同じ
+in |地域指定:
+[<current>/<amount>] unique tolls|<amount>か所の料金所
+<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>|<shelter_type>シェルターに<target_item>を<amount><action><LINE><location>
+Bring [<current>/<amount>] to any shelter <location>|任意のシェルターに<amount>個保管<LINE><location>
+Hoard [<current>/<amount>] in the same shelter <location>|同じシェルターに<amount>個保管<LINE><location>
+Throw a grenade at the <toll> scavenger toll|<toll>スカベンジャー料金所に手榴弾を投げる
+Throw a grenade at [<current>/<amount>] unique tolls|<amount>か所のスカベンジャー料金所に爆弾を投げる
+Collect the <unlock> unlock|<unlock>を収集
+Never kill <victim>|<victim>をキルしない
+Eat [<current>/<amount>] <food_type> <starved>|<starved><food_type>を食べる<LINE>[<current>/<amount>]
+ in different regions| 異なる地域
+
+//Can't correct grammar, completely........... hand translated... things.  (OH......................................)
+Enter Outskirts|郊外に入る
+Enter Industrial Complex|工業団地に入る
+Enter Chimney Canopy|煙突キャノピーに入る
+Enter Drainage System|排水システムに入る
+Enter Garbage Wastes|生ゴミに入る
+Enter Shaded Citadel|影の城塞に入る
+Enter Shoreline|海岸線に入る
+Enter Sky Islands|スカイアイランドに入る
+Enter Farm Arrays|農場アレイに入る
+Enter The Exterior|外観に入る
+Enter Five Pebbles|小石男に入る
+Enter Subterranean|地下に入る
+Enter Pipeyard|パイプヤードに入る
+Enter Submerged Superstructure|水中上部構造に入る
+Enter Outer Expanse|外部拡張に入る
+Enter Waterfront Facility|臨海施設に入る
+Enter Metropolis|首都に入る
+Enter The Rot|腐敗に入る
+Enter Looks to the Moon|月に入る
+Enter Suburban Drifts|郊外の漂流地に入る
+Enter Icy Monument|氷の記念碑に入る
+Enter Undergrowth|やぶに入る
+Enter Solitary Towers|孤立した塔に入る
+Enter Glacial Wasteland|氷河の荒野に入る
+Enter Frigid Coast|寒冷な海岸に入る
+Enter Silent Construct|静かな建築物に入る
+Enter Windswept Spires|風に吹かれた尖塔に入る
+Enter Desolate Fields|荒廃した平原に入る
+Enter Barren Conduits|不毛の導管に入る
+Enter Primordial Underground|原始の地下に入る
+Enter Rubicon|ルビコンに入る
+
+Do not enter 郊外|郊外に入らない
+Do not enter 工業団地|工業団地に入らない
+Do not enter 煙突キャノピー|煙突キャノピーに入らない
+Do not enter 排水システム|排水システムに入らない
+Do not enter 生ゴミ|生ゴミに入らない
+Do not enter 影の城塞|影の城塞に入らない
+Do not enter 海岸線|海岸線に入らない
+Do not enter スカイアイランド|スカイアイランドに入らない
+Do not enter 農場アレイ|農場アレイに入らない
+Do not enter 外観|外観に入らない
+Do not enter 小石男|小石男に入らない
+Do not enter 地下|地下に入らない
+Do not enter パイプヤード|パイプヤードに入らない
+Do not enter 水中上部構造|水中上部構造に入らない
+Do not enter 外部拡張|外部拡張に入らない
+Do not enter 臨海施設|臨海施設に入らない
+Do not enter 首都|首都に入らない
+Do not enter 腐敗|腐敗に入らない
+Do not enter 月|月に入らない
+Do not enter 郊外のドリフト|郊外のドリフトに入らない
+Do not enter 氷のモニュメント|氷のモニュメントに入らない
+Do not enter やぶ|やぶに入らない
+Do not enter 孤独な塔|孤独な塔に入らない
+Do not enter 氷河の荒野|氷河の荒野に入らない
+Do not enter 極寒の海岸|極寒の海岸に入らない
+Do not enter 静かな建築物|静かな建築物に入らない
+Do not enter 吹きさらしの尖塔|吹きさらしの尖塔に入らない
+Do not enter 荒れ果てた地|荒れ果てた地に入らない
+Do not enter 不毛の水路|不毛の水路に入らない
+Do not enter 原始的な地下|原始的な地下に入らない
+Do not enter ルビコン|ルビコンに入らない
+
+Craft [0/1] <item>|<item>を1個クラフト
+Craft [0/2] <item>|<item>を2個クラフト
+Craft [0/3] <item>|<item>を3個クラフト
+Craft [0/4] <item>|<item>を4個クラフト
+Craft [0/5] <item>|<item>を5個クラフト
+Craft [0/6] <item>|<item>を6個クラフト
+Craft [0/7] <item>|<item>を7個クラフト
+Craft [0/8] <item>|<item>を8個クラフト
+Craft [0/9] <item>|<item>を9個クラフト
+Craft [0/10] <item>|<item>を10個クラフト
+Craft [1/1] <item>|<item>を1個クラフト
+Craft [1/2] <item>|<item>を2個クラフト
+Craft [1/3] <item>|<item>を3個クラフト
+Craft [1/4] <item>|<item>を4個クラフト
+Craft [1/5] <item>|<item>を5個クラフト
+Craft [1/6] <item>|<item>を6個クラフト
+Craft [1/7] <item>|<item>を7個クラフト
+Craft [1/8] <item>|<item>を8個クラフト
+Craft [1/9] <item>|<item>を9個クラフト
+Craft [1/10] <item>|<item>を10個クラフト
+Craft [2/1] <item>|<item>を1個クラフト
+Craft [2/2] <item>|<item>を2個クラフト
+Craft [2/3] <item>|<item>を3個クラフト
+Craft [2/4] <item>|<item>を4個クラフト
+Craft [2/5] <item>|<item>を5個クラフト
+Craft [2/6] <item>|<item>を6個クラフト
+Craft [2/7] <item>|<item>を7個クラフト
+Craft [2/8] <item>|<item>を8個クラフト
+Craft [2/9] <item>|<item>を9個クラフト
+Craft [2/10] <item>|<item>を10個クラフト
+Craft [3/1] <item>|<item>を1個クラフト
+Craft [3/2] <item>|<item>を2個クラフト
+Craft [3/3] <item>|<item>を3個クラフト
+Craft [3/4] <item>|<item>を4個クラフト
+Craft [3/5] <item>|<item>を5個クラフト
+Craft [3/6] <item>|<item>を6個クラフト
+Craft [3/7] <item>|<item>を7個クラフト
+Craft [3/8] <item>|<item>を8個クラフト
+Craft [3/9] <item>|<item>を9個クラフト
+Craft [3/10] <item>|<item>を10個クラフト
+Craft [4/1] <item>|<item>を1個クラフト
+Craft [4/2] <item>|<item>を2個クラフト
+Craft [4/3] <item>|<item>を3個クラフト
+Craft [4/4] <item>|<item>を4個クラフト
+Craft [4/5] <item>|<item>を5個クラフト
+Craft [4/6] <item>|<item>を6個クラフト
+Craft [4/7] <item>|<item>を7個クラフト
+Craft [4/8] <item>|<item>を8個クラフト
+Craft [4/9] <item>|<item>を9個クラフト
+Craft [4/10] <item>|<item>を10個クラフト
+Craft [5/1] <item>|<item>を1個クラフト
+Craft [5/2] <item>|<item>を2個クラフト
+Craft [5/3] <item>|<item>を3個クラフト
+Craft [5/4] <item>|<item>を4個クラフト
+Craft [5/5] <item>|<item>を5個クラフト
+Craft [5/6] <item>|<item>を6個クラフト
+Craft [5/7] <item>|<item>を7個クラフト
+Craft [5/8] <item>|<item>を8個クラフト
+Craft [5/9] <item>|<item>を9個クラフト
+Craft [5/10] <item>|<item>を10個クラフト
+Craft [6/1] <item>|<item>を1個クラフト
+Craft [6/2] <item>|<item>を2個クラフト
+Craft [6/3] <item>|<item>を3個クラフト
+Craft [6/4] <item>|<item>を4個クラフト
+Craft [6/5] <item>|<item>を5個クラフト
+Craft [6/6] <item>|<item>を6個クラフト
+Craft [6/7] <item>|<item>を7個クラフト
+Craft [6/8] <item>|<item>を8個クラフト
+Craft [6/9] <item>|<item>を9個クラフト
+Craft [6/10] <item>|<item>を10個クラフト
+Craft [7/1] <item>|<item>を1個クラフト
+Craft [7/2] <item>|<item>を2個クラフト
+Craft [7/3] <item>|<item>を3個クラフト
+Craft [7/4] <item>|<item>を4個クラフト
+Craft [7/5] <item>|<item>を5個クラフト
+Craft [7/6] <item>|<item>を6個クラフト
+Craft [7/7] <item>|<item>を7個クラフト
+Craft [7/8] <item>|<item>を8個クラフト
+Craft [7/9] <item>|<item>を9個クラフト
+Craft [7/10] <item>|<item>を10個クラフト
+Craft [8/1] <item>|<item>を1個クラフト
+Craft [8/2] <item>|<item>を2個クラフト
+Craft [8/3] <item>|<item>を3個クラフト
+Craft [8/4] <item>|<item>を4個クラフト
+Craft [8/5] <item>|<item>を5個クラフト
+Craft [8/6] <item>|<item>を6個クラフト
+Craft [8/7] <item>|<item>を7個クラフト
+Craft [8/8] <item>|<item>を8個クラフト
+Craft [8/9] <item>|<item>を9個クラフト
+Craft [8/10] <item>|<item>を10個クラフト
+Craft [9/1] <item>|<item>を1個クラフト
+Craft [9/2] <item>|<item>を2個クラフト
+Craft [9/3] <item>|<item>を3個クラフト
+Craft [9/4] <item>|<item>を4個クラフト
+Craft [9/5] <item>|<item>を5個クラフト
+Craft [9/6] <item>|<item>を6個クラフト
+Craft [9/7] <item>|<item>を7個クラフト
+Craft [9/8] <item>|<item>を8個クラフト
+Craft [9/9] <item>|<item>を9個クラフト
+Craft [9/10] <item>|<item>を10個クラフト
+Craft [10/1] <item>|<item>を1個クラフト
+Craft [10/2] <item>|<item>を2個クラフト
+Craft [10/3] <item>|<item>を3個クラフト
+Craft [10/4] <item>|<item>を4個クラフト
+Craft [10/5] <item>|<item>を5個クラフト
+Craft [10/6] <item>|<item>を6個クラフト
+Craft [10/7] <item>|<item>を7個クラフト
+Craft [10/8] <item>|<item>を8個クラフト
+Craft [10/9] <item>|<item>を9個クラフト
+Craft [10/10] <item>|<item>を10個クラフト
+
+Enter [<current>/<required>] regions without entering 郊外|郊外に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 工業団地|工業団地に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 煙突キャノピー|煙突キャノピーに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 排水システム|排水システムに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 生ゴミ|生ゴミに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 影の城塞|影の城塞に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 海岸線|海岸線に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering スカイアイランド|スカイアイランドに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 農場アレイ|農場アレイに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 外観|外観に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 小石男|小石男に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 地下|地下に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering パイプヤード|パイプヤードに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 水中上部構造|水中上部構造に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 外部拡張|外部拡張に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 臨海施設|臨海施設に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 首都|首都に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 腐敗|腐敗に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 月|月に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 郊外のドリフト|郊外のドリフトに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 氷のモニュメント|氷のモニュメントに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering やぶ|やぶに入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 孤独な塔|孤独な塔に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 氷河の荒野|氷河の荒野に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 極寒の海岸|極寒の海岸に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 静かな建築物|静かな建築物に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 吹きさらしの尖塔|吹きさらしの尖塔に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 荒れ果てた地|荒れ果てた地に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 不毛の水路|不毛の水路に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering 原始的な地下|原始的な地下に入らず<required>つの地域を訪問する
+Enter [<current>/<required>] regions without entering ルビコン|ルビコンに入らず<required>つの地域を訪問する

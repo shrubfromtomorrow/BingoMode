@@ -69,6 +69,8 @@ namespace BingoMode.BingoHUD
                 this.reason = reason;
             }
         }
+        private FAtlasElement normalTitle;
+        private FAtlasElement watcherTitle;
         public FSprite bingoCompleteTitle;
         public FLabel bingoCompleteInfo;
         public FLabel bingoCompleteInfoShadow;
@@ -95,6 +97,9 @@ namespace BingoMode.BingoHUD
 
         public BingoHUDMain(HUD.HUD hud) : base(hud)
         {
+            normalTitle = Futile.atlasManager.GetElementWithName("bingotitle");
+            watcherTitle = Futile.atlasManager.GetElementWithName("bingotitlewatcher");
+
             pos = new Vector2(20.2f, 725.2f);
             board = BingoHooks.GlobalBoard;
             queue = [];
@@ -111,7 +116,7 @@ namespace BingoMode.BingoHUD
             }
 
             ChallengeHooks.revealInMemory = [];
-            bingoCompleteTitle = new FSprite(ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? "bingotitlewatcher" : "bingotitle")
+            bingoCompleteTitle = new FSprite(normalTitle)
             {
                 x = hud.rainWorld.screenSize.x * 0.5f,
                 y = hud.rainWorld.screenSize.y * 0.92f,
@@ -837,6 +842,7 @@ namespace BingoMode.BingoHUD
         {
             base.Draw(timeStacker);
 
+
             float alfa = Mathf.Lerp(lastAlpha, alpha, timeStacker);
             for (int i = 0; i < grid.GetLength(0); i++)
             {
@@ -849,6 +855,18 @@ namespace BingoMode.BingoHUD
             }
 
             float cAlfa = Custom.LerpCircEaseOut(0f, 1f, Mathf.Lerp(lastCompleteAlpha, completeAlpha, timeStacker));
+
+            if (bingoCompleteTitle.element == watcherTitle && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                bingoCompleteTitle.element = normalTitle;
+                bingoCompleteTitle.shader = Custom.rainWorld.Shaders["MenuText"]; ;
+            }
+            if (bingoCompleteTitle.element == normalTitle && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                bingoCompleteTitle.element = watcherTitle;
+                bingoCompleteTitle.shader = Custom.rainWorld.Shaders["Basic"];
+            }
+
             bingoCompleteTitle.alpha = cAlfa;
             bingoCompleteInfo.alpha = cAlfa;
             bingoCompleteInfoShadow.alpha = cAlfa;

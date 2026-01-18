@@ -1,6 +1,7 @@
 @echo off
 SETLOCAL
 title Rain World BingoMode Dev Setup
+REM This batch script will create a bingo mode mod folder in Rain World, symlink it to your development mod folder (right next to this script), grab all deps from Rain World, and nstrip the main assembly for RW (needed for bingo)
 
 REM Check if script is run as administrator (needed for mklink)
 net session >nul 2>&1
@@ -23,20 +24,20 @@ if not exist "%lib_dir%" (
 )
 
 REM Go to the Rain World mod directory
-cd "%rw_dir%RainWorld_Data\StreamingAssets\mods\bingomode" || (
-    echo Failed to find bingomode mod directory in mods. You might not have a local mod copy of bingomode in mods or your install drive is not your C drive. Update the rw_dir path in the batch script.
+cd "%rw_dir%RainWorld_Data\StreamingAssets\mods" || (
+    echo Failed to find mod directory in Rain World. Your install drive might not be your C drive. Update the rw_dir path in the batch script.
     exit /b
 )
 
 REM Remove old plugins folder or symlink
-IF EXIST plugins (
+IF EXIST bingomode (
     echo Removing existing plugins folder or symlink...
-    rmdir /S /Q plugins
+    rmdir /S /Q bingomode
 )
 
 REM Create symbolic link to development build
 echo Creating symbolic link to development build...
-mklink /D plugins "%bingo_dir%\BingoMode\bin\Release" || (
+mklink /D bingomode "%bingo_dir%\mod" || (
     echo [ERROR] Failed to create symbolic link. Skill issue really
     pause
     exit /b

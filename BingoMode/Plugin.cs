@@ -24,7 +24,7 @@ namespace BingoMode
     [BepInPlugin("nacu.bingomodebeta", "Watcher Bingo Beta", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "1.331";
+        public const string VERSION = "1.34";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
@@ -70,7 +70,6 @@ namespace BingoMode
         public static void OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld raingame)
         { 
             orig(raingame);
-
             if (!AppliedAlreadyDontDoItAgainPlease)
             {
                 AppliedAlreadyDontDoItAgainPlease = true;
@@ -97,9 +96,13 @@ namespace BingoMode
                 // Timeline fix
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
-
                 MachineConnector.SetRegisteredOI("nacu.bingomodebeta", PluginInstance.BingoConfig);
             }
+
+            // If watcher has been disabled
+            if (!ModManager.Watcher) WatcherBingoHooks.Remove();
+            // If watcher has been enabled and was not on game launch
+            else if (!WatcherBingoHooks.applied) WatcherBingoHooks.Apply();
         }
 
         private static void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
@@ -109,8 +112,13 @@ namespace BingoMode
             if (!AppliedAlreadyDontDoItAgainPleasePartTwo)
             {
                 AppliedAlreadyDontDoItAgainPleasePartTwo = true;
-                BingoData.LoadAllBannedChallengeLists();
+                foreach (SlugcatStats.Name slug in Expedition.ExpeditionData.GetPlayableCharacters())
+                {
+                    BingoData.LoadAllBannedChallengeLists(slug);
+                }
             }
+
+            ChallengeUtilsFiltering.ClearCache();
         }
 
         public static void MainLoopProcess_RawUpdate(ILContext il)

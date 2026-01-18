@@ -65,7 +65,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("crafticon"), Icon.FromEntityName(craftee.Value)],
+                [[new Icon("crafticon"), craftee.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(craftee.Value)],
                 [new Counter(current, amount.Value)]]);
         }
 

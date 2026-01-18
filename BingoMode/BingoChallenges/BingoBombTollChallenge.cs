@@ -81,14 +81,14 @@ namespace BingoMode.BingoChallenges
 
             if (specific.Value)
             {
-                string region = roomName.Value.Substring(0, 2);
+                string region = Regex.Split(roomName.Value, "_")[0];
                 string regionName = ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer));
 
-                if (roomName.Value == "gw_c05")
+                if (roomName.Value == "GW_C05")
                 {
                     regionName += ChallengeTools.IGT.Translate(" surface");
                 }
-                else if (roomName.Value == "gw_c11")
+                else if (roomName.Value == "GW_C11")
                 {
                     regionName += ChallengeTools.IGT.Translate(" underground");
                 }

@@ -29,6 +29,9 @@ namespace BingoMode.BingoMenu
         private const float BACK_BUTTON_SIZE = 45f;
         private const float TITLE_SPRITE_ALIGN = 5f;
 
+        private FAtlasElement normalTitle;
+        private FAtlasElement watcherTitle;
+
         private FSprite title;
         private SymbolButton back;
         #endregion
@@ -110,29 +113,19 @@ namespace BingoMode.BingoMenu
             BingoData.BingoMode = false;
             BingoData.TeamsInBingo = [0];
 
+            normalTitle = Futile.atlasManager.GetElementWithName("bingotitle");
+            watcherTitle = Futile.atlasManager.GetElementWithName("bingotitlewatcher");
+
             Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
-            if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            title = new(normalTitle)
             {
-                title = new("bingotitlewatcher")
-                {
-                    anchorX = 0.5f,
-                    anchorY = 1f,
-                    x = topCenter.x,
-                    y = topCenter.y,
-                };
-            }
-            else
-            {
-                title = new("bingotitle")
-                {
-                    anchorX = 0.5f,
-                    anchorY = 1f,
-                    x = topCenter.x,
-                    y = topCenter.y,
-                    shader = menu.manager.rainWorld.Shaders["MenuText"]
-                };
-            }
-                Container.AddChild(title);
+                anchorX = 0.5f,
+                anchorY = 1f,
+                x = topCenter.x,
+                y = topCenter.y,
+                shader = menu.manager.rainWorld.Shaders["MenuText"]
+            };
+            Container.AddChild(title);
 
             back = new(
                     menu,
@@ -312,6 +305,17 @@ namespace BingoMode.BingoMenu
         public override void GrafUpdate(float timeStacker)
         {
             base.GrafUpdate(timeStacker);
+
+            if (title.element == watcherTitle && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                title.element = normalTitle;
+                title.shader = Custom.rainWorld.Shaders["MenuText"];
+            }
+            if (title.element == normalTitle && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                title.element = watcherTitle;
+                title.shader = Custom.rainWorld.Shaders["Basic"];
+            }
 
             title.SetPosition(DrawPos(timeStacker) + new Vector2(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN));
 
