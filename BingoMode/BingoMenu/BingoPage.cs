@@ -32,6 +32,8 @@ namespace BingoMode.BingoMenu
         private FAtlasElement normalTitle;
         private FAtlasElement watcherTitle;
 
+        private MenuLabel nowPlaying;
+
         private FSprite title;
         private SymbolButton back;
         #endregion
@@ -115,6 +117,11 @@ namespace BingoMode.BingoMenu
 
             normalTitle = Futile.atlasManager.GetElementWithName("bingotitle");
             watcherTitle = Futile.atlasManager.GetElementWithName("bingotitlewatcher");
+
+            nowPlaying = new MenuLabel(menu, owner, expMenu.characterSelect.nowPlaying.label.text, new Vector2(683f, 35f), default(Vector2), true, null);
+            nowPlaying.label.color = new Color(0.5f, 0.5f, 0.5f);
+            nowPlaying.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
+            subObjects.Add(nowPlaying);
 
             Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
             title = new(normalTitle)
@@ -306,6 +313,8 @@ namespace BingoMode.BingoMenu
         {
             base.GrafUpdate(timeStacker);
 
+            nowPlaying.text = expMenu.characterSelect.nowPlaying.label.text;
+
             if (title.element == watcherTitle && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
                 title.element = normalTitle;
@@ -327,6 +336,7 @@ namespace BingoMode.BingoMenu
                     eggButton.symbolSprite.color = ((ExpeditionData.ints[num] == 2) ? new HSLColor(Mathf.Sin(expMenu.challengeSelect.colorCounter / 20f), 1f, 0.75f).rgb : new Color(0.3f, 0.3f, 0.3f));
                 }
             }
+
 
             MultiplayerSlide(timeStacker);
             RandomizerSlide(timeStacker);

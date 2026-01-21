@@ -88,19 +88,20 @@ namespace BingoMode.BingoChallenges
                 "tolls",
                 (slug, baseList) =>
                 {
-                    List<string> mutableBase = baseList.ToList();
-
                     string[] watcherTolls = { "WARF_G01", "WBLA_F01", "WSKD_B41" };
                     string[] artiTolls = { "LC_C10", "LC_STRIPMALLNEW", "LC_TEMPLETOLL" };
                     string[] saintTolls = { "UG_TOLL" };
+                    string[] oeTolls = { "OE_TOWER04" };
 
-
-                    // check how toll names are done! #####################################
                     return baseList
                         .Where(x =>
-                            (slug == watchername || !watcherTolls.Contains(x))
-                            && (slug == artiname || !artiTolls.Contains(x))
-                            && (slug == saintname || !saintTolls.Contains(x))
+                            (slug == watchername ? watcherTolls.Contains(x) : !watcherTolls.Contains(x))
+
+                            && (slug == artiname ? artiTolls.Contains(x) : !artiTolls.Contains(x))
+
+                            && (slug == saintname ? saintTolls.Contains(x) : !saintTolls.Contains(x))
+
+                            && ((slug == gourname || slug == monkname || slug == survivorname) ? oeTolls.Contains(x) : !oeTolls.Contains(x))
                         )
                         .ToArray();
                 }
@@ -149,10 +150,13 @@ namespace BingoMode.BingoChallenges
 
                     string[] mscWeapons = { "LillyPuck" };
                     string[] watcherWeapons = { "Boomerang", "Frog", "GraffitiBomb" };
+                    string[] rivForbid = { "WaterNut" };
 
                     if (slug != watchername) mutableBase = mutableBase.Where(x => !watcherWeapons.Contains(x)).ToList();
 
                     if (!ModManager.MSC) mutableBase = mutableBase.Where(x => !mscWeapons.Contains(x) || slug == watchername).ToList();
+
+                    if (slug == rivname) mutableBase = mutableBase.Where(x => !rivForbid.Contains(x)).ToList();
 
                     return mutableBase.ToArray();
 

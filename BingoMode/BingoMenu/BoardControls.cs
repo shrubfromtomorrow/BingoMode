@@ -53,6 +53,7 @@ namespace BingoMode.BingoMenu
                 filter.buttonBehav.greyedOut = !value;
                 randomize.buttonBehav.greyedOut = !value;
                 shuffle.buttonBehav.greyedOut = !value;
+                
             }
         }
 

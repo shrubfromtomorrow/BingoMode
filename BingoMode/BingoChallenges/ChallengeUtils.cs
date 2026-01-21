@@ -106,6 +106,7 @@ namespace BingoMode.BingoChallenges
             //}
             switch (ln)
             {
+                case "Wtransport": return ChallengeUtilsFiltering.GetFilteredList("transport", Transportable, sorted);
                 case "transport": return ChallengeUtilsFiltering.GetFilteredList("transport", Transportable, sorted);
                 case "pin": return ChallengeUtilsFiltering.GetFilteredList("pin", Pinnable, sorted);
                 case "tolls": return ChallengeUtilsFiltering.GetFilteredList("tolls", BombableOutposts, sorted);
@@ -306,6 +307,7 @@ namespace BingoMode.BingoChallenges
             "GW_C05",
             "GW_C11",
             "LF_E03",
+            "OE_TOWER04",
             "UG_TOLL",
             "LC_C10",
             "LC_STRIPMALLNEW",
@@ -405,6 +407,7 @@ namespace BingoMode.BingoChallenges
             "JellyFish",
             "PuffBall",
             "LillyPuck",
+            "WaterNut",
             "Boomerang",
             "Frog",
             "GraffitiBomb"
@@ -422,10 +425,9 @@ namespace BingoMode.BingoChallenges
             "GlowWeed",
             "DataPearl",
             "FirecrackerPlant",
-            "KarmaFlower",
             "SporePlant",
             "FlareBomb",
-            "Lillypuck",
+            "LillyPuck",
             "KarmaFlower",
             "PuffBall",
             "FlyLure"

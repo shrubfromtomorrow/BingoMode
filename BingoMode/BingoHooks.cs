@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Expedition;
 using Menu;
@@ -11,11 +12,11 @@ using RWCustom;
 using Steamworks;
 using UnityEngine;
 using Watcher;
-using System.Reflection;
 
 namespace BingoMode
 {
     using System.IO;
+    using System.Net;
     using System.Text.RegularExpressions;
     using BingoChallenges;
     using BingoHUD;
@@ -23,6 +24,7 @@ namespace BingoMode
     using BingoSteamworks;
     using IL.JollyCoop.JollyMenu;
     using Music;
+    using static BingoMode.BingoSteamworks.LobbySettings;
 
     public class BingoHooks
     {
@@ -165,6 +167,7 @@ namespace BingoMode
             On.Menu.ExpeditionMenu.InitMenuPages += ExpeditionMenu_InitMenuPages;
             On.Menu.ExpeditionMenu.Singal += ExpeditionMenu_Singal;
             On.Menu.ExpeditionMenu.UpdatePage += ExpeditionMenu_UpdatePage;
+            IL.Menu.ExpeditionMenu.Update += ExpeditionMenu_Update_Speed;
 
             // Add bingo to intro roll
             IL.Menu.IntroRoll.ctor += IntroRoll_ctor;
@@ -195,11 +198,13 @@ namespace BingoMode
             // Unlocks butone
             On.Menu.UnlockDialog.Singal += UnlockDialog_Singal;
             On.Menu.UnlockDialog.Update += UnlockDialog_Update;
+            // Needs to be done to grey out multiple groups of perks over different pages
+            On.Menu.UnlockDialog.UpdateSelectables += UnlockDialog_UpdateSelectables;
 
             // Passage butone
             On.Menu.SleepAndDeathScreen.AddSubObjects += SleepAndDeathScreen_AddSubObjects;
 
-            // Saving and loaading shit
+            // Saving and loading shit
             On.Menu.CharacterSelectPage.AbandonButton_OnPressDone += CharacterSelectPage_AbandonButton_OnPressDone;
 
             // Preventing expedition antics
@@ -368,19 +373,26 @@ namespace BingoMode
 
         private static void ExpeditionMenu_Update(On.Menu.ExpeditionMenu.orig_Update orig, ExpeditionMenu self)
         {
-            if (!self.muted && Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager.musicPlayer != null && self.currentPage == 4 && (self.manager.musicPlayer.song == null || self.manager.musicPlayer.song.name == ExpeditionData.menuSong))
+            if (!self.muted && Plugin.PluginInstance.BingoConfig.PlayMenuSong.Value && self.manager?.musicPlayer != null && self.currentPage == 4 && (self.manager.musicPlayer.song == null || self.manager.musicPlayer.song.name == ExpeditionData.menuSong))
             {
+                if (self.manager.musicPlayer.song != null)
+                {
+                    self.manager.musicPlayer.song.StopAndDestroy();
+                    self.manager.musicPlayer.song = null;
+                }
                 if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                 {
                     self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the fast guy", 1f, 1f);
+                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Bingo, Intikus - Loops around the fast guy";
                 }
                 else
                 {
                     self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 1f);
+                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Bingo, Intikus - Loops around the meattree";
                 }
             }
-
             orig.Invoke(self);
+
         }
 
         private static void FastTravelScreen_Singal(On.Menu.FastTravelScreen.orig_Singal orig, FastTravelScreen self, MenuObject sender, string message)
@@ -895,9 +907,45 @@ namespace BingoMode
             }
         }
 
+        private static void UnlockDialog_UpdateSelectables(On.Menu.UnlockDialog.orig_UpdateSelectables orig, UnlockDialog self)
+        {
+            orig.Invoke(self);
+
+            if (BingoData.MultiplayerGame)
+            {
+                bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
+                foreach (var perk in self.perkButtons)
+                {
+                    perk.buttonBehav.greyedOut = perk.buttonBehav.greyedOut || BingoData.globalSettings.perks == AllowUnlocks.None || (BingoData.globalSettings.perks == AllowUnlocks.Inherited && !isHost);
+                }
+                foreach (var burden in self.burdenButtons)
+                {
+                    burden.buttonBehav.greyedOut = burden.buttonBehav.greyedOut || BingoData.globalSettings.burdens == AllowUnlocks.None || (BingoData.globalSettings.burdens == AllowUnlocks.Inherited && !isHost);
+                }
+            }
+            string[] bannedBurdens = ["bur-doomed"];
+            string[] bannedPerks = ["unl-passage", "unl-karma"];
+            foreach (var bur in self.burdenButtons)
+            {
+                if (bannedBurdens.Contains(bur.signalText))
+                {
+                    bur.buttonBehav.greyedOut = true;
+                    if (ExpeditionGame.activeUnlocks.Contains(bur.signalText)) self.ToggleBurden(bur.signalText);
+                }
+            }
+            foreach (var per in self.perkButtons)
+            {
+                if (bannedPerks.Contains(per.signalText))
+                {
+                    per.buttonBehav.greyedOut = true;
+                    if (ExpeditionGame.activeUnlocks.Contains(per.signalText)) self.ToggleBurden(per.signalText);
+                }
+            }
+        }
+
         public static void ChallengeSelectPage_SetUpSelectables(On.Menu.ChallengeSelectPage.orig_SetUpSelectables orig, ChallengeSelectPage self)
         {
-            if (self.menu.currentPage == 4) return;
+            if (self?.menu?.currentPage != null && self.menu.currentPage == 4) return;
             orig.Invoke(self);
         }
 
@@ -1112,6 +1160,9 @@ namespace BingoMode
         {
             if (pageIndex == 4)
             {
+                self.exitButton.RemoveSubObject(self.exitButton);
+                self.exitButton = new SimpleButton(self, self.pages[self.currentPage], self.Translate("BACK"), "EXIT", new Vector2(self.leftAnchor + 50f, 695f), new Vector2(100f, 30f));
+
                 if (bingoPage.TryGetValue(self, out var page))
                 {
                     self.selectedObject = page.grid;
@@ -1120,6 +1171,22 @@ namespace BingoMode
             }
 
             orig.Invoke(self, pageIndex);
+        }
+
+        public static void ExpeditionMenu_Update_Speed(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                x => x.MatchCall(typeof(Mathf), nameof(Mathf.Lerp)
+                )))
+            {
+                c.Emit(OpCodes.Ldc_R4, 2f);
+
+                c.Emit(OpCodes.Mul);
+            }
+            else Plugin.logger.LogError("ExpeditionMenu_Update_Speed broked " + il);
+
         }
 
         private static void IntroRoll_ctor(MonoMod.Cil.ILContext il)
@@ -1173,7 +1240,7 @@ namespace BingoMode
                 self.slugcatDescription.text = "";
                 if (!newBingoButton.TryGetValue(self, out _))
                 {
-                    newBingoButton.Add(self, new HoldButton(self.menu, self, isSpectator ? self.menu.Translate("CONTINUE<LINE>SPECTATING").Replace("<LINE>", "\r\n") : isMultiplayer ? self.menu.Translate("CONTINUE<LINE>MULTIPLAYER").Replace("<LINE>", "\r\n") : self.menu.Translate("CONTINUE<LINE>BINGO").Replace("<LINE>", "\r\n"), self.menu.Translate("LOADBINGO"), new Vector2(680f, 210f), 30f));
+                    newBingoButton.Add(self, new HoldButton(self.menu, self, isSpectator ? self.menu.Translate("CONTINUE<LINE>SPECTATING").Replace("<LINE>", "\r\n") : isMultiplayer ? self.menu.Translate("CONTINUE<LINE>MULTIPLAYER").Replace("<LINE>", "\r\n") : self.menu.Translate("CONTINUE<LINE>BINGO").Replace("<LINE>", "\r\n"), "LOADBINGO", new Vector2(680f, 210f), 30f));
                 }
                 newBingoButton.TryGetValue(self, out var bb);
                 self.subObjects.Add(bb);

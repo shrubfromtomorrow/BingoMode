@@ -24,8 +24,6 @@ namespace BingoMode
 
         private static Perk_DialWarp dialWarpPerkInstance;
 
-        public static bool applied;
-
         public static void Apply()
         {
             // Update starting savestate
@@ -118,52 +116,6 @@ namespace BingoMode
 
             // Temp fix for warp points that are sealed near landing locations (ONLY NARNIA)
             IL.Watcher.WarpPoint.Update += WarpPoint_Update;
-
-            applied = true;
-        }
-
-        public static void Remove()
-        {
-            On.SaveState.ctor -= SaveState_ctor;
-            On.RainWorldGame.GoToDeathScreen -= RainWorldGame_GoToDeathScreen;
-            On.SlugcatStats.SlugcatStoryRegions -= SlugcatStats_SlugcatStoryRegions;
-            On.Expedition.ExpeditionGame.ExpeditionRandomStarts -= WatcherShelters_ExpeditionGame_ExpeditionRandomStarts;
-            On.Expedition.ChallengeTools.GenerateCreatureScores -= ChallengeTools_GenerateCreatureScores;
-            On.Expedition.ChallengeTools.AppendAdditionalCreatureSpawns -= ChallengeTools_AppendAdditionalCreatureSpawns;
-            On.Expedition.ChallengeTools.ItemName -= ChallengeTools_ItemName;
-            On.SaveState.SessionEnded -= SaveState_SessionEnded;
-            On.Expedition.ExpeditionGame.IsUndesirableRoomScript -= ExpeditionGame_IsUndesirableRoomScript;
-            IL.Menu.KarmaLadder.KarmaSymbol.Update -= KarmaLadder_KarmaSymbol_Update;
-            IL.OverWorld.InitiateSpecialWarp_WarpPoint -= OverWorld_InitiateSpecialWarp_WarpPoint;
-            On.Expedition.ExpeditionData.GetPlayableCharacters -= ExpeditionData_GetPlayableCharacters;
-            IL.Menu.CharacterSelectPage.ctor -= CharacterSelectPage_ctor;
-            On.Watcher.SpinningTop.StartConversation -= SpinningTop_StartConversation;
-            On.Watcher.SpinningTop.NextMinMaxRippleLevel -= SpinningTop_NextMinMaxRippleLevel;
-            IL.Menu.FastTravelScreen.ctor -= FastTravelScreen_ctor;
-            On.Menu.SleepAndDeathScreen.FoodMeterXPos -= SleepAndDeathScreen_FoodMeterXPos;
-            On.Menu.FastTravelScreen.SpawnChoiceMenu -= FastTravelScreen_SpawnChoiceMenu;
-            On.Expedition.ExpeditionCoreFile.FromString -= ExpeditionCoreFile_FromString;
-            On.Menu.StatsDialog.ResetAll_OnPressDone -= StatsDialog_ResetAll_OnPressDone;
-            if (ExpeditionGame.ePos.ContainsKey("V0FSQV9QMTc=")) ExpeditionGame.ePos.Remove("V0FSQV9QMTc=");
-            IL.Room.Loaded -= Room_Loaded;
-            IL.Room.Loaded -= Room_Loaded1;
-            On.PlayerProgression.GetOrInitiateSaveState -= PlayerProgression_GetOrInitiateSaveState;
-            IL.Watcher.WarpMap.LoadWarpConnections -= WarpMap_LoadWarpConnections;
-            On.Expedition.Challenge.ValidForThisSlugcat -= Challenge_ValidForThisSlugcat;
-            On.Expedition.EchoChallenge.Generate -= EchoChallenge_Generate;
-            On.Expedition.NeuronDeliveryChallenge.ValidForThisSlugcat -= NeuronDeliveryChallenge_ValidForThisSlugcat;
-            On.Expedition.PearlDeliveryChallenge.ValidForThisSlugcat -= PearlDeliveryChallenge_ValidForThisSlugcat;
-            On.Expedition.AchievementChallenge.ValidForThisSlugcat -= AchievementChallenge_ValidForThisSlugcat;
-            On.Region.GetRegionLandscapeScene -= Region_GetRegionLandscapeScene;
-            On.Menu.MenuScene.BuildScene -= MenuScene_BuildScene;
-            On.Menu.MenuScene.BuildVoidBathScene -= MenuScene_BuildVoidBathScene;
-            On.Menu.CharacterSelectPage.UpdateSelectedSlugcat -= CharacterSelectPage_UpdateSelectedSlugcat;
-            IL.Watcher.WarpPoint.ActivateWeaver -= WarpPoint_ActivateWeaver;
-            On.SaveState.ApplyCustomEndGame -= SaveState_ApplyCustomEndGame;
-            On.Watcher.WarpPoint.ChooseDynamicWarpTarget -= WarpPoint_ChooseDynamicWarpTarget;
-            Modding.Expedition.CustomPerks.RegisteredPerks.Remove(dialWarpPerkInstance);
-            IL.Watcher.WarpPoint.Update -= WarpPoint_Update;
-            applied = false;
         }
 
         private static void WarpPoint_Update(ILContext il)
