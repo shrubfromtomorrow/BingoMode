@@ -182,7 +182,7 @@ namespace BingoMode.BingoMenu
 
             if (ExpeditionData.ints.Sum() >= 8)
             {
-                eggButton = new SymbolButton(menu, this, "GuidanceSlugcat", "EGGBUTTON", new Vector2(663f, 25f));
+                eggButton = new SymbolButton(menu, this, "GuidanceSlugcat", "EGGBUTTON", new Vector2(1313f, 11f));
                 eggButton.roundedRect.size = new Vector2(40f, 40f);
                 eggButton.size = eggButton.roundedRect.size;
                 subObjects.Add(eggButton);

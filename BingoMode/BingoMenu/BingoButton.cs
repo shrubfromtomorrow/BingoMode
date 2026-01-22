@@ -270,6 +270,7 @@ namespace BingoMode.BingoMenu
             Singal(this, singalText);
             //challenge.CompleteChallenge();
             menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
+            menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
         }
 
         public void UpdateText()

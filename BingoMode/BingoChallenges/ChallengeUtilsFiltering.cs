@@ -229,7 +229,11 @@ namespace BingoMode.BingoChallenges
                 {
                     List<string> mutableBase = baselist.ToList();
 
-                    string[] noArtiSpearPearls = { "SL_chimney", "SL_bridge", "SL_moon" };
+                    string[] noArtiSpearPearls = { "SL_chimney", "SL_bridge", "SL_moon"};
+                    string[] artiPearls = { "LC", "LC_second" };
+                    string[] saintForbid = { "UW" };
+                    string[] spearPearls = { "DM" };
+                    string[] OEForbid = { "OE" };
                     string[] watcherPearls = { "WORA_WORA",
                         "WAUA_WAUA",
                         "WPTA_DRONE",
@@ -266,7 +270,15 @@ namespace BingoMode.BingoChallenges
                     if (!ModManager.MSC) mutableBase = mutableBase.Where(x => !mscPearls.Contains(x)).ToList();
 
                     if (slug == artiname || slug == spearname) mutableBase = mutableBase.Where(x => !noArtiSpearPearls.Contains(x)).ToList();
-                    
+
+                    if (slug != monkname && slug != survivorname && slug != gourname) mutableBase = mutableBase.Where(x => !OEForbid.Contains(x)).ToList();
+
+                    if (slug != spearname) mutableBase = mutableBase.Where(x => !spearPearls.Contains(x)).ToList();
+
+                    if (slug != artiname) mutableBase = mutableBase.Where(x => !artiPearls.Contains(x)).ToList();
+
+                    if (slug == saintname) mutableBase = mutableBase.Where(x => !saintForbid.Contains(x)).ToList();
+
 
                     return mutableBase.ToArray();
 
@@ -406,8 +418,8 @@ namespace BingoMode.BingoChallenges
                 {
                     List<string> mutableBase =  WinState.EndgameID.values.entries;
 
-                    string[] exclusions = { "Mother", "Gourmand" };
-                    string[] watcherForbidPassages = { "Nomad", "Pilgrim", "Scholar", "Traveller", "Survivor" };
+                    string[] exclusions = { "Mother", "Gourmand", "Survivor" };
+                    string[] watcherForbidPassages = { "Nomad", "Pilgrim", "Scholar", "Traveller" };
 
                     mutableBase = mutableBase.Where(x => !exclusions.Contains(x)).ToList();
 

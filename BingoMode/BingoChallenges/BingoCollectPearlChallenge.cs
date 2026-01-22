@@ -70,7 +70,10 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            region = pearl.Value.Substring(0, 2);
+            region = Regex.Split(pearl.Value, "_")[0];
+            if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint && region == "DS") region = "UG";
+            if ((ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) && region == "MS") region = "GW";
+
             this.description = specific.Value ? ChallengeTools.IGT.Translate("Collect the <pearl> pearl from <region>")
                 .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer)))
                 .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl.Value)))

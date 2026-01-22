@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HUD;
 
 namespace BingoMode.BingoMenu
 {
@@ -329,7 +330,7 @@ namespace BingoMode.BingoMenu
                 var bans = ChallengeUtils.GetCorrectListForChallenge("banitem");
                 var foods = ChallengeUtils.GetCorrectListForChallenge("food");
 
-                cccc.isFood = Array.IndexOf(bans, cccc.item.Value) <= Array.IndexOf(bans, "SmallCentipede");
+                cccc.isFood = Array.IndexOf(bans, cccc.item.Value) <= Array.IndexOf(bans, "Barnacle");
                 if (cccc.isFood) cccc.isCreature = Array.IndexOf(foods, cccc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
             }
             else if (owner.challenge is BingoVistaChallenge ccccc)
@@ -358,17 +359,21 @@ namespace BingoMode.BingoMenu
                     closing = true;
                     targetAlpha = 0f;
                     SteamTest.UpdateOnlineBingo();
+                    owner.menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
                     break;
                 case "RANDOMIZE_VARIABLE":
                     AssignChallenge(onSettings ? owner.challenge : null);
+                    owner.menu.PlaySound(SoundID.MENU_Next_Slugcat);
                     break;
                 case "CHALLENGE_SETTINGS":
                     onSettings = true;
                     sliderF = 1f;
+                    owner.menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
                     break;
                 case "CHALLENGE_TYPES":
                     onSettings = false;
                     sliderF = 1f;
+                    owner.menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
                     break;
             }
 
@@ -377,6 +382,7 @@ namespace BingoMode.BingoMenu
                 ChallengeSetting s = challengeSettings[int.Parse(message.Split(';')[1])];
                 ListItem[] list = (s.field as OpComboBox)._itemList;
                 (s.field as OpComboBox).value = list[UnityEngine.Random.Range(0, list.Length)].name;
+                owner.menu.PlaySound(SoundID.MENU_Next_Slugcat);
             }
         }
 
