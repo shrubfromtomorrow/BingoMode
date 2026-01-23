@@ -206,8 +206,7 @@ namespace BingoMode
         public static void CullIllegalWatcherChallenges(List<Challenge> chals)
         {
             var illegals = new HashSet<Type>
-{
-                typeof(BingoCollectPearlChallenge),
+            {
                 typeof(BingoPearlDeliveryChallenge),
                 typeof(BingoNeuronDeliveryChallenge),
                 typeof(BingoDepthsChallenge),
@@ -216,16 +215,10 @@ namespace BingoMode
                 typeof(BingoEnterRegionChallenge),
                 typeof(BingoNoRegionChallenge),
                 typeof(BingoEchoChallenge),
-                typeof(BingoEatChallenge),
-                typeof(BingoTameChallenge),
-                typeof(BingoBombTollChallenge),
                 typeof(BingoEnterRegionFromChallenge),
                 typeof(BingoCreatureGateChallenge),
                 typeof(BingoAllRegionsExceptChallenge),
                 typeof(BingoTransportChallenge),
-                typeof(BingoAchievementChallenge),
-                typeof(BingoStealChallenge),
-                typeof(BingoDontUseItemChallenge),
             };
 
             chals.RemoveAll(x => illegals.Contains(x.GetType()));

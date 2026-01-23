@@ -52,7 +52,7 @@ namespace BingoMode.BingoChallenges
         public BingoPopcornChallenge()
         {
             amount = new(0, "Amount", 0);
-            region = new("", "Region", 1, listName: "popcornRegions");
+            region = new("", "Region", 1, listName: "popcornregions");
             differentRegions = new(false, "Different Regions", 2);
             oneCycle = new(false, "In one Cycle", 3);
         }
@@ -113,10 +113,10 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoPopcornChallenge ch = new();
-            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("popcornRegions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("popcornRegions").Length)] : "Any Region";
+            string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("popcornregions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("popcornregions").Length)] : "Any Region";
 
             ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
-            ch.region = new(r, "Region", 1, listName: "popcornRegions");
+            ch.region = new(r, "Region", 1, listName: "popcornregions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(false, "In one Cycle", 3);
             return ch;

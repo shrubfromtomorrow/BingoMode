@@ -23,7 +23,7 @@ namespace BingoMode.BingoChallenges
         public string region;
         public WatcherBingoWeaverChallenge()
         {
-            room = new("", "Portal Room", 0, listName: "WweaverRooms");
+            room = new("", "Portal Room", 0, listName: "weaverrooms");
         }
 
         public override void UpdateDescription()
@@ -53,12 +53,12 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] rooms = ChallengeUtils.GetCorrectListForChallenge("WweaverRooms", true);
+            string[] rooms = ChallengeUtils.GetCorrectListForChallenge("weaverrooms", true);
             string room = rooms[UnityEngine.Random.Range(0, rooms.Length)];
             return new WatcherBingoWeaverChallenge
             {
                 region = Regex.Split(room, "_")[0],
-                room = new(room, "Portal Room", 0, listName: "WweaverRooms"),
+                room = new(room, "Portal Room", 0, listName: "weaverrooms"),
             };
         }
 

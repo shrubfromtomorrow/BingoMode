@@ -318,14 +318,14 @@ namespace BingoMode.BingoChallenges
                 }
             },
             {
-                "popcornRegions",
+                "popcornregions",
                 (slug, baselist) =>
                 {
                     List<string> mutableBase = baselist.ToList();
 
-                    string[] excludedPopcornRegions = { "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR" };
+                    string[] excludedpopcornregions = { "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR" };
 
-                    return mutableBase.Where(x => !excludedPopcornRegions.Contains(x)).ToArray();
+                    return mutableBase.Where(x => !excludedpopcornregions.Contains(x)).ToArray();
                 }
             },
             {
@@ -386,6 +386,7 @@ namespace BingoMode.BingoChallenges
                 }
             },
             {
+                // The architecture of this is weird. To put it simply, everything before and including SmallCentipede from food is a food, everything before VultureGrub within the food section is a non-creature edible. Everything after SmallCentipede is an item.
                 "banitem",
                 (slug, baselist) =>
                 {

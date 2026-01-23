@@ -123,7 +123,8 @@ namespace BingoMode.BingoChallenges
                 {
                     
                 }; 
-                Plugin.logger.LogError("Failed to recreate SettingBox from string!!!" + ex);
+                // Kind of an obnoxious log
+                //Plugin.logger.LogError("Failed to recreate SettingBox from string!" + ex);
                 return null;
             }
         }
@@ -1973,73 +1974,6 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void Watcher_Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
-        {
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is WatcherBingoEatChallenge c)
-                {
-                    c.FoodEated(edible, self);
-                }
-            }
-            // Invoke after so player malnourishment is correct
-            orig.Invoke(self, edible);
-        }
-
-        public static void Watcher_FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
-        {
-            orig.Invoke(self);
-
-            // Copied from base game
-            if (self.AI.creature.state.socialMemory != null && self.AI.creature.state.socialMemory.relationShips != null && self.AI.creature.state.socialMemory.relationShips.Count > 0)
-            {
-                for (int j = 0; j < self.AI.creature.state.socialMemory.relationShips.Count; j++)
-                {
-                    if (self.AI.creature.state.socialMemory.relationShips[j].like > 0.5f && self.AI.creature.state.socialMemory.relationShips[j].tempLike > 0.5f)
-                    {
-                        for (int k = 0; k < self.AI.creature.Room.creatures.Count; k++)
-                        {
-                            if (self.AI.creature.Room.creatures[k].ID == self.AI.creature.state.socialMemory.relationShips[j].subjectID && self.AI.creature.Room.creatures[k].realizedCreature != null)
-                            {
-                                for (int p = 0; p < ExpeditionData.challengeList.Count; p++)
-                                {
-                                    if (ExpeditionData.challengeList[p] is WatcherBingoTameChallenge c)
-                                    {
-                                        c.Fren(self.AI.creature);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                return;
-            }
-        }
-
-        public static void Watcher_ScavengerBomb_Explode(On.ScavengerBomb.orig_Explode orig, ScavengerBomb self, BodyChunk hitChunk)
-        {
-            orig.Invoke(self, hitChunk);
-
-            if (self.room.abstractRoom.scavengerOutpost && self.room.updateList.Find(x => x is ScavengerOutpost) is ScavengerOutpost outpost && Custom.DistLess(self.firstChunk.pos, outpost.placedObj.pos, 500f))
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is WatcherBingoBombTollChallenge c)
-                    {
-                        for (int k = 0; k < outpost.playerTrackers.Count; k++)
-                        {
-                            if (outpost.playerTrackers[k] != null)
-                            {
-                                c.Boom(self.room.abstractRoom.name, outpost.playerTrackers[k].PlayerOnOtherSide);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         public static void Watcher_Pomegranate_Smash(On.Pomegranate.orig_Smash orig, Pomegranate self)
         {
             orig.Invoke(self);
@@ -2087,87 +2021,6 @@ namespace BingoMode.BingoChallenges
                 if (ExpeditionData.challengeList[j] is WatcherBingoWeaverChallenge c && c.region == self.owner.room.abstractRoom.world.name.ToUpperInvariant())
                 {
                     c.Meet();
-                }
-            }
-        }
-
-        public static void Watcher_KarmaLadder_AddEndgameMeters(On.Menu.KarmaLadder.orig_AddEndgameMeters orig, KarmaLadder self)
-        {
-            orig.Invoke(self);
-            if (self.endGameMeters.Count == 0)
-            {
-                return;
-            }
-
-            foreach (var meter in self.endGameMeters)
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is WatcherBingoAchievementChallenge c &&
-                        meter.tracker.ID.value.ToUpperInvariant() == c.ID.Value.ToUpperInvariant() &&
-                        meter.tracker.GoalFullfilled)
-                    {
-                        c.GetAchievement();
-                    }
-                }
-            }
-        }
-
-        public static void Watcher_PlayerTracker_Update(On.ScavengerOutpost.PlayerTracker.orig_Update orig, ScavengerOutpost.PlayerTracker self)
-        {
-            orig.Invoke(self);
-
-            for (int j = 0; j < self.player.realizedCreature.grasps.Length; j++)
-            {
-                if (self.player.realizedCreature.grasps[j] != null)
-                {
-                    int k = 0;
-                    while (k < self.outpost.outPostProperty.Count)
-                    {
-                        if (self.player.realizedCreature.grasps[j].grabbed.abstractPhysicalObject.ID == self.outpost.outPostProperty[k].ID)
-                        {
-                            bool gruh = false;
-                            for (int w = 0; w < ExpeditionData.challengeList.Count; w++)
-                            {
-                                if (ExpeditionData.challengeList[w] is WatcherBingoStealChallenge c)
-                                {
-                                    c.Stoled(self.outpost.outPostProperty[k], true);
-                                    gruh = true;
-                                }
-                            }
-                            if (gruh) break;
-                        }
-                        k++;
-                    }
-                }
-            }
-        }
-
-        public static void Watcher_SocialEventRecognizer_Theft(On.SocialEventRecognizer.orig_Theft orig, SocialEventRecognizer self, PhysicalObject item, Creature theif, Creature victim)
-        {
-            orig.Invoke(self, item, theif, victim);
-
-            if (theif is Player && victim is Scavenger)
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is WatcherBingoStealChallenge c)
-                    {
-                        c.Stoled(item.abstractPhysicalObject, false);
-                    }
-                }
-            }
-        }
-
-        public static void Watcher_Player_SlugcatGrabNoStealExploit(On.Player.orig_SlugcatGrab orig, Player self, PhysicalObject obj, int graspUsed)
-        {
-            orig.Invoke(self, obj, graspUsed);
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is WatcherBingoStealChallenge c && !c.toll.Value)
-                {
-                    c.checkedIDs.Add(obj.abstractPhysicalObject.ID);
                 }
             }
         }
@@ -2298,54 +2151,6 @@ namespace BingoMode.BingoChallenges
 
                     WarpPoint warpPoint = new WarpPoint(self, po);
                     self.AddObject(warpPoint);
-                }
-            }
-        }
-
-        public static void Watcher_Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
-        {
-            if (self.grasps[grasp] != null && self.grasps[grasp].grabbed is not Creature)
-            {
-                for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                {
-                    if (ExpeditionData.challengeList[j] is WatcherBingoDontUseItemChallenge c && !c.isFood && self.grasps[grasp].grabbed is Weapon)
-                    {
-                        c.Used(self.grasps[grasp].grabbed.abstractPhysicalObject.type);
-                    }
-                }
-            }
-            orig.Invoke(self, grasp, eu);
-        }
-
-        public static void Watcher_Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
-        {
-            orig.Invoke(self, eu);
-
-            // This is so if you dual wield something it doesnt add time twice
-            ItemType ignore = null;
-            for (int i = 0; i < self.grasps.Length; i++)
-            {
-                if (self.grasps[i] != null)
-                {
-                    ItemType heldType = self.grasps[i].grabbed.abstractPhysicalObject.type;
-                    if (heldType != ignore)
-                    {
-                        ignore = heldType;
-                        BingoData.heldItemsTime[(int)heldType]++;
-                    }
-                }
-            }
-        }
-
-        public static void Watcher_Player_ObjectEaten2(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
-        {
-            orig.Invoke(self, edible);
-
-            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-            {
-                if (ExpeditionData.challengeList[j] is WatcherBingoDontUseItemChallenge g && g.isFood)
-                {
-                    g.Eated(edible);
                 }
             }
         }

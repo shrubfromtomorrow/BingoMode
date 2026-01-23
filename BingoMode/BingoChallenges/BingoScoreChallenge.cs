@@ -136,7 +136,6 @@ namespace BingoMode.BingoChallenges
             {
                 int points = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type).points;
                 score += points;
-                
             }
             if (score != lastPoints)
             {

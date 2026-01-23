@@ -106,40 +106,32 @@ namespace BingoMode.BingoChallenges
             //}
             switch (ln)
             {
-                case "Wtransport": return ChallengeUtilsFiltering.GetFilteredList("transport", Transportable, sorted);
                 case "transport": return ChallengeUtilsFiltering.GetFilteredList("transport", Transportable, sorted);
                 case "pin": return ChallengeUtilsFiltering.GetFilteredList("pin", Pinnable, sorted);
                 case "tolls": return ChallengeUtilsFiltering.GetFilteredList("tolls", BombableOutposts, sorted);
-                case "Wtolls": return ChallengeUtilsFiltering.GetFilteredList("tolls", BombableOutposts, sorted);
                 case "food": return ChallengeUtilsFiltering.GetFilteredList("food", FoodTypes, sorted);
-                case "Wfood": return ChallengeUtilsFiltering.GetFilteredList("food", FoodTypes, sorted);
                 case "weapons": return ChallengeUtilsFiltering.GetFilteredList("weapons", Weapons, sorted);
                 case "weaponsnojelly": return ChallengeUtilsFiltering.GetFilteredList("weaponsnojelly", GetCorrectListForChallenge("weapons"), sorted);
                 case "theft": return ChallengeUtilsFiltering.GetFilteredList("theft", StealableStolable, sorted);
-                case "Wtheft": return ChallengeUtilsFiltering.GetFilteredList("theft", StealableStolable, sorted);
                 case "friend": return ChallengeUtilsFiltering.GetFilteredList("friend", Befriendable, sorted);
-                case "Wfriend": return ChallengeUtilsFiltering.GetFilteredList("friend", Befriendable, sorted);
                 case "pearls": return ChallengeUtilsFiltering.GetFilteredList("pearls", CollectablePearls, sorted);
-                case "Wpearls": return ChallengeUtilsFiltering.GetFilteredList("pearls", CollectablePearls, sorted);
                 case "craft": return ChallengeUtilsFiltering.GetFilteredList("craft", CraftableItems, sorted);
                 case "regions": return ChallengeUtilsFiltering.GetFilteredList("regions", null, sorted);
                 case "regionsreal": return ChallengeUtilsFiltering.GetFilteredList("regionsreal", null, sorted);
                 case "nootregions": return ChallengeUtilsFiltering.GetFilteredList("nootregions", GetCorrectListForChallenge("regions"), sorted);
-                case "popcornRegions": return ChallengeUtilsFiltering.GetFilteredList("popcornRegions", GetCorrectListForChallenge("regionsreal"), sorted);
-                case "Wpoms": return ChallengeUtilsFiltering.GetFilteredList("pomegranateRegions", PomegranateRegions, sorted);
+                case "popcornregions": return ChallengeUtilsFiltering.GetFilteredList("popcornregions", GetCorrectListForChallenge("regionsreal"), sorted);
+                case "pomegranateregions": return ChallengeUtilsFiltering.GetFilteredList("pomegranateRegions", PomegranateRegions, sorted);
                 case "echoes": return ChallengeUtilsFiltering.GetFilteredList("echoes", null, sorted);
                 //No clean way to get all spots because CheckForRegionGhost doesn't work for spinning top
                 case "spinners": return ChallengeUtilsFiltering.GetFilteredList("spinners", null, sorted);
-                case "WweaverRooms": return ChallengeUtilsFiltering.GetFilteredList("weavers", null, sorted);
+                case "weaverrooms": return ChallengeUtilsFiltering.GetFilteredList("weavers", null, sorted);
                 case "creatures": return ChallengeUtilsFiltering.GetFilteredList("creatures", null, sorted);
                 case "depths": return ChallengeUtilsFiltering.GetFilteredList("depths", Depthable, sorted);
                 case "banitem": return ChallengeUtilsFiltering.GetFilteredList("banitem", Bannable, sorted);
-                case "Wbanitem": return ChallengeUtilsFiltering.GetFilteredList("banitem", Bannable, sorted);
                 // this one fucking sucks
                 case "unlocks": return ChallengeUtilsFiltering.GetFilteredList("unlocks", null, sorted);
                 case "chatlogs": return ChallengeUtilsFiltering.GetFilteredList("chatlogs", null, sorted);
                 case "passage": return ChallengeUtilsFiltering.GetFilteredList("passage", null, sorted);
-                case "Wpassage": return ChallengeUtilsFiltering.GetFilteredList("passage", null, sorted);
                 case "expobject": return ChallengeUtilsFiltering.GetFilteredList("storable", Storable, sorted);
                 case "vista": return ChallengeUtilsFiltering.GetFilteredList("vista", null, sorted);
             }
@@ -185,6 +177,10 @@ namespace BingoMode.BingoChallenges
             creatureNames[(int)CreatureType.Spider] = ChallengeTools.IGT.Translate("Coalescipedes");
             if (ModManager.MSC) creatureNames[(int)DLCSharedEnums.CreatureTemplateType.Yeek] = ChallengeTools.IGT.Translate("Yeeks");
             if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.SandGrub] = ChallengeTools.IGT.Translate("Sand Grubs");
+            if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.Tardigrade] = ChallengeTools.IGT.Translate("Tardigrades");
+            if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.Rat] = ChallengeTools.IGT.Translate("Rats");
+            if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.Frog] = ChallengeTools.IGT.Translate("Frogs");
+            if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.Barnacle] = ChallengeTools.IGT.Translate("Barnacles");
         }
 
         public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)
@@ -385,17 +381,17 @@ namespace BingoMode.BingoChallenges
             "DandelionPeach",
             "GlowWeed",
 
-            // Crits
+            // Crits. Put DLC items after vulturegrub but before small centi so that smallcentipede remains the divider (customizerdialog)
             "VultureGrub",
-            "Hazer",
-            "SmallNeedleWorm",
-            "Fly",
-            "SmallCentipede",
             "Rat",
             "Tardigrade",
             "SandGrub",
             "Frog",
             "Barnacle",
+            "Hazer",
+            "SmallNeedleWorm",
+            "Fly",
+            "SmallCentipede",
         };
 
         public static readonly string[] Weapons =

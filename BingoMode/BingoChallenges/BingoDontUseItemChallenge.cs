@@ -84,7 +84,7 @@ namespace BingoMode.BingoChallenges
                 type = ChallengeUtils.GetCorrectListForChallenge("food")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("food").Length)];
                 c = ChallengeUtils.GetCorrectListForChallenge("food").IndexOf(type) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
-            else type = ChallengeUtils.GetCorrectListForChallenge("banitem")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("banitem").Length)];
+            else type = ChallengeUtils.GetCorrectListForChallenge("banitem")[UnityEngine.Random.Range(Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("banitem"), "SmallCentipede") + 1, ChallengeUtils.GetCorrectListForChallenge("banitem").Length)];
             BingoDontUseItemChallenge ch = new BingoDontUseItemChallenge
             {
                 item = new(type, "Item type", 0, listName: "banitem"),

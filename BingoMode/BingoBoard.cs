@@ -649,7 +649,8 @@ namespace BingoMode
                         }
                         catch (Exception ex)
                         {
-                            Plugin.logger.LogError("ERROR: Problem recreating challenge \"" + challenges[next] + "\" with reflection in bingoboard.fromstring: " + ex.Message);
+                            challengeGrid[i, j] = RandomBingoChallenge();
+                            Plugin.logger.LogError("Problem recreating challenge \"" + challenges[next] + "\" in bingoboard.fromstring: " + ex.Message + "\nReplacing with: " + challengeGrid[i, j]);
                         }
                         next++;
                     }

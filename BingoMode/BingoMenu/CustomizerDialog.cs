@@ -12,6 +12,7 @@ using UnityEngine;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HUD;
+using On.Watcher;
 
 namespace BingoMode.BingoMenu
 {
@@ -313,36 +314,24 @@ namespace BingoMode.BingoMenu
             {
                 c.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), c.foodType.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
             }
-            if (owner.challenge is WatcherBingoEatChallenge cc)
-            {
-                cc.isCreature = Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), cc.foodType.Value) >= Array.IndexOf(ChallengeUtils.GetCorrectListForChallenge("food"), "VultureGrub");
-            }
-            else if (owner.challenge is BingoDontUseItemChallenge ccc)
+            else if (owner.challenge is BingoDontUseItemChallenge cc)
             {
                 var bans = ChallengeUtils.GetCorrectListForChallenge("banitem");
                 var foods = ChallengeUtils.GetCorrectListForChallenge("food");
 
-                ccc.isFood = Array.IndexOf(bans, ccc.item.Value) <= Array.IndexOf(bans, "SmallCentipede");
-                if (ccc.isFood) ccc.isCreature = Array.IndexOf(foods, ccc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
+                cc.isFood = Array.IndexOf(bans, cc.item.Value) <= Array.IndexOf(bans, "SmallCentipede");
+                if (cc.isFood) cc.isCreature = Array.IndexOf(foods, cc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
             }
-            else if (owner.challenge is WatcherBingoDontUseItemChallenge cccc)
+            else if (owner.challenge is BingoVistaChallenge ccc)
             {
-                var bans = ChallengeUtils.GetCorrectListForChallenge("banitem");
-                var foods = ChallengeUtils.GetCorrectListForChallenge("food");
-
-                cccc.isFood = Array.IndexOf(bans, cccc.item.Value) <= Array.IndexOf(bans, "Barnacle");
-                if (cccc.isFood) cccc.isCreature = Array.IndexOf(foods, cccc.item.Value) >= Array.IndexOf(foods, "VultureGrub");
-            }
-            else if (owner.challenge is BingoVistaChallenge ccccc)
-            {
-                ccccc.region = ccccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
+                ccc.region = ccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2);
                 
-                ccccc.location = ChallengeUtils.BingoVistaLocations[ccccc.region][ccccc.room.Value];
-                BingoVistaChallenge.ModifyVistaPositions(ccccc);
+                ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value];
+                BingoVistaChallenge.ModifyVistaPositions(ccc);
             }
-            else if (owner.challenge is WatcherBingoWeaverChallenge cccccc)
+            else if (owner.challenge is WatcherBingoWeaverChallenge cccc)
             {
-                cccccc.region = Regex.Split(cccccc.room.Value, "_")[0];
+                cccc.region = Regex.Split(cccc.room.Value, "_")[0];
             }
             owner.challenge.UpdateDescription();
             owner.UpdateText();
