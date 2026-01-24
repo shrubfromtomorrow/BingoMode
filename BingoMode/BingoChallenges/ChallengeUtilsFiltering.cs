@@ -322,6 +322,7 @@ namespace BingoMode.BingoChallenges
                 (slug, baselist) =>
                 {
                     List<string> mutableBase = baselist.ToList();
+                    mutableBase.Add("Any Region");
 
                     string[] excludedpopcornregions = { "DS", "SH", "UW", "UG", "WARD", "WRFA", "WTDB", "WVWB", "WARE", "WPGA", "WRRA", "WPTA", "WSKC", "WSKA", "WTDA", "WVWA", "WARA", "WAUA", "WRSA", "WSSR" };
 
@@ -439,19 +440,24 @@ namespace BingoMode.BingoChallenges
 
                     return baseList
                         .Where(x =>
-                            (ModManager.MSC || !mscItems.Contains(x)) &&
-                            (slug == watchername || !watcherItems.Contains(x))
+                            (ModManager.MSC || !mscItems.Contains(x))
+
+                            && (slug == watchername || !watcherItems.Contains(x))
 
                             && !(ModManager.MSC &&
                                  (slug == artiname || slug == spearname) &&
                                  x == "BubbleGrass")
 
-                            && !(ModManager.MSC && slug == saintname &&
-                                 (x == "LillyPuck" ||
-                                  x == "EggBugEgg" ||
-                                  x == "SmallNeedleWorm" ||
-                                  x == "SSOracleSwarmer") ||
-                                  x == "DandelionPeach")
+                            && !(ModManager.MSC &&
+                                 slug == saintname &&
+                                 slug != watchername &&
+                                 (
+                                     x == "LillyPuck" ||
+                                     x == "EggBugEgg" ||
+                                     x == "SmallNeedleWorm" ||
+                                     x == "SSOracleSwarmer" ||
+                                     x == "DandelionPeach"
+                                 ))
                         )
                         .ToArray();
                 }

@@ -85,7 +85,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new([[new Icon("echo_icon"), specific.Value ? new Verse(ghost.Value) : new Counter(current, amount.Value)]]);
-            if (starve.Value) phrase.InsertWord(new Icon("Multiplayer_Death"), 1);
+            if (starve.Value) phrase.InsertWord(new Icon("MartyrB"), 1);
             return phrase;
         }
 

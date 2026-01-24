@@ -592,9 +592,10 @@ namespace BingoMode
             return text;
         }
         
-        public void FromString(string text)
+        public bool FromString(string text)
         {
-            if (string.IsNullOrEmpty(text) || !text.Contains("bChG") || !text.Contains(';')) return;
+            bool success = true;
+            if (string.IsNullOrEmpty(text) || !text.Contains("bChG") || !text.Contains(';')) { success = false; return success; }
             string slug = text.Substring(0, text.IndexOf(';'));
             text = text.Substring(text.IndexOf(";") + 1);
             if (slug.ToLowerInvariant() != ExpeditionData.slugcatPlayer.value.ToLowerInvariant())
@@ -606,7 +607,8 @@ namespace BingoMode
                             BingoData.globalMenu.Translate($"Selected slugcat: {ExpeditionData.slugcatPlayer.value}<LINE>").Replace("<LINE>", "\r\n") +
                             BingoData.globalMenu.Translate($"Provided Slugcat: {slug}<LINE><LINE>").Replace("<LINE>", "\r\n") +
                             BingoData.globalMenu.Translate($"Please paste a board from the same slugcat that's currently selected.")));
-                return;
+                success = false;
+                return success;
             }
 
             string shelter = "random";
@@ -620,7 +622,8 @@ namespace BingoMode
             {
                 page.Shelter = shelter;
             }
-                string last = ToString();
+
+            string last = ToString();
             try
             {
                 if (ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer) && ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer] != null) ExpeditionData.allChallengeLists[ExpeditionData.slugcatPlayer].Clear();
@@ -649,17 +652,31 @@ namespace BingoMode
                         }
                         catch (Exception ex)
                         {
-                            challengeGrid[i, j] = RandomBingoChallenge();
-                            Plugin.logger.LogError("Problem recreating challenge \"" + challenges[next] + "\" in bingoboard.fromstring: " + ex.Message + "\nReplacing with: " + challengeGrid[i, j]);
+                            Plugin.logger.LogError("Problem recreating challenge \"" + challenges[next] + "\" in bingoboard.fromstring: " + ex.Message);
+
+                            // Eat 999999 levis
+                            string[] eatLevi = Regex.Split("BingoEatChallenge~System.Int32|999999|Amount|3|NULL><0><1><System.String|BigEel|Food type|0|food><System.Boolean|false|While Starving|2|NULL><0><0", "~");
+                            string type = eatLevi[0];
+                            string details = eatLevi[1];
+                            Challenge fill = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                            fill.FromString(details);
+
+                            challengeGrid[i, j] = fill;
+                            ExpeditionData.challengeList.Add(fill);
+                            success = false;
+                            Plugin.logger.LogInfo("Replacing with: " + challengeGrid[i, j]);
                         }
                         next++;
                     }
                 }
                 UpdateChallenges();
+                return success;
             }
             catch
             {
+                success = false;
                 FromString(last);
+                return success;
             }
         }
 

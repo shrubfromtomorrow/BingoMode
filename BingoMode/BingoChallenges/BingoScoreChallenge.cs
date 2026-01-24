@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 namespace BingoMode.BingoChallenges
 {
@@ -132,10 +133,18 @@ namespace BingoMode.BingoChallenges
             }
             int lastPoints = score;
             CreatureTemplate.Type type = crit.abstractCreature.creatureTemplate.type;
-            if (type != null && ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type) != null)
+
+            if (type != null)
             {
-                int points = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type).points;
-                score += points;
+                foreach (SlugcatStats.Name slug in ExpeditionData.GetPlayableCharacters())
+                {
+                    if (ChallengeTools.creatureSpawns[slug.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type) != null)
+                    {
+                        int points = ChallengeTools.creatureSpawns[slug.value].Find((ChallengeTools.ExpeditionCreature f) => f.creature == type).points;
+                        score += points;
+                        break;
+                    }
+                }
             }
             if (score != lastPoints)
             {

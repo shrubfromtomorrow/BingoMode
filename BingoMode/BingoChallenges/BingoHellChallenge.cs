@@ -55,7 +55,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase() => new(
             [[new Icon("completechallenge"), new Counter(current, amount.Value)],
-            [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red), new Icon("Multiplayer_Death")]]);
+            [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red), new Icon("MartyrB")]]);
 
         public override bool Duplicable(Challenge challenge)
         {

@@ -88,8 +88,8 @@ namespace BingoMode.BingoChallenges
             if (specific.Value)
             {
                 return new Phrase(
-                    [[new Verse(pearl.Value)],
-                    [new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(pearl.Value, false))) { background = new FSprite("radialgradient") }]]);
+                    [[new Verse(region.Length == 4 ? pearl.Value.Substring(pearl.Value.LastIndexOf('_') + 1) : pearl.Value)],
+                    [new Icon("Symbol_Pearl", 1f, DataPearl.UniquePearlMainColor(new(region.Length == 4 ? pearl.Value.Substring(5) : pearl.Value, false))) { background = new FSprite("radialgradient") }]]);
             }
             return new Phrase(
                 [[Icon.PEARL_HOARD_COLOR],

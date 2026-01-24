@@ -172,7 +172,9 @@ namespace BingoMode
             // Add bingo to intro roll
             IL.Menu.IntroRoll.ctor += IntroRoll_ctor;
 
-            // HOLY EGO (replace expedition button with bingo)
+            On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+
+            // HOLY EGO (replace expedition button with bingo) (and replace background)
             IL.Menu.MainMenu.ctor += MainMenu_ctor;
             // HOLY EGO 2 (replace expedition word with bingo word)
             On.Menu.CharacterSelectPage.ctor += CharacterSelectPage_ctor;
@@ -1201,9 +1203,44 @@ namespace BingoMode
             else Plugin.logger.LogError("BingoIntroReplacement broked " + il);
         }
 
+        private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
+        {
+            orig.Invoke(self);
+            if (self.sceneID == null || self.sceneID != BingoEnums.MainMenu_Bingo) return;
+
+            self.blurMin = -0.2f;
+            self.blurMax = 0.4f;
+            string folder = $"Scenes{Path.DirectorySeparatorChar}main menu - bingo watcher";
+
+            self.sceneFolder = folder;
+            
+            if (self.flatMode)
+            {
+                self.AddIllustration(new MenuIllustration(self.menu, self, folder, "bingo - flat", new Vector2(683f, 384f), false, true));
+            }
+            else
+            {
+                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 5", new Vector2(23f, 17f), 8f, MenuDepthIllustration.MenuShader.Normal));
+                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 4", new Vector2(23f, 17f), 4f, MenuDepthIllustration.MenuShader.Normal));
+                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 3", new Vector2(23f, 17f), 3.5f, MenuDepthIllustration.MenuShader.Normal));
+                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 2", new Vector2(23f, 17f), 1.8f, MenuDepthIllustration.MenuShader.Lighten));
+                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 1", new Vector2(23f, 17f), 2f, MenuDepthIllustration.MenuShader.Normal));
+            }
+        }
+
         private static void MainMenu_ctor(ILContext il)
         {
             ILCursor c = new ILCursor(il);
+
+            //if (c.TryGotoNext(MoveType.Before,
+            //    x => x.MatchNewobj(typeof(InteractiveMenuScene))))
+            //{
+            //    c.Index--;
+            //    c.Remove();
+            //    var field = typeof(BingoEnums).GetField(nameof(BingoEnums.MainMenu_Bingo));
+            //    c.Emit(OpCodes.Ldsfld, field);
+            //}
+            //else Plugin.logger.LogError("BingoMainMenuBackgroundReplacement broked " + il);
 
             if (c.TryGotoNext(MoveType.Before,
                 x => x.MatchLdstr("EXPEDITION"),
@@ -1212,6 +1249,7 @@ namespace BingoMode
                 c.Next.Operand = "BINGO";
             }
             else Plugin.logger.LogError("BingoExpeditionButtonReplacement broked " + il);
+
         }
 
         private static void CharacterSelectPage_ctor(On.Menu.CharacterSelectPage.orig_ctor orig, CharacterSelectPage self, Menu.Menu menu, MenuObject owner, Vector2 pos)

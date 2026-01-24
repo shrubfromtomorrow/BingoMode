@@ -266,12 +266,15 @@ namespace BingoMode.BingoMenu
             if (message == "COPYTOCLIPBOARD")
             {
                 UniClipboard.SetText(BingoHooks.GlobalBoard.ToString());
+                menu.PlaySound(SoundID.MENU_Next_Slugcat);
                 return;
             }
 
             if (message == "PASTEFROMCLIPBOARD")
             {
-                BingoHooks.GlobalBoard.FromString(UniClipboard.GetText());
+                bool success = BingoHooks.GlobalBoard.FromString(UniClipboard.GetText());
+                if (success) menu.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom);
+                else menu.PlaySound(SoundID.Snail_Pop);
                 SteamTest.UpdateOnlineBingo();
                 return;
             }

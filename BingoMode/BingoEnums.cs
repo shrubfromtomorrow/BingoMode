@@ -7,6 +7,8 @@ namespace BingoMode
         public static Menu.Slider.SliderID MultiplayerSlider;
         public static Menu.Slider.SliderID RandomizerSlider;
 
+        public static Menu.MenuScene.SceneID MainMenu_Bingo;
+
 
         public static SoundID BINGO_FINAL_BONG;
 
@@ -21,6 +23,8 @@ namespace BingoMode
             BINGO_FINAL_BONG = new("BINGO_FINAL_BONG", true);
 
             BingoCredits = new("BingoCredits", true);
+
+            MainMenu_Bingo = new Menu.MenuScene.SceneID("main menu bingo - flat", true);
         }
 
         public class LandscapeType

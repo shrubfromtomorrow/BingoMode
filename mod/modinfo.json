@@ -1,7 +1,7 @@
 {
   "id": "nacu.bingomodebeta",
-  "name": "Watcher Bingo Beta",
-  "version": "1.36",
+  "name": "Bingo Beta",
+  "version": "1.361",
   "authors": "Nacu, ICED, shrubftomtomorrow",
   "checksum_override_version": false,
   "description": "Beta for Bingo mode \nMassive thank you to Wolfo for their code making Watcher work with Expedition",

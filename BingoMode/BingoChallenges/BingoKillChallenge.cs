@@ -152,7 +152,7 @@ namespace BingoMode.BingoChallenges
             }
 
             phrase.InsertWord(new Counter(current, amount.Value), lastLine);
-            if (starve.Value) phrase.InsertWord(new Icon("Multiplayer_Death"), lastLine);
+            if (starve.Value) phrase.InsertWord(new Icon("MartyrB"), lastLine);
             if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), lastLine);
             if (shrooms.Value) phrase.InsertWord(Icon.FromEntityName("Mushroom"), lastLine);
             return phrase;

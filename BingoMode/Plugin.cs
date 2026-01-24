@@ -25,10 +25,10 @@ namespace BingoMode
     using BingoHUD;
     using BingoSteamworks;
 
-    [BepInPlugin("nacu.bingomodebeta", "Watcher Bingo Beta", VERSION)]
+    [BepInPlugin("nacu.bingomodebeta", "Bingo Beta", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "1.36";
+        public const string VERSION = "1.361";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
@@ -206,6 +206,7 @@ namespace BingoMode
         // Always restart even on DLC changes
         private bool ModApplyer_RequiresRestart(On.ModManager.ModApplyer.orig_RequiresRestart orig, ModManager.ModApplyer self)
         {
+            //return orig.Invoke(self);
             return true;
         }
     }
