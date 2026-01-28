@@ -48,7 +48,7 @@ namespace BingoMode
             DiscordRichPresence = config.Bind<bool>("DiscordRichPresence", true);
 
 
-            DialCharged = config.Bind<bool>("DialCharged", true);
+            DialCharged = config.Bind<bool>("DialCharged", false);
             DialAmount = config.Bind<int>("DialAmount", 50, new ConfigurableInfo("", new ConfigAcceptableRange<int>(1, 100)));
         }
 

@@ -111,7 +111,7 @@ namespace BingoMode.BingoChallenges
             if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden) return;
             if (specific.Value)
             {
-                if (type.value != pearl.Value) return;
+                if (type.value != (region.Length == 4 ? pearl.Value.Substring(pearl.Value.IndexOf('_') + 1) : pearl.Value)) return;
                 current = 1;
                 UpdateDescription();
                 CompleteChallenge();
@@ -159,7 +159,7 @@ namespace BingoMode.BingoChallenges
                 collected = []
             };
             chal.pearl = new(p, "Pearl", 1, listName: "pearls");
-            chal.region = p.Substring(0, 2);
+            chal.region = Regex.Split(p, "_")[0];
             chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
 
             return chal;
@@ -217,7 +217,7 @@ namespace BingoMode.BingoChallenges
                 string[] array = Regex.Split(args, "><");
                 specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
                 pearl = SettingBoxFromString(array[1]) as SettingBox<string>;
-                region = pearl == null ? "noregion" : pearl.Value.Substring(0, 2);
+                region = pearl == null ? "noregion" : Regex.Split(pearl.Value, "_")[0];
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[3]) as SettingBox<int>;
                 completed = (array[4] == "1");

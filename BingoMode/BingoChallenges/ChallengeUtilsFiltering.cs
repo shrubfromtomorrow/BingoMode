@@ -101,7 +101,7 @@ namespace BingoMode.BingoChallenges
 
                             && (slug == saintname ? saintTolls.Contains(x) : !saintTolls.Contains(x))
 
-                            && ((slug == gourname || slug == monkname || slug == survivorname) ? oeTolls.Contains(x) : !oeTolls.Contains(x))
+                            && (slug == gourname || slug == monkname || slug == survivorname || !oeTolls.Contains(x))
                         )
                         .ToArray();
                 }

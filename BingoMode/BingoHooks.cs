@@ -170,7 +170,7 @@ namespace BingoMode
             IL.Menu.ExpeditionMenu.Update += ExpeditionMenu_Update_Speed;
 
             // Add bingo to intro roll
-            IL.Menu.IntroRoll.ctor += IntroRoll_ctor;
+            On.Menu.IntroRoll.ctor += IntroRoll_ctor;
 
             On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
 
@@ -1191,16 +1191,18 @@ namespace BingoMode
 
         }
 
-        private static void IntroRoll_ctor(MonoMod.Cil.ILContext il)
+        private static void IntroRoll_ctor(On.Menu.IntroRoll.orig_ctor orig, IntroRoll self, ProcessManager manager)
         {
-            ILCursor c = new ILCursor(il);
+            orig.Invoke(self, manager);
 
-            if (c.TryGotoNext(MoveType.Before,
-                x => x.MatchLdstr("Intro_Roll_A")))
-            {
-                c.Next.Operand = "Intro_Roll_Bingo";
-            }
-            else Plugin.logger.LogError("BingoIntroReplacement broked " + il);
+            //string folder = $"illustrations{Path.DirectorySeparatorChar}intro_roll";
+
+            //self.illustrations[2].RemoveSprites();
+            //self.pages[0].subObjects.Remove(self.illustrations[2]);
+
+            //self.illustrations[2] = new MenuIllustration(self, self.pages[0], folder, ModManager.Watcher ? "intro_roll_b_bingo_watcher" : "intro_roll_b_bingo", new Vector2(0f, 0f), true, false);
+
+            //self.pages[0].subObjects.Add(self.illustrations[2]);
         }
 
         private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
@@ -1210,21 +1212,47 @@ namespace BingoMode
 
             self.blurMin = -0.2f;
             self.blurMax = 0.4f;
-            string folder = $"Scenes{Path.DirectorySeparatorChar}main menu - bingo watcher";
 
-            self.sceneFolder = folder;
-            
-            if (self.flatMode)
+            if (ModManager.Watcher)
             {
-                self.AddIllustration(new MenuIllustration(self.menu, self, folder, "bingo - flat", new Vector2(683f, 384f), false, true));
+                string folder = $"scenes{Path.DirectorySeparatorChar}main menu - bingo watcher";
+
+                self.sceneFolder = folder;
+            
+                if (self.flatMode)
+                {
+                    self.AddIllustration(new MenuIllustration(self.menu, self, folder, "bingo - flat", new Vector2(683f, 384f), false, true));
+                }
+                else
+                {
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 6", new Vector2(-137f, -89f), 9f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 5", new Vector2(187f, -78f), 6f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 4", new Vector2(161f, 36f), 3f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 3", new Vector2(313f, 29f), 4f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 2", new Vector2(364f, 42f), 2.5f, MenuDepthIllustration.MenuShader.Lighten));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 1", new Vector2(-137f, -89f), 2f, MenuDepthIllustration.MenuShader.Normal));
+                }
             }
             else
             {
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 5", new Vector2(23f, 17f), 8f, MenuDepthIllustration.MenuShader.Normal));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 4", new Vector2(23f, 17f), 4f, MenuDepthIllustration.MenuShader.Normal));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 3", new Vector2(23f, 17f), 3.5f, MenuDepthIllustration.MenuShader.Normal));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 2", new Vector2(23f, 17f), 1.8f, MenuDepthIllustration.MenuShader.Lighten));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 1", new Vector2(23f, 17f), 2f, MenuDepthIllustration.MenuShader.Normal));
+                string folder = $"Scenes{Path.DirectorySeparatorChar}main menu - bingo";
+
+                self.sceneFolder = folder;
+
+                if (self.flatMode)
+                {
+                    self.AddIllustration(new MenuIllustration(self.menu, self, folder, "bingo - flat", new Vector2(683f, 384f), false, true));
+                }
+                else
+                {
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 8", new Vector2(-117f, -112f), 8f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 7", new Vector2(305f, -24f), 6f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 6", new Vector2(119f, 256f), 4f, MenuDepthIllustration.MenuShader.Lighten));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 5", new Vector2(304f, 254f), 3f, MenuDepthIllustration.MenuShader.Lighten));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 4", new Vector2(334f, 225f), 2.5f, MenuDepthIllustration.MenuShader.Lighten));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 3", new Vector2(680f, 15f), 4f, MenuDepthIllustration.MenuShader.Normal));
+                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, folder, "bingo - 2", new Vector2(-126f, -138f), 4f, MenuDepthIllustration.MenuShader.Normal));
+                }
             }
         }
 

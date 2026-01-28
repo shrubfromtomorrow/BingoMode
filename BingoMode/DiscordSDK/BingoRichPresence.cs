@@ -144,7 +144,7 @@ namespace BingoMode.DiscordSDK
             {
                 state = "Picking slugcat...";
             }
-
+            // This is true in lobbies but not in game
             if (BingoData.MultiplayerGame)
             {
                 details = $"The {SlugcatStats.getSlugcatName(ExpeditionData.slugcatPlayer)} | With friends!";
@@ -182,19 +182,19 @@ namespace BingoMode.DiscordSDK
                 discordActivity.Assets.LargeImage = "bingosquarethumb";
                 discordActivity.Assets.LargeText = "Bingo Mode";
             }
-            else if (player.abstractCreature?.world?.game?.session is StoryGameSession sesh)
+            else
             {
-                discordActivity.Details = $"The {SlugcatStats.getSlugcatName(player.slugcatStats.name)} | " +$"{(BingoData.MultiplayerGame ? "Multiplayer" : "Solo")}";
-                discordActivity.State = GetBingoDetails(player, sesh);
+                // connectedplayers is more than 0 in game but not in lobbies
+                discordActivity.Details = $"The {SlugcatStats.getSlugcatName(player.slugcatStats.name)} | " +$"{(SteamFinal.ConnectedPlayers.Count > 0 ? "Multiplayer" : "Solo")}";
+                discordActivity.State = GetBingoDetails(player);
                 discordActivity.Assets.LargeImage = "bingosquarethumb";
                 discordActivity.Assets.LargeText = "Bingo Mode";
             }
         }
 
-        private static string GetBingoDetails(Player player, StoryGameSession sesh)
+        private static string GetBingoDetails(Player player)
         {
             int team = SteamTest.team;
-            string multiplayer = BingoData.MultiplayerGame ? "Multiplayer" : "Solo";
             int size = BingoHooks.GlobalBoard.size;
             string gameMode = "";
 

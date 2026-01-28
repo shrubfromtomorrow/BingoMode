@@ -137,7 +137,6 @@ namespace BingoMode.BingoSteamworks
                             ReceivedPlayerUpKeep[r] = false;
                         }
                     }
-
                     BroadcastCurrentBoardState();
                 }
                 else
@@ -150,7 +149,6 @@ namespace BingoMode.BingoSteamworks
                         {
                             if (!ReceivedPlayerUpKeep[kvp.Key])
                             {
-                                
                                 RequestPlayerUpKeep(kvp.Key);
                                 //ToFalse.Add(kvp.Key);
                             }

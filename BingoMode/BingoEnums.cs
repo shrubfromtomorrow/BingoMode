@@ -24,7 +24,7 @@ namespace BingoMode
 
             BingoCredits = new("BingoCredits", true);
 
-            MainMenu_Bingo = new Menu.MenuScene.SceneID("main menu bingo - flat", true);
+            MainMenu_Bingo = new Menu.MenuScene.SceneID("main menu - bingo", true);
         }
 
         public class LandscapeType

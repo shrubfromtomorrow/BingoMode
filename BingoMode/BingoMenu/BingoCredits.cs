@@ -205,7 +205,8 @@ namespace BingoMode
                 this.slowDownScrollSpeed = (ModManager.MMF ? 1.5f : 2f);
                 if (stage == BingoCredits.Stage.BingoLogo)
                 {
-                    this.subObjects.Add(new MenuIllustration(menu, this, "", "bingomaintitle", new Vector2(683f, 384f), true, true));
+                    string folder = $"illustrations{Path.DirectorySeparatorChar}intro_roll";
+                    this.subObjects.Add(new MenuIllustration(menu, this, folder, "bingomaintitle", new Vector2(683f, 384f), true, true));
                     (this.subObjects[0] as MenuIllustration).alpha = 0f;
                     this.scroll = 0f;
                     this.lastScroll = 0f;
