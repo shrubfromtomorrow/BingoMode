@@ -25,7 +25,7 @@ if not exist "%lib_dir%" (
 
 REM Go to the Rain World mod directory
 cd "%rw_dir%RainWorld_Data\StreamingAssets\mods" || (
-    echo Failed to find mod directory in Rain World. Your install drive might not be your C drive. Update the rw_dir path in the batch script.
+    echo [ERROR] Failed to find mod directory in Rain World. Your install drive might not be your C drive. Update the rw_dir path in the batch script.
     exit /b
 )
 
