@@ -16,6 +16,7 @@ This mod was Nacu's first large programming project and since I have begun devel
 
 ## How to build
 ### Make sure your c# language version is set to `13.0` in your .csproj file (for the release configuration). The code uses some of the modern c# version features in a lot of places so this is necessary.
+Download nstrip.exe (a release from here: https://github.com/bbepis/NStrip) and put it alongside the batch script.
 Run the setup.bat file as administrator to setup up your build environment from your local repo entirely.
 
 That does sound sketchy so feel free to check out the source yourself, here's what it does though:
@@ -41,6 +42,6 @@ Copies all necessary dependencies into the created lib folder, these are:
 - MonoMod.RuntimeDetour.dll
 - MonoMod.Utils.dll
 
-Runs the included nstrip binary to strip and publicize Assembly-CSharp.dll while putting it in the lib folder.
+Runs the nstrip binary to strip and publicize Assembly-CSharp.dll while putting it in the lib folder.
 
 This saves like, a lot of time so I would recommend using it lol.
