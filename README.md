@@ -1,33 +1,31 @@
-# Bingo Mode
+# Rain World Bingo
 For the mod description/how it works, see https://steamcommunity.com/sharedfiles/filedetails/?id=3441764924
 
 ## Adding onto the mod
-This mod is open source! Feel free to clone the code, make forks, pull requests, whatever else github has!!
+This mod is open source! Feel free to clone the code, make forks, pull requests, whatever else github has!
 
 I encourage any person interested in growing this mod to contribute! Whether that'd be code improvements, new content, or any other cool stuff, I'd be more than happy to add your stuff to this mod!
 
-If you're interested, I'd recommend starting with adding a new challenge, you can research Expedition challenges in vanilla game, and `BingoChallenge` classes in this repository.
+If you're interested, I'd recommend starting with adding a new challenge, you can research Expedition challenges in vanilla game, and `BingoChallenge` classes in this repository. There's also a section in the Wiki for developers, good to read :)
 
-I personally won't be adding anything else to the mod, I'll only fix major bugs and make it work for the new versions, I might not even be the owner of this repo later! Who knows.
-Either way I want to give anyone interested an option to expand or improve this mod, cause that's cool i think :)) And there are always many ideas left on the cutting room floor that someone might pick up.
-When you do work on a build, make sure to change your VERSION in `Plugin.cs` to be unique to avoid stuff breaking when playing multiplayer.
-
-I'd love to see your part in this mess! Oh right...
+We'd love to see your part in this mess! Oh right...
 
 ## This mod is a little bit of a mess
-It's true! This was my very first large project like this, so a lot of the code is structured pretty messy, especially the menu stuff... However do not be discouraged, it's all not too complicated, 
-just that I would've done a loot of things very differently if I was making this again. I won't though, since I have been developing the mod for a bit over a year(with breaks) and im so done!.
 
-This mod allowed me to grow as a developer and programmer, which I appreciate greatly... its just that the mod's turned out way more messy than i wanted because of the learning haha.
+This mod was Nacu's first large programming project and since I have begun development, it's been my largest as well. All across the board there is jank and, dare I say, charm. Optimizations will always be welcome, though the mod is quite stable as of right now. Do not be afraid though! I got into it, so can you.
 
 ## How to build
 ### Make sure your c# language version is set to `13.0` in your .csproj file (for the release configuration). The code uses some of the modern c# version features in a lot of places so this is necessary.
-### Change your post build event destination to your bingo mod plugins folder
-### Place the required dependencies in the lib folder, these include:
-- Assembly-CSharp-nstrip.dll: A stripped and publicized (important to use the `-p` flag when running the nstrip command) version of the Assembly-CSharp found in `Rain World\RainWorld_Data\Managed` using NStrip (https://github.com/bbepis/NStrip). This was necessary due to some menu issues (PUBLIC-Assembly-CSharp doesn't work as far as i know)
-- HOOKS-Assembly-CSharp.dll from `Rain World\BepInEx\plugins`
+Run the setup.bat file as administrator to setup up your build environment from your local repo entirely.
 
-Found in `Rain World\RainWorld_Data\Managed`:
+That does sound sketchy so feel free to check out the source yourself, here's what it does though:
+
+Creates a lib folder for dependencies.
+Creates a bingo mod folder in your Rain World installation (by default `C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\`, change this is in the batch file yourself to make your life easier.)
+Creates a symlink between that mod folder and your build from git (this means all you need to do is change what's in the repo directory to have it update in game.)
+Copies all necessary dependencies into the created lib folder, these are:
+
+- HOOKS-Assembly-CSharp.dll
 - Assembly-CSharp-firstpass.dll
 - com.rlabrecque.steamworks.net.dll
 - Rewired_Core.dll
@@ -37,10 +35,12 @@ Found in `Rain World\RainWorld_Data\Managed`:
 - UnityEngine.dll
 - UnityEngine.InputLegacyModule.dll
 - UnityEngine.UnityWebRequestWWWModule.dll
-
-Found in `Rain World\BepInEx\core`:
-- BepInEx
+- BepInEx.dll
 - Mono.Cecil.dll
 - MonoMod.dll
 - MonoMod.RuntimeDetour.dll
 - MonoMod.Utils.dll
+
+Runs the included nstrip binary to strip and publicize Assembly-CSharp.dll while putting it in the lib folder.
+
+This saves like, a lot of time so I would recommend using it lol.
