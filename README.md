@@ -20,9 +20,9 @@ Run the setup.bat file as administrator to setup up your build environment from 
 
 That does sound sketchy so feel free to check out the source yourself, here's what it does though:
 
-Creates a lib folder for dependencies.
-Creates a bingo mod folder in your Rain World installation (by default `C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\`, change this is in the batch file yourself to make your life easier.)
-Creates a symlink between that mod folder and your build from git (this means all you need to do is change what's in the repo directory to have it update in game.)
+Creates a lib folder for dependencies.<br>
+Creates a bingo mod folder in your Rain World installation (by default `C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\`, change this is in the batch file yourself to make your life easier.)<br>
+Creates a symlink between that mod folder and your build from git (this means all you need to do is change what's in the repo directory to have it update in game.)<br>
 Copies all necessary dependencies into the created lib folder, these are:
 
 - HOOKS-Assembly-CSharp.dll
