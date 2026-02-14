@@ -1,5 +1,6 @@
 # Rain World Bingo
 For the mod description/how it works, see https://steamcommunity.com/sharedfiles/filedetails/?id=3441764924
+To find the original repo for Bingo by Nacu (last updated 2.0), see https://github.com/Nacu0021/BingoMode
 
 ## Adding onto the mod
 This mod is open source! Feel free to clone the code, make forks, pull requests, whatever else github has!
