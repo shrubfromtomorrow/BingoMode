@@ -56,15 +56,17 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions without entering ").Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString())
-                + ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer));
+            this.description = ChallengeTools.IGT.Translate("Enter [<current>/<required>] regions without entering <region>")
+                .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)))
+                .Replace("<required>", required.Value.ToString()).Replace("<current>", current.ToString());
             base.UpdateDescription();
         }
 
         public override Phrase ConstructPhrase()
         {
             return new Phrase(
-                [[new Icon("TravellerA"), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red), new Verse(region.Value)],
+                [[new Icon("TravellerA"), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "buttonCrossB" : "buttonCrossA", 1f, Color.red)],
+                [new Verse(region.Value)], 
                 [new Counter(current, required.Value)]]);
         }
 

@@ -140,7 +140,7 @@ namespace BingoMode.BingoChallenges
             {
                 specific = new SettingBox<bool>(Random.value < 0.5f, "Specific Echo", 0),
                 ghost = new(ChallengeUtils.GetCorrectListForChallenge("echoes")[Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("echoes").Length)], "Region", 1, listName: "echoes"),
-                amount = new(Random.Range(2, 7), "Amount", 2),
+                amount = new(Random.Range(1, 5), "Amount", 2),
                 starve = new(Random.value < 0.1f, "While Starving", 3)
             };
         }

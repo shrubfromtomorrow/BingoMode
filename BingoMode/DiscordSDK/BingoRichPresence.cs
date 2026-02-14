@@ -21,6 +21,7 @@ namespace BingoMode.DiscordSDK
         private static readonly float updateDiscordInterval = 1f / 4;
         private static float timeSinceLastDiscordUpdate = 0f;
         public static long bingoRPTimestamp;
+        public const string IMAGEID = "watcherbingosquarethumb";
 
         public static void Hook()
         {
@@ -107,7 +108,7 @@ namespace BingoMode.DiscordSDK
             {
                 State = "Finding Bingo menu...",
                 Timestamps = { Start = bingoRPTimestamp },
-                Assets = { LargeImage = "bingosquarethumb", LargeText = "Bingo Mode" }
+                Assets = { LargeImage = IMAGEID, LargeText = "Bingo" }
             }, _ => { });
             timeSinceLastDiscordUpdate = 0f;
         }
@@ -159,7 +160,7 @@ namespace BingoMode.DiscordSDK
                 State = state,
                 Details = self.currentPage == 4 ? details : null,
                 Timestamps = { Start = bingoRPTimestamp },
-                Assets = { LargeImage = "bingosquarethumb", LargeText = "Bingo Mode" }
+                Assets = { LargeImage = IMAGEID, LargeText = "Bingo" }
             }, _ => { });
             timeSinceLastDiscordUpdate = 0f;
         }
@@ -179,16 +180,16 @@ namespace BingoMode.DiscordSDK
                 }
                 discordActivity.Details = $"Not Bingoing";
                 discordActivity.State = $"Playing: {sesh}";
-                discordActivity.Assets.LargeImage = "bingosquarethumb";
-                discordActivity.Assets.LargeText = "Bingo Mode";
+                discordActivity.Assets.LargeImage = IMAGEID;
+                discordActivity.Assets.LargeText = "Bingo";
             }
             else
             {
                 // connectedplayers is more than 0 in game but not in lobbies
-                discordActivity.Details = $"The {SlugcatStats.getSlugcatName(player.slugcatStats.name)} | " +$"{(SteamFinal.ConnectedPlayers.Count > 0 ? "Multiplayer" : "Solo")}";
+                discordActivity.Details = $"The {SlugcatStats.getSlugcatName(player.slugcatStats.name)} | " +$"{(SteamFinal.GetHost().GetSteamID64() == default ? "Solo" : "Multiplayer")}";
                 discordActivity.State = GetBingoDetails(player);
-                discordActivity.Assets.LargeImage = "bingosquarethumb";
-                discordActivity.Assets.LargeText = "Bingo Mode";
+                discordActivity.Assets.LargeImage = IMAGEID;
+                discordActivity.Assets.LargeText = "Bingo";
             }
         }
 

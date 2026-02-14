@@ -33,6 +33,7 @@ namespace BingoMode.BingoMenu
         private FAtlasElement watcherTitle;
 
         private MenuLabel nowPlaying;
+        private MenuLabel tutorial;
 
         private FSprite title;
         private SymbolButton back;
@@ -114,16 +115,21 @@ namespace BingoMode.BingoMenu
             board = BingoHooks.GlobalBoard;
             BingoData.BingoMode = false;
             BingoData.TeamsInBingo = [0];
+            Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
 
             normalTitle = Futile.atlasManager.GetElementWithName("bingotitle");
             watcherTitle = Futile.atlasManager.GetElementWithName("bingotitlewatcher");
 
-            nowPlaying = new MenuLabel(menu, owner, expMenu.characterSelect.nowPlaying.label.text, new Vector2(683f, 35f), default(Vector2), true, null);
+            nowPlaying = new MenuLabel(menu, owner, expMenu.characterSelect.nowPlaying.label.text, new Vector2(683f, 40f), default(Vector2), true, null);
             nowPlaying.label.color = new Color(0.5f, 0.5f, 0.5f);
             nowPlaying.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
             subObjects.Add(nowPlaying);
 
-            Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+            tutorial = new MenuLabel(menu, owner, Plugin.PluginInstance.BingoConfig.Tutorials.Value ? menu.Translate("Click a square to customize it!") : "", topCenter - new Vector2(0, 100f), default(Vector2), true, null);
+            tutorial.label.color = new Color(0.85f, 0.85f, 0.85f);
+            tutorial.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
+            subObjects.Add(tutorial);
+
             title = new(normalTitle)
             {
                 anchorX = 0.5f,
@@ -560,6 +566,14 @@ namespace BingoMode.BingoMenu
                 else randomizerSlideStep = -randomizerSlideStep;
                 float ff = randomizerSlideStep == 1f ? 1f : 0f;
                 return;
+            }
+
+            if (sender is BingoButton)
+            {
+                if (tutorial.text != "")
+                {
+                    tutorial.text = "";
+                }
             }
         }
 

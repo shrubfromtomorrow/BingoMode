@@ -268,7 +268,6 @@ namespace BingoMode.BingoMenu
         public override void Clicked()
         {
             Singal(this, singalText);
-            //challenge.CompleteChallenge();
             menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
             menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
         }

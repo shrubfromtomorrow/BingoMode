@@ -183,6 +183,12 @@ namespace BingoMode.BingoChallenges
             if (ModManager.Watcher) creatureNames[(int)WatcherEnums.CreatureTemplateType.Barnacle] = ChallengeTools.IGT.Translate("Barnacles");
         }
 
+        public static string CreatureSingularNames(string type)
+        {
+            if (type == CreatureType.SmallNeedleWorm.value) return ChallengeTools.IGT.Translate("Small Noodlefly");
+            else return ChallengeTools.IGT.Translate(ChallengeTools.creatureNames[new CreatureType(type).Index].TrimEnd('s'));
+        }
+
         public static List<string> CreatureOriginRegions(string type, SlugcatStats.Name slug)
         {
             List<string> r = [];
@@ -361,6 +367,37 @@ namespace BingoMode.BingoChallenges
                 case "WAUA_WAUA": return "Orange";
                 case "WAUA_TEXT_AUDIO_TALKSHOW": return "Light Magenta";
                 default: return "Erm, pearl colored pearl";
+            }
+        }
+
+        public static string NameForUnlock(string unlock)
+        {
+            // If it's a safari, get the region, if it's not a safari (arena), also gets the region
+            string[] region = Regex.Split(unlock, "-");
+
+            // safari or arena
+            if (AllEnterableRegions.Contains(region[0]))
+            {
+                // safari
+                if (region.Length > 1)
+                {
+                    return ChallengeTools.IGT.Translate("<region> Safari").Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region[0], ExpeditionData.slugcatPlayer)));
+                }
+                else
+                {
+                    return ChallengeTools.IGT.Translate("<region> Arenas").Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region[0], ExpeditionData.slugcatPlayer)));
+                }
+            }
+            else
+            {
+                // Specials
+                switch(unlock)
+                {
+                    case "filter": return ChallengeTools.IGT.Translate("Filtration System Arenas");
+                    case "gutter": return ChallengeTools.IGT.Translate("Gutter Arenas");
+                    case "GWold": return ChallengeTools.IGT.Translate("Past Garbage Wastes");
+                    default: return ChallengeTools.IGT.Translate(unlock);
+                }
             }
         }
 

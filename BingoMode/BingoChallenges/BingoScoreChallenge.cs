@@ -91,7 +91,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             bool oneCycle = UnityEngine.Random.value < 0.5f;
-            int num = oneCycle ? UnityEngine.Random.Range(20, 151) : UnityEngine.Random.Range(80, 301);
+            int num = oneCycle ? UnityEngine.Random.Range(20, 76) : UnityEngine.Random.Range(80, 201);
             return new BingoScoreChallenge
             {
                 target = new(num, "Target Score", 0),

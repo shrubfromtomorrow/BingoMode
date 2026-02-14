@@ -25,6 +25,7 @@ namespace BingoMode
     using IL.JollyCoop.JollyMenu;
     using Music;
     using static BingoMode.BingoSteamworks.LobbySettings;
+    using static ExtraExtentions;
 
     public class BingoHooks
     {
@@ -275,6 +276,9 @@ namespace BingoMode
             // Credits
             On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
 
+            // Translate combo boxes because they don't for some reason
+            On.Menu.Remix.MixedUI.OpComboBox._GetDisplayValue += OpComboBox__GetDisplayValue;
+
             // Flabberghasted this never got unloaded
             On.Menu.Menu.ShutDownProcess += Menu_ShutDownProcess;
         }
@@ -385,12 +389,12 @@ namespace BingoMode
                 if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                 {
                     self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the fast guy", 1f, 1f);
-                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Bingo, Intikus - Loops around the fast guy";
+                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Loops around the fast guy";
                 }
                 else
                 {
                     self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the meattree", 1f, 1f);
-                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Bingo, Intikus - Loops around the meattree";
+                    self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Loops around the meattree";
                 }
             }
             orig.Invoke(self);
@@ -1195,20 +1199,27 @@ namespace BingoMode
         {
             orig.Invoke(self, manager);
 
-            //string folder = $"illustrations{Path.DirectorySeparatorChar}intro_roll";
+            string folder = $"illustrations{Path.DirectorySeparatorChar}intro_roll";
 
-            //self.illustrations[2].RemoveSprites();
-            //self.pages[0].subObjects.Remove(self.illustrations[2]);
+            self.illustrations[2].RemoveSprites();
+            self.pages[0].subObjects.Remove(self.illustrations[2]);
 
-            //self.illustrations[2] = new MenuIllustration(self, self.pages[0], folder, ModManager.Watcher ? "intro_roll_b_bingo_watcher" : "intro_roll_b_bingo", new Vector2(0f, 0f), true, false);
+            self.illustrations[2] = new MenuIllustration(self, self.pages[0], folder, ModManager.Watcher ? "intro_roll_b_bingo_watcher" : "intro_roll_b_bingo", new Vector2(0f, 0f), true, false);
 
-            //self.pages[0].subObjects.Add(self.illustrations[2]);
+            self.pages[0].subObjects.Add(self.illustrations[2]);
         }
 
         private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
         {
             orig.Invoke(self);
-            if (self.sceneID == null || self.sceneID != BingoEnums.MainMenu_Bingo) return;
+            if (self.sceneID == null || (self.sceneID != BingoEnums.MainMenu_Bingo && self.sceneID != BingoEnums.WatcherExpeditionBackground)) return;
+
+            if (self.sceneID == BingoEnums.WatcherExpeditionBackground)
+            {
+                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "outro prince 3";
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "outro prince 3-1 - flat", new Vector2(683f, 384f), false, true));
+                return;
+            }
 
             self.blurMin = -0.2f;
             self.blurMax = 0.4f;
@@ -1260,15 +1271,15 @@ namespace BingoMode
         {
             ILCursor c = new ILCursor(il);
 
-            //if (c.TryGotoNext(MoveType.Before,
-            //    x => x.MatchNewobj(typeof(InteractiveMenuScene))))
-            //{
-            //    c.Index--;
-            //    c.Remove();
-            //    var field = typeof(BingoEnums).GetField(nameof(BingoEnums.MainMenu_Bingo));
-            //    c.Emit(OpCodes.Ldsfld, field);
-            //}
-            //else Plugin.logger.LogError("BingoMainMenuBackgroundReplacement broked " + il);
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchNewobj(typeof(InteractiveMenuScene))))
+            {
+                c.Index--;
+                c.Remove();
+                var field = typeof(BingoEnums).GetField(nameof(BingoEnums.MainMenu_Bingo));
+                c.Emit(OpCodes.Ldsfld, field);
+            }
+            else Plugin.logger.LogError("BingoMainMenuBackgroundReplacement broked " + il);
 
             if (c.TryGotoNext(MoveType.Before,
                 x => x.MatchLdstr("EXPEDITION"),
@@ -1383,6 +1394,11 @@ namespace BingoMode
                 button.RemoveSubObject(button);
                 newBingoButton.Remove(self);
             }
+        }
+
+        private static string OpComboBox__GetDisplayValue(On.Menu.Remix.MixedUI.OpComboBox.orig__GetDisplayValue orig, Menu.Remix.MixedUI.OpComboBox self)
+        {
+            return ChallengeTools.IGT.Translate(orig(self));
         }
     }
 }

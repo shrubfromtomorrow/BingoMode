@@ -102,7 +102,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoKarmaFlowerChallenge c || c.region.Value != region.Value || c.oneCycle.Value != oneCycle.Value || c.differentRegions.Value != differentRegions.Value;
+            return challenge is not BingoKarmaFlowerChallenge c || c.differentRegions.Value != differentRegions.Value;
         }
 
         public override string ChallengeName()
@@ -115,7 +115,7 @@ namespace BingoMode.BingoChallenges
             BingoKarmaFlowerChallenge ch = new();
             string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("regionsreal")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("regionsreal").Length)] : "Any Region";
 
-            ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 6), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "regions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "In one Cycle", 3);

@@ -82,7 +82,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoTradeTradedChallenge
             {
-                amount = new(UnityEngine.Random.Range(1, 4), "Amount of Items", 0),
+                amount = new(UnityEngine.Random.Range(1, 3), "Amount of Items", 0),
                 traderItems = []
             };
         }

@@ -242,6 +242,12 @@ namespace BingoMode
                     this.defaulScrollSpeed = 1f;
                     this.slowDownScrollSpeed = 0.5f;
                 }
+                else if (stage == BingoCredits.Stage.ShrubThanks)
+                {
+                    text = "07 - BINGO SHRUB THANKS";
+                    this.defaulScrollSpeed = 1f;
+                    this.slowDownScrollSpeed = 0.5f;
+                }
                 float num = 0f;
                 if (text != null)
                 {
@@ -366,6 +372,7 @@ namespace BingoMode
             public static readonly BingoCredits.Stage SpecialThanks = new BingoCredits.Stage("SpecialThanks", true);
             public static readonly BingoCredits.Stage NacuThanks = new BingoCredits.Stage("NacuThanks", true);
             public static readonly BingoCredits.Stage IcedThanks = new BingoCredits.Stage("IcedThanks", true);
+            public static readonly BingoCredits.Stage ShrubThanks = new BingoCredits.Stage("ShrubThanks", true);
             public static readonly BingoCredits.Stage End = new BingoCredits.Stage("End", true);
         }
     }

@@ -89,7 +89,7 @@ namespace BingoMode.BingoChallenges
             WatcherBingoOpenMelonsChallenge ch = new();
             string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("pomegranateregions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("pomegranateregions").Length)] : "Any Region";
 
-            ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(2, 6), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "pomegranateregions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(false, "In one Cycle", 3);

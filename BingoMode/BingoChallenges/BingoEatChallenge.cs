@@ -122,7 +122,7 @@ namespace BingoMode.BingoChallenges
                 foodType = new(randomFood, "Food type", 0, listName: "food"),
                 isCreature = c,
                 starve = new(UnityEngine.Random.value < 0.1f, "While Starving", 2),
-                amountRequired = new(UnityEngine.Random.Range(3, 8) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 1)
+                amountRequired = new(UnityEngine.Random.Range(1, 7) * (isCreature && foodType.Value == "Fly" ? 2 : 1), "Amount", 1)
             };
         }
 

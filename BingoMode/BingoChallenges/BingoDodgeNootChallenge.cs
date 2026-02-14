@@ -86,7 +86,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoDodgeNootChallenge()
             {
-                amount = new(UnityEngine.Random.Range(2, 10), "Amount", 0)
+                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0)
             };
         }
 

@@ -70,7 +70,8 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new Phrase(
-                [[new Icon("Symbol_Spear"), new Icon("popcorn_plant", 1f, new Color(0.41f, 0.16f, 0.23f))]]);
+                //                                                                        what the fuck are we doing team
+                [[Icon.FromEntityName("Spear"), new Icon("popcorn_plant", 1f, new Color(0.68235296f, 0.15686275f, 0.11764706f))]]);
             if (differentRegions.Value)
             {
                 phrase.InsertWord(new Icon("TravellerA"));
@@ -115,7 +116,7 @@ namespace BingoMode.BingoChallenges
             BingoPopcornChallenge ch = new();
             string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("popcornregions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("popcornregions").Length)] : "Any Region";
 
-            ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 6), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "popcornregions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(false, "In one Cycle", 3);

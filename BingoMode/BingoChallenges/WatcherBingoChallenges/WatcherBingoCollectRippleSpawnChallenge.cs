@@ -56,7 +56,7 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
         public override Challenge Generate()
         {
             WatcherBingoCollectRippleSpawnChallenge ch = new();
-            ch.amount = new(UnityEngine.Random.Range(2, 50), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(2, 26), "Amount", 0);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "In one Cycle", 1);
             return ch;
         }

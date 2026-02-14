@@ -32,7 +32,7 @@ namespace BingoMode.BingoChallenges
 
         public override Phrase ConstructPhrase()
         {
-            Phrase phrase = new Phrase([[new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("prince")]]);
+            Phrase phrase = new Phrase([[new Icon("prince")]]);
             return phrase;
         }
 

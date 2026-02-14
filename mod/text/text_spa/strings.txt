@@ -1,0 +1,531 @@
+// ========================================
+// CREATURE TYPES
+// ========================================
+MothGrub|Larva de polilla
+Barnacle|Percebe
+SandGrub|Larva de arena
+SkyWhale|Ballena celestial
+RotLoach|Mastodonte putrefacto
+RippleSpider|Araña de onda
+IndigoLizard|Lagarto índigo
+GrappleSnake|Serpiente de agarre
+PeachLizard|Lagarto melocotón
+BigSandGrub|Gusano de arena
+AltSkyWhale|Ballena celestial
+DrillCrab|Cangrejo perforador
+SmallMoth|Polilla pequeña
+Millipede|Milpiés
+FireSprite|Duende de fuego
+Tardigrade|Tardígrado
+ScavengerTemplar|Carroñero templario
+Frog|Rana
+Rat|Rata
+Angler|Rape
+Loach|Locha
+BigMoth|Polilla gigante
+BoxWorm|Gusano de caja
+Rattler|Agitahuesos
+ScavengerDisciple|Carroñero discípulo
+BlizzardLizard|Lagarto ventisca
+BasiliskLizard|Lagarto basilisco
+ScavengerKing|Carroñero líder
+StowawayBug|Bichogancho
+JungleLeech|Sanguijuela selvática
+EelLizard|Lagarto anguila
+AquaCenti|Acuípedo
+Inspector|Inspector
+Yeek|Yeek
+FireBug|Bichofuego
+SlugNPC|Cría de gato-babosa
+MirosVulture|Buitre Miró
+MotherSpider|Araña nodriza
+SpitLizard|Lagarto caramelo
+ZoopLizard|Lagarto fresa
+TerrorLongLegs|Madre patilarga
+ScavengerElite|Carroñero de élite
+BigJelly|Medusa gigante
+Spider|Arañipiés
+BigEel|Leviatán
+EggBug|Bichohuevo
+GreenLizard|Lagarto verde
+WhiteLizard|Lagarto blanco
+BlackLizard|Lagarto negro
+GarbageWorm|Gusano de la basura
+TempleGuard|Guardián
+VultureGrub|Larva de buitre
+KingVulture|Buitre real
+SmallCentipede|Ciempiés pequeño
+YellowLizard|Lagarto amarillo
+LanternMouse|Ratón Literna
+RedCentipede|Ciempiés rojo
+BrotherLongLegs|Hermano patilargo
+SmallNeedleWorm|Cría de moscafideo
+Fly|Mosca-murciélago
+RedLizard|Lagarto rojo
+PoleMimic|Planta de postes
+MirosBird|Pájaro Miró
+Centipede|Ciempiés
+Centiwing|Cienalas
+Scavenger|Carroñero
+BigSpider|Araña gigante
+PinkLizard|Lagarto rosa
+BlueLizard|Lagarto azul
+Salamander|Salamandra
+CyanLizard|Lagarto cian
+Leech|Sanguijuela
+Snail|Caracol
+Hazer|Calamar humeante
+SeaLeech|Sanguijuela marina
+TubeWorm|Gusano gancho
+Overseer|Supervisor
+DaddyLongLegs|Papá patilargo
+TentaclePlant|Monstrualga
+SpitterSpider|Araña escupidora
+BigNeedleWorm|Moscafideo
+Slugcat|Gato-babosa
+Vulture|Buitre
+CicadaA|Calamigarra
+CicadaB|Calamigarra
+JetFish|Impulpez
+DropBug|Tijereta
+Deer|Ciervo pluvial
+
+// ========================================
+// OBJECT TYPES
+// ========================================
+Pomegranate|Granada
+GraffitiBomb|Bomba grafiti
+FireSpriteLarva|Larva de duende de fuego
+Boomerang|Bumerán
+SingularityBomb|Bomba de singularidad
+JokeRifle|Fusil de broma
+GooieDuck|Frutacable
+LillyPuck|Zanaloto
+MoonCloak|Capa
+DandelionPeach|Melocotón diente de león
+GlowWeed|Hierba luminosa
+EnergyCell|Batería de rarefacción
+FireEgg|Huevo ígneo
+Seed|Palomita
+PuffBall|Bola de esporas
+WaterNut|Fruta burbuja
+Mushroom|Seta
+ScavengerBomb|Granada
+FirecrackerPlant|Petardo
+Spear|Lanza
+VultureMask|Máscara de buitre
+DangleFruit|Fruta azul
+KarmaFlower|Flor de karma
+BubbleGrass|Hierba burbuja
+SeedCob|Planta de palomitas
+Lantern|Farol
+FlyLure|Hierba de mosca-murciélagos
+SporePlant|Colmena
+NSHSwarmer|Neurona verde
+SLOracleSwarmer|Neurona
+SSOracleSwarmer|Neurona
+OverseerCarcass|Ojo de supervisor
+FlareBomb|Granada cegadora
+DataPearl|Perla
+JellyFish|Medusa
+SlimeMold|Hongo baboso
+EggBugEgg|Huevo de bichohuevo
+NeedleEgg|Huevo de moscafideo
+Rock|Roca
+
+// ========================================
+// CHALLENGE CATEGORY NAMES
+// ========================================
+Avoiding a region|Evitar una región
+Avoiding death before completing challenges|Evitar morir antes de completar desafíos
+Avoiding giving Needles to Scavengers|Evitar dar Agujas a los Carroñeros
+Avoiding items|Evitar objetos
+Avoiding killing creatures|Evitar matar criaturas
+Befriending creatures|Hacer amistad con criaturas
+Collecting arena unlocks|Recolectar desbloqueos de arena
+Collecting broadcasts|Recolectar transmisiones
+Collecting or delivering Moon's cloak|Recolectar o entregar la Capa de Miras a la Luna
+Collecting pearls|Recolectar perlas
+Collecting ripplespawn eggs|Recolectar huevos de ripplespawn
+Collecting vistas|Recolectar vistas
+Consuming karma flowers|Consumir flores de karma
+Crafting items|Fabricar objetos
+Crushing creatures|Aplastar criaturas
+Delivering colored pearls|Entregar perlas de colores
+Delivering neurons|Entregar neuronas
+Delivering the green neuron|Entregar la neurona verde
+Delivering the music pearl to Five Pebbles|Entregar la perla de música a Cinco Guijarros
+Dodging a Leviathan|Esquivar un Leviatán
+Dodging Noodlefly attacks|Esquivar ataques de Moscafideo
+Dropping a creature in the depth pit|Tirar una criatura en el pozo de las profundidades
+Eating popcorn plant seeds|Comer semillas de planta de palomita
+Eating specific food|Comer comida específica
+Entering a region|Entrar a una región
+Entering a region from another region|Entrar a una región desde otra región
+Entering regions without visiting one|Entrar a regiones sin visitar una
+Feeding the Rarefaction Cell to a Leviathan|Alimentar la Bateria de Rarefacción a un Leviatán
+Getting licked by lizards|Ser lamido por lagartijas
+Hatching Moth Grubs|Incubar Larvas de Polilla
+Hatching Noodlefly eggs|Incubar huevos de Moscafideo
+Hitting creatures with items|Golpear criaturas con objetos
+Killing creatures|Matar criaturas
+Mauling creatures a certain amount of times|Desgarrar criaturas cierta cantidad de veces
+Mauling different types of creatures|Desgarrar diferentes tipos de criaturas
+Obtaining passages|Obtener pasajes
+Opening pomegranates|Abrir granadas
+Opening popcorn plants|Abrir plantas palomitas
+Pinning creatures|Clavar criaturas
+Putting items in shelters|Poner objetos en refugios
+Putting pearls in shelters|Poner perlas en refugios
+Scoring points|Anotar puntos
+Stealing items|Robar objetos
+Throwing grenades at scavenger tolls|Lanzar granadas a peajes de carroñeros
+Trading items to merchants|Comerciar objetos con mercaderes
+Trading same items between merchants|Comerciar los mismos objetos entre mercaderes
+Transporting creatures|Transportar criaturas
+Transporting the same creature through gates|Transportar la misma criatura a través de puertas
+Transporting the same creature through portals|Transportar la misma criatura a través de portales
+Visiting echoes|Visitar ecos
+Visiting iterators|Visitar iteradores
+Visiting Spinning Top|Visitar a Peonza
+Visiting The Prince|Visitar al Príncipe
+Visiting The Weaver|Visitar al Tejedor
+
+// ========================================
+// CHALLENGE DESCRIPTIONS 
+// ========================================
+[<current>/<amount>] unique tolls|[<current>/<amount>] peajes únicos
+<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>|<action> [<current>/<amount>] <target_item> <shelter_type> refugio <location>
+Befriend [<current>/<amount>] <crit>|Hacer amistad con [<current>/<amount>] <crit>
+Befriend [<current>/<amount>] unique creature types|Hacer amistad con [<current>/<amount>] tipos únicos de criaturas
+Collect Moon's Cloak|Recolectar la Capa de Moon
+Collect [<current>/<amount>] colored pearls|Recolectar [<current>/<amount>] perlas de colores
+Collect [<current>/<amount>] ripplespawn eggs <onecycle>|Recolectar [<current>/<amount>] huevos de ciclo <onecycle>
+Collect the <chatlog> broadcast|Recolectar la transmisión <chatlog>
+Collect the <pearl> pearl from <region>|Recolectar la perla <pearl> de <region>
+Collect the <unlock> unlock|Recolectar el desbloqueo de <unlock>
+Collect the vista in <region_name>|Recolectar la vista en <region_name>
+Consume [<current>/<amount>] Karma Flowers <region> <onecycle>|Consumir [<current>/<amount>] Flores de Karma en <region> <onecycle>
+Craft [<current>/<amount>] <item>|Fabricar [<current>/<amount>] <item>
+Crush [<current>/<amount>] unique creatures by falling|Aplastar [<current>/<amount>] criaturas únicas al caer
+Deliver <progress> neurons to Looks to the Moon|Entregar <progress> neuronas a Miras a la Luna
+Deliver the Cloak to Moon|Entregar la Capa a Moon
+Deliver the <region> colored pearl to <iterator>|Entregar la perla colorida de <region> a <iterator>
+
+// I dont like the name but is the rain world style, NOOOOOOOOO T__T
+Deliver the music pearl to Five Pebbles|Entregar la perla de música a Cinco Guijarros
+Do not die before completing [<current>/<amount>] bingo challenges|No morir antes de completar [<current>/<amount>] desafíos de bingo
+Do not enter <region>|No entrar a <region>
+Do not gift Needles to Scavengers|No regalar Agujas a los Carroñeros
+Dodge [<current>/<amount>] Noodlefly attacks|Esquivar [<current>/<amount>] ataques de una Moscafideo
+Dodge a Leviathan's bite|Esquivar la mordida de un Leviatán
+Drop a <crit> into the depths drop room (SB_D06)|Dejar caer un <crit> en la sala de caída de las profundidades (SB_D06)
+Earn [<current_score>/<score_target>] points from creature kills <onecycle>|Ganar [<current_score>/<score_target>] puntos por matar criaturas <onecycle>
+Earn <achievement_name> passage|Obtener el pasaje <achievement_name>
+Eat [<current>/<amount>] <food_type> <starved>|Comer [<current>/<amount>] <food_type> <starved>
+Eat [<current>/<amount>] popcorn plant seeds|Comer [<current>/<amount>] semillas de plantas palomitas
+Enter <region>|Entrar a <region>
+Enter [<current>/<required>] regions without entering <region>|Entrar a [<current>/<required>] regiones sin visitar <region>
+Hit <crit> with <weapon> [<current>/<amount>] times<location><onecycle>|Golpear <crit> con <weapon> [<current>/<amount>] veces<location><onecycle>
+Feed the Rarefaction Cell to a Leviathan (completes if you die)|Alimentar a un Leviatán con una Batería de Rarefacción (se completa si mueres)
+First time entering <to> must be from <from>|La primera vez que entres a <to> debe ser desde <from>
+Get licked by [<current>/<amount>] unique lizards|Ser lamido por [<current>/<amount>] lagartijas únicas
+Hatch [<current>/<amount>] Moth Grubs <onecycle>|Incubar [<current>/<amount>] Larvas de Polilla <onecycle>
+Hatch [<current>/<amount>] Noodlefly eggs <region> <onecycle>|Incubar [<current>/<amount>] huevos de Moscafideo <region> <onecycle>
+Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>|Matar [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>
+Maul [<current>/<amount>] unique creature types|Desgarrar [<current>/<amount>] tipos únicos de criaturas
+Maul creatures [<current>/<amount>] times|Desgarrar criaturas [<current>/<amount>] veces
+Never eat <item>|Nunca comer <item>
+Never kill <victim>|Nunca matar <victim>
+Never use <item>|Nunca usar <item>
+Open [<current>/<amount>] pomegranates <region> <onecycle>|Abrir [<current>/<amount>] granadas <region> <onecycle>
+Open [<current>/<amount>] popcorn plants<region><onecycle>|Abrir [<current>/<amount>] plantas palomitas<region><onecycle>
+Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>|Clavar [<current_pin>/<pin_amount>] <crit> a paredes o pisos<region>
+Steal [<current>/<amount>] <item> from a Scavenger toll|Robar [<current>/<amount>] <item> de un peaje de Carroñeros
+Steal [<current>/<amount>] <item> from Scavengers|Robar [<current>/<amount>] <item> de los Carroñeros
+the <toll> toll|el peaje <toll>
+Throw <action> at <toll><pass>|Lanzar <action> a <toll><pass>
+Trade [<current>/<amount>] worth of value to Scavenger Merchants|Comerciar [<current>/<amount>] de valor con Mercaderes Carroñeros
+Trade [<current>/<amount>] item from Scavenger Merchants to other Scavenger Merchants|Comerciar [<current>/<amount>] objeto de Mercaderes Carroñeros a otros Mercaderes Carroñeros
+Trade [<current>/<amount>] items from Scavenger Merchants to other Scavenger Merchants|Comerciar [<current>/<amount>] objetos de Mercaderes Carroñeros a otros Mercaderes Carroñeros
+Transport a <crit><from><to>|Transportar un <crit><from><to>
+Transport the same <crit> through [<current>/<amount>] gates|Transportar el mismo <crit> a través de [<current>/<amount>] puertas
+Transport the same <crit> through [<current>/<amount>] portals|Transportar el mismo <crit> a través de [<current>/<amount>] portales
+Visit <iterator>|Visitar <iterator>
+Visit Spinning Top in <location> while starving|Visitar a Peonza en <location> mientras te mueres de hambre
+Visit Spinning Top in <location>|Visitar a Peonza en <location>
+Visit Spinning Top <amount> times while starving|Visitar a Peonza <amount> veces mientras te mueres de hambre
+Visit Spinning Top <amount> times|Visitar a Peonza <amount> veces
+Visit The Prince|Visitar al Príncipe
+Visit The Weaver in <region>|Visitar al Tejedor en <region>
+
+// ========================================
+// CHALLENGUE CONFIG
+// ========================================
+Amount|Cantidad
+Amount of Items|Cantidad de objetos
+Amount of Neurons|Cantidad de neuronas
+Any Shelter|Cualquier refugio
+Any Region|Cualquier región
+Any Weapon|Cualquier arma
+At once|De una vez
+Broadcast|Transmisión
+Common Pearls|Perlas comunes
+Creature Type|Tipo de criatura
+Deliver|Entregar
+Different Regions|Regiones diferentes
+Food type|Tipo de comida
+From|Desde
+From Region|Desde la región
+From Scavenger Toll|Desde el peaje de carroñeros
+In One Cycle|En un Ciclo
+In one Cycle|En un ciclo
+Item|Objeto
+Item to Craft|Objeto a fabricar
+Item type|Tipo de objeto
+Passage|Pasaje
+Pass the Toll|Pasar el peaje
+Pearl|Perla
+Pearl from Region|Perla de la región
+Portal Room|Sala del portal
+Region|Región
+Room|Sala
+Scavenger Toll|Peaje de carroñeros
+Specific Creature Type|Tipo de criatura específico
+Specific Echo|Eco específico
+Specific location|Ubicación específica
+Specific Pearl|Perla específica
+Specific toll|Peaje específico
+Target Score|Puntuación objetivo
+To|Hacia
+To Region|Hacia la región
+Unlock|Desbloquear
+Value|Valor
+Via a Death Pit|A través de un pozo mortal
+Weapon|Arma
+Weapon Used|Arma utilizada
+While Starving|Mientras estas hambriento
+While under mushroom effect|Mientras está bajo los efectos de hongos
+
+
+
+// ========================================
+// ACTIONS
+// ========================================
+Bring|Traer
+Hoard|Acumular
+
+// ========================================
+// PREPOSITIONS & CONNECTORS
+// ========================================
+ and then pass it| y luego pasarla
+ and then pass them| y luego pasarlas
+ from| de
+ in| en
+ in different regions| en diferentes regiones
+in diff erent regions|en diferentes regiones
+ in one cycle| en un ciclo
+in one cycle|en un ciclo
+ out of| fuera de
+ to| a
+in the same|en el mismo
+to any|a cualquier
+
+// ========================================
+// MODIFIERS & CONDITIONS
+// ========================================
+ surface| superficie
+ underground| subterráneo
+ while starving| mientras estés hambriento
+ while under mushroom effect| mientras estás bajo los efectos de hongos
+ with| con
+ with a death pit| con un pozo mortal
+while starving|mientras estés hambriento
+
+// ========================================
+// UI MESSAGES & NOTIFICATIONS
+// ========================================
+<LINE>Completed by: |<LINE>Completado por: 
+<LINE>Failed by:|<LINE>Fallado por:
+<LINE>Save the game to Complete|<LINE>Guarda el juego para Completar
+Click on a challenge type to block it from generating|Haz clic en un tipo de desafío para bloquear su generación
+End Session|Terminar Sesión
+Exit the game and abandon the save or wait for host to end the session.|Sal del juego y abandona la partida o espera a que el anfitrión termine la sesión.
+Game concluded!|¡Partida concluida!
+Number of challenges completed for each team: |Número de desafíos completados por cada equipo: 
+Number of challenges completed: |Número de desafíos completados: 
+Please paste a board from the same slugcat that's currently selected.|Por favor pega un tablero del mismo slugcat que está seleccionado actualmente.
+Press the button in the bingo HUD or abandon the save to end the bingo session.|Presiona el botón en el HUD de bingo o abandona la partida para terminar la sesión de bingo.
+Press the button in the bingo HUD to end the bingo session for everyone.|Presiona el botón en el HUD de bingo para terminar la sesión de bingo para todos.
+Provided Slugcat: |Slugcat proporcionado: 
+Selected slugcat: |Slugcat seleccionado: 
+Slugcat mismatch!<LINE><LINE>|¡Los slugcats no coinciden!<LINE><LINE>
+Tally up|Conteo final
+Team <team_name> won!|¡El equipo <team_name> ganó!
+We have a tie!|¡Tenemos un empate!
+You feel the presence of a vista . . .|Sientes la presencia de una vista . . .
+You won!|¡Ganaste!
+
+// ========================================
+// MENU & INTERFACE
+// ========================================
+<hostName>'s lobby|Sala de <hostName>
+Allowed |Permitido 
+AVAILABLE: |DISPONIBLE: 
+BACK|ATRÁS
+BEGIN|EMPEZAR
+Bingo |Bingo 
+Bingo - Scheming|Bingo - En planificación
+BINGO|BINGO
+Blackout |  Bingo    <LINE> completo 
+Board view|Vista del tablero
+Burdens:|Sacrificios:
+Burdens: |Sacrificios: 
+CANCEL|CANCELAR
+Cannot reconnect to host.|No se pudo reconectar con el anfitrión.
+CLOSE|CERRAR
+CONFIGURE<LINE>PERKS & BURDENS|CONFIGURAR<LINE>VENTAJAS Y SACRIFICIOS
+CONTINUE<LINE>BINGO|CONTINUAR<LINE>BINGO
+CONTINUE<LINE>MULTIPLAYER|CONTINUAR<LINE>MULTIJUGADOR
+CONTINUE<LINE>SPECTATING|CONTINUAR<LINE>ESPECTANDO
+Copy board|Copiar tablero
+CREATE|CREAR
+CREDITS|CRÉDITOS
+Disabled |Desactivado 
+Friends only: |Solo amigos: 
+Friends only: No|Solo amigos: No
+Friends only: Yes|Solo amigos: Sí
+Game mode:|Modo de juego:
+Game mode: |Modo de juego: 
+Host decides |El anfitrión decide 
+I'M<LINE>READY|ESTOY<LINE>LISTO
+I'M NOT<LINE>READY|NO ESTOY<LINE>LISTO
+JOIN|UNIRSE
+Kick|Expulsar
+Leave Lobby|Salir de la Sala
+  Lockout  <LINE> (no ties)  |    Bloqueo      <LINE>  (sin empates)  
+ Lockout <LINE> (ties)    |    Bloqueo     <LINE> (con empates) 
+Lost connection to host.|Se perdió la conexión con el anfitrión.
+MANUAL|MANUAL
+Max Players: |Jugadores máximos: 
+Mod version: |Versión del mod: 
+Multiplayer|Multijugador
+No|No
+Not all players are ready !|¡No todos los jugadores están listos!
+Now Playing:|Reproduciendo:
+PASSAGE|PASAJE
+Paste board|Pegar Tablero
+Perks:|Ventajas:
+Perks: |Ventajas: 
+PLAY<LINE>BINGO|JUGAR<LINE>BINGO
+Please enter the expedition menu to accept an invite.|Por favor entra al menú de expedición para aceptar una invitación.
+Profiles|Perfiles
+Refresh|Refrescar
+Require host's mods: |Requeriere mods del anfitrión: 
+Shelter: |Refugio: 
+Slugcat: |Gato-Babosa: 
+The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'|El refugio donde los jugadores empiezan. Por favor escriba un nombre de refugio válido (SENSIBLE A MAYÚSCULAS), o 'random'
+Trying to reconnect to the host.|Intentando reconectar con el anfitrión.
+unloaded|descargado
+Yes|Sí
+You've been kicked from the lobby.|Has sido expulsado de la sala.
+
+// ========================================
+// REMIX
+// ========================================
+-  Controller 1|-  Control 1
+-  Keyboard|-  Teclado
+Bingo Config|Configuración de Bingo
+Bingo Mode Config|Configuración del Modo Bingo
+Bingo Mode Gameplay Config|Ajustes de jugabilidad del modo Bingo
+Black|Negro
+Blue|Azul
+Cyan|Cian
+
+// SEND HELP, HOW TF SOULD TRANSLATE THIS
+Dial Warp|Dial Warp
+Dial Warp (Ripple Egg Warp) is unlocked from the start. <LINE>Watcher Exclusive|El Teletransporte con Huevo de Onda (Dial Warp) está disponible desde el inicio. <LINE>Exclusivo del Vigilante
+Discord Rich Presence:|Presencia enriquecida de Discord:
+Fill icon sprites:|Rellenar sprites de los iconos:
+Fill the crosses and arrows on certain goals|Rellena las cruces y flechas en ciertos objetivos
+Gameplay|Jugabilidad
+Green|Verde
+Hurricane|Gris tormenta
+Main|Principal
+Open Bingo HUD keybind:|Tecla para abrir el HUD del Bingo:
+Orange|Naranja
+Pink|Rosa
+Play custom music in bingo menu:|Reproducir música personalizada en el menú de bingo:
+Play custom music when game ends:|Reproducir música personalizada al finalizar la partida:
+Play custom music when your team is losing:|Reproducir música personalizada cuando el equipo va perdiendo:
+Quick reset keybind:|Tecla de reinicio rápido:
+Red|Rojo
+Reset a Bingo/Expedition save instantly|Resetea la partida de Bingo/Expedición instantaneamente
+
+// What is the rw translation of rippel eggs, Dial Warp?
+Ripple eggs required for dial warp:|Huevos de onda requerido para el Teletransporte (Dial Warp):
+Show Bingo Mode as your Discord activity (restart to take effect)|Mostrar el Modo Bingo como actividad en Discord (requiere reinicio)
+Singleplayer team color:|Color del equipo en modo un jugador
+Start with the Dial Warp perk fully charged:|Comenzar con la ventaja de Teletransporte completamente cargada:
+
+Use map input instead:|Usar control del mapa en su lugar:
+Use map<LINE>input instead:|Usar control del<LINE>mapa en su lugar:
+Which button opens/closes the Bingo grid in game|Botón que abre/cierra la cuadrícula de Bingo en el juego
+Which team's color to use in singleplayer|Qué color de equipo usar en modo un jugador
+1:1 spectator board:|Tablero de espectador 1:1
+
+
+
+// ========================================
+// ARENA & SAFARI TYPES
+// ========================================
+<region> Arenas|Arena en <region>
+<region> Safari|Safari en <region>
+Safari|Safari
+Arenas|Arenas
+Filtration System Arenas|Arenas del sistema de filtración
+Gutter Arenas|Arenas de las Alcantarillas
+Past Garbage Wastes|Pasado de Residuos de Basura
+
+// ========================================
+// PEARL COLORS
+// ========================================
+audio|audio
+Light Blue|Azul claro
+Pale Green|Verde pálido
+Deep Magenta|Magenta profundo
+Bright Red|Rojo brillante
+Deep Pink|Rosa profundo
+Pale Yellow|Amarillo pálido
+Bright Magenta|Magenta brillante
+Bright Purple|Púrpura brillante
+Bright Green|Verde brillante
+Viridian|Verde viridiano
+Gold|Dorado
+Bright Blue|Azul brillante
+Teal|Verde azulado
+Dark Magenta|Magenta oscuro
+Dark Blue|Azul oscuro
+Dark Green|Verde oscuro
+Dark Purple|Púrpura oscuro
+Olive Green|Verde oliva
+Deep Purple|Púrpura profundo
+Light Purple|Púrpura claro
+Light Yellow|Amarillo claro
+Deep Green|Verde profundo
+Bronze|Bronce
+Light Pink|Rosa claro
+Dull Yellow|Amarillo apagado
+Pink|Rosa
+Dark Teal|Verde azulado oscuro
+Bright Viridian|Verde viridiano brillante
+Pale Pink|Rosa pálido
+Beige|Beige
+Amber|Ámbar
+Pale Viridian|Viridiano pálido
+Light Green|Verde claro
+Orange|Naranja
+Light Magenta|Magenta claro
+
+//wtf???
+Erm, pearl colored pearl|Eh, perla color perla

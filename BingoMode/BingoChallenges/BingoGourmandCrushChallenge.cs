@@ -69,7 +69,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoGourmandCrushChallenge
             {
-                amount = new(UnityEngine.Random.Range(2, 10), "Amount", 0)
+                amount = new(UnityEngine.Random.Range(1, 9), "Amount", 0)
             };
         }
 

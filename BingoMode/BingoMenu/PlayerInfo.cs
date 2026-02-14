@@ -81,7 +81,7 @@ namespace BingoMode.BingoMenu
             this.size = size;
             this.data = data;
 
-            string nameAndTeam = $"{data.nickname} ({BingoPage.TeamName[data.team]})";
+            string nameAndTeam = $"{data.nickname} ({Expedition.ChallengeTools.IGT.Translate(BingoPage.TeamName[data.team])})";
 
             string markAtlas = data.isHost ? "TinyCrown" : data.ready ? "TinyCheck" : "TinyX";
             Color markColor = data.isHost ? Color.yellow : data.ready ? Color.green : Color.red;

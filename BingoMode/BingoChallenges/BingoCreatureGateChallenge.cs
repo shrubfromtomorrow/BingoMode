@@ -92,7 +92,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoCreatureGateChallenge
             {
-                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
+                amount = new(UnityEngine.Random.Range(1, 3), "Amount", 0),
                 crit = new(ChallengeUtils.GetCorrectListForChallenge("transport")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("transport").Length)], "Creature Type", 1, listName: "transport")
             };
         }

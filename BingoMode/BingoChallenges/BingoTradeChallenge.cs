@@ -79,7 +79,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            int amou = UnityEngine.Random.Range(9, 21);
+            int amou = UnityEngine.Random.Range(5, 21);
 
             return new BingoTradeChallenge
             {

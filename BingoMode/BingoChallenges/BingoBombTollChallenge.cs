@@ -130,7 +130,7 @@ namespace BingoMode.BingoChallenges
             return new BingoBombTollChallenge
             {
                 specific = new(UnityEngine.Random.value < 0.5f, "Specific toll", 0),
-                amount = new(UnityEngine.Random.Range(1, 4), "Amount", 1),
+                amount = new(UnityEngine.Random.Range(1, 3), "Amount", 1),
                 pass = new(UnityEngine.Random.value < 0.5f, "Pass the Toll", 2),
                 roomName = new(toll, "Scavenger Toll", 3, listName: "tolls")
             };

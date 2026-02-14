@@ -162,6 +162,21 @@ namespace BingoMode.BingoChallenges
         {
             float diff = UnityEngine.Random.value;
             ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(ExpeditionData.slugcatPlayer, diff);
+
+            int maxAttempts = 50;
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                if (expeditionCreature != null && expeditionCreature.creature.value != "Frog") break;
+
+                expeditionCreature = ChallengeTools.GetExpeditionCreature(ExpeditionData.slugcatPlayer, diff);
+            }
+
+            if (expeditionCreature == null)
+            {
+                expeditionCreature = ChallengeTools.GetExpeditionCreature(ExpeditionData.slugcatPlayer, diff);
+            }
+
             int num = (int)Mathf.Lerp(1f, 10f, (float)Math.Pow(diff, 2.5));
             if (expeditionCreature.points < 7)
             {
@@ -178,9 +193,8 @@ namespace BingoMode.BingoChallenges
             bool onePiece = UnityEngine.Random.value < 0.2f;
             bool starvv = UnityEngine.Random.value < 0.1f;
             if (onePiece || starvv) num = Mathf.CeilToInt(num / 2);
-            num = Mathf.Max(2, num);
+            num = Mathf.Max(1, num);
             List<string> clone = ChallengeUtils.GetCorrectListForChallenge("weapons").ToList();
-            // watcher touches this
             clone.RemoveAll(x => x == "PuffBall" || x == "Rock" || x == "JellyFish" || x == "Boomerang" || x == "Frog" || x == "GraffitiBomb");
             bool doWeapon = UnityEngine.Random.value < 0.5f;
             bool doCreature = !doWeapon || UnityEngine.Random.value < 0.8f;

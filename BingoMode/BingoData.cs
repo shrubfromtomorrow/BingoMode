@@ -155,6 +155,10 @@ namespace BingoMode
                 bannedChallenges[slug] = new List<string>
                 {
                     nameof(BingoHellChallenge),
+                    nameof(BingoDontKillChallenge),
+                    nameof(BingoDontUseItemChallenge),
+                    nameof(BingoNoNeedleTradingChallenge),
+                    nameof(BingoNoRegionChallenge),
                 };
                 if (slug == WatcherEnums.SlugcatStatsName.Watcher) bannedChallenges[slug].Add(nameof(WatcherBingoHatchMothGrubChallenge));
             }
@@ -314,12 +318,13 @@ namespace BingoMode
                 foreach (var kvp in Custom.rainWorld.regionBlueTokens)
                 {
                     // FUCKING WATCHER DEVS AND regionBlueTokensAccessibility
-                    if (SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
+                    if (ModManager.Watcher && SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
                     for (int n = 0; n < kvp.Value.Count; n++)
                     {
                         if (!Custom.rainWorld.regionBlueTokensAccessibility.ContainsKey(kvp.Key)) continue;
                         if (Custom.rainWorld.regionBlueTokensAccessibility[kvp.Key][n].Contains(slug))
                         {
+                            
                             possibleTokens[0].Add(kvp.Value[n].value);
                         }
                     }
@@ -327,7 +332,7 @@ namespace BingoMode
                 foreach (var kvp in Custom.rainWorld.regionGoldTokens)
                 {
                     // FUCKING WATCHER DEVS AND regionGoldTokensAccessibility
-                    if (SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
+                    if (ModManager.Watcher && SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
                     for (int n = 0; n < kvp.Value.Count; n++)
                     {
                         if (!Custom.rainWorld.regionGoldTokensAccessibility.ContainsKey(kvp.Key)) continue;
@@ -343,7 +348,7 @@ namespace BingoMode
                 foreach (var kvp in Custom.rainWorld.regionRedTokens)
                 {
                     // FUCKING WATCHER DEVS AND regionRedTokensAccessibility
-                    if (SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
+                    if (ModManager.Watcher && SlugcatStats.SlugcatStoryRegions(WatcherEnums.SlugcatStatsName.Watcher).Contains(kvp.Key.ToUpperInvariant())) continue;
                     if (!Custom.rainWorld.regionRedTokensAccessibility.ContainsKey(kvp.Key)) continue;
                     if (kvp.Key.ToLowerInvariant() == "lc" && slug != MoreSlugcatsEnums.SlugcatStatsName.Artificer) continue;
                     if (kvp.Key.ToLowerInvariant() == "cl" && slug != MoreSlugcatsEnums.SlugcatStatsName.Saint) continue;

@@ -110,7 +110,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool Duplicable(Challenge challenge)
         {
-            return challenge is not BingoHatchNoodleChallenge c || c.region.Value != region.Value || c.oneCycle.Value != oneCycle.Value || c.differentRegions.Value != differentRegions.Value;
+            return challenge is not BingoHatchNoodleChallenge c;
         }
 
         public override string ChallengeName()
@@ -123,7 +123,7 @@ namespace BingoMode.BingoChallenges
             BingoHatchNoodleChallenge ch = new();
             string r = UnityEngine.Random.value < 0.3f ? ChallengeUtils.GetCorrectListForChallenge("nootregions")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("nootregions").Length)] : "Any Region";
 
-            ch.amount = new(UnityEngine.Random.Range(3, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 4), "Amount", 0);
             ch.region = new(r, "Region", 1, listName: "nootregions");
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "At once", 3);

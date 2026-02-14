@@ -87,8 +87,11 @@ namespace BingoMode.BingoMenu
             perks = new CheckBox[3];
             burdens = new CheckBox[3];
             gamemode = new CheckBox[4];
-            string[] gamemodes = { Translate("Bingo - "), Translate("Lockout (ties) - "), Translate("Lockout (no ties) - "), Translate("Blackout - ") };
-            string[] texts = { Translate("Allowed - "), Translate("Disabled - "), Translate("Host decides - ") };
+            string[] gamemodes = { Translate("Bingo "),
+                                Translate(" Lockout <LINE> (ties)    ").Replace("<LINE>", "\n"),
+                                Translate("  Lockout  <LINE> (no ties)  ").Replace("<LINE>", "\n"),
+                                Translate("Blackout ").Replace("<LINE>", "\n") };
+            string[] texts = { Translate("Allowed "), Translate("Disabled "), Translate("Host decides ") };
             for (int i = 0; i < 3; i++)
             {
                 perks[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, texts[i], "PERJ" + i.ToString());
@@ -196,11 +199,16 @@ namespace BingoMode.BingoMenu
 
             // I'm sorry nacu it was my constitutional duty to center ts
 
+            string HostDecidesText = Translate("Host decides ");
+            string BingoText = Translate("Bingo ");
+            // In other languages, can need 2 words to describe this mode
+            string BlackoutText = Translate("Blackout ").Replace("<LINE>", "\n");
+
             for (int i = 0; i < 3; i++)
             {
                 perks[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 150f);
                 burdens[i].pos = new Vector2(xPos - 120f + 126f * i, yTop - 200f);
-                if (perks[i].displayText == Translate("Host decides - "))
+                if (perks[i].displayText == HostDecidesText)
                 {
                     perks[i].pos.x += 20f;
                     burdens[i].pos.x += 20f;
@@ -210,11 +218,11 @@ namespace BingoMode.BingoMenu
             for (int i = 0; i < 4; i++)
             {
                 gamemode[i].pos = new Vector2(xPos - 188f + 140f * i, yTop - 100f);
-                if (gamemode[i].displayText == Translate("Bingo - "))
+                if (gamemode[i].displayText == BingoText)
                 {
                     gamemode[i].pos.x += 17f;
                 }
-                else if (gamemode[i].displayText == Translate("Blackout - "))
+                else if (gamemode[i].displayText == BlackoutText)
                 {
                     gamemode[i].pos.x -= 44f;
                 }

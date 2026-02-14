@@ -119,7 +119,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoNeuronDeliveryChallenge
             {
-                neurons = new(Mathf.RoundToInt(UnityEngine.Random.Range(1f, Mathf.Lerp(1f, 4f, Mathf.InverseLerp(0.4f, 1f, UnityEngine.Random.value)))), "Amount of Neurons", 0)
+                neurons = new(UnityEngine.Random.Range(1, 3), "Amount of Neurons", 0)
             };
         }
 

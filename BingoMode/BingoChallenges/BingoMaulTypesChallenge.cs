@@ -77,7 +77,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoMaulTypesChallenge ch = new();
-            ch.amount = new(UnityEngine.Random.Range(4, 10), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(2, 6), "Amount", 0);
             return ch;
         }
 

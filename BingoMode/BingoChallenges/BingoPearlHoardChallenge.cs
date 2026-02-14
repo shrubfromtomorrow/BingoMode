@@ -90,11 +90,13 @@ namespace BingoMode.BingoChallenges
             Phrase phrase = anyShelter.Value ?
                 new Phrase([[common.Value ? Icon.PEARL_HOARD_NORMAL : Icon.PEARL_HOARD_COLOR, new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("doubleshelter")]]) :
                 new Phrase([[new Icon("ShelterMarker"), common.Value ? Icon.PEARL_HOARD_NORMAL : Icon.PEARL_HOARD_COLOR]]);
-            phrase.InsertWord(new Counter(current, amount.Value), 1);
+            int lastLine = 1;
             if (region.Value != "Any Region")
             {
-                phrase.InsertWord(new Verse(region.Value), 2);
+                phrase.InsertWord(new Verse(region.Value), 1);
+                lastLine = 2;
             }
+            phrase.InsertWord(new Counter(current, amount.Value), lastLine);
             return phrase;
         }
 
@@ -121,7 +123,7 @@ namespace BingoMode.BingoChallenges
             return new BingoPearlHoardChallenge
             {
                 common = new(flag, "Common Pearls", 0),
-                amount = new(UnityEngine.Random.Range(2, 4), "Amount", 1),
+                amount = new(UnityEngine.Random.Range(1, 4), "Amount", 1),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
                 region = new(region, "Region", 3, listName: "regions"),
             };

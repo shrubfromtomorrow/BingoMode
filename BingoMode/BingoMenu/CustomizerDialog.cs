@@ -484,7 +484,7 @@ namespace BingoMode.BingoMenu
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<int>("_ChallengeSetting", i.Value, new ConfigAcceptableRange<int>(1, 500));
                     field = new OpUpdown(true, conf, pos, 60f);
                     field.OnValueUpdate += UpdootInt;
-                    label.text = i.name;
+                    label.text = ChallengeTools.IGT.Translate(i.name);
                     offSet = new Vector2(5f, -2.5f);
                 }
                 else if (value is SettingBox<string> s)
@@ -495,7 +495,7 @@ namespace BingoMode.BingoMenu
                     field.OnValueUpdate += UpdootString;
                     (field as OpComboBox).OnListOpen += FocusThing;
                     (field as OpComboBox).OnListClose += UnfocusThing;
-                    label.text = s.name;
+                    label.text = ChallengeTools.IGT.Translate(s.name);
                     offSet = new Vector2(5f, 0f);
                     randomize = new SymbolButton(menu, owner, "tinydice", "RANDOMIZE_LIST_SETTING;"+index, pos);
                     //randomize.symbolSprite.scale = 0.6f;
@@ -508,7 +508,7 @@ namespace BingoMode.BingoMenu
                     conf = MenuModList.ModButton.RainWorldDummy.config.Bind<bool>("_ChallengeSetting", b.Value, (ConfigAcceptableBase)null);
                     field = new OpCheckBox(conf as Configurable<bool>, pos);
                     field.OnValueUpdate += UpdootBool;
-                    label.text = b.name;
+                    label.text = ChallengeTools.IGT.Translate(b.name);
                     offSet = new Vector2(5f, 0f);
                 }
                 else

@@ -388,7 +388,7 @@ namespace BingoMode.BingoMenu
             lobbyName = new MenuLabel(
                     menu,
                     this,
-                    SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name"),
+                    Expedition.ChallengeTools.IGT.Translate("<hostName>'s lobby").Replace("<hostName>", SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "name")),
                     new Vector2(MARGIN, size.y - MARGIN - BIG_TEXT_HEIGHT),
                     new Vector2(size.x - 3f * MARGIN - SYMBOL_BUTTON_SIZE, BIG_TEXT_HEIGHT),
                     true);

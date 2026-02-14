@@ -17,14 +17,14 @@ namespace BingoMode.BingoChallenges
 
     public class BingoPinRandomizer : ChallengeRandomizer
     {
-        public Randomizer<int> target;
+        public Randomizer<int> amount;
         public Randomizer<string> region;
         public Randomizer<string> crit;
 
         public override Challenge Random()
         {
             BingoPinChallenge challenge = new();
-            challenge.target.Value = target.Random();
+            challenge.amount.Value = amount.Random();
             challenge.region.Value = region.Random();
             challenge.crit.Value = crit.Random();
             return challenge;
@@ -34,7 +34,7 @@ namespace BingoMode.BingoChallenges
         {
             string surindent = indent + INDENT_INCREMENT;
             StringBuilder serializedContent = new();
-            serializedContent.AppendLine($"{surindent}target-{target.Serialize(surindent)}");
+            serializedContent.AppendLine($"{surindent}amount-{amount.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}region-{region.Serialize(surindent)}");
             serializedContent.AppendLine($"{surindent}crit-{crit.Serialize(surindent)}");
             return base.Serialize(indent).Replace("__Type__", "Pin").Replace("__Content__", serializedContent.ToString());
@@ -43,7 +43,7 @@ namespace BingoMode.BingoChallenges
         public override void Deserialize(string serialized)
         {
             Dictionary<string, string> dict = ToDict(serialized);
-            target = Randomizer<int>.InitDeserialize(dict["target"]);
+            amount = Randomizer<int>.InitDeserialize(dict["amount"]);
             region = Randomizer<string>.InitDeserialize(dict["region"]);
             crit = Randomizer<string>.InitDeserialize(dict["crit"]);
         }
@@ -52,7 +52,7 @@ namespace BingoMode.BingoChallenges
     public class BingoPinChallenge : BingoChallenge
     {
         public int current;
-        public SettingBox<int> target;
+        public SettingBox<int> amount;
         public List<Creature> pinList = [];
         public List<Spear> spearList = [];
         public SettingBox<string> region;
@@ -61,7 +61,7 @@ namespace BingoMode.BingoChallenges
 
         public BingoPinChallenge()
         {
-            target = new(0, "Amount", 0);
+            amount = new(0, "Amount", 0);
             crit = new("", "Creature Type", 1, listName: "creatures");
             region = new("", "Region", 2, listName: "regions");
         }
@@ -70,7 +70,7 @@ namespace BingoMode.BingoChallenges
         {
             description = ChallengeTools.IGT.Translate("Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>")
                 .Replace("<current_pin>", current.ToString())
-                .Replace("<pin_amount>", target.Value.ToString())
+                .Replace("<pin_amount>", amount.Value.ToString())
                 .Replace("<crit>", crit.Value != "Any Creature" ? ChallengeTools.creatureNames[new CreatureType(crit.Value).Index] : ChallengeTools.IGT.Translate("creatures"))
                 .Replace("<region>", region.Value != "" ? region.Value == "Any Region" ? ChallengeTools.IGT.Translate(" in different regions") : ChallengeTools.IGT.Translate(" in ") + ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)) : "");
             base.UpdateDescription();
@@ -79,11 +79,12 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new(
-                [[new Icon("pin_creature")],
-                [new Counter(current, target.Value)]]);
+                [[new Icon("pin_creature")]]);
             if (crit.Value != "Any Creature") phrase.InsertWord(Icon.FromEntityName(crit.Value));
-            if (region.Value == "Any Region") phrase.InsertWord(new Icon("TravellerA"));
-            else phrase.InsertWord(new Verse(region.Value));
+            if (region.Value == "Any Region") phrase.InsertWord(new Icon("TravellerA"), 1);
+            else phrase.InsertWord(new Verse(region.Value), 1);
+
+            phrase.InsertWord(new Counter(current, amount.Value), 2);
             return phrase;
         }
 
@@ -120,7 +121,7 @@ namespace BingoMode.BingoChallenges
     
             return new BingoPinChallenge
             {
-                target = new(Mathf.Max(2, Mathf.FloorToInt(Random.Range(2, 7) / (r == "Any Region" ? 2f : 1f))), "Amount", 0),
+                amount = new(Mathf.Max(1, Mathf.FloorToInt(Random.Range(1, 4) / (r == "Any Region" ? 2f : 1f))), "Amount", 0),
                 crit = new(c, "Creature Type", 1, listName: "creatures"),
                 region = new(r, "Region", 2, listName: "regions"),
             };
@@ -158,12 +159,12 @@ namespace BingoMode.BingoChallenges
                     this.current++;
                     if (region.Value == "Any Region") pinRegions.Add(rr);
                     this.UpdateDescription();
-                    if (current != target.Value) ChangeValue();
+                    if (current != amount.Value) ChangeValue();
                     this.spearList.Remove(this.spearList[k]);
                     break;
                 }
             }
-            if (this.current >= this.target.Value)
+            if (this.current >= this.amount.Value)
             {
                 this.CompleteChallenge();
             }
@@ -207,7 +208,7 @@ namespace BingoMode.BingoChallenges
                 "~",
                 ValueConverter.ConvertToString(current),
                 "><",
-                target.ToString(),
+                amount.ToString(),
                 "><",
                 crit.ToString(),
                 "><",
@@ -227,7 +228,7 @@ namespace BingoMode.BingoChallenges
             {
                 string[] array = Regex.Split(args, "><");
                 current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                target = SettingBoxFromString(array[1]) as SettingBox<int>;
+                amount = SettingBoxFromString(array[1]) as SettingBox<int>;
                 crit = SettingBoxFromString(array[2]) as SettingBox<string>;
                 pinRegions = [];
                 pinRegions = [.. array[3].Split('|')];
@@ -253,6 +254,6 @@ namespace BingoMode.BingoChallenges
         {
         }
     
-        public override List<object> Settings() => [region, crit, target];
+        public override List<object> Settings() => [region, crit, amount];
     }
 }

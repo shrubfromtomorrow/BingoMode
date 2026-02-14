@@ -31,11 +31,11 @@ namespace BingoMode.BingoChallenges
         {
             _words = words;
         }
-
         public void Draw()
         {
             float scaledSpacing = SPACING * scale;
             Vector2 cursor = centerPos + new Vector2(0f, (_words.Count - 1) * scaledSpacing * 0.5f); //set cursor on first line
+
             foreach (List<Word> wordLine in _words)
             {
                 cursor.x = centerPos.x - ((wordLine.Count - 1) * scaledSpacing * 0.5f); //set cursor at beginning of line
@@ -49,6 +49,96 @@ namespace BingoMode.BingoChallenges
                 cursor.y -= scaledSpacing;
             }
         }
+
+        // Centered spacing
+        //public void Draw()
+        //{
+        //    float horizontalSpacing = 4f; // gap between icons
+        //    float verticalSpacing = 6f; // gap between lines
+
+        //    Dictionary<List<Word>, (float width, float height)> lines = new();
+
+        //    float totalHeight = 0f;
+
+        //    foreach (List<Word> wordLine in _words)
+        //    {
+        //        float lineWidth = 0f;
+        //        float lineHeight = 0f;
+
+        //        foreach (Word word in wordLine)
+        //        {
+        //            float w = WordWidth(word);
+        //            float h = WordHeight(word);
+
+        //            lineWidth += w + horizontalSpacing;
+        //            lineHeight = System.Math.Max(lineHeight, h);
+        //        }
+
+        //        if (wordLine.Count > 0)
+        //            lineWidth -= horizontalSpacing;
+
+        //        lines[wordLine] = (lineWidth, lineHeight);
+        //        totalHeight += lineHeight + verticalSpacing;
+        //    }
+
+        //    if (_words.Count > 0)
+        //        totalHeight -= verticalSpacing;
+
+
+        //    Vector2 cursor = centerPos;
+
+        //    cursor.y += totalHeight * 0.5f;
+
+        //    foreach (List<Word> wordLine in _words)
+        //    {
+        //        var (lineWidth, lineHeight) = lines[wordLine];
+
+        //        cursor.x = centerPos.x - lineWidth * 0.5f;
+
+        //        foreach (Word word in wordLine)
+        //        {
+        //            float w = WordWidth(word);
+        //            float h = WordHeight(word);
+
+        //            float yOffset = (lineHeight - h) * 0.5f;
+
+        //            Vector2 pos = new Vector2(
+        //                cursor.x + w * 0.5f,
+        //                cursor.y - yOffset - h * 0.5f
+        //            );
+
+        //            word.display.SetPosition(pos);
+        //            word.background?.SetPosition(pos);
+
+        //            cursor.x += w + horizontalSpacing;
+        //        }
+
+        //        cursor.y -= lineHeight + verticalSpacing;
+        //    }
+        //}
+
+        // Fsprites have their width in .width and Flabels have their width in .textRect.width
+        //private float WordWidth(Word word)
+        //{
+        //    if (word.display is FSprite sprite)
+        //        return sprite.width * sprite.scaleX;
+
+        //    if (word.display is FLabel label)
+        //        return label.textRect.width * label.scaleX;
+
+        //    return 0f;
+        //}
+
+        //private float WordHeight(Word word)
+        //{
+        //    if (word.display is FSprite sprite)
+        //        return sprite.height * sprite.scaleY;
+
+        //    if (word.display is FLabel label)
+        //        return label.textRect.height * label.scaleY;
+
+        //    return 0f;
+        //}
 
         /// <summary>
         /// Inserts a <c>word</c> in this Phrase on a given <c>line</c> at a given <c>index</c>.<br/>

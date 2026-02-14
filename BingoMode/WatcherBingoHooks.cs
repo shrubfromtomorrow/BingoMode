@@ -8,14 +8,16 @@ using Expedition;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using RWCustom;
 using UnityEngine;
 using Watcher;
-using RWCustom;
 
 namespace BingoMode
 {
     using BingoChallenges;
     using BingoSteamworks;
+    using IL.MoreSlugcats;
+    using static MonoMod.InlineRT.MonoModRule;
 
     public class WatcherBingoHooks
     {
@@ -60,7 +62,7 @@ namespace BingoMode
             IL.Menu.FastTravelScreen.ctor += FastTravelScreen_ctor;
             // Fix foodmeter pos for warp map
             On.Menu.SleepAndDeathScreen.FoodMeterXPos += SleepAndDeathScreen_FoodMeterXPos;
-            // Add appropriate region choices
+            // Remove vanilla Watcher regions from choice menu
             On.Menu.FastTravelScreen.SpawnChoiceMenu += FastTravelScreen_SpawnChoiceMenu;
             // Functional egg :(
             On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
@@ -86,7 +88,6 @@ namespace BingoMode
             On.Region.GetRegionLandscapeScene += Region_GetRegionLandscapeScene;
             On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
             // Watcher select screen background
-            On.Menu.MenuScene.BuildVoidBathScene += MenuScene_BuildVoidBathScene;
             On.Menu.CharacterSelectPage.UpdateSelectedSlugcat += CharacterSelectPage_UpdateSelectedSlugcat;
             // Lock everyone but washa
             //On.Expedition.ExpeditionProgression.CheckUnlocked += ExpeditionData_CheckUnlocked;
@@ -116,6 +117,16 @@ namespace BingoMode
 
             // Temp fix for warp points that are sealed near landing locations (ONLY NARNIA)
             IL.Watcher.WarpPoint.Update += WarpPoint_Update;
+            // Slideshows load existing save rather than loading new (mainly for visiting ST in bath on first cycle, thanks salty_syrup)
+            IL.Menu.SlideShow.ctor += SlideShow_ctor;
+            // Replace toys ending conditional link logic to make all waua connections open
+            On.WorldLoader.Preprocessing.SpinningTopEndingConditions += Preprocessing_SpinningTopEndingConditions;
+            // Prevent closed off toys room camera texture from being loaded on top of the toys room with all connections open ^
+            On.RoomCamera.CameraTextureSuffixManipulator += RoomCamera_CameraTextureSuffixManipulator;
+            // Prevent sawVoidBathSlideshow being set to true when seeing ST in bath to allow for continued spawns
+            IL.Watcher.SpinningTop.MarkSpinningTopEncountered += SpinningTop_MarkSpinningTopEncountered;
+            // Allow waua karma flower to spawn even while you haven't beaten ST
+            On.KarmaFlower.CanSpawnKarmaFlower += KarmaFlower_CanSpawnKarmaFlower;
         }
 
         private static void WarpPoint_Update(ILContext il)
@@ -136,6 +147,7 @@ namespace BingoMode
                     return true;
                 });
             }
+            else Plugin.logger.LogError("WarpPoint_Update FAIULRE " + il);
         }
 
         private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
@@ -331,7 +343,7 @@ namespace BingoMode
 
         private static bool ExpeditionGame_IsUndesirableRoomScript(On.Expedition.ExpeditionGame.orig_IsUndesirableRoomScript orig, UpdatableAndDeletable item)
         {
-            if (item is WatcherRoomSpecificScript.WAUA_TOYS || item is WatcherRoomSpecificScript.WAUA_BATH || item is WatcherRoomSpecificScript.WORA_AI || item is WatcherRoomSpecificScript.WORA_DESERT6 || item is WatcherRoomSpecificScript.WORA_KarmaSigils)
+            if (item is WatcherRoomSpecificScript.WAUA_TOYS || item is WatcherRoomSpecificScript.WORA_AI || item is WatcherRoomSpecificScript.WORA_DESERT6 || item is WatcherRoomSpecificScript.WORA_KarmaSigils)
             {
                 return true;
             }
@@ -408,7 +420,7 @@ namespace BingoMode
             {
                 c.EmitDelegate<Func<int, int>>((exped) =>
                 {
-                    if (exped == 8)
+                    if (ExpeditionGame.playableCharacters[exped] == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                     {
                         return 0;
                     }
@@ -437,6 +449,7 @@ namespace BingoMode
                     return exped;
                 });
             }
+
             if (c.TryGotoNext(MoveType.After,
             x => x.MatchLdcR4(110f),
             x => x.MatchLdloc(3)))
@@ -459,6 +472,7 @@ namespace BingoMode
                     return exped + 55f;
                 });
             }
+
             if (c.TryGotoNext(MoveType.After,
             x => x.MatchLdcR4(875f)))
             {
@@ -467,8 +481,9 @@ namespace BingoMode
                     return exped + 55f;
                 });
             }
+
             if (c.TryGotoNext(MoveType.After,
-           x => x.MatchLdcR4(440f)))
+            x => x.MatchLdcR4(440f)))
             {
                 c.EmitDelegate<Func<float, float>>((exped) =>
                 {
@@ -825,7 +840,7 @@ namespace BingoMode
             }
         }
 
-        public static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
+        private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, Menu.MenuScene self)
         {
             orig.Invoke(self);
 
@@ -851,11 +866,16 @@ namespace BingoMode
             self.AddIllustration(
                 new MenuIllustration(self.menu, self, "", shadowName, new Vector2(0.01f, 0.01f), true, false));
 
-            self.AddIllustration(
-                new MenuIllustration(self.menu, self, "", titleName, new Vector2(0.01f, 0.01f), true, false));
+            if (self.menu.ID == ProcessManager.ProcessID.FastTravelScreen || self.menu.ID == ProcessManager.ProcessID.RegionsOverviewScreen)
+            {
+                self.AddIllustration(
+                    new MenuIllustration(self.menu, self, "", shadowName, new Vector2(0.01f, 0.01f), true, false));
 
-            self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader =
-                self.menu.manager.rainWorld.Shaders["MenuText"];
+                self.AddIllustration(
+                    new MenuIllustration(self.menu, self, "", titleName, new Vector2(0.01f, 0.01f), true, false));
+
+                self.flatIllustrations[self.flatIllustrations.Count - 1].sprite.shader = self.menu.manager.rainWorld.Shaders["MenuText"];
+            }
         }
 
         private static void BuildSceneRegionMap()
@@ -880,41 +900,12 @@ namespace BingoMode
             }
         }
 
-        private static void MenuScene_BuildVoidBathScene(On.Menu.MenuScene.orig_BuildVoidBathScene orig, MenuScene self, int index)
-        {
-            if (BingoData.BingoMode)
-            {
-                if (index != 2)
-                {
-                    return;
-                }
-                self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "outro void bath " + index.ToString();
-                string str = "outro void bath " + index.ToString();
-                if (self.flatMode)
-                {
-                    self.useFlatCrossfades = true;
-                    self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, str + " - flat - b", new Vector2(683f, 384f), false, true));
-                }
-                else
-                {
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " background - 9", new Vector2(0f, 0f), 8f, MenuDepthIllustration.MenuShader.Normal));
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " pillars distort - 8", new Vector2(0f, 0f), 6.2f, MenuDepthIllustration.MenuShader.Normal));
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " candle row - 7", new Vector2(0f, 0f), 3.4f, MenuDepthIllustration.MenuShader.Normal));
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " big candles - 6", new Vector2(0f, 0f), 3.2f, MenuDepthIllustration.MenuShader.Normal));
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " echo remains - 2b", new Vector2(0f, 0f), 3.2f, MenuDepthIllustration.MenuShader.Basic));
-                    self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, str + " slugcat watching - 1", new Vector2(0f, 0f), 1.8f, MenuDepthIllustration.MenuShader.Normal));
-                    return;
-                }
-                return;
-            }
-            orig(self, index);
-        }
         private static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
         {
             orig(self, num);
             if (ModManager.Watcher && ExpeditionGame.playableCharacters[num] == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                self.slugcatScene = WatcherEnums.MenuSceneID.Ending_VoidBath2;
+                self.slugcatScene = BingoEnums.WatcherExpeditionBackground;
             }
         }
 
@@ -1018,6 +1009,74 @@ namespace BingoMode
             return orig();
         }
 
+        private static void SlideShow_ctor(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            FieldInfo[] relevantSlideShowIDs = [.. new string[]
+            {
+                "DreamSpinningTop",
+                "DreamRot",
+                "DreamVoidWeaver",
+                "DreamTerrace",
+                "EndingVoidBath"
+            }.Select(s => typeof(Watcher.WatcherEnums.SlideShowID).GetField(s))];
+
+            foreach (FieldInfo f in relevantSlideShowIDs)
+            {
+                c.GotoNext(x => x.MatchLdsfld(f));
+                c.GotoNext(MoveType.After, x => x.MatchStfld(typeof(Menu.SlideShow).GetField(nameof(Menu.SlideShow.processAfterSlideShow))));
+
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate(SetStartGameCondition);
+            }
+
+            static void SetStartGameCondition(Menu.SlideShow self)
+            {
+                self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load;
+            }
+        }
+
+        private static bool? Preprocessing_SpinningTopEndingConditions(On.WorldLoader.Preprocessing.orig_SpinningTopEndingConditions orig, string text, RainWorldGame game)
+        {
+            bool? result = orig(text, game);
+            if (result == null) return result;
+            if (!BingoData.BingoMode) return result;
+
+            if (text == "ToysEnding" || text == "PostBathScene")
+            {
+                return true;
+            }
+            return result;
+        }
+
+        private static string RoomCamera_CameraTextureSuffixManipulator(On.RoomCamera.orig_CameraTextureSuffixManipulator orig, RoomCamera self, string roomName, int camPos)
+        {
+            if (!BingoData.BingoMode) return orig(self, roomName, camPos);
+            return "_" + (camPos + 1).ToString() + ".png";
+        }
+
+        private static void SpinningTop_MarkSpinningTopEncountered(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchStfld(typeof(DeathPersistentSaveData).GetField(nameof(DeathPersistentSaveData.sawVoidBathSlideshow)))))
+            {
+                c.EmitDelegate<Func<bool, bool>>(originalValue =>
+                {
+                    if (BingoData.BingoMode) return false;
+                    return originalValue;
+                });
+            }
+            else Plugin.logger.LogError("SpinningTop_MarkSpinningTopEncountered FAIULRE " + il);
+        }
+
+        // Hunter stuff is probably redundant with how normal bingo touches flower generation but I just want to cut out the waua stuff so it'll be like this
+        private static bool KarmaFlower_CanSpawnKarmaFlower(On.KarmaFlower.orig_CanSpawnKarmaFlower orig, Room room)
+        {
+            if (!BingoData.BingoMode) return orig(room);
+            return room.game.StoryCharacter != SlugcatStats.Name.Red;
+        }
     }
 
     public class Perk_DialWarp : Modding.Expedition.CustomPerk

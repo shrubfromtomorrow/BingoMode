@@ -421,7 +421,7 @@ namespace BingoMode.BingoChallenges
                     List<string> mutableBase =  WinState.EndgameID.values.entries;
 
                     string[] exclusions = { "Mother", "Gourmand", "Survivor" };
-                    string[] watcherForbidPassages = { "Nomad", "Pilgrim", "Scholar", "Traveller" };
+                    string[] watcherForbidPassages = { "Nomad", "Pilgrim", "Traveller" };
 
                     mutableBase = mutableBase.Where(x => !exclusions.Contains(x)).ToList();
 

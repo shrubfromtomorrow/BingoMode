@@ -78,7 +78,7 @@ namespace BingoMode.BingoChallenges
                 .Replace("<action>", anyShelter.Value ? ChallengeTools.IGT.Translate("Bring") : ChallengeTools.IGT.Translate("Hoard"))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString<int>(this.amount.Value))
-                .Replace("<target_item>", ChallengeTools.ItemName(new(target.Value)))
+                .Replace("<target_item>", ChallengeTools.IGT.Translate(ChallengeTools.ItemName(new(target.Value))))
                 .Replace("<shelter_type>", anyShelter.Value ? ChallengeTools.IGT.Translate("to any") : ChallengeTools.IGT.Translate("in the same"))
                 .Replace("<location>", location != "" ? ChallengeTools.IGT.Translate("in ") + location : "");
             base.UpdateDescription();
@@ -121,7 +121,7 @@ namespace BingoMode.BingoChallenges
         {
             return new BingoItemHoardChallenge
             {
-                amount = new((int)Mathf.Lerp(2f, 8f, UnityEngine.Random.value), "Amount", 0),
+                amount = new(UnityEngine.Random.Range(1, 5), "Amount", 0),
                 target = new(ChallengeUtils.GetCorrectListForChallenge("expobject")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("expobject").Length)], "Item", 1, listName: "expobject"),
                 anyShelter = new(UnityEngine.Random.value < 0.5f, "Any Shelter", 2),
                 region = new("Any Region", "Region", 4, listName: "regions"),

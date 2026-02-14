@@ -73,7 +73,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoSaintPopcornChallenge ch = new();
-            ch.amount = new(UnityEngine.Random.Range(2, 10), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 7), "Amount", 0);
             return ch;
         }
 

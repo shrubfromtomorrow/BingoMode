@@ -1,13 +1,14 @@
-﻿using BingoMode.BingoRandomizer;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using BingoMode.BingoRandomizer;
 using BingoMode.BingoSteamworks;
 using Expedition;
 using Menu.Remix;
 using On.Watcher;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
 
@@ -84,12 +85,13 @@ namespace BingoMode.BingoChallenges
                 ChallengeTools.CreatureName(ref ChallengeTools.creatureNames);
             }
             string location = region.Value != "Any Region" ? ChallengeTools.IGT.Translate(Region.GetRegionFullName(region.Value, ExpeditionData.slugcatPlayer)) : "";
-            this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times<location>" + ChallengeTools.IGT.Translate(inOneCycle.Value ? " in one cycle" : ""))
+            this.description = ChallengeTools.IGT.Translate("Hit <crit> with <weapon> [<current>/<amount>] times<location><onecycle>")
                 .Replace("<crit>", victim.Value == "Any Creature" ? ChallengeTools.IGT.Translate("creatures") : ChallengeTools.creatureNames[new CreatureType(victim.Value, false).Index])
                 .Replace("<location>", location != "" ? ChallengeTools.IGT.Translate(" in ") + location : "")
                 .Replace("<weapon>", ChallengeTools.ItemName(new(weapon.Value)))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
-                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value));
+                .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
+                .Replace("<onecycle>", inOneCycle.Value ? ChallengeTools.IGT.Translate(" in one cycle") : "");
             base.UpdateDescription();
         }
 
@@ -126,7 +128,6 @@ namespace BingoMode.BingoChallenges
             List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[ExpeditionData.slugcatPlayer.value];
             bool oneCycle = UnityEngine.Random.value < 0.33f;
 
-            // watcher touches this
             string wep = ChallengeUtils.GetCorrectListForChallenge("weapons")[UnityEngine.Random.Range(1, ChallengeUtils.GetCorrectListForChallenge("weapons").Length)];
 
             string crit;
@@ -135,8 +136,14 @@ namespace BingoMode.BingoChallenges
                 crit = "Any Creature";
                 if (wep == "Any Weapon") wep = ChallengeUtils.GetCorrectListForChallenge("weapons")[UnityEngine.Random.Range(1, ChallengeUtils.GetCorrectListForChallenge("weapons").Length)];
             }
-            else crit = randoe[UnityEngine.Random.Range(0, randoe.Count)].creature.value;
-            int amound = UnityEngine.Random.Range(2, 7);
+            else
+            {
+                List<ChallengeTools.ExpeditionCreature> valid = randoe.Where(x => x.creature.value != "Frog").ToList();
+
+                if (valid.Count > 0) crit = valid[UnityEngine.Random.Range(0, valid.Count)].creature.value;
+                else crit = "Frog";
+            }
+            int amound = UnityEngine.Random.Range(1, 5);
 
             return new BingoDamageChallenge
             {

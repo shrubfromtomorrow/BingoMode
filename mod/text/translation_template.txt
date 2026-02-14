@@ -1,0 +1,514 @@
+// ========================================
+// CREATURE TYPES
+// ========================================
+MothGrub|
+Barnacle|
+SandGrub|
+SkyWhale|
+RotLoach|
+RippleSpider|
+IndigoLizard|
+GrappleSnake|
+PeachLizard|
+BigSandGrub|
+AltSkyWhale|
+DrillCrab|
+SmallMoth|
+Millipede|
+FireSprite|
+Tardigrade|
+ScavengerTemplar|
+Frog|
+Rat|
+Angler|
+Loach|
+BigMoth|
+BoxWorm|
+Rattler|
+ScavengerDisciple|
+BlizzardLizard|
+BasiliskLizard|
+ScavengerKing|
+StowawayBug|
+JungleLeech|
+EelLizard|
+AquaCenti|
+Inspector|
+Yeek|
+FireBug|
+SlugNPC|
+MirosVulture|
+MotherSpider|
+SpitLizard|
+ZoopLizard|
+TerrorLongLegs|
+ScavengerElite|
+BigJelly|
+Spider|
+BigEel|
+EggBug|
+GreenLizard|
+WhiteLizard|
+BlackLizard|
+GarbageWorm|
+TempleGuard|
+VultureGrub|
+KingVulture|
+SmallCentipede|
+YellowLizard|
+LanternMouse|
+RedCentipede|
+BrotherLongLegs|
+SmallNeedleWorm|
+Fly|
+RedLizard|
+PoleMimic|
+MirosBird|
+Centipede|
+Centiwing|
+Scavenger|
+BigSpider|
+PinkLizard|
+BlueLizard|
+Salamander|
+CyanLizard|
+Leech|
+Snail|
+Hazer|
+SeaLeech|
+TubeWorm|
+Overseer|
+DaddyLongLegs|
+TentaclePlant|
+SpitterSpider|
+BigNeedleWorm|
+Slugcat|
+Vulture|
+CicadaA|
+CicadaB|
+JetFish|
+DropBug|
+Deer|
+
+// ========================================
+// OBJECT TYPES
+// ========================================
+Pomegranate|
+GraffitiBomb|
+FireSpriteLarva|
+Boomerang|
+SingularityBomb|
+JokeRifle|
+GooieDuck|
+LillyPuck|
+MoonCloak|
+DandelionPeach|
+GlowWeed|
+EnergyCell|
+FireEgg|
+Seed|
+PuffBall|
+WaterNut|
+Mushroom|
+ScavengerBomb|
+FirecrackerPlant|
+Spear|
+VultureMask|
+DangleFruit|
+KarmaFlower|
+BubbleGrass|
+SeedCob|
+Lantern|
+FlyLure|
+SporePlant|
+NSHSwarmer|
+SLOracleSwarmer|
+SSOracleSwarmer|
+OverseerCarcass|
+FlareBomb|
+DataPearl|
+JellyFish|
+SlimeMold|
+EggBugEgg|
+NeedleEgg|
+Rock|
+
+// ========================================
+// PREPOSITIONS & CONNECTORS
+// ========================================
+ and then pass it|
+ and then pass them|
+Bring|
+ from|
+Hoard|
+ in|
+  in |
+ in different regions|
+in different regions|
+ in one cycle|
+in one cycle|
+in the same|
+ surface|
+ out of|
+ to|
+to any|
+ underground|
+ while starving|
+ while under mushroom effect|
+ with|
+ with a death pit|
+while starving|
+
+// ========================================
+// UI MESSAGES & NOTIFICATIONS
+// ========================================
+<LINE>Completed by: |
+<LINE>Failed by:|
+<LINE>Save the game to Complete|
+Click on a challenge type to block it from generating|
+End Session|
+Exit the game and abandon the save or wait for host to end the session.|
+Game concluded!|
+Number of challenges completed for each team: |
+Number of challenges completed: |
+Please paste a board from the same slugcat that's currently selected.|
+Press the button in the bingo HUD or abandon the save to end the bingo session.|
+Press the button in the bingo HUD to end the bingo session for everyone.|
+Provided Slugcat: |
+Selected slugcat: |
+Slugcat mismatch!<LINE><LINE>|
+Tally up|
+Team <team_name> won!|
+We have a tie!|
+You feel the presence of a vista . . .|
+You won!|
+
+// ========================================
+// MENU & INTERFACE
+// ========================================
+<hostName>'s lobby|
+Allowed |
+AVAILABLE: |
+BACK|
+BEGIN|
+Bingo |
+Bingo - Scheming|
+BINGO|
+Blackout |
+Board view|
+Burdens:|
+Burdens: |
+CANCEL|
+Cannot reconnect to host.|
+CLOSE|
+CONFIGURE<LINE>PERKS & BURDENS|
+CONTINUE<LINE>BINGO|
+CONTINUE<LINE>MULTIPLAYER|
+CONTINUE<LINE>SPECTATING|
+Copy board|
+CREATE|
+CREDITS|
+Disabled |Desactivado 
+Friends only: |
+Friends only: No|
+Friends only: Yes|
+Game mode:|
+Game mode: |
+Host decides 
+I'M<LINE>READY|
+I'M NOT<LINE>READY|
+JOIN|
+Kick|
+Leave Lobby|
+  Lockout  <LINE> (no ties)  |
+   Lockout <LINE> (ties)    |
+Lost connection to host.|
+MANUAL|
+Max Players: |
+Mod version: |
+Multiplayer|
+No|
+Not all players are ready !|
+Now Playing:|
+PASSAGE|
+Paste board|
+Perks:|
+Perks: |
+PLAY<LINE>BINGO|
+Please enter the expedition menu to accept an invite.|
+Profiles|
+Refresh|
+Require host's mods: |
+Shelter: |
+Slugcat: |
+The shelter players start in. Please type in a valid shelter's room name (CASE SENSITIVE), or 'random'|
+Trying to reconnect to the host.|
+unloaded|
+Yes|
+You've been kicked from the lobby.|
+
+// ========================================
+// REMIX
+// ========================================
+-  Controller 1|
+-  Keyboard|
+Bingo Config|
+Bingo Mode Config|
+Bingo Mode Gameplay Config|
+Black|
+Blue|
+Cyan|
+Dial Warp|
+Dial Warp (Ripple Egg Warp) is unlocked from the start. <LINE>Watcher Exclusive|
+Discord Rich Presence:|
+Fill icon sprites:|
+Fill the crosses and arrows on certain goals|
+Gameplay|
+Green|
+Hurricane|
+Main|
+Open Bingo HUD keybind:|
+Orange|
+Pink|
+Play custom music in bingo menu:|
+Play custom music when game ends:|
+Play custom music when your team is losing:|
+Quick reset keybind:|
+Red|
+Reset a Bingo/Expedition save instantly|
+Ripple eggs required for dial warp:|
+Show Bingo as your Discord activity (restart to take effect)|
+Show tutorials:|
+Singleplayer team color:|
+Start with the Dial Warp perk fully charged:|
+Use map input instead:|
+Which button opens/closes the Bingo grid in game|
+Which team's color to use in singleplayer|
+1:1 spectator board:|
+
+// ========================================
+// ARENA & SAFARI TYPES
+// ========================================
+<region> Arenas
+<region> Safari|
+Safari|
+Arenas|
+Filtration System Arenas|
+Gutter Arenas|
+Past Garbage Wastes|
+
+// ========================================
+// PEARL COLORS
+// ========================================
+Light Blue|
+Pale Green|
+Deep Magenta|
+Bright Red|
+Deep Pink|
+Pale Yellow|
+Bright Magenta|
+Bright Purple|
+Bright Green|
+Viridian|
+Gold|
+Bright Blue|
+Teal|
+Dark Magenta|
+Dark Blue|
+Dark Green|
+Dark Purple|
+Olive Green|
+Deep Purple|
+Light Purple|
+Light Yellow|
+Deep Green|
+Bronze|
+Light Pink|
+Dull Yellow|
+Pink|
+audio|
+Dark Teal|
+Bright Viridian|
+Pale Pink|
+Beige|
+Amber|
+Pale Viridian|
+Light Green|
+Orange|
+Light Magenta|
+Erm, pearl colored pearl|
+
+
+
+// ========================================
+// CHALLENGUE CONFIG
+// ========================================
+Amount|
+Amount of Items|
+Amount of Neurons|
+Any Region|
+Any Shelter|
+Any Weapon|
+At once|
+Broadcast|
+Common Pearls|
+Creature Type|
+Deliver|
+Different Regions|
+Food type|
+From|
+From Region|
+From Scavenger Toll|
+In One Cycle|
+In one Cycle|
+Item|
+Item to Craft|
+Item type|
+Looks to the Moon|
+Passage|
+Pass the Toll|
+Pearl|
+Pearl from Region|
+Portal Room|
+Region|
+Room|
+Scavenger Toll|
+Specific Creature Type|
+Specific Echo|
+Specific location|
+Specific Pearl|
+Specific toll|
+Target Score|
+To|
+To Region|
+Unlock|
+Value|
+Via a Death Pit|
+Weapon|
+Weapon Used|
+While Starving|
+While under mushroom effect|
+
+// ========================================
+// CHALLENGE CATEGORY NAMES
+// ========================================
+Avoiding a region|
+Avoiding death before completing challenges|
+Avoiding giving Needles to Scavengers|
+Avoiding items|
+Avoiding killing creatures|
+Befriending creatures|
+Collecting arena unlocks|
+Collecting broadcasts|
+Collecting or delivering Moon's cloak|
+Collecting pearls|
+Collecting ripplespawn eggs|
+Collecting vistas|
+Consuming karma flowers|
+Crafting items|
+Crushing creatures|
+Delivering colored pearls|
+Delivering neurons|
+Delivering the green neuron|
+Delivering the music pearl to Five Pebbles|
+Dodging a Leviathan|
+Dodging Noodlefly attacks|
+Dropping a creature in the depth pit|
+Eating popcorn plant seeds|
+Eating specific food|
+Entering a region|
+Entering a region from another region|
+Entering regions without visiting one|
+Feeding the Rarefaction Cell to a Leviathan|
+Getting licked by lizards|
+Hatching Moth Grubs|
+Hatching Noodlefly eggs|
+Hitting creatures with items|
+Killing creatures|
+Mauling creatures a certain amount of times|
+Mauling different types of creatures|
+Obtaining passages|
+Opening pomegranates|
+Opening popcorn plants|
+Pinning creatures|
+Putting items in shelters|
+Putting pearls in shelters|
+Scoring points|
+Stealing items|
+Throwing grenades at scavenger tolls|
+Trading items to merchants|
+Trading same items between merchants|
+Transporting creatures|
+Transporting the same creature through gates|
+Transporting the same creature through portals|
+Visiting echoes|
+Visiting iterators|
+Visiting Spinning Top|
+Visiting The Prince|
+Visiting The Weaver|
+
+// ========================================
+// CHALLENGE DESCRIPTIONS (with variables)
+// ========================================
+[<current>/<amount>] unique tolls|
+<action> [<current>/<amount>] <target_item> <shelter_type> shelter <location>|
+Befriend [<current>/<amount>] <crit>|
+Befriend [<current>/<amount>] unique creature types|
+Collect [<current>/<amount>] colored pearls|
+Collect [<current>/<amount>] ripplespawn eggs <onecycle>|
+Collect Moon's Cloak|
+Collect the <chatlog> broadcast|
+Collect the <pearl> pearl from <region>|
+Collect the <unlock> unlock|
+Collect the vista in <region_name>|
+Consume [<current>/<amount>] Karma Flowers <region> <onecycle>|
+Craft [<current>/<amount>] <item>|
+Crush [<current>/<amount>] unique creatures by falling|
+Deliver <progress> neurons to Looks to the Moon|
+Deliver the <region> colored pearl to <iterator>|
+Deliver the Cloak to Moon|
+Deliver the music pearl to Five Pebbles|
+Do not die before completing [<current>/<amount>] bingo challenges|
+Do not enter <region>|
+Do not gift Needles to Scavengers|
+Dodge [<current>/<amount>] Noodlefly attacks|
+Dodge a Leviathan's bite|
+Drop a <crit> into the depths drop room (SB_D06)|
+Earn [<current_score>/<score_target>] points from creature kills <onecycle>|
+Earn <achievement_name> passage|
+Eat [<current>/<amount>] <food_type> <starved>|
+Eat [<current>/<amount>] popcorn plant seeds|
+Enter <region>|
+Enter [<current>/<required>] regions without entering <region>|
+Feed the Rarefaction Cell to a Leviathan (completes if you die)|
+First time entering <to> must be from <from>|
+Get licked by [<current>/<amount>] unique lizards|
+Hatch [<current>/<amount>] Moth Grubs <onecycle>|
+Hatch [<current>/<amount>] Noodlefly eggs <region> <onecycle>|
+Hit <crit> with <weapon> [<current>/<amount>] times<location><onecycle>|
+Kill [<current>/<amount>] <crit><location><pitorweapon><starving><onecycle><shrooms>|
+Maul [<current>/<amount>] unique creature types|
+Maul creatures [<current>/<amount>] times|
+Never eat <item>|
+Never kill <victim>|
+Never use <item>|
+Open [<current>/<amount>] pomegranates <region> <onecycle>|
+Open [<current>/<amount>] popcorn plants<region><onecycle>|
+Pin [<current_pin>/<pin_amount>] <crit> to walls or floors<region>|
+Steal [<current>/<amount>] <item> from a Scavenger toll|
+Steal [<current>/<amount>] <item> from Scavengers|
+the <toll> toll|
+Throw <action> at <toll><pass>|
+Trade [<current>/<amount>] worth of value to Scavenger Merchants|
+Trade [<current>/<amount>] item from Scavenger Merchants to other Scavenger Merchants|
+Trade [<current>/<amount>] items from Scavenger Merchants to other Scavenger Merchants|
+Transport a <crit><from><to>|
+Transport the same <crit> through [<current>/<amount>] gates|
+Transport the same <crit> through [<current>/<amount>] portals|
+Visit <iterator>|
+Visit Spinning Top in <location> while starving|
+Visit Spinning Top in <location>|
+Visit Spinning Top <amount> times while starving|
+Visit Spinning Top <amount> times|
+Visit The Prince|
+Visit The Weaver in <region>|

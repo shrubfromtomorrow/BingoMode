@@ -104,7 +104,7 @@ namespace BingoMode.BingoChallenges
             {
                 specific = new SettingBox<bool>(specific, "Specific Creature Type", 0),
                 crit = new(crug, "Creature Type", 1, listName: "friend"),
-                amount = new(UnityEngine.Random.Range(2, 7), "Amount", 2),
+                amount = new(UnityEngine.Random.Range(1, 4), "Amount", 2),
                 tamedTypes = [],
                 tamedIDs = []
             };

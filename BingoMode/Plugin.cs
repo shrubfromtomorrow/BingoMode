@@ -67,11 +67,7 @@ namespace BingoMode
         public void Update()
         {
             if (_bingoConfig == null || _bingoConfig.UseMapInput.Value) return;
-            if (Input.anyKeyDown && (Input.GetKeyDown(_bingoConfig.HUDKeybindKeyboard.Value) || 
-                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC1.Value) ||
-                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC2.Value) ||
-                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC3.Value) ||
-                                    Input.GetKeyDown(_bingoConfig.HUDKeybindC4.Value)))
+            if (Input.anyKeyDown && (Input.GetKeyDown(_bingoConfig.HUDKeybindKeyboard.Value) || Input.GetKeyDown(_bingoConfig.HUDKeybindC1.Value)))
             {
                 BingoHUDMain.Toggled = !BingoHUDMain.Toggled;
             }

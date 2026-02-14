@@ -85,12 +85,8 @@ namespace BingoMode.BingoChallenges
                         {
                             if (!room.physicalObjects[j][k].slatedForDeletetion && room.physicalObjects[j][k] is BigEel levi && levi.jawCharge > 0f && levi.InBiteArea(player.bodyChunks[1].pos, 10f))
                             {
-                                if (levi.InBiteArea(player.bodyChunks[1].pos, 10f))
-                                {
-                                    CompleteChallenge();
-                                    return;
-                                    //wasInArea = 100;
-                                }
+                                CompleteChallenge();
+                                return;
                             }
                         }
                     }

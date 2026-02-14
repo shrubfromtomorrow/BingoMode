@@ -60,7 +60,7 @@ namespace BingoMode.BingoChallenges
         {
             return new Phrase(
                 [[new Verse(region.Value), Icon.DATA_PEARL],
-                [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90)],
+                [new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 180)],
                 [ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer ? Icon.PEBBLES : Icon.MOON]]);
         }
 

@@ -160,7 +160,7 @@ namespace BingoMode.BingoChallenges
             };
             chal.pearl = new(p, "Pearl", 1, listName: "pearls");
             chal.region = Regex.Split(p, "_")[0];
-            chal.amount = new(UnityEngine.Random.Range(2, 7), "Amount", 3);
+            chal.amount = new(UnityEngine.Random.Range(1, 5), "Amount", 3);
 
             return chal;
         }

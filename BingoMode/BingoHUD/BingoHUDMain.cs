@@ -299,12 +299,11 @@ namespace BingoMode.BingoHUD
                         return GetBlackoutCompleteInfo(teamsInBingo, isMultiplayer, addText, songAlreadyPlayed, doDangerMusic);
                 }
             }
-            else // Singleplayer only has a one bingo win condition
+            else // Default to blackout for win
             {
-                if (BingoHooks.GlobalBoard.CheckWin(SteamTest.team))
+                if (GetBlackoutCompleteInfo([SteamTest.team], isMultiplayer, addText, true, doDangerMusic) is BingoCompleteInfo info)
                 {
-                    
-                    return new BingoCompleteInfo([SteamTest.team], ChallengeTools.IGT.Translate("You won!"), addText, BingoCompleteReason.Bingo);
+                    return info;
                 }
             }
 
@@ -695,7 +694,7 @@ namespace BingoMode.BingoHUD
 
             cursor.Update();
 
-            Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f, hud.rainWorld.screenSize.y * 0.5f - 35f) : new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
+            Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f + 0.01f, hud.rainWorld.screenSize.y * 0.5f - 35f + 0.01f) : new(hud.rainWorld.screenSize.x * 0.16f + 0.01f, hud.rainWorld.screenSize.y * 0.715f + 0.01f);
             int activeButts = 0;
             foreach (var butt in hudButtons)
             {
@@ -829,9 +828,9 @@ namespace BingoMode.BingoHUD
             {
                 for (int i = 0; i < grid.GetLength(0); i++)
                 {
-                    float size = (BingoData.SpectatorMode ? 475f : 420f) / board.size;
+                    float size = ((BingoData.SpectatorMode && !Plugin.PluginInstance.BingoConfig.OneToOneSpecBoard.Value) ? 475f : 420f) / board.size;
                     float topLeft = -size * board.size / 2f;
-                    Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f, hud.rainWorld.screenSize.y * 0.5f - 35f) : new(hud.rainWorld.screenSize.x * 0.16f, hud.rainWorld.screenSize.y * 0.715f);
+                    Vector2 center = BingoData.SpectatorMode ? new(hud.rainWorld.screenSize.x * 0.5f - 15f + 0.01f, hud.rainWorld.screenSize.y * 0.5f - 35f + 0.01f) : new(hud.rainWorld.screenSize.x * 0.16f + 0.01f, hud.rainWorld.screenSize.y * 0.715f + 0.01f);
                     grid[i, j] = new BingoInfo(hud, this,
                         center + new Vector2(topLeft + i * size + (i * size * 0.075f) + size / 2f, -topLeft - j * size - (j * size * 0.075f) - size / 2f), size, hud.fContainers[0], board.challengeGrid[i, j], i, j);
                 }
@@ -859,7 +858,7 @@ namespace BingoMode.BingoHUD
             if (bingoCompleteTitle.element == watcherTitle && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
                 bingoCompleteTitle.element = normalTitle;
-                bingoCompleteTitle.shader = Custom.rainWorld.Shaders["MenuText"]; ;
+                bingoCompleteTitle.shader = Custom.rainWorld.Shaders["MenuText"];
             }
             if (bingoCompleteTitle.element == normalTitle && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {

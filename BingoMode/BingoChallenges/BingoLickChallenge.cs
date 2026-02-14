@@ -76,7 +76,7 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             BingoLickChallenge ch = new();
-            ch.amount = new(UnityEngine.Random.Range(2, 8), "Amount", 0);
+            ch.amount = new(UnityEngine.Random.Range(1, 6), "Amount", 0);
             return ch;
         }
 

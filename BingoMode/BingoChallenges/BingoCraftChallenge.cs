@@ -57,7 +57,9 @@ namespace BingoMode.BingoChallenges
 
         public override void UpdateDescription()
         {
-            this.description = ChallengeTools.IGT.Translate($"Craft [{current}/{amount.Value}] <item>")
+            this.description = ChallengeTools.IGT.Translate($"Craft [<current>/<amount>] <item>")
+                .Replace("<current>", current.ToString())
+                .Replace("<amount>", amount.Value.ToString())
                 .Replace("<item>", ChallengeTools.ItemName(new(craftee.Value)));
             base.UpdateDescription();
         }
@@ -81,7 +83,7 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            int thingies = UnityEngine.Random.Range(2, 6);
+            int thingies = UnityEngine.Random.Range(1, 5);
             return new BingoCraftChallenge
             {
                 craftee = new(ChallengeUtils.GetCorrectListForChallenge("craft")[UnityEngine.Random.Range(0, ChallengeUtils.GetCorrectListForChallenge("craft").Length)], "Item to Craft", 0, listName: "craft"),

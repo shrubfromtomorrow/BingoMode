@@ -66,7 +66,7 @@ namespace BingoMode.BingoChallenges
             string[] crits = ChallengeUtils.GetCorrectListForChallenge("transport");
             return new WatcherBingoCreaturePortalChallenge
             {
-                amount = new(UnityEngine.Random.Range(2, 5), "Amount", 0),
+                amount = new(UnityEngine.Random.Range(1, 4), "Amount", 0),
                 crit = new(crits[UnityEngine.Random.Range(0, crits.Length)], "Creature Type", 1, listName: "transport")
             };
         }

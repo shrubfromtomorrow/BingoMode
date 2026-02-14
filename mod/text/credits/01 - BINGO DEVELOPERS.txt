@@ -1,17 +1,32 @@
 Mod Developers:
 
-Mod creation
+Mod creation -
 Nacu
 
-Mod Direction
+Mod development -
+shrub
+
+Mod Direction -
 ICED
 
-Mod art
+Mod art -
 Nacu
 Saren
+shrub
+AnnoyingFlower
 
-Music
+Music -
 Intikus
 
-Supplementary mod website
+Translation -
+Global translation template -
+Seko
+
+Spanish -
+Seko
+
+Korean -
+Karnellon
+
+Supplementary mod website -
 T3sl4co1l

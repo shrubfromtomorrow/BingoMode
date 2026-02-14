@@ -29,7 +29,7 @@ ViviTheQueen
 Skefir
 Medli
 Sigma
-Shrub
+shrub
 Pixel
 Regon
 Spinach
