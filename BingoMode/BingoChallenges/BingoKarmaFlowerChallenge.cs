@@ -247,19 +247,14 @@ namespace BingoMode.BingoChallenges
         public override void AddHooks()
         {
             On.Player.ObjectEaten += Player_ObjectEatenKarmaFlower;
-            IL.Room.Loaded += Room_LoadedKarmaFlower;
             On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
-            placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
-
             IL.Player.FoodInRoom_Room_bool += Player_FoodInRoom_Room_bool;
         }
 
         public override void RemoveHooks()
         {
             On.Player.ObjectEaten -= Player_ObjectEatenKarmaFlower;
-            IL.Room.Loaded -= Room_LoadedKarmaFlower;
             On.Spear.HitSomethingWithoutStopping -= Spear_HitSomethingWithoutStopping;
-            placeKarmaFlowerHook?.Dispose();
             IL.Player.FoodInRoom_Room_bool -= Player_FoodInRoom_Room_bool;
         }
 

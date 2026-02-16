@@ -151,7 +151,7 @@ namespace BingoMode.BingoChallenges
                 victim = new(crit, "Creature Type", 1, listName: "creatures"),
                 amount = new(amound, "Amount", 2),
                 inOneCycle = new(oneCycle, "In One Cycle", 3),
-                region = new("Any Region", "Region", 5, listName: "regions"),
+                region = new("Any Region", "Region", 4, listName: "regions"),
                 frogsThrown = []
             };
         }

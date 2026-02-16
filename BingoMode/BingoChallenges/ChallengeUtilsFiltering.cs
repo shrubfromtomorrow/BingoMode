@@ -185,6 +185,7 @@ namespace BingoMode.BingoChallenges
                     string[] watcherItems = { "Boomerang", "GraffitiBomb" };
                     string[] watcherForbid = { "GooieDuck", "GlowWeed" };
                     string[] mscItems = { "GooieDuck", "GlowWeed", "LillyPuck" };
+                    string[] hunterForbid = { "KarmaFlower" };
 
                     if (slug != watchername)
                     {
@@ -194,6 +195,7 @@ namespace BingoMode.BingoChallenges
                         {
                             mutableBase = mutableBase.Where(x => !mscItems.Contains(x)).ToList();
                         }
+                        if (slug == huntername) mutableBase = mutableBase.Where(x => !hunterForbid.Contains(x)).ToList();
                     }
                     else
                     {
@@ -436,6 +438,7 @@ namespace BingoMode.BingoChallenges
                 {
                     string[] watcherItems = { "Boomerang", "GraffitiBomb", "FireSpriteLarva" };
                     string[] mscItems = { "GooieDuck", "LillyPuck", "DandelionPeach" };
+                    string[] hunterForbid = { "KarmaFlower" };
 
 
                     return baseList
@@ -443,6 +446,8 @@ namespace BingoMode.BingoChallenges
                             (ModManager.MSC || !mscItems.Contains(x))
 
                             && (slug == watchername || !watcherItems.Contains(x))
+
+                            && (slug != huntername || !hunterForbid.Contains(x))
 
                             && !(ModManager.MSC &&
                                  (slug == artiname || slug == spearname) &&

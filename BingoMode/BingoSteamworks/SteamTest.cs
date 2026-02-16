@@ -305,7 +305,7 @@ namespace BingoMode.BingoSteamworks
             CurrentLobby = lobbyID;
             string hostName = SteamFriends.GetPersonaName();
             SteamMatchmaking.SetLobbyData(lobbyID, "mode", "BingoMode");
-            SteamMatchmaking.SetLobbyData(lobbyID, "name", $"{hostName}'s lobby");
+            SteamMatchmaking.SetLobbyData(lobbyID, "name", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "isHost", hostName);
             SteamMatchmaking.SetLobbyData(lobbyID, "hostID", selfIdentity.GetSteamID64().ToString());
             SteamMatchmaking.SetLobbyData(lobbyID, "slugcat", ExpeditionData.slugcatPlayer.value);

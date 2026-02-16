@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Reflection;
 using BingoMode.BingoChallenges.WatcherBingoChallenges;
 using BingoMode.BingoSteamworks;
 using Expedition;
@@ -161,6 +162,10 @@ namespace BingoMode.BingoChallenges
             // No need for unlocked slugs
             IL.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawnsIL;
             On.Expedition.ChallengeTools.ParseCreatureSpawns += ChallengeTools_ParseCreatureSpawns;
+
+            // Many challenges use this and I want to make it general purpose
+            IL.Room.Loaded += Room_LoadedKarmaFlower;
+            placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
         }
 
         public static bool Scavenger_GrabTrade(On.Scavenger.orig_Grab orig, Scavenger self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
@@ -626,7 +631,13 @@ namespace BingoMode.BingoChallenges
                 c.EmitDelegate<Func<bool, bool>>((orig) =>
                 {
                     //if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig;
-                    return false;
+                    if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge || 
+                        (x is BingoItemHoardChallenge c && c.target.Value == "KarmaFlower") ||
+                        (x is BingoCraftChallenge c2 && c2.craftee.Value == "KarmaFlower") ||
+                        (x is BingoStealChallenge c3 && c3.subject.Value == "KarmaFlower"))) {
+                        return false;
+                    }
+                    return orig;
                 });
             }
             else Plugin.logger.LogError("Room_LoadedKarmaFlower FAILURE " + il);
@@ -1533,7 +1544,14 @@ namespace BingoMode.BingoChallenges
         // false prevents a death flower from spawning
         public static bool Player_PlaceKarmaFlower_get(orig_PlaceKarmaFlower orig, Player self)
         {
-            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge c && (c.TeamsCompleted[SteamTest.team] || c.completed))) return orig.Invoke(self);
+            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge ||
+                        (x is BingoItemHoardChallenge c && c.target.Value == "KarmaFlower" && (c.TeamsCompleted[SteamTest.team] || c.completed)) ||
+                        (x is BingoCraftChallenge c2 && c2.craftee.Value == "KarmaFlower" && (c2.TeamsCompleted[SteamTest.team] || c2.completed)) ||
+                        (x is BingoStealChallenge c3 && c3.subject.Value == "KarmaFlower" && (c3.TeamsCompleted[SteamTest.team] || c3.completed))))
+            {
+                return orig.Invoke(self);
+            }
+            
             return false;
         }
 

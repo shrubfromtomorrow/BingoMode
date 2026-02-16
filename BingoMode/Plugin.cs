@@ -25,10 +25,11 @@ namespace BingoMode
     using BingoHUD;
     using BingoSteamworks;
 
-    [BepInPlugin("nacu_shrub.bingomode", "Bingo", VERSION)]
+    [BepInPlugin(ID, "Bingo", VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "2.0";
+        public const string VERSION = "2.01";
+        public const string ID = "nacu_shrub.bingomode";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;
@@ -102,7 +103,7 @@ namespace BingoMode
                 // Timeline fix
                 IL.MainLoopProcess.RawUpdate += MainLoopProcess_RawUpdate;
 
-                MachineConnector.SetRegisteredOI("nacu_shrub.bingomode", PluginInstance.BingoConfig);
+                MachineConnector.SetRegisteredOI(ID, PluginInstance.BingoConfig);
             }
         }
 
